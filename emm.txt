@@ -1,0 +1,6 @@
+"emm"
+{
+	"base" "base"
+	"title"	"Extended Movement Mod"
+	"menusystem" "1"
+}

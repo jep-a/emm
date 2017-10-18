@@ -1,0 +1,3 @@
+EMM.Include {
+	"core/gamemode"
+}
