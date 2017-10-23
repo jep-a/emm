@@ -65,6 +65,10 @@ hook.Add("PlayerDeath", "NetworkPlayerDeath", function (ply, infl, att)
 	net.Broadcast()
 end)
 
+hook.Add("PlayerDeath", "DeathTime", function (ply)
+	ply.last_death_time = CurTime()
+end)
+
 hook.Add("PlayerDeath", "FreezeMovement", function (ply)
 	ply:FreezeMovement()
 end)
@@ -74,10 +78,6 @@ hook.Add("PostPlayerDeath", "NetworkPostPlayerDeath", function (ply)
 	net.Start("PostPlayerDeath")
 	net.WriteEntity(ply)
 	net.Broadcast()
-end)
-
-hook.Add("PostPlayerDeath", "SetDeathTime", function (ply)
-	ply.last_death_time = CurTime()
 end)
 
 hook.Add("PlayerDeathThink", "Respawn", function (ply)
