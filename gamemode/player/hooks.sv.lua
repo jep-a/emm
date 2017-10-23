@@ -69,6 +69,10 @@ hook.Add("PlayerDeath", "DeathTime", function (ply)
 	ply.last_death_time = CurTime()
 end)
 
+hook.Add("PlayerSilentDeath", "SilentDeathTime", function (ply)
+	ply.last_death_time = CurTime()
+end)
+
 hook.Add("PlayerDeath", "FreezeMovement", function (ply)
 	ply:FreezeMovement()
 end)
