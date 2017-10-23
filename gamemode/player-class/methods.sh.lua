@@ -1,6 +1,7 @@
 local player_metatable = FindMetaTable("Player")
 
-local ent_get_table = FindMetaTable("Entity").GetTable
+local ent_metatable =  FindMetaTable("Entity")
+local ent_get_table = ent_metatable.GetTable
 function player_metatable:__index(key)
 	local tab = ent_get_table(self)
 
@@ -19,7 +20,7 @@ function player_metatable:__index(key)
 		return ply_mt_val
 	end
 
-	local ent_mt_val = entity_metatable[key]
+	local ent_mt_val = ent_metatable[key]
 	if not (ent_mt_val == nil) then
 		return ent_mt_val
 	end
