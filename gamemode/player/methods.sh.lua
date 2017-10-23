@@ -23,8 +23,8 @@ function player_metatable:SetupModel()
 end
 
 function player_metatable:FreezeMovement()
-	ply:SetWalkSpeed(1)
-	ply:SetRunSpeed(1)
+	self:SetWalkSpeed(1)
+	self:SetRunSpeed(1)
 end
 
 function player_metatable:Strip()

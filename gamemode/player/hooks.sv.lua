@@ -76,6 +76,10 @@ hook.Add("PostPlayerDeath", "NetworkPostPlayerDeath", function (ply)
 	net.Broadcast()
 end)
 
+hook.Add("PostPlayerDeath", "SetDeathTime", function (ply)
+	ply.last_death_time = CurTime()
+end)
+
 hook.Add("PlayerDeathThink", "Respawn", function (ply)
 	local cur_time = CurTime()
 	if cur_time > (ply.last_death_time + ply.death_cooldown) then
