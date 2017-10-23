@@ -65,13 +65,11 @@ hook.Add("PlayerDeath", "NetworkPlayerDeath", function (ply, infl, att)
 	net.Broadcast()
 end)
 
-hook.Add("PlayerDeath", "DeathTime", function (ply)
+local function SetDeathTime(ply)
 	ply.last_death_time = CurTime()
-end)
-
-hook.Add("PlayerSilentDeath", "SilentDeathTime", function (ply)
-	ply.last_death_time = CurTime()
-end)
+end
+hook.Add("PlayerDeath", "DeathTime", SetDeathTime)
+hook.Add("PlayerSilentDeath", "SilentDeathTime", SetDeathTime)
 
 hook.Add("PlayerDeath", "FreezeMovement", function (ply)
 	ply:FreezeMovement()
