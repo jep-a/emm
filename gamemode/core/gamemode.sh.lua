@@ -7,6 +7,7 @@ EMM.Include {
 	"util/palette",
 	"player/hooks",
 	"player/methods",
+	"player-class/methods",
 	"movement/walljump",
 	"movement/wallslide",
 	"movement/airaccel"

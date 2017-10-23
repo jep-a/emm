@@ -33,3 +33,11 @@ function player_metatable:__index(key)
 
 	return nil
 end
+
+function player_metatable:SetPlayerClass(ply_class)
+	self.player_class = ply_class
+end
+
+function player_metatable:ClearPlayerClass()
+	self.player_class = nil
+end
