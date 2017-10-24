@@ -3,6 +3,27 @@ Stamina = Stamina or {}
 Stamina.__index = Stamina
 
 
+-- # Properties
+
+function StaminaService.InitPlayerProperties(ply)
+	ply.stamina = ply.stamina or {}
+end
+hook.Add(
+	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
+	"StaminaService.InitPlayerProperties",
+	StaminaService.InitPlayerProperties
+)
+
+function StaminaService.PlayerProperties(ply)
+
+end
+hook.Add(
+	SERVER and "PlayerProperties" or "LocalPlayerProperties",
+	"StaminaService.PlayerProperties",
+	StaminaService.PlayerProperties
+)
+
+
 -- # Stamina Methods
 
 function Stamina:Amount()
@@ -41,27 +62,6 @@ function StaminaService.CreateStaminaType()
 		is_active = false
 	}, Stamina)
 end
-
-
--- # Properties
-
-function StaminaService.InitPlayerProperties(ply)
-	ply.stamina = ply.stamina or {}
-end
-hook.Add(
-	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
-	"StaminaService.InitPlayerProperties",
-	StaminaService.InitPlayerProperties
-)
-
-function StaminaService.PlayerProperties(ply)
-
-end
-hook.Add(
-	SERVER and "PlayerProperties" or "LocalPlayerProperties",
-	"StaminaService.PlayerProperties",
-	StaminaService.PlayerProperties
-)
 
 
 -- # Stamina Decay Handling
