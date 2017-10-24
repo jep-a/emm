@@ -27,7 +27,11 @@ end
 net.Receive("PlayerSpawn", CallPlayerSpawnHooks)
 
 hook.Add("InitPostEntity", "InitLocalPlayerProperties", function ()
-	hook.Run("InitLocalPlayerProperties", LocalPlayer())
+	local ply = LocalPlayer()
+
+	hook.Run("InitLocalPlayerProperties", ply)
+	ply.initialized = true
+	hook.Run("LocalPlayerProperties", ply)
 end)
 
 hook.Add("InitPostEntity", "PlayersSpawn", function ()
@@ -54,7 +58,9 @@ hook.Add("PlayerSpawn", "PlayerProperties", function (ply)
 end)
 
 hook.Add("LocalPlayerSpawn", "LocalPlayerProperties", function (ply)
-	hook.Run("LocalPlayerProperties", ply)
+	if ply.initialized then
+		hook.Run("LocalPlayerProperties", ply)
+	end
 end)
 
 hook.Add("OnEntityCreated", "CallDelayedPlayerSpawn", function (ent)
