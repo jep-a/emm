@@ -10,6 +10,9 @@ function WallslideService.InitPlayerProperties(ply)
 	ply.wallslide_time = 6
 	ply.wallslide_distance = 30
 
+	ply.stamina = ply.stamina or {}
+	ply.stamina.wallslide = StaminaService.CreateStaminaType()
+
 	if SERVER then
 		ply.wallslide_sound = CreateSound(ply, "physics/body/body_medium_scrape_smooth_loop1.wav")
 	end
@@ -25,12 +28,23 @@ function WallslideService.PlayerProperties(ply)
 	ply.wallslide_velocity = Vector(0, 0, 0)
 	ply.last_wallslide_time = 0
 	ply.last_wallslide_spark_time = 0
+
+	WallslideService.SetStaminaValues(ply)
 end
 hook.Add(
 	SERVER and "PlayerProperties" or "LocalPlayerProperties",
 	"WallslideService.PlayerProperties",
 	WallslideService.PlayerProperties
 )
+
+function WallslideService.SetStaminaValues(ply)
+	ply.stamina.wallslide.amount = 100
+	ply.stamina.wallslide.decay_step = 100 / 66 / ply.wallslide_time
+	ply.stamina.wallslide.regen_step = ply.stamina.wallslide.decay_step
+	ply.stamina.wallslide.cooldown = 1
+	ply.stamina.wallslide.last_used = 0
+	ply.stamina.wallslide.is_active = false
+end
 
 
 -- # Effects
