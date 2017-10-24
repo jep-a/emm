@@ -46,8 +46,8 @@ function StaminaService.CreateStaminaType()
 		amount = 100,
 		decay_step = 0.1,
 		regen_step = 0.1,
-		last_used = 0,
 		cooldown = 1,
+		last_used = 0,
 		is_active = false
 	}, Stamina)
 end
@@ -56,8 +56,8 @@ function StaminaService.InitWallslideStamina(ply)
 	ply.stamina.wallslide.amount = 100
 	ply.stamina.wallslide.decay_step = 100 / 66 / ply.wallslide_time
 	ply.stamina.wallslide.regen_step = ply.stamina.wallslide.decay_step
+	ply.stamina.wallslide.cooldown = 1
 	ply.stamina.wallslide.last_used = 0
-	ply.stamina.wallslide.cooldown = 0.5
 	ply.stamina.wallslide.is_active = false
 end
 
@@ -65,8 +65,8 @@ function StaminaService.InitAirAccelStamina(ply)
 	ply.stamina.airaccel.amount = 100
 	ply.stamina.airaccel.decay_step = ply.airaccel_decay_step
 	ply.stamina.airaccel.regen_step = ply.airaccel_regen_step
-	ply.stamina.airaccel.last_used = 0
 	ply.stamina.airaccel.cooldown = ply.airaccel_cooldown
+	ply.stamina.airaccel.last_used = 0
 	ply.stamina.airaccel.is_active = false
 end
 
