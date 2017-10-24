@@ -6,8 +6,9 @@ AiraccelService = AiraccelService or {}
 function AiraccelService.InitPlayerProperties(ply)
 	ply.can_airaccel = true
 	ply.airaccel_regen_step = 0.1
+	ply.airaccel_decay_step = 0.1
 	ply.airaccel_cooldown = 2
-	ply.airaccel_max_stamina = 100
+	ply.airaccel_stamina_coeficient = 0.01
 	ply.airaccel_sound = "player/suit_sprint.wav"
 end
 hook.Add(
@@ -47,12 +48,18 @@ function AiraccelService.SetupAiraccel(ply, move)
 		ply:Alive() and
 		ply.can_airaccel and
 		not ply:IsOnGround() and
-		move:KeyDown(IN_SPEED)
+		move:KeyDown(IN_SPEED) and
+		ply.stamina.airaccel:Amount() > 0
 	then
+		ply.stamina.airaccel:SetActive(true)
+	
 		local vel_diff, new_vel = AiraccelService.Velocity(ply, move)
 		if vel_diff > 0 then
+			ply.stamina.airaccel:ReduceStamina(vel_diff * ply.airaccel_stamina_coeficient)
 			move:SetVelocity(new_vel)
 		end
+	else
+		ply.stamina.airaccel:SetActive(false)
 	end
 end
 hook.Add("SetupMove", "AiraccelService.SetupAiraccel", AiraccelService.SetupAiraccel)

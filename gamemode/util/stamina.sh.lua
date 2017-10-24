@@ -6,6 +6,10 @@ Stamina.__index = Stamina
 
 -- # Stamina Methods
 
+function Stamina:Amount()
+	return self.amount
+end
+
 function Stamina:AddStamina(value)
 	self.amount = math.Clamp(self.amount + value, 0, 100)
 end
@@ -38,18 +42,32 @@ function StaminaService.New()
 end
 
 function StaminaService.CreateStaminaType()
-	return setmetatable(StaminaService.InitStaminaType({}), Stamina)
+	return setmetatable({
+		amount = 100,
+		decay_step = 0.1,
+		regen_step = 0.1,
+		last_used = 0,
+		cooldown = 1,
+		is_active = false
+	}, Stamina)
 end
 
-function StaminaService.InitStaminaType(stamina_type)
-	stamina_type.amount = 100
-	stamina_type.decay_step = 0.1
-	stamina_type.regen_step = 0.1
-	stamina_type.last_used = 0
-	stamina_type.cooldown = 1
-	stamina_type.is_active = false
+function StaminaService.InitWallslideStamina(ply)
+	ply.stamina.wallslide.amount = 100
+	ply.stamina.wallslide.decay_step = 100 / 66 / ply.wallslide_time
+	ply.stamina.wallslide.regen_step = ply.stamina.wallslide.decay_step
+	ply.stamina.wallslide.last_used = 0
+	ply.stamina.wallslide.cooldown = 0.5
+	ply.stamina.wallslide.is_active = false
+end
 
-	return stamina_type
+function StaminaService.InitAirAccelStamina(ply)
+	ply.stamina.airaccel.amount = 100
+	ply.stamina.airaccel.decay_step = ply.airaccel_decay_step
+	ply.stamina.airaccel.regen_step = ply.airaccel_regen_step
+	ply.stamina.airaccel.last_used = 0
+	ply.stamina.airaccel.cooldown = ply.airaccel_cooldown
+	ply.stamina.airaccel.is_active = false
 end
 
 
@@ -65,8 +83,9 @@ hook.Add(
 )
 
 function StaminaService.PlayerProperties(ply)
-	for _, stamina_type in pairs(ply.stamina or {}) do
-		StaminaService.InitStaminaType(stamina_type)
+	if ply.stamina then
+		StaminaService.InitWallslideStamina(ply)
+		StaminaService.InitAirAccelStamina(ply)
 	end
 end
 hook.Add(

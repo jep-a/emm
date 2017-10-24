@@ -7,7 +7,7 @@ local SPARK_EFFECT_DELAY = 0.05
 
 function WallslideService.InitPlayerProperties(ply)
 	ply.can_wallslide = true
-	ply.wallslide_cooldown = 6
+	ply.wallslide_time = 6
 	ply.wallslide_distance = 30
 
 	if SERVER then
@@ -67,16 +67,19 @@ function WallslideService.SetupWallslide(ply, move)
 			trace.HitWorld and
 			not trace.HitSky and
 			not ply:OnGround() and
-			move:KeyDown(IN_ATTACK2)
+			move:KeyDown(IN_ATTACK2) and
+			ply.stamina.wallslide:Amount() > 0
 		then
 			if not ply.wallsliding then
 				ply.wallslide_velocity = ply:GetVelocity()
 				ply.last_wallslide_time = cur_time
 			end
 			ply.wallsliding = true
+			ply.stamina.wallslide:SetActive(true)
 			move:SetVelocity(WallslideService.Velocity(ply, trace))
 		else
 			ply.wallsliding = false
+			ply.stamina.wallslide:SetActive(false)
 		end
 	end
 end
