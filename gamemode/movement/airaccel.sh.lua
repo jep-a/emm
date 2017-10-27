@@ -18,12 +18,6 @@ hook.Add(
 )
 
 function AiraccelService.PlayerProperties(ply)
-	ply.airacceling = false
-	ply.airaccel_started = false
-	ply.airaccel_stamina = 100
-	ply.airaccel_velocity = Vector(0, 0, 0)
-	ply.airaccel_angle = Angle(0, 0, 0)
-	ply.last_airaccel_time = 0
 	AiraccelService.SetStaminaValues(ply)
 end
 hook.Add(
