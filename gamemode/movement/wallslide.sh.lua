@@ -8,8 +8,9 @@ local SPARK_EFFECT_DELAY = 0.05
 function WallslideService.InitPlayerProperties(ply)
 	ply.can_wallslide = true
 	ply.wallslide_distance = 30
-	ply.wallslide_regen_step = 0.25
-	ply.wallslide_decay_step = 0.25
+	ply.wallslide_stamina_regen = 0.25
+	ply.wallslide_stamina_decay = 0.25
+	ply.wallslide_stamina_cost = 5
 	ply.wallslide_cooldown = 2
 
 	if SERVER then
@@ -37,8 +38,8 @@ hook.Add(
 
 function WallslideService.SetStaminaValues(ply)
 	ply.stamina.wallslide = ply.stamina.wallslide or StaminaService.CreateStaminaType()
-	ply.stamina.wallslide.decay_step = ply.wallslide_regen_step
-	ply.stamina.wallslide.regen_step = ply.wallslide_decay_step
+	ply.stamina.wallslide.decay_step = ply.wallslide_stamina_decay
+	ply.stamina.wallslide.regen_step = ply.wallslide_stamina_regen
 	ply.stamina.wallslide.cooldown = ply.wallslide_cooldown
 end
 
@@ -83,6 +84,7 @@ function WallslideService.SetupWallslide(ply, move)
 			if not ply.wallsliding then
 				ply.wallslide_velocity = ply:GetVelocity()
 				ply.last_wallslide_time = cur_time
+				ply.stamina.wallslide:ReduceStamina(ply.wallslide_stamina_cost)
 			end
 			ply.wallsliding = true
 			ply.stamina.wallslide:SetActive(true)
