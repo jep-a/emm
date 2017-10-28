@@ -67,16 +67,20 @@ end
 
 function WalljumpService.Walljump(ply, mv, dir)
 	local trace = WalljumpService.Trace(ply, dir)
+	local did_wall_jump = false
 	
 	if trace.Hit and (ply.can_walljump_sky or not trace.HitSky) then
 		mv:SetVelocity(mv:GetVelocity() + WalljumpService.Velocity(ply, dir))
 		WalljumpService.Effect(ply, trace)
-		if IsFirstTimePredicted then ply.last_walljump_time = CurTime() end
+		ply.last_walljump_time = CurTime()
+		did_wall_jump = true
 		
 		if SERVER then
 			ply:EmitSound(ply.walljump_sound..math.random(1, 6)..".wav")
 		end
 	end
+	
+	return did_wall_jump
 end
 
 if SERVER then
@@ -98,21 +102,22 @@ function WalljumpService.SetupWalljump(ply, mv, ucmd)
 		fwd.z = 0
 		fwd:Normalize()
 		local right = Vector(fwd.y, -fwd.x)
+		local did_wall_jump = false
 		
-		if mv:KeyDown(IN_MOVELEFT) then
-			WalljumpService.Walljump(ply, mv, -right)
+		if mv:KeyDown(IN_MOVERIGHT) and not did_wall_jump then
+			did_wall_jump = WalljumpService.Walljump(ply, mv, right)
 		end
 		
-		if mv:KeyDown(IN_MOVERIGHT) then
-			WalljumpService.Walljump(ply, mv, right)
+		if mv:KeyDown(IN_MOVELEFT) and not did_wall_jump then
+			did_wall_jump = WalljumpService.Walljump(ply, mv, -right)
 		end
 		
-		if mv:KeyDown(IN_FORWARD) then
-			WalljumpService.Walljump(ply, mv, fwd)
+		if mv:KeyDown(IN_FORWARD) and not did_wall_jump then
+			did_wall_jump = WalljumpService.Walljump(ply, mv, fwd)
 		end
 		
-		if mv:KeyDown(IN_BACK) then
-			WalljumpService.Walljump(ply, mv, -fwd)
+		if mv:KeyDown(IN_BACK) and not did_wall_jump then
+			did_wall_jump = WalljumpService.Walljump(ply, mv, -fwd)
 		end
 	end
 end
