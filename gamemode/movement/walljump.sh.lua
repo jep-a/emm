@@ -1,6 +1,5 @@
 WalljumpService = WalljumpService or {}
 WalljumpService.BUTTONS = bit.bor(IN_JUMP, IN_FORWARD, IN_MOVELEFT, IN_MOVERIGHT)
-WalljumpService.WALLJUMP_COOLED_DOWN = bit.lshift(1, 25)
 
 
 -- # Properties
@@ -14,10 +13,6 @@ function WalljumpService.InitPlayerProperties(ply)
 	ply.walljump_up_velocity = 200
 	ply.walljump_sound = "npc/footsteps/hardboot_generic"
 	ply.last_walljump_time = 0
-	
-	if CLIENT then 
-		ply.walljumps = {}
-	end
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
@@ -88,27 +83,7 @@ if SERVER then
 	function WalljumpService.IsCooledDown(ply)
 		return CurTime() > (ply.last_walljump_time + ply.walljump_delay)
 	end
-else 
-	function WalljumpService.IsCooledDown(ply)
-		if not ply.walljumps[CurTime()] then
-			ply.walljumps[CurTime()] = ply.last_walljump_time
-		end
-		
-		return CurTime() > (ply.walljumps[CurTime()] + ply.walljump_delay)
-	end
 end
-
-function WalljumpService.ThinkCleanup()
-	for _, ply in pairs({LocalPlayer()}) do
-		local cuttoff = CurTime() - ply.walljump_delay
-		for i, t in pairs(ply.walljumps) do
-			if i < cuttoff then
-				ply.walljumps[i] = nil
-			end
-		end
-	end
-end
-if CLIENT then hook.Add("Think", "WalljumpService.ThinkCleanup", WalljumpService.ThinkCleanup) end
 
 function WalljumpService.SetupWalljump(ply, mv, ucmd)
 	if
@@ -139,8 +114,6 @@ function WalljumpService.SetupWalljump(ply, mv, ucmd)
 		if mv:KeyDown(IN_BACK) then
 			WalljumpService.Walljump(ply, mv, -fwd)
 		end
-
-		
 	end
 end
 hook.Add("SetupMove", "WalljumpService.SetupWalljump", WalljumpService.SetupWalljump)
