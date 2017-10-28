@@ -5,6 +5,7 @@ GM.Website = "jep.sh"
 
 EMM.Include {
 	"util/palette",
+	"util/sounds",
 	"player/hooks",
 	"player/methods",
 	"movement/walljump",
