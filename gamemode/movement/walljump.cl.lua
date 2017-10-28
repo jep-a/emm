@@ -3,14 +3,10 @@ WalljumpService = WalljumpService or {}
 
 -- # Properties
 
-function WalljumpService.InitPlayerProperties(ply)
+function WalljumpService.InitLocalPlayerProperties(ply)
 	ply.walljumps = {}
 end
-hook.Add(
-	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
-	"WalljumpService.InitPlayerProperties",
-	WalljumpService.InitPlayerProperties
-)
+hook.Add("InitLocalPlayerProperties", "WalljumpService.InitLocalPlayerProperties", WalljumpService.InitLocalPlayerProperties)
 
 
 -- # Prediction
