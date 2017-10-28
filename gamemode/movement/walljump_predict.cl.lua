@@ -15,18 +15,18 @@ function WalljumpService.IsCooledDown(ply)
 	if not ply.walljumps[CurTime()] then
 		ply.walljumps[CurTime()] = ply.last_walljump_time
 	end
-	
+
 	return CurTime() > (ply.walljumps[CurTime()] + ply.walljump_delay)
 end
 
-function WalljumpService.ThinkCleanup()
+function WalljumpService.PredictionCleanup()
 	local ply = LocalPlayer()
 	local cuttoff = CurTime() - ply.walljump_delay
-	
+
 	for i, t in pairs(ply.walljumps) do
 		if i < cuttoff then
 			ply.walljumps[i] = nil
 		end
 	end
 end
-hook.Add("Think", "WalljumpService.ThinkCleanup", WalljumpService.ThinkCleanup)
+hook.Add("Think", "WalljumpService.PredictionCleanup", WalljumpService.PredictionCleanup	)
