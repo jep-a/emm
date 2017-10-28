@@ -4,32 +4,27 @@ SoundsService = SoundsService or {}
 -- # Properties
 
 function SoundsService.InitPlayerProperties(ply)
-	ply.sounds = ply.sounds or {}
+	ply.sound_emitter = ply
 end
-hook.Add(
-	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
-	"SoundsService.InitPlayerProperties",
-	SoundsService.InitPlayerProperties
-)
+hook.Add("InitPlayerProperties", "SoundsService.InitPlayerProperties", SoundsService.InitPlayerProperties)
+
+function SoundsService.InitLocalPlayerProperties(ply)
+	ply.sound_emitter = ClientsideModel("models/hunter/blocks/cube025x025x025.mdl")
+	ply.sound_emitter:SetPos(ply:GetShootPos())
+	ply.sound_emitter:SetNoDraw(true)
+	ply.sound_emitter:SetParent(ply)
+end
+hook.Add("InitLocalPlayerProperties", "SoundsService.InitLocalPlayerProperties", SoundsService.InitLocalPlayerProperties)
 
 
--- # Functions
+-- # Sound Services
 
-function SoundsService.PlaySoundOnPlayer(ply, sound_file)
-	if ply.sounds[sound_file] then
-		ply.sounds[sound_file]:Stop()
-	end
-
-	SoundsService.UpdateSoundOnPlayer(ply, sound_file)
-	ply.sounds[sound_file]:Play()
+function SoundsService.PlaySoundShared(ply, sound_file)
+	CreateSound(ply.sound_emitter, sound_file, SoundsService.GetExclusiveFilter(ply)):Play()
 end
 
 
 -- # Utility Functions
-
-function SoundsService.UpdateSoundOnPlayer(ply, sound_file)
-	ply.sounds[sound_file] = (CLIENT and ply.sounds[sound_file]) and ply.sounds[sound_file] or CreateSound(ply, sound_file, SoundsService.GetExclusiveFilter(ply))
-end
 
 function SoundsService.GetExclusiveFilter(ply)
 	local filter = nil

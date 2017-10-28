@@ -53,6 +53,10 @@ function WalljumpService.IsCooledDown(ply)
 	return CurTime() > (ply.last_walljump_time + ply.walljump_delay)
 end
 
+function WalljumpService.PlayedSound(ply)
+	return IsFirstTimePredicted()
+end
+
 function WalljumpService.Trace(ply, dir)
 	local ply_pos = ply:GetPos()
 	local trace = util.TraceLine {
@@ -78,7 +82,10 @@ function WalljumpService.Walljump(ply, mv, dir)
 		WalljumpService.Effect(ply, trace)
 		ply.last_walljump_time = CurTime()
 		did_wall_jump = true
-		if IsFirstTimePredicted() then SoundsService.PlaySoundOnPlayer(ply, ply.walljump_sound..math.random(1, 6)..".wav") end
+
+		if not WalljumpService.PlayedSound(ply) then
+			SoundsService.PlaySoundShared(ply, ply.walljump_sound.. math.random(1, 6) ..".wav")
+		end
 	end
 
 	return did_wall_jump
