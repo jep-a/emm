@@ -1,5 +1,5 @@
 WalljumpService = WalljumpService or {}
-WalljumpService.BUTTONS = bit.bor(IN_JUMP, IN_FORWARD, IN_MOVELEFT, IN_MOVERIGHT)
+local WALLJUMP_BUTTONS = bit.bor(IN_JUMP, IN_FORWARD, IN_MOVELEFT, IN_MOVERIGHT)
 
 
 -- # Properties
@@ -45,7 +45,7 @@ end
 -- # Walljumping
 
 function WalljumpService.PressedWalljumpButton(buttons, old_buttons)
-	local walljump_buttons_down = bit.band(buttons, WalljumpService.BUTTONS)
+	local walljump_buttons_down = bit.band(buttons, WALLJUMP_BUTTONS)
 	return bit.band(walljump_buttons_down, old_buttons) < walljump_buttons_down
 end
 
