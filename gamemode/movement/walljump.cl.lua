@@ -10,24 +10,29 @@ end
 hook.Add("InitLocalPlayerProperties", "WalljumpService.InitLocalPlayerProperties", WalljumpService.InitLocalPlayerProperties)
 
 
--- # Prediction
+-- # Client Patch
 
-function WalljumpService.IsCooledDown(ply)
-	if not ply.walljumps[CurTime()] then
-		ply.walljumps[CurTime()] = ply.last_walljump_time
+function WalljumpService.ClientPatch()
+	function WalljumpService.IsCooledDown(ply)
+		if not ply.walljumps[CurTime()] then
+			ply.walljumps[CurTime()] = ply.last_walljump_time
+		end
+
+		return CurTime() > (ply.walljumps[CurTime()] + ply.walljump_delay)
 	end
 
-	return CurTime() > (ply.walljumps[CurTime()] + ply.walljump_delay)
-end
+	function WalljumpService.PlayedSound(ply)
+		if ply.playedsounds[CurTime()] == nil then
+			ply.playedsounds[CurTime()] = true
+			return false
+		end
 
-function WalljumpService.PlayedSound(ply)
-	if ply.playedsounds[CurTime()] == nil then
-		ply.playedsounds[CurTime()] = true
-		return false
+		return ply.playedsounds[CurTime()]
 	end
-
-	return ply.playedsounds[CurTime()]
 end
+WalljumpService.ClientPatch()
+
+-- # Cleanup
 
 function WalljumpService.PredictionCleanup()
 	local ply = LocalPlayer()

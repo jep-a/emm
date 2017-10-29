@@ -9,7 +9,6 @@ EMM.Include {
 	"player/hooks",
 	"player/methods",
 	"movement/walljump",
-	"movement/walljump_predict",
 	"movement/wallslide",
 	"movement/airaccel"
 }

@@ -124,3 +124,5 @@ function WalljumpService.SetupWalljump(ply, mv, ucmd)
 	end
 end
 hook.Add("SetupMove", "WalljumpService.SetupWalljump", WalljumpService.SetupWalljump)
+
+if CLIENT and WalljumpService.ClientPatch then WalljumpService.ClientPatch() end
