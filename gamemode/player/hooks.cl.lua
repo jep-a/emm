@@ -51,8 +51,7 @@ hook.Add("LocalPlayerInitialSpawn", "InitLocalPlayerProperties", function (ply)
 	hook.Run("InitLocalPlayerProperties", ply)
 end)
 
-		end
-	end
+hook.Add("LocalPlayerSpawn", "LocalPlayerProperties", function (ply)
 	hook.Run("LocalPlayerProperties", ply)
 end)
 
