@@ -8,7 +8,7 @@ function AiraccelService.InitPlayerProperties(ply)
 	ply.airaccel_regen_step = 0.1
 	ply.airaccel_decay_step = 0.1
 	ply.airaccel_cooldown = 2
-	ply.airaccel_stamina_coeficient = 0.01
+	ply.airaccel_stamina_coefficient = 0.01
 	ply.airaccel_sound = "player/suit_sprint.wav"
 end
 hook.Add(
@@ -18,7 +18,7 @@ hook.Add(
 )
 
 function AiraccelService.PlayerProperties(ply)
-	AiraccelService.SetupStaminaValues(ply)
+	AiraccelService.SetupStamina(ply)
 end
 hook.Add(
 	SERVER and "PlayerProperties" or "LocalPlayerProperties",
@@ -26,7 +26,7 @@ hook.Add(
 	AiraccelService.PlayerProperties
 )
 
-function AiraccelService.SetupStaminaValues(ply)
+function AiraccelService.SetupStamina(ply)
 	ply.stamina.airaccel = ply.stamina.airaccel or StaminaService.CreateStaminaType()
 	ply.stamina.airaccel.amount = 100
 	ply.stamina.airaccel.last_active = 0
@@ -57,11 +57,10 @@ function AiraccelService.SetupAiraccel(ply, move)
 		ply.stamina.airaccel:GetAmount() > 0
 	then
 		ply.stamina.airaccel:SetActive(true)
-
 		local vel_diff, new_vel = AiraccelService.Velocity(ply, move)
 		if vel_diff > 0 then
 			move:SetVelocity(new_vel)
-			if IsFirstTimePredicted() then ply.stamina.airaccel:ReduceStamina(vel_diff * ply.airaccel_stamina_coeficient) end
+			if IsFirstTimePredicted() then ply.stamina.airaccel:ReduceStamina(vel_diff * ply.airaccel_stamina_coefficient) end
 		end
 	else
 		ply.stamina.airaccel:SetActive(false)

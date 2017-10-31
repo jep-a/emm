@@ -35,7 +35,6 @@ local function CallPlayerSpawnHooks()
 end
 net.Receive("PlayerSpawn", CallPlayerSpawnHooks)
 
-
 hook.Add("InitPostEntity", "EMM.InitPostEntity", function ()
 	local local_ply = LocalPlayer()
 	init_post_ent = true

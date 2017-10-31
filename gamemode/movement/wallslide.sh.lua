@@ -28,7 +28,7 @@ function WallslideService.PlayerProperties(ply)
 	ply.wallslide_velocity = Vector(0, 0, 0)
 	ply.last_wallslide_time = 0
 	ply.last_wallslide_spark_time = 0
-	WallslideService.SetupStaminaValues(ply)
+	WallslideService.SetupStamina(ply)
 end
 hook.Add(
 	SERVER and "PlayerProperties" or "LocalPlayerProperties",
@@ -36,7 +36,7 @@ hook.Add(
 	WallslideService.PlayerProperties
 )
 
-function WallslideService.SetupStaminaValues(ply)
+function WallslideService.SetupStamina(ply)
 	ply.stamina.wallslide = ply.stamina.wallslide or StaminaService.CreateStaminaType()
 	ply.stamina.wallslide.amount = 100
 	ply.stamina.wallslide.last_active = 0

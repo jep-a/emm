@@ -14,16 +14,6 @@ hook.Add(
 	StaminaService.InitPlayerProperties
 )
 
-function StaminaService.PlayerProperties(ply)
-
-end
-hook.Add(
-	SERVER and "PlayerProperties" or "LocalPlayerProperties",
-	"StaminaService.PlayerProperties",
-	StaminaService.PlayerProperties
-)
-
-
 -- # Stamina Methods
 
 function Stamina:GetAmount()
@@ -56,6 +46,7 @@ end
 
 
 -- # Stamina Creation
+
 function StaminaService.CreateStaminaType()
 	return setmetatable({
 		amount = 100,
