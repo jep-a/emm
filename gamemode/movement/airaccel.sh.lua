@@ -6,8 +6,9 @@ AiraccelService = AiraccelService or {}
 function AiraccelService.InitPlayerProperties(ply)
 	ply.can_airaccel = true
 	ply.airaccel_regen_step = 0.1
+	ply.airaccel_decay_step = 0.1
 	ply.airaccel_cooldown = 2
-	ply.airaccel_max_stamina = 100
+	ply.airaccel_velocity_cost = 0.01
 	ply.airaccel_sound = "player/suit_sprint.wav"
 end
 hook.Add(
@@ -16,13 +17,17 @@ hook.Add(
 	AiraccelService.InitPlayerProperties
 )
 
+function AiraccelService.SetupStamina(ply)
+	ply.stamina.airaccel = ply.stamina.airaccel or StaminaService.CreateStaminaType()
+	ply.stamina.airaccel.active = false
+	ply.stamina.airaccel.regen_step = ply.airaccel_regen_step
+	ply.stamina.airaccel.decay_step = ply.airaccel_decay_step
+	ply.stamina.airaccel.cooldown = ply.airaccel_cooldown
+	ply.stamina.airaccel.amount = 100
+end
+
 function AiraccelService.PlayerProperties(ply)
-	ply.airacceling = false
-	ply.airaccel_started = false
-	ply.airaccel_stamina = 100
-	ply.airaccel_velocity = Vector(0, 0, 0)
-	ply.airaccel_angle = Angle(0, 0, 0)
-	ply.last_airaccel_time = 0
+	AiraccelService.SetupStamina(ply)
 end
 hook.Add(
 	SERVER and "PlayerProperties" or "LocalPlayerProperties",
@@ -47,12 +52,17 @@ function AiraccelService.SetupAiraccel(ply, move)
 		ply:Alive() and
 		ply.can_airaccel and
 		not ply:IsOnGround() and
-		move:KeyDown(IN_SPEED)
+		move:KeyDown(IN_SPEED) and
+		ply.stamina.airaccel:HasStamina()
 	then
+		ply.stamina.airaccel:SetActive(true)
 		local vel_diff, new_vel = AiraccelService.Velocity(ply, move)
 		if vel_diff > 0 then
 			move:SetVelocity(new_vel)
+			if IsFirstTimePredicted() then ply.stamina.airaccel:ReduceStamina(vel_diff * ply.airaccel_velocity_cost) end
 		end
+	else
+		ply.stamina.airaccel:SetActive(false)
 	end
 end
 hook.Add("SetupMove", "AiraccelService.SetupAiraccel", AiraccelService.SetupAiraccel)
