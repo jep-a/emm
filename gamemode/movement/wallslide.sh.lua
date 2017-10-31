@@ -28,7 +28,7 @@ function WallslideService.PlayerProperties(ply)
 	ply.wallslide_velocity = Vector(0, 0, 0)
 	ply.last_wallslide_time = 0
 	ply.last_wallslide_spark_time = 0
-	WallslideService.SetStaminaValues(ply)
+	WallslideService.SetupStaminaValues(ply)
 end
 hook.Add(
 	SERVER and "PlayerProperties" or "LocalPlayerProperties",
@@ -36,13 +36,13 @@ hook.Add(
 	WallslideService.PlayerProperties
 )
 
-function WallslideService.SetStaminaValues(ply)
+function WallslideService.SetupStaminaValues(ply)
 	ply.stamina.wallslide = ply.stamina.wallslide or StaminaService.CreateStaminaType()
 	ply.stamina.wallslide.amount = 100
-	ply.stamina.wallslide.last_used = 0
-	ply.stamina.wallslide.is_active = false	
-	ply.stamina.wallslide.decay_step = ply.wallslide_stamina_decay
+	ply.stamina.wallslide.last_active = 0
+	ply.stamina.wallslide.active = false	
 	ply.stamina.wallslide.regen_step = ply.wallslide_stamina_regen
+	ply.stamina.wallslide.decay_step = ply.wallslide_stamina_decay
 	ply.stamina.wallslide.cooldown = ply.wallslide_cooldown
 end
 
@@ -82,7 +82,7 @@ function WallslideService.SetupWallslide(ply, move)
 			not trace.HitSky and
 			not ply:OnGround() and
 			move:KeyDown(IN_ATTACK2) and
-			ply.stamina.wallslide:Amount() > 0
+			ply.stamina.wallslide:GetAmount() > 0
 		then
 			if not ply.wallsliding then
 				ply.wallslide_velocity = ply:GetVelocity()

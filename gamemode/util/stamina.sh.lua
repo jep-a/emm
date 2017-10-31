@@ -26,8 +26,12 @@ hook.Add(
 
 -- # Stamina Methods
 
-function Stamina:Amount()
+function Stamina:GetAmount()
 	return self.amount
+end
+
+function Stamina:SetStamina(value)
+	self.amount = math.Clamp(value, 0, 100)
 end
 
 function Stamina:AddStamina(value)
@@ -39,15 +43,15 @@ function Stamina:ReduceStamina(value)
 end
 
 function Stamina:IsActive()
-	return self.is_active
+	return self.active
 end
 
-function Stamina:SetActive(is_active)
-	if self.is_active and not is_active then
-		self.last_used = CurTime()
+function Stamina:SetActive(active)
+	if self.active and not active then
+		self.last_active = CurTime()
 	end
 
-	self.is_active = is_active
+	self.active = active
 end
 
 
@@ -55,11 +59,11 @@ end
 function StaminaService.CreateStaminaType()
 	return setmetatable({
 		amount = 100,
-		decay_step = 0.1,
 		regen_step = 0.1,
+		decay_step = 0.1,
 		cooldown = 1,
-		last_used = 0,
-		is_active = false
+		last_active = 0,
+		active = false
 	}, Stamina)
 end
 
@@ -68,12 +72,11 @@ end
 
 function StaminaService.TickUpdate()
 	local cur_time = CurTime()
-
 	for _, ply in pairs(SERVER and player.GetAll() or {LocalPlayer()}) do
 		for _, stamina_type in pairs(ply.stamina or {}) do
-			if stamina_type.is_active then
+			if stamina_type.active then
 				stamina_type:ReduceStamina(stamina_type.decay_step)
-			elseif cur_time > stamina_type.last_used + stamina_type.cooldown then
+			elseif cur_time > stamina_type.last_active + stamina_type.cooldown then
 				stamina_type:AddStamina(stamina_type.regen_step)
 			end
 		end
