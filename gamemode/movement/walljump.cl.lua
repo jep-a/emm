@@ -29,6 +29,7 @@ function WalljumpService.PlayedSound(ply)
 	return ply.played_sounds[CurTime()]
 end
 
+
 -- # Cleanup
 
 function WalljumpService.PredictionCleanup()
