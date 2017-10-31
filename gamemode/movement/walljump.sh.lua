@@ -20,6 +20,7 @@ hook.Add(
 	WalljumpService.InitPlayerProperties
 )
 
+
 -- # Effects
 
 function WalljumpService.EffectOrigin(trace)
@@ -44,17 +45,9 @@ end
 
 -- # Walljumping
 
-function WalljumpService.PressedWalljumpButton(buttons, old_buttons)
+function WalljumpService.PressedWalljumpButtons(buttons, old_buttons)
 	local walljump_buttons_down = bit.band(buttons, WALLJUMP_BUTTONS)
-	return bit.band(walljump_buttons_down, old_buttons) < walljump_buttons_down
-end
-
-function WalljumpService.IsCooledDown(ply)
-	return CurTime() > (ply.last_walljump_time + ply.walljump_delay)
-end
-
-function WalljumpService.PlayedSound(ply)
-	return IsFirstTimePredicted()
+	return walljump_buttons_down > bit.band(walljump_buttons_down, old_buttons)
 end
 
 function WalljumpService.Trace(ply, dir)
@@ -73,53 +66,53 @@ function WalljumpService.Velocity(ply, dir)
 	return new_self_vel
 end
 
-function WalljumpService.Walljump(ply, mv, dir)
+function WalljumpService.Walljump(ply, move, dir)
 	local trace = WalljumpService.Trace(ply, dir)
-	local did_wall_jump = false
+	local did_walljump = false
 
 	if trace.Hit and (ply.can_walljump_sky or not trace.HitSky) then
-		mv:SetVelocity(mv:GetVelocity() + WalljumpService.Velocity(ply, dir))
+		move:SetVelocity(move:GetVelocity() + WalljumpService.Velocity(ply, dir))
 		WalljumpService.Effect(ply, trace)
 		ply.last_walljump_time = CurTime()
-		did_wall_jump = true
+		did_walljump = true
 
 		if not WalljumpService.PlayedSound(ply) then
-			SoundsService.PlaySoundShared(ply, ply.walljump_sound.. math.random(1, 6) ..".wav")
+			PredictedSoundsService.PlaySound(ply, ply.walljump_sound.. math.random(1, 6) ..".wav")
 		end
 	end
 
-	return did_wall_jump
+	return did_walljump
 end
 
-function WalljumpService.SetupWalljump(ply, mv, ucmd)
+function WalljumpService.SetupWalljump(ply, move)
 	if
 		ply:Alive() and
 		ply.can_walljump and
 		not ply.wallsliding and
-		mv:KeyDown(IN_JUMP) and
-		WalljumpService.PressedWalljumpButton(mv:GetButtons(), mv:GetOldButtons()) and
-		WalljumpService.IsCooledDown(ply)
+		move:KeyDown(IN_JUMP) and
+		WalljumpService.PressedWalljumpButtons(move:GetButtons(), move:GetOldButtons()) and
+		WalljumpService.CooledDown(ply)
 	then
-		local fwd = mv:GetAngles():Forward()
+		local fwd = move:GetAngles():Forward()
 		fwd.z = 0
 		fwd:Normalize()
 		local right = Vector(fwd.y, -fwd.x)
-		local did_wall_jump = false
+		local did_walljump = false
 
-		if mv:KeyDown(IN_MOVERIGHT) then
-			did_wall_jump = WalljumpService.Walljump(ply, mv, right)
+		if move:KeyDown(IN_MOVERIGHT) then
+			did_walljump = WalljumpService.Walljump(ply, move, right)
 		end
 
-		if mv:KeyDown(IN_MOVELEFT) and not did_wall_jump then
-			did_wall_jump = WalljumpService.Walljump(ply, mv, -right)
+		if move:KeyDown(IN_MOVELEFT) and not did_walljump then
+			did_walljump = WalljumpService.Walljump(ply, move, -right)
 		end
 
-		if mv:KeyDown(IN_FORWARD) and not did_wall_jump then
-			did_wall_jump = WalljumpService.Walljump(ply, mv, fwd)
+		if move:KeyDown(IN_FORWARD) and not did_walljump then
+			did_walljump = WalljumpService.Walljump(ply, move, fwd)
 		end
 
-		if mv:KeyDown(IN_BACK) and not did_wall_jump then
-			did_wall_jump = WalljumpService.Walljump(ply, mv, -fwd)
+		if move:KeyDown(IN_BACK) and not did_walljump then
+			did_walljump = WalljumpService.Walljump(ply, move, -fwd)
 		end
 	end
 end

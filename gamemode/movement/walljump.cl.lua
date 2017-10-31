@@ -5,32 +5,29 @@ WalljumpService = WalljumpService or {}
 
 function WalljumpService.InitLocalPlayerProperties(ply)
 	ply.walljumps = {}
-	ply.playedsounds = {}
+	ply.played_sounds = {}
 end
 hook.Add("InitLocalPlayerProperties", "WalljumpService.InitLocalPlayerProperties", WalljumpService.InitLocalPlayerProperties)
 
 
--- # Client Patch
+-- # Client Functions
 
-function WalljumpService.ClientPatch()
-	function WalljumpService.IsCooledDown(ply)
-		if not ply.walljumps[CurTime()] then
-			ply.walljumps[CurTime()] = ply.last_walljump_time
-		end
-
-		return CurTime() > (ply.walljumps[CurTime()] + ply.walljump_delay)
+function WalljumpService.CooledDown(ply)
+	if not ply.walljumps[CurTime()] then
+		ply.walljumps[CurTime()] = ply.last_walljump_time
 	end
 
-	function WalljumpService.PlayedSound(ply)
-		if ply.playedsounds[CurTime()] == nil then
-			ply.playedsounds[CurTime()] = true
-			return false
-		end
-
-		return ply.playedsounds[CurTime()]
-	end
+	return CurTime() > (ply.walljumps[CurTime()] + ply.walljump_delay)
 end
-WalljumpService.ClientPatch()
+
+function WalljumpService.PlayedSound(ply)
+	if ply.played_sounds[CurTime()] == nil then
+		ply.played_sounds[CurTime()] = true
+		return false
+	end
+
+	return ply.played_sounds[CurTime()]
+end
 
 -- # Cleanup
 
@@ -38,15 +35,15 @@ function WalljumpService.PredictionCleanup()
 	local ply = LocalPlayer()
 	local cuttoff = CurTime() - ply.walljump_delay
 
-	for i, t in pairs(ply.walljumps) do
-		if i < cuttoff then
-			ply.walljumps[i] = nil
+	for k, _ in pairs(ply.walljumps) do
+		if k < cuttoff then
+			ply.walljumps[k] = nil
 		end
 	end
 
-	for i, t in pairs(ply.playedsounds) do
-		if i < cuttoff then
-			ply.playedsounds[i] = nil
+	for k, _ in pairs(ply.played_sounds) do
+		if k < cuttoff then
+			ply.played_sounds[k] = nil
 		end
 	end
 end
