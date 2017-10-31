@@ -24,9 +24,11 @@ hook.Add(
 
 function WallslideService.SetupStamina(ply)
 	ply.stamina.wallslide = ply.stamina.wallslide or StaminaService.CreateStaminaType()
+	ply.stamina.wallslide.active = false
 	ply.stamina.wallslide.regen_step = ply.wallslide_regen_step
 	ply.stamina.wallslide.decay_step = ply.wallslide_decay_step
 	ply.stamina.wallslide.cooldown = ply.wallslide_cooldown
+	ply.stamina.wallslide.amount = 100
 end
 
 function WallslideService.PlayerProperties(ply)
