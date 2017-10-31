@@ -8,11 +8,10 @@ local SPARK_EFFECT_DELAY = 0.05
 function WallslideService.InitPlayerProperties(ply)
 	ply.can_wallslide = true
 	ply.wallslide_distance = 30
-	ply.wallslide_stamina_regen = 0.25
-	ply.wallslide_stamina_decay = 0.25
-	ply.wallslide_stamina_cost = 5
+	ply.wallslide_regen_step = 0.25
+	ply.wallslide_decay_step = 0.25
 	ply.wallslide_cooldown = 2
-
+	ply.wallslide_init_cost = 5
 	if SERVER then
 		ply.wallslide_sound = CreateSound(ply, "physics/body/body_medium_scrape_smooth_loop1.wav")
 	end
@@ -22,6 +21,13 @@ hook.Add(
 	"WallslideService.InitPlayerProperties",
 	WallslideService.InitPlayerProperties
 )
+
+function WallslideService.SetupStamina(ply)
+	ply.stamina.wallslide = ply.stamina.wallslide or StaminaService.CreateStaminaType()
+	ply.stamina.wallslide.regen_step = ply.wallslide_regen_step
+	ply.stamina.wallslide.decay_step = ply.wallslide_decay_step
+	ply.stamina.wallslide.cooldown = ply.wallslide_cooldown
+end
 
 function WallslideService.PlayerProperties(ply)
 	ply.wallsliding = false
@@ -35,16 +41,6 @@ hook.Add(
 	"WallslideService.PlayerProperties",
 	WallslideService.PlayerProperties
 )
-
-function WallslideService.SetupStamina(ply)
-	ply.stamina.wallslide = ply.stamina.wallslide or StaminaService.CreateStaminaType()
-	ply.stamina.wallslide.amount = 100
-	ply.stamina.wallslide.last_active = 0
-	ply.stamina.wallslide.active = false	
-	ply.stamina.wallslide.regen_step = ply.wallslide_stamina_regen
-	ply.stamina.wallslide.decay_step = ply.wallslide_stamina_decay
-	ply.stamina.wallslide.cooldown = ply.wallslide_cooldown
-end
 
 
 -- # Effects
@@ -82,12 +78,12 @@ function WallslideService.SetupWallslide(ply, move)
 			not trace.HitSky and
 			not ply:OnGround() and
 			move:KeyDown(IN_ATTACK2) and
-			ply.stamina.wallslide:GetAmount() > 0
+			ply.stamina.wallslide:HasStamina()
 		then
 			if not ply.wallsliding then
 				ply.wallslide_velocity = ply:GetVelocity()
 				ply.last_wallslide_time = cur_time
-				ply.stamina.wallslide:ReduceStamina(ply.wallslide_stamina_cost)
+				ply.stamina.wallslide:ReduceStamina(ply.wallslide_init_cost)
 			end
 			ply.wallsliding = true
 			ply.stamina.wallslide:SetActive(true)
