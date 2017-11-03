@@ -1,5 +1,5 @@
 WalljumpService = WalljumpService or {}
-local WALLJUMP_BUTTONS = bit.bor(IN_JUMP, IN_FORWARD, IN_MOVELEFT, IN_MOVERIGHT)
+local WALLJUMP_BUTTONS = bit.bor(IN_JUMP, IN_FORWARD, IN_MOVELEFT, IN_MOVERIGHT, IN_BACK)
 
 
 -- # Properties
