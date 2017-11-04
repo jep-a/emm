@@ -1,6 +1,7 @@
 PredictedSoundsService = PredictedSoundsService or {}
 
 
+
 -- # Properties
 
 function PredictedSoundsService.InitLocalPlayerProperties(ply)
@@ -14,6 +15,7 @@ hook.Add("InitLocalPlayerProperties", "PredictedSoundsService.InitLocalPlayerPro
 
 -- # Sound Services
 
-function PredictedSoundsService.PlaySound(ply, sound_file)
-	CreateSound(ply.sound_emitter, sound_file):Play()
+function PredictedSoundsService.PlaySound(ply, sound_file, soundLevel, pitchPercent, volume, channel)
+	--CreateSound(ply.sound_emitter, sound_file):Play()
+	ply:EmitSound(sound_file, soundLevel, pitchPercent, volume, channel)
 end
