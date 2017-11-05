@@ -1,51 +1,46 @@
 WalljumpService = WalljumpService or {}
 
 
--- # Properties
+-- # Client-side prediction
 
-function WalljumpService.InitLocalPlayerProperties(ply)
-	ply.walljumps = {}
-	ply.played_sounds = {}
-end
-hook.Add("InitLocalPlayerProperties", "WalljumpService.InitLocalPlayerProperties", WalljumpService.InitLocalPlayerProperties)
-
-
--- # Client Functions
+local walljumps = {}
+local played_walljump_sounds = {}
 
 function WalljumpService.CooledDown(ply)
-	if not ply.walljumps[CurTime()] then
-		ply.walljumps[CurTime()] = ply.last_walljump_time
+	local cur_time = CurTime()
+
+	if not walljumps[cur_time] then
+		walljumps[cur_time] = ply.last_walljump_time
 	end
 
-	return CurTime() > (ply.walljumps[CurTime()] + ply.walljump_delay)
+	return cur_time > (walljumps[cur_time] + ply.walljump_delay)
 end
 
 function WalljumpService.PlayedSound(ply)
-	if ply.played_sounds[CurTime()] == nil then
-		ply.played_sounds[CurTime()] = true
+	local cur_time = CurTime()
+
+	if played_walljump_sounds[cur_time] == nil then
+		played_walljump_sounds[cur_time] = true
 		return false
 	end
 
-	return ply.played_sounds[CurTime()]
+	return played_walljump_sounds[cur_time]
 end
 
-
--- # Cleanup
-
-function WalljumpService.PredictionCleanup()
+function WalljumpService.CleanupPrediction()
 	local ply = LocalPlayer()
 	local cuttoff = CurTime() - ply.walljump_delay
 
-	for k, _ in pairs(ply.walljumps) do
+	for k, _ in pairs(walljumps) do
 		if k < cuttoff then
-			ply.walljumps[k] = nil
+			walljumps[k] = nil
 		end
 	end
 
-	for k, _ in pairs(ply.played_sounds) do
+	for k, _ in pairs(played_walljump_sounds) do
 		if k < cuttoff then
-			ply.played_sounds[k] = nil
+			played_walljump_sounds[k] = nil
 		end
 	end
 end
-hook.Add("Think", "WalljumpService.PredictionCleanup", WalljumpService.PredictionCleanup)
+hook.Add("Think", "WalljumpService.CleanupPrediction", WalljumpService.CleanupPrediction)

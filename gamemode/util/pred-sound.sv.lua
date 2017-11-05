@@ -1,31 +1,17 @@
-PredictedSoundsService = PredictedSoundsService or {}
+PredictedSoundService = PredictedSoundService or {}
 
-
--- # Properties
-
-function PredictedSoundsService.InitPlayerProperties(ply)
-	ply.sound_emitter = ply
+function PredictedSoundService.InitPlayerProperties(ply)
+	ply.predicted_sound_emitter = ply
 end
-hook.Add("InitPlayerProperties", "PredictedSoundsService.InitPlayerProperties", PredictedSoundsService.InitPlayerProperties)
+hook.Add("InitPlayerProperties", "PredictedSoundService.InitPlayerProperties", PredictedSoundService.InitPlayerProperties)
 
-
--- # Utility Functions
-
-function PredictedSoundsService.GetExclusiveFilter(ply)
-	local filter = nil
-
-	if SERVER then
-		filter = RecipientFilter()
-		filter:AddAllPlayers()
-		filter:RemovePlayer(ply)
-	end
-
+function PredictedSoundService.GetExclusiveFilter(ply)
+	local filter = RecipientFilter()
+	filter:AddAllPlayers()
+	filter:RemovePlayer(ply)
 	return filter
 end
 
-
--- # Sound Services
-
-function PredictedSoundsService.PlaySound(ply, sound_file)
-	CreateSound(ply.sound_emitter, sound_file, PredictedSoundsService.GetExclusiveFilter(ply)):Play()
+function PredictedSoundService.PlaySound(ply, sound_file)
+	CreateSound(ply.predicted_sound_emitter, sound_file, PredictedSoundService.GetExclusiveFilter(ply)):Play()
 end

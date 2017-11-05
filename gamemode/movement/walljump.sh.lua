@@ -77,7 +77,7 @@ function WalljumpService.Walljump(ply, move, dir)
 		did_walljump = true
 
 		if not WalljumpService.PlayedSound(ply) then
-			PredictedSoundsService.PlaySound(ply, ply.walljump_sound.. math.random(1, 6) ..".wav")
+			PredictedSoundService.PlaySound(ply, ply.walljump_sound.. math.random(1, 6) ..".wav")
 		end
 	end
 
@@ -117,5 +117,3 @@ function WalljumpService.SetupWalljump(ply, move)
 	end
 end
 hook.Add("SetupMove", "WalljumpService.SetupWalljump", WalljumpService.SetupWalljump)
-
-if CLIENT and WalljumpService.ClientPatch then WalljumpService.ClientPatch() end

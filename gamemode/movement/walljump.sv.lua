@@ -1,12 +1,12 @@
 WalljumpService = WalljumpService or {}
 
 
--- # Server Functions
+-- # Server-side prediction
 
 function WalljumpService.CooledDown(ply)
 	return CurTime() > (ply.last_walljump_time + ply.walljump_delay)
 end
 
 function WalljumpService.PlayedSound(ply)
-	return IsFirstTimePredicted()
+	return not IsFirstTimePredicted()
 end
