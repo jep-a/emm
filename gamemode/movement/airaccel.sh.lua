@@ -10,6 +10,7 @@ function AiraccelService.InitPlayerProperties(ply)
 	ply.airaccel_cooldown = 2
 	ply.airaccel_velocity_cost = 0.01
 	ply.airaccel_sound = "player/suit_sprint.wav"
+	ply.airacceling = false
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
@@ -47,7 +48,15 @@ function AiraccelService.Velocity(ply, move)
 	return vel_diff, move:GetVelocity() + (strafe_vel_norm * math.Clamp(strafe_vel_length * 100, 0, vel_diff))
 end
 
+-- function AiraccelService.KeyPress(ply, key)
+
+
+-- end
+-- hook.Add("KeyPress", "AiraccelService.KeyPress", AiraccelService.KeyPress)
+
 function AiraccelService.SetupAiraccel(ply, move)
+	local is_first_time_predicted = IsFirstTimePredicted()
+
 	if
 		ply:Alive() and
 		ply.can_airaccel and
@@ -55,14 +64,23 @@ function AiraccelService.SetupAiraccel(ply, move)
 		move:KeyDown(IN_SPEED) and
 		ply.stamina.airaccel:HasStamina()
 	then
-		ply.stamina.airaccel:SetActive(true)
+		if not ply.airacceling then
+			ply.airacceling = true
+			ply.stamina.airaccel:SetActive(true)
+			if is_first_time_predicted then PredictedSoundsService.PlaySound(ply, ply.airaccel_sound) end
+		end
+	
 		local vel_diff, new_vel = AiraccelService.Velocity(ply, move)
 		if vel_diff > 0 then
 			move:SetVelocity(new_vel)
-			if IsFirstTimePredicted() then ply.stamina.airaccel:ReduceStamina(vel_diff * ply.airaccel_velocity_cost) end
+			if is_first_time_predicted then ply.stamina.airaccel:ReduceStamina(vel_diff * ply.airaccel_velocity_cost) end
 		end
-	else
+	elseif ply.airacceling then
+		ply.airacceling = false
 		ply.stamina.airaccel:SetActive(false)
+		if CLIENT and is_first_time_predicted then
+			PredictedSoundsService.PlaySound(ply, ply.airaccel_sound, 100, 75, 0.2)
+		end
 	end
 end
 hook.Add("SetupMove", "AiraccelService.SetupAiraccel", AiraccelService.SetupAiraccel)
