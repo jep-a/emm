@@ -35,10 +35,18 @@ function player_metatable:__index(key)
 	return nil
 end
 
-function player_metatable:SetPlayerClass(ply_class)
-	self.player_class = ply_class
+function player_metatable:GetPlayerClass()
+	return self.player_class
 end
 
-function player_metatable:ClearPlayerClass()
-	self.player_class = nil
+function player_metatable:HasPlayerClass()
+	return not (self.player_class == nil)
+end
+
+function player_metatable:SetupPlayerClass()
+	--
+end
+
+function player_metatable:EndPlayerClass()
+	--
 end

@@ -9,6 +9,7 @@ EMM.Include {
 	"util/stamina",
 	"player/hooks",
 	"player/methods",
+	"player-class/player-class",
 	"player-class/methods",
 	"movement/walljump",
 	"movement/wallslide",
