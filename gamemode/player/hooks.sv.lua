@@ -1,27 +1,22 @@
 -- # Spawning
 
 util.AddNetworkString "PlayerInitialSpawn"
-hook.Add("PlayerInitialSpawn", "NetworkPlayerInitialSpawn", function (ply)
+hook.Add("PlayerInitialSpawn", "EMM.PlayerInitialSpawn", function (ply)
+	hook.Run("InitPlayerProperties", ply)
 	net.Start("PlayerInitialSpawn")
 	net.WriteUInt(ply:EntIndex(), 16)
 	net.Broadcast()
 end)
 
-hook.Add("PlayerInitialSpawn", "InitPlayerProperties", function (ply)
-	hook.Run("InitPlayerProperties", ply)
-end)
-
 util.AddNetworkString "PlayerSpawn"
-hook.Add("PlayerSpawn", "NetworkPlayerSpawn", function (ply)
-	net.Start("PlayerSpawn")
-	net.WriteUInt(ply:EntIndex(), 16)
-	net.Broadcast()
-end)
-
-hook.Add("PlayerSpawn", "PlayerProperties", function (ply)
+hook.Add("PlayerSpawn", "EMM.PlayerSpawn", function (ply)
 	hook.Run("PlayerProperties", ply)
 	ply:SetupCoreProperties()
 	ply:SetupModel()
+
+	net.Start("PlayerSpawn")
+	net.WriteUInt(ply:EntIndex(), 16)
+	net.Broadcast()
 end)
 
 
@@ -83,8 +78,12 @@ hook.Add("PostPlayerDeath", "NetworkPostPlayerDeath", function (ply)
 end)
 
 hook.Add("PlayerDeathThink", "Respawn", function (ply)
+	local allow_spawn
+
 	local cur_time = CurTime()
 	if cur_time > (ply.last_death_time + ply.death_cooldown) then
+		allow_spawn = true
+
 		if
 			ply:IsBot() or
 			ply:KeyPressed(IN_FORWARD) or
@@ -96,7 +95,11 @@ hook.Add("PlayerDeathThink", "Respawn", function (ply)
 		then
 			ply:Spawn()
 		end
+	else
+		allow_spawn = false
 	end
+
+	return allow_spawn
 end)
 
 
