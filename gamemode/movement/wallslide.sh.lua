@@ -1,7 +1,5 @@
 WallslideService = WallslideService or {}
 
-local SPARK_EFFECT_DELAY = 0.05
-
 
 -- # Properties
 
@@ -12,6 +10,7 @@ function WallslideService.InitPlayerProperties(ply)
 	ply.wallslide_decay_step = 0.25
 	ply.wallslide_cooldown = 2
 	ply.wallslide_init_cost = 5
+
 	if SERVER then
 		ply.wallslide_sound = CreateSound(ply, "physics/body/body_medium_scrape_smooth_loop1.wav")
 	end
@@ -74,7 +73,6 @@ end
 function WallslideService.SetupWallslide(ply, move)
 	if ply:Alive() and ply.can_wallslide then
 		local trace = WallslideService.Trace(ply, ply:GetAimVector())
-		local cur_time = CurTime()
 		if
 			trace.HitWorld and
 			not trace.HitSky and
@@ -84,9 +82,10 @@ function WallslideService.SetupWallslide(ply, move)
 		then
 			if not ply.wallsliding then
 				ply.wallslide_velocity = ply:GetVelocity()
-				ply.last_wallslide_time = cur_time
+				ply.last_wallslide_time = CurTime()
 				ply.stamina.wallslide:ReduceStamina(ply.wallslide_init_cost)
 			end
+
 			ply.wallsliding = true
 			ply.stamina.wallslide:SetActive(true)
 			move:SetVelocity(WallslideService.Velocity(ply, trace))

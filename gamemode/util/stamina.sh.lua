@@ -57,6 +57,7 @@ function StaminaType:SetActive(active)
 	if not active and self.active then
 		self.last_active = CurTime()
 	end
+
 	self.active = active
 end
 

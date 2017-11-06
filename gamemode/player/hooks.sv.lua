@@ -78,10 +78,12 @@ hook.Add("PostPlayerDeath", "NetworkPostPlayerDeath", function (ply)
 end)
 
 hook.Add("PlayerDeathThink", "Respawn", function (ply)
-	local allow_spawn = false
+	local allow_spawn
+
 	local cur_time = CurTime()
 	if cur_time > (ply.last_death_time + ply.death_cooldown) then
 		allow_spawn = true
+
 		if
 			ply:IsBot() or
 			ply:KeyPressed(IN_FORWARD) or

@@ -26,9 +26,11 @@ local function CallPlayerSpawnHooks()
 		local ply_index = net.ReadUInt(16)
 		CallPlayerSpawnHook(ply_index, function ()
 			local ply = Entity(ply_index)
+
 			if ply == LocalPlayer() then
 				hook.Run("LocalPlayerSpawn", ply)
 			end
+
 			hook.Run("PlayerSpawn", ply)
 		end)
 	end
@@ -36,10 +38,12 @@ end
 net.Receive("PlayerSpawn", CallPlayerSpawnHooks)
 
 hook.Add("InitPostEntity", "EMM.InitPostEntity", function ()
-	local local_ply = LocalPlayer()
 	init_post_ent = true
+
+	local local_ply = LocalPlayer()
 	hook.Run("LocalPlayerInitialSpawn", local_ply)
 	hook.Run("LocalPlayerSpawn", local_ply)
+
 	for _, ply in pairs(player.GetAll()) do
 		hook.Run("PlayerInitialSpawn", ply)
 		hook.Run("PlayerSpawn", ply)
@@ -64,12 +68,14 @@ end)
 
 hook.Add("OnEntityCreated", "CallDelayedPlayerSpawnHooks", function (ent)
 	local done_hks = {}
+
 	for i, hk in pairs(queued_ent_created_hooks) do
 		if ent:EntIndex() == hk.player_index then
 			hk.func()
 			table.insert(done_hks, i)
 		end
 	end
+
 	for _, i in pairs(done_hks) do
 		table.remove(queued_ent_created_hooks, i)
 	end

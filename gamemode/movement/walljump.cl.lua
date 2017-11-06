@@ -17,28 +17,30 @@ function WalljumpService.CooledDown(ply)
 end
 
 function WalljumpService.PlayedSound(ply)
-	local cur_time = CurTime()
+	local played_snd
 
-	if played_walljump_sounds[cur_time] == nil then
+	local cur_time = CurTime()
+	if played_walljump_sounds[cur_time] then
+		played_snd = true
+	else
 		played_walljump_sounds[cur_time] = true
-		return false
+		played_snd = false
 	end
 
-	return played_walljump_sounds[cur_time]
+	return played_snd
 end
 
 function WalljumpService.CleanupPrediction()
-	local ply = LocalPlayer()
-	local cuttoff = CurTime() - ply.walljump_delay
+	local cuttoff = CurTime() - LocalPlayer().walljump_delay
 
 	for k, _ in pairs(walljumps) do
-		if k < cuttoff then
+		if cutoff > k then
 			walljumps[k] = nil
 		end
 	end
 
 	for k, _ in pairs(played_walljump_sounds) do
-		if k < cuttoff then
+		if cutoff > k then
 			played_walljump_sounds[k] = nil
 		end
 	end
