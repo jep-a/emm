@@ -11,15 +11,15 @@ function EMM.Include(inc)
 		end
 	elseif isstring(inc) then
 		local inc_path = EMM_GAMEMODE_DIRECTORY..inc
-		local cl_inc_file = file.Find(inc_path..".cl.lua", "LUA")[1]
 		local sh_inc_file = file.Find(inc_path..".sh.lua", "LUA")[1]
-
-		if cl_inc_file then
-			include(inc_path..".cl.lua")
-		end
+		local cl_inc_file = file.Find(inc_path..".cl.lua", "LUA")[1]
 
 		if sh_inc_file then
 			include(inc_path..".sh.lua")
+		end
+
+		if cl_inc_file then
+			include(inc_path..".cl.lua")
 		end
 
 		EMM.client_includes[inc] = true

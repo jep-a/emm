@@ -13,7 +13,7 @@ function EMM.RequireClientsideLuaDirectory(dir)
 	local files, child_dirs = file.Find(EMM_GAMEMODE_DIRECTORY..dir.."/*", "LUA")
 
 	for _, file in pairs(files) do
-		if string.match(file, "cl.lua$") or string.match(file, "sh.lua$") then
+		if string.match(file, "sh.lua$") or string.match(file, "cl.lua$") then
 			MsgN("requiring client-side include "..dir.."/"..file)
 			AddCSLuaFile(EMM_GAMEMODE_DIRECTORY..dir.."/"..file)
 		end
@@ -32,10 +32,10 @@ function EMM.Include(inc)
 		end
 	elseif isstring(inc) then
 		local inc_path = EMM_GAMEMODE_DIRECTORY..inc
-		local sv_inc_file = file.Find(inc_path..".sv.lua", "LUA")[1]
 		local sh_inc_file = file.Find(inc_path..".sh.lua", "LUA")[1]
+		local sv_inc_file = file.Find(inc_path..".sv.lua", "LUA")[1]
 
-		if sv_inc_file or sh_inc_file then
+		if sh_inc_file or sv_inc_file then
 			MsgN("including "..inc)
 		else
 			MsgN("could not find include "..inc)
@@ -43,12 +43,12 @@ function EMM.Include(inc)
 			return
 		end
 
-		if sv_inc_file then
-			include(inc_path..".sv.lua")
-		end
-
 		if sh_inc_file then
 			include(inc_path..".sh.lua")
+		end
+
+		if sv_inc_file then
+			include(inc_path..".sv.lua")
 		end
 
 		EMM.server_includes[inc] = true
