@@ -4,7 +4,9 @@ EMM.client_includes = {}
 
 EMM_GAMEMODE_DIRECTORY = "emm/gamemode/"
 
-function EMM.Include(inc)
+function EMM.Include(inc, inc_func)
+	inc_func = inc_func or include
+
 	if istable(inc) then
 		for _, _inc in pairs(inc) do
 			EMM.Include(_inc)
@@ -15,11 +17,11 @@ function EMM.Include(inc)
 		local cl_inc_file = file.Find(inc_path..".cl.lua", "LUA")[1]
 
 		if sh_inc_file then
-			include(inc_path..".sh.lua")
+			inc_func(inc_path..".sh.lua")
 		end
 
 		if cl_inc_file then
-			include(inc_path..".cl.lua")
+			inc_func(inc_path..".cl.lua")
 		end
 
 		EMM.client_includes[inc] = true

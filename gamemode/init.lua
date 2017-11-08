@@ -25,7 +25,9 @@ function EMM.RequireClientsideLuaDirectory(dir)
 end
 EMM.RequireClientsideLuaDirectory()
 
-function EMM.Include(inc)
+function EMM.Include(inc, inc_func)
+	inc_func = inc_func or include
+
 	if istable(inc) then
 		for _, _inc in pairs(inc) do
 			EMM.Include(_inc)
@@ -44,11 +46,11 @@ function EMM.Include(inc)
 		end
 
 		if sh_inc_file then
-			include(inc_path..".sh.lua")
+			inc_func(inc_path..".sh.lua")
 		end
 
 		if sv_inc_file then
-			include(inc_path..".sv.lua")
+			inc_func(inc_path..".sv.lua")
 		end
 
 		EMM.server_includes[inc] = true
