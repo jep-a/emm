@@ -7,11 +7,11 @@ function player_metatable:SetPlayerClass(ply_class)
 
 	self.player_class = ply_class
 	self:SetupPlayerClass()
-	PlayerClassService.NetworkPlayerClass(ply, ply_class)
+	PlayerClassService.NetworkPlayerClass(self, ply_class)
 end
 
 function player_metatable:ClearPlayerClass()
 	self.player_class = nil
 	self:EndPlayerClass()
-	PlayerClassService.NetworkPlayerClass(ply)
+	PlayerClassService.NetworkPlayerClass(self)
 end

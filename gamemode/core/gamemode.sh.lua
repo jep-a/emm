@@ -13,5 +13,6 @@ EMM.Include {
 	"player-class/methods",
 	"movement/walljump",
 	"movement/wallslide",
-	"movement/airaccel"
+	"movement/airaccel",
+	"minigame/minigame"
 }

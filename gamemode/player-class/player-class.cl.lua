@@ -1,14 +1,18 @@
 PlayerClassService = PlayerClassService or {}
 
-function PlayerClassService.MinigamePlayerClass(ply, ply_class_id)
-	return ply:GetMinigame().player_classes[ply_class_id]
+function PlayerClassService.MinigamePlayerClass(ply, id)
+	for _, ply_class in pairs(ply.minigame_lobby.player_classes) do
+		if id == ply_class.id then
+			return ply_class
+		end
+	end
 end
 
 function PlayerClassService.ReceivePlayerClass()
 	local ply = net.ReadEntity()
-	local ply_class_id = net.ReadUInt(8)
-	if not (ply_class_id == 0) then
-		ply:SetPlayerClass(PlayerClassService.MinigamePlayerClass(ply, ply_class_id))
+	local id = net.ReadUInt(8)
+	if not (id == 0) then
+		ply:SetPlayerClass(PlayerClassService.MinigamePlayerClass(ply, id))
 	else
 		ply:ClearPlayerClass()
 	end
