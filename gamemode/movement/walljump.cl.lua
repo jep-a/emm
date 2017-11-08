@@ -31,7 +31,7 @@ function WalljumpService.PlayedSound(ply)
 end
 
 function WalljumpService.CleanupPrediction()
-	local cuttoff = CurTime() - LocalPlayer().walljump_delay
+	local cutoff = CurTime() - LocalPlayer().walljump_delay
 
 	for k, _ in pairs(walljumps) do
 		if cutoff > k then
