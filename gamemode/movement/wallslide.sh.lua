@@ -83,13 +83,13 @@ function WallslideService.SetupWallslide(ply, move)
 			if not ply.wallsliding then
 				ply.wallslide_velocity = ply:GetVelocity()
 				ply.last_wallslide_time = CurTime()
-				ply.stamina.wallslide:ReduceStamina(ply.wallslide_init_cost)
+				ply.wallsliding = true
+				ply.stamina.wallslide:SetActive(true)
+				if IsFirstTimePredicted() then ply.stamina.wallslide:ReduceStamina(ply.wallslide_init_cost) end
 			end
 
-			ply.wallsliding = true
-			ply.stamina.wallslide:SetActive(true)
 			move:SetVelocity(WallslideService.Velocity(ply, trace))
-		else
+		elseif ply.wallsliding then
 			ply.wallsliding = false
 			ply.stamina.wallslide:SetActive(false)
 		end
