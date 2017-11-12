@@ -9,21 +9,44 @@ function MinigameService.CreateLobby(lobby)
 	lobby = setmetatable(table.Merge({
 		players = {}
 	}, lobby or {}), MinigameLobby)
-	lobby.id = table.insert(MinigameService.lobbies, lobby)
-	MinigameService.NetworkLobbyCreate(lobby)
+	lobby.id = #MinigameService.lobbies + 1
+	MinigameService.lobbies[lobby.id] = lobby
+	MinigameService.NetworkCreateLobby(lobby)
 	return lobby
 end
 
-function MinigameLobby:AddPlayer(ply)
-	ply.minigame_lobby = self
-	table.insert(self.players, ply)
-	MinigameService.NetworkLobbyJoin(self, ply)
+function MinigameService.RemoveLobby(lobby)
+	MinigameService.lobbies[lobby.id] = nil
+
+	for _, ply in pairs(lobby.players) do
+		lobby:RemovePlayer(ply, false)
+	end
+
+	MinigameService.NetworkRemoveLobby(lobby)
+	table.Empty(lobby)
 end
 
-function MinigameLobby:RemovePlayer(ply)
+function MinigameLobby:AddPlayer(ply, net)
+	net = net == nil and true or net
+
+	ply.minigame_lobby = self
+	table.insert(self.players, ply)
+
+	if net then
+		MinigameService.NetworkLobbyAddPlayer(self, ply)
+	end
+end
+
+function MinigameLobby:RemovePlayer(ply, net)
+	net = net == nil and true or net
+
+	ply:ClearPlayerClass()
 	ply.minigame_lobby = nil
 	table.RemoveByValue(self.players, ply)
-	MinigameService.NetworkLobbyLeave(self, ply)
+
+	if net then
+		MinigameService.NetworkLobbyRemovePlayer(self, ply)
+	end
 end
 
 

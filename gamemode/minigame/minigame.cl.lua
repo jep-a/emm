@@ -5,18 +5,34 @@ MinigameService = MinigameService or {}
 
 MinigameLobby = MinigameLobby or {}
 
-function MinigameService.CreateLobby(lobby)
+function MinigameService.CreateLobby(lobby, notify)
+	notify = notify == nil and true or notify
+
 	MinigameService.lobbies[lobby.id] = setmetatable(table.Merge({
 		players = {}
 	}, lobby or {}), MinigameLobby)
 end
 
-function MinigameLobby:AddPlayer(ply)
+function MinigameService.RemoveLobby(lobby)
+	MinigameService.lobbies[lobby.id] = nil
+
+	for _, ply in pairs(lobby.players) do
+		lobby:RemovePlayer(ply, false)
+	end
+
+	table.Empty(lobby)
+end
+
+function MinigameLobby:AddPlayer(ply, notify)
+	notify = notify == nil and true or notify
+
 	ply.minigame_lobby = self
 	table.insert(self.players, ply)
 end
 
-function MinigameLobby:RemovePlayer(ply)
+function MinigameLobby:RemovePlayer(ply, notify)
+	notify = notify == nil and true or notify
+
 	ply.minigame_lobby = nil
 	table.RemoveByValue(self.players, ply)
 end
@@ -36,11 +52,11 @@ function MinigameService.ReceiveCreateLobby()
 end
 net.Receive("CreateLobby", MinigameService.ReceiveCreateLobby)
 
--- function MinigameService.ReceiveRemoveLobby()
--- 	local lobby_id = net.ReadUInt(8)
--- 	MinigameService.RemoveLobby(MinigameService.lobbies(lobby_id))
--- end
--- net.Receive("RemoveLobby", MinigameService.ReceiveRemoveLobby)
+function MinigameService.ReceiveRemoveLobby()
+	local lobby_id = net.ReadUInt(8)
+	MinigameService.RemoveLobby(MinigameService.lobbies[lobby_id])
+end
+net.Receive("RemoveLobby", MinigameService.ReceiveRemoveLobby)
 
 function MinigameService.LobbyAddPlayer()
 	local lobby_id = net.ReadUInt(8)
