@@ -7,6 +7,7 @@ EMM.Include {
 	"util/palette",
 	"util/pred-sound",
 	"util/stamina",
+	"util/time-associated-map",
 	"player/hooks",
 	"player/methods",
 	"movement/walljump",
