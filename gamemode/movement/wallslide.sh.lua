@@ -78,7 +78,7 @@ function WallslideService.SetupWallslide(ply, move)
 			not trace.HitSky and
 			not ply:OnGround() and
 			move:KeyDown(IN_ATTACK2) and
-			ply.stamina.wallslide:HasStamina()
+			WallslideService.HasStamina(ply)
 		then
 			if not ply.wallsliding then
 				ply.wallslide_velocity = ply:GetVelocity()
@@ -87,7 +87,12 @@ function WallslideService.SetupWallslide(ply, move)
 				ply.stamina.wallslide:SetActive(true)
 				if IsFirstTimePredicted() then ply.stamina.wallslide:ReduceStamina(ply.wallslide_init_cost) end
 			end
-
+			
+			
+			if IsFirstTimePredicted() then 
+				print(ply.stamina.wallslide:GetStamina())
+			end
+			
 			move:SetVelocity(WallslideService.Velocity(ply, trace))
 		elseif ply.wallsliding then
 			ply.wallsliding = false

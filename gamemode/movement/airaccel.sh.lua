@@ -53,10 +53,10 @@ function AiraccelService.SetupAiraccel(ply, move)
 		ply.can_airaccel and
 		not ply:IsOnGround() and
 		move:KeyDown(IN_SPEED) and
-		ply.stamina.airaccel:HasStamina()
+		AiraccelService.HasStamina(ply)
 	then
 		ply.stamina.airaccel:SetActive(true)
-
+		
 		local vel_diff, new_vel = AiraccelService.Velocity(ply, move)
 		if vel_diff > 0 then
 			move:SetVelocity(new_vel)
