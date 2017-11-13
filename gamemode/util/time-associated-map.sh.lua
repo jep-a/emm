@@ -18,13 +18,13 @@ function TimeAssociatedMapService.CreateMap(cooldown, lookup_func)
 	}, TimeAssociatedMap)
 
 	table.insert(maps, result)
-	
+
 	return result
 end
 
 function TimeAssociatedMap:Value(...)
 	local cur_time = CurTime()
-	
+
 	if self.values[cur_time] == nil then
 		self.values[cur_time] = self.lookup_func(args)
 	end
@@ -51,4 +51,3 @@ function TimeAssociatedMapService.Cleanup()
 	end
 end
 hook.Add("Think", " TimeAssociatedMapService.Cleanup",  TimeAssociatedMapService.Cleanup)
-
