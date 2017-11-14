@@ -10,10 +10,7 @@ function WallslideService.InitPlayerProperties(ply)
 	ply.wallslide_decay_step = 0.25
 	ply.wallslide_cooldown = 2
 	ply.wallslide_init_cost = 5
-
-	if SERVER then
-		ply.wallslide_sound = CreateSound(ply, "physics/body/body_medium_scrape_smooth_loop1.wav")
-	end
+	ply.wallslide_sound_file = "physics/body/body_medium_scrape_smooth_loop1.wav"
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
@@ -80,20 +77,22 @@ function WallslideService.SetupWallslide(ply, move)
 			move:KeyDown(IN_ATTACK2) and
 			WallslideService.HasStamina(ply)
 		then
-			if not WallslideService.IsWallsliding(ply) then
+			if not WallslideService.IsWallsliding(ply) and not WallslideService.StartedWallslide(ply) then
 				ply.wallslide_velocity = ply:GetVelocity()
 				ply.last_wallslide_time = CurTime()
 				ply.wallsliding = true
 				ply.stamina.wallslide:SetActive(true)
-				if not WallslideService.StartedWallslide(ply) then
-					ply.stamina.wallslide:ReduceStamina(ply.wallslide_init_cost)
-				end
+				ply.stamina.wallslide:ReduceStamina(ply.wallslide_init_cost)
+				PredictedSoundService.PlayWallslideSound(ply)
+				print(CurTime() .. " : " .. ply.stamina.wallslide:GetStamina())
 			end
-			
+
 			move:SetVelocity(WallslideService.Velocity(ply, trace))
-		elseif WallslideService.IsWallsliding(ply) then
+		elseif WallslideService.IsWallsliding(ply) and not WallslideService.FinishedWallslide(ply) then
+			print("finished wallslide")
 			ply.wallsliding = false
 			ply.stamina.wallslide:SetActive(false)
+			PredictedSoundService.StopWallslideSound(ply)
 		end
 	end
 end

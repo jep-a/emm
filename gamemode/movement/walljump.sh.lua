@@ -74,7 +74,7 @@ function WalljumpService.Walljump(ply, move, dir)
 		did_walljump = true
 
 		move:SetVelocity(move:GetVelocity() + WalljumpService.Velocity(ply, dir))
-		WalljumpService.Effect(ply, trace)
+		--WalljumpService.Effect(ply, trace)
 		ply.last_walljump_time = CurTime()
 
 		if not WalljumpService.PlayedSound(ply) then

@@ -14,3 +14,7 @@ end
 function WallslideService.StartedWallslide(ply)
 	return false
 end
+
+function WallslideService.FinishedWallslide(ply)
+	return false
+end
