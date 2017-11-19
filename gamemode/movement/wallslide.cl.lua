@@ -36,3 +36,7 @@ end
 function WallslideService.LastWallslideTime(ply)
 	return player_last_wallslide_time:Value()
 end
+
+function WallslideService.WallslideVelocity(ply)
+	return player_wallslide_velocity:Value()
+end
