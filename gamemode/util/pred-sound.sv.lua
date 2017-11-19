@@ -1,18 +1,6 @@
 PredictedSoundService = PredictedSoundService or {}
+PredictedSoundService.RegisteredSounds = PredictedSoundService.RegisteredSounds or {}
 
-sound.Add( {
-	name = "server_wallslide_sound",
-	channel = CHAN_STATIC,
-	volume = 1.0,
-	level = 80,
-	pitch = { 95, 110 },
-	sound = "physics/body/body_medium_scrape_smooth_loop1.wav"
-} )
-
-function PredictedSoundService.InitPlayerProperties(ply)
-	ply.predicted_sound_emitter = ply
-end
-hook.Add("InitPlayerProperties", "PredictedSoundService.InitPlayerProperties", PredictedSoundService.InitPlayerProperties)
 
 function PredictedSoundService.GetExclusiveFilter(ply)
 	local filter = RecipientFilter()
@@ -21,16 +9,34 @@ function PredictedSoundService.GetExclusiveFilter(ply)
 	return filter
 end
 
+function PredictedSoundService.RegisterSound(sound_file)
+	local sound_table = {
+		name = "server_predicted_sound_" .. table.Count(PredictedSoundService.RegisteredSounds),
+		channel = CHAN_STATIC,
+		volume = 1.0,
+		level = 80,
+		pitch = { 95, 110 },
+		sound = sound_file
+	}
+
+	sound.Add(sound_table)
+	PredictedSoundService.RegisteredSounds[sound_file] = sound_table.name
+end
+
 function PredictedSoundService.PlaySound(ply, sound_file)
-	CreateSound(ply.predicted_sound_emitter, sound_file, PredictedSoundService.GetExclusiveFilter(ply)):Play()
+	CreateSound(ply, sound_file, PredictedSoundService.GetExclusiveFilter(ply)):Play()
 end
 
 function PredictedSoundService.PlayWallslideSound(ply)
+	if not PredictedSoundService.RegisteredSounds[ply.wallslide_sound_file] then
+		PredictedSoundService.RegisterSound(ply.wallslide_sound_file)
+	end
+
 	if ply.wallslide_sound and ply.wallslide_sound:IsPlaying() then
 		ply.wallslide_sound:Stop()
 	end
 	
-	ply.wallslide_sound = CreateSound(ply, "server_wallslide_sound", PredictedSoundService.GetExclusiveFilter(ply))
+	ply.wallslide_sound = CreateSound(ply, PredictedSoundService.RegisteredSounds[ply.wallslide_sound_file], PredictedSoundService.GetExclusiveFilter(ply))
 	ply.wallslide_sound:Play()
 end
 
