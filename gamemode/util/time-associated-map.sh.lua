@@ -2,6 +2,7 @@ TimeAssociatedMapService = TimeAssociatedMapService or {}
 
 
 -- # Global values
+
 maps = maps or {}
 
 
@@ -32,8 +33,8 @@ function TimeAssociatedMap:Value(...)
 	return self.values[cur_time]
 end
 
-function TimeAssociatedMap:SetValue(v)
-	self.values[CurTime()] = v
+function TimeAssociatedMap:Update(...)
+	self.values[CurTime()] = self.lookup_func(args)
 end
 
 function TimeAssociatedMap:HasChecked()

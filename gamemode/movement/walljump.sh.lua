@@ -78,7 +78,6 @@ function WalljumpService.Walljump(ply, move, dir)
 		ply.last_walljump_time = CurTime()
 
 		if not WalljumpService.PlayedSound(ply) then
-			print(CurTime() .. " : did wall jump")
 			PredictedSoundService.PlaySound(ply, ply.walljump_sound.. math.random(1, 6) ..".wav")
 		end
 	else

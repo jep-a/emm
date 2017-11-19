@@ -82,19 +82,17 @@ function WallslideService.SetupWallslide(ply, move)
 				ply.last_wallslide_time = CurTime()
 				ply.wallsliding = true
 				ply.stamina.wallslide:SetActive(true)
-				if CLIENT then WallslideService.SetPredictedIsWallsliding(ply, true) end
-				--ply.stamina.wallslide:ReduceStamina(ply.wallslide_init_cost)
+				ply.stamina.wallslide:ReduceStamina(ply.wallslide_init_cost)
 				PredictedSoundService.PlayWallslideSound(ply)
-				print(CurTime() .. " : " .. ply.stamina.wallslide:GetStamina())
+				if CLIENT then WallslideService.UpdateWallsliding(ply) end
 			end
 
 			move:SetVelocity(WallslideService.Velocity(trace, WallslideService.LastWallslideTime(ply), WallslideService.WallslideVelocity(ply)))
 		elseif WallslideService.IsWallsliding(ply) and not WallslideService.FinishedWallslide(ply) then
-			print(CurTime() .. " : finished wallslide")
 			ply.wallsliding = false
 			ply.stamina.wallslide:SetActive(false)
-			if CLIENT then WallslideService.SetPredictedIsWallsliding(ply, false) end
 			PredictedSoundService.StopWallslideSound(ply)
+			if CLIENT then WallslideService.UpdateWallsliding(ply) end
 		end
 	end
 end
