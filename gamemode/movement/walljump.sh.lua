@@ -78,6 +78,7 @@ function WalljumpService.Walljump(ply, move, dir)
 		ply.last_walljump_time = CurTime()
 
 		if not WalljumpService.PlayedSound(ply) then
+			print(CurTime() .. " : did wall jump")
 			PredictedSoundService.PlaySound(ply, ply.walljump_sound.. math.random(1, 6) ..".wav")
 		end
 	else
@@ -91,7 +92,7 @@ function WalljumpService.SetupWalljump(ply, move)
 	if
 		ply:Alive() and
 		ply.can_walljump and
-		not ply.wallsliding and
+		not WallslideService.IsWallsliding(ply) and
 		move:KeyDown(IN_JUMP) and
 		WalljumpService.PressedWalljumpButtons(move:GetButtons(), move:GetOldButtons()) and
 		WalljumpService.CooledDown(ply)

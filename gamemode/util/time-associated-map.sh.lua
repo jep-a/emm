@@ -32,6 +32,10 @@ function TimeAssociatedMap:Value(...)
 	return self.values[cur_time]
 end
 
+function TimeAssociatedMap:SetValue(v)
+	self.values[CurTime()] = v
+end
+
 function TimeAssociatedMap:HasChecked()
 	return self.values[CurTime()] != nil
 end
