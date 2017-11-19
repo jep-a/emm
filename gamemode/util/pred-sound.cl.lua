@@ -1,13 +1,24 @@
 PredictedSoundService = PredictedSoundService or {}
 
-function PredictedSoundService.InitPlayerProperties(ply)
-	ply.predicted_sound_emitter = ClientsideModel("models/hunter/blocks/cube025x025x025.mdl")
-	ply.predicted_sound_emitter:SetPos(ply:GetShootPos())
-	ply.predicted_sound_emitter:SetNoDraw(true)
-	ply.predicted_sound_emitter:SetParent(ply)
-end
-hook.Add("InitLocalPlayerProperties", "PredictedSoundService.InitPlayerProperties", PredictedSoundService.InitPlayerProperties)
+local cache = {}
 
-function PredictedSoundService.PlaySound(ply, sound_file)
-	CreateSound(ply.predicted_sound_emitter, sound_file):Play()
+function PredictedSoundService.PlaySound(ply, sound_file, soundLevel, pitchPercent, volume, channel)
+	ply:EmitSound(sound_file, soundLevel, pitchPercent, volume, channel)
+end
+
+function PredictedSoundService.PlayWallslideSound(ply)
+	if cache[ply.wallslide_sound_file] == nil then
+		if ply.wallslide_sound and ply.wallslide_sound:IsPlaying() then
+			ply.wallslide_sound:Stop()
+		end
+		
+		cache[ply.wallslide_sound_file] = CreateSound(ply, ply.wallslide_sound_file)
+	end
+	
+	ply.wallslide_sound = cache[ply.wallslide_sound_file]
+	ply.wallslide_sound:Play()
+end
+
+function PredictedSoundService.StopWallslideSound(ply)
+	ply.wallslide_sound:ChangeVolume(0, 0.25)
 end

@@ -35,6 +35,23 @@ hook.Add(
 	AiraccelService.PlayerProperties
 )
 
+-- # Sound effects
+function AiraccelService.KeyPress(ply, key)
+	if IsFirstTimePredicted() and key == IN_SPEED and not ply.airaccel_started then
+		ply.airaccel_started = true
+		PredictedSoundService.PlaySound(ply, ply.airaccel_sound)
+	end
+end
+hook.Add("KeyPress", "AiraccelService.KeyPress", AiraccelService.KeyPress)
+
+function AiraccelService.KeyRelease(ply, key)
+	if IsFirstTimePredicted() and key == IN_SPEED and ply.airaccel_started then
+		if CLIENT then PredictedSoundService.PlaySound(ply, ply.airaccel_sound, 100, 75, 0.2) end
+		ply.airaccel_started = false
+	end
+end
+hook.Add("KeyRelease", "AiraccelService.KeyRelease", AiraccelService.KeyRelease)
+
 
 -- # Airacceling
 
@@ -53,7 +70,7 @@ function AiraccelService.SetupAiraccel(ply, move)
 		ply.can_airaccel and
 		not ply:IsOnGround() and
 		move:KeyDown(IN_SPEED) and
-		ply.stamina.airaccel:HasStamina()
+		AiraccelService.HasStamina(ply)
 	then
 		ply.stamina.airaccel:SetActive(true)
 
@@ -66,6 +83,10 @@ function AiraccelService.SetupAiraccel(ply, move)
 			end
 		end
 	else
+		if IsFirstTimePredicted() and ply.airaccel_started then
+			if CLIENT then PredictedSoundService.PlaySound(ply, ply.airaccel_sound, 100, 75, 0.2) end
+			ply.airaccel_started = false
+		end
 		ply.stamina.airaccel:SetActive(false)
 	end
 end

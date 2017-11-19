@@ -10,10 +10,7 @@ function WallslideService.InitPlayerProperties(ply)
 	ply.wallslide_decay_step = 0.25
 	ply.wallslide_cooldown = 2
 	ply.wallslide_init_cost = 5
-
-	if SERVER then
-		ply.wallslide_sound = CreateSound(ply, "physics/body/body_medium_scrape_smooth_loop1.wav")
-	end
+	ply.wallslide_sound_file = "physics/body/body_medium_scrape_smooth_loop1.wav"
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
@@ -63,9 +60,9 @@ function WallslideService.Trace(ply, dir)
 	return trace
 end
 
-function WallslideService.Velocity(ply, trace)
-	local frac = math.Clamp(math.TimeFraction(ply.last_wallslide_time, ply.last_wallslide_time + 2, CurTime()), 0, 1)
-	local new_move_vel = ((1 - frac) * (ply.wallslide_velocity * Vector(1, 1, 0))) + (frac * (trace.Normal * Vector(1, 1, 0.1)) * 400) - Vector(0, 0, 5)
+function WallslideService.Velocity(trace, last_wallslide_time, wallslide_velocity)
+	local frac = math.Clamp(math.TimeFraction(last_wallslide_time, last_wallslide_time + 2, CurTime()), 0, 1)
+	local new_move_vel = ((1 - frac) * (wallslide_velocity * Vector(1, 1, 0))) + (frac * (trace.Normal * Vector(1, 1, 0.1)) * 400) - Vector(0, 0, 5)
 	new_move_vel.z = math.min(new_move_vel.z, 1)
 	return new_move_vel
 end
@@ -78,20 +75,24 @@ function WallslideService.SetupWallslide(ply, move)
 			not trace.HitSky and
 			not ply:OnGround() and
 			move:KeyDown(IN_ATTACK2) and
-			ply.stamina.wallslide:HasStamina()
+			WallslideService.HasStamina(ply)
 		then
-			if not ply.wallsliding then
+			if not WallslideService.IsWallsliding(ply) and not WallslideService.StartedWallslide(ply) then
 				ply.wallslide_velocity = ply:GetVelocity()
 				ply.last_wallslide_time = CurTime()
+				ply.wallsliding = true
+				ply.stamina.wallslide:SetActive(true)
 				ply.stamina.wallslide:ReduceStamina(ply.wallslide_init_cost)
+				PredictedSoundService.PlayWallslideSound(ply)
+				if CLIENT then WallslideService.UpdateWallsliding(ply) end
 			end
 
-			ply.wallsliding = true
-			ply.stamina.wallslide:SetActive(true)
-			move:SetVelocity(WallslideService.Velocity(ply, trace))
-		else
+			move:SetVelocity(WallslideService.Velocity(trace, WallslideService.LastWallslideTime(ply), WallslideService.WallslideVelocity(ply)))
+		elseif WallslideService.IsWallsliding(ply) and not WallslideService.FinishedWallslide(ply) then
 			ply.wallsliding = false
 			ply.stamina.wallslide:SetActive(false)
+			PredictedSoundService.StopWallslideSound(ply)
+			if CLIENT then WallslideService.UpdateWallsliding(ply) end
 		end
 	end
 end
