@@ -12,5 +12,6 @@ EMM.Include {
 	"player/methods",
 	"movement/walljump",
 	"movement/wallslide",
-	"movement/airaccel"
+	"movement/airaccel",
+	"movement/ramp-fix"
 }
