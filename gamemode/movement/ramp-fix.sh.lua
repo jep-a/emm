@@ -2,7 +2,7 @@ RampFixService = RampFixService or {}
 RampFixService.TraceHullMins = Vector(-16, -16, 0)
 RampFixService.TraceHullMaxs = Vector(16, 16, 0)
 RampFixService.MinRampSlideSpeed = 70 * 70 * 10 * 10
-RampFixService.MinSurfRamp = 0.71
+RampFixService.MinSurfRamp = 0.9
 
 
 -- # Utility
