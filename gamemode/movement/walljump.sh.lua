@@ -74,7 +74,7 @@ function WalljumpService.Walljump(ply, move, dir)
 		did_walljump = true
 
 		move:SetVelocity(move:GetVelocity() + WalljumpService.Velocity(ply, dir))
-		WalljumpService.Effect(ply, trace)
+		--WalljumpService.Effect(ply, trace)
 		ply.last_walljump_time = CurTime()
 
 		if not WalljumpService.PlayedSound(ply) then
@@ -91,7 +91,7 @@ function WalljumpService.SetupWalljump(ply, move)
 	if
 		ply:Alive() and
 		ply.can_walljump and
-		not ply.wallsliding and
+		not WallslideService.IsWallsliding(ply) and
 		move:KeyDown(IN_JUMP) and
 		WalljumpService.PressedWalljumpButtons(move:GetButtons(), move:GetOldButtons()) and
 		WalljumpService.CooledDown(ply)

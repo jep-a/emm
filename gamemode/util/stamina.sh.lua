@@ -65,15 +65,17 @@ end
 -- # Updating
 
 function StaminaService.Update()
-	local cur_time = CurTime()
-	for _, ply in pairs(SERVER and player.GetAll() or {LocalPlayer()}) do
-		for _, stamina_type in pairs(ply.stamina or {}) do
-			if stamina_type.active then
-				stamina_type:ReduceStamina(stamina_type.decay_step)
-			elseif cur_time > (stamina_type.last_active + stamina_type.cooldown) then
-				stamina_type:AddStamina(stamina_type.regen_step)
+	if IsFirstTimePredicted() then
+		local cur_time = CurTime()
+		for _, ply in pairs(SERVER and player.GetAll() or {LocalPlayer()}) do
+			for _, stamina_type in pairs(ply.stamina or {}) do
+				if stamina_type.active then
+					stamina_type:ReduceStamina(stamina_type.decay_step)
+				elseif cur_time > (stamina_type.last_active + stamina_type.cooldown) then
+					stamina_type:AddStamina(stamina_type.regen_step)
+				end
 			end
 		end
 	end
 end
-hook.Add("Tick", "StaminaService.Update", StaminaService.Update)
+hook.Add("SetupMove", "StaminaService.Update", StaminaService.Update)
