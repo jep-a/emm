@@ -1,13 +1,14 @@
 RampFixService = RampFixService or {}
 RampFixService.TraceHullMins = Vector(-16, -16, 0)
 RampFixService.TraceHullMaxs = Vector(16, 16, 0)
+RampFixService.MinRampSlideSpeed = 70 * 70 * 10
 
 
 -- # Utility
 
 function RampFixService.GetGroundTrace(mv)
 	local position = mv:GetOrigin()
-	local endPos = Vector(position.x, position.y, position.z - 1)
+	local endPos = Vector(position.x, position.y, position.z - 2)
 	return util.TraceHull{
 		start = position,
 		endpos = endPos,
@@ -22,22 +23,20 @@ end
 
 function RampFixService.RampFix(ply, mv)
 	local tr = RampFixService.GetGroundTrace(mv)
-	local velocity = mv:GetVelocity()
-	
-	if tr.HitWorld and tr.HitNormal.z <1 then
-		ply.on_ramp = true
-		ply.last_ramp = Vector(tr.HitNormal.x, tr.HitNormal.y, 0)
-	else
-		if not (velocity.x == 0 and velocity.y == 0) and RampFixService.OnRamp(ply) and Vector(velocity.x, velocity.y, 0):Dot(RampFixService.LastRamp(ply)) == 0 then
-			if IsFirstTimePredicted() then print("ramp glitch fixed") end
-			local position = mv:GetOrigin()
-			position.z = position.z + 1
-			mv:SetOrigin(position)
-			mv:SetVelocity(RampFixService.LastRampVelocity(ply))
-		end
-		ply.on_ramp = false
-	end
 
-	ply.last_velocity = velocity
+	if (tr.HitWorld and tr.HitNormal.z < 1) then
+		local velocity = mv:GetVelocity()
+		local velocity2D = Vector(velocity.x, velocity.y)
+		local pos = mv:GetOrigin()
+		local backoff = velocity:Dot(tr.HitNormal)
+
+		if (velocity2D:Dot(tr.HitNormal) < 0 and velocity2D:Dot(velocity2D) > RampFixService.MinRampSlideSpeed) then 
+			local result = tr.HitNormal * backoff
+			pos.z = tr.HitPos.z + 2
+			mv:SetVelocity(velocity - result)
+			mv:SetOrigin(pos)
+			ply:SetGroundEntity(NULL)
+		end
+	end
 end
 hook.Add("SetupMove", "RampFixService.RampFix", RampFixService.RampFix)
