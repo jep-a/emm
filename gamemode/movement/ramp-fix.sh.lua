@@ -1,7 +1,7 @@
 RampFixService = RampFixService or {}
 RampFixService.TraceHullMins = Vector(-16, -16, 0)
 RampFixService.TraceHullMaxs = Vector(16, 16, 0)
-RampFixService.MinRampSlideSpeed = 70 * 70 * 10 * 10
+RampFixService.MinRampSlideSpeedSqr = 700 * 700
 RampFixService.MinSurfRamp = 0.9
 RampFixService.HoverHeight = 2
 
@@ -33,7 +33,7 @@ function RampFixService.ShouldSlide(velocity, tr)
 	ramp2D:Normalize()
 	velocity2D.x = velocity2D.x * ramp2D.x
 	velocity2D.y = velocity2D.y * ramp2D.y
-	return velocity2D.x + velocity2D.y < 0 and velocity2D:Dot(velocity2D) > RampFixService.MinRampSlideSpeed
+	return velocity2D.x + velocity2D.y < 0 and velocity2D:Dot(velocity2D) > RampFixService.MinRampSlideSpeedSqr
 end
 
 
