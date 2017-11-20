@@ -7,10 +7,7 @@ MinigameLobby = MinigameLobby or {}
 
 function MinigameService.CreateLobby(lobby, notify)
 	notify = notify == nil and true or notify
-
-	MinigameService.lobbies[lobby.id] = setmetatable(table.Merge({
-		players = {}
-	}, lobby or {}), MinigameLobby)
+	MinigameService.lobbies[lobby.id] = setmetatable(table.Merge({players = {}}, lobby or {}), MinigameLobby)
 end
 
 function MinigameService.RemoveLobby(lobby)
@@ -71,3 +68,33 @@ function MinigameService.LobbyRemovePlayer()
 	MinigameService.lobbies[lobby_id]:RemovePlayer(ply)
 end
 net.Receive("LobbyRemovePlayer", MinigameService.LobbyRemovePlayer)
+
+function MinigameService.RequestLobbies()
+	net.Start "RequestLobbies"
+	net.SendToServer()
+end
+hook.Add("InitPostEntity", "MinigameService.RequestLobbies", MinigameService.RequestLobbies)
+
+function MinigameService.ReceiveLobbies()
+	local lobby_count = net.ReadUInt(8)
+	for i = 1, lobby_count do
+		local lobby_id = net.ReadUInt(8)
+		local proto_id = net.ReadUInt(8)
+		local host = net.ReadEntity()
+		local ply_count = net.ReadUInt(8)
+		local plys = {}
+
+		for i = 1, ply_count do
+			local ply = net.ReadEntity()
+			table.insert(plys, ply)
+		end
+
+		MinigameService.CreateLobby({
+			id = lobby_id,
+			prototype = MinigameService.Prototype(proto_id),
+			host = host,
+			players = plys
+		}, false)
+	end
+end
+net.Receive("Lobbies", MinigameService.ReceiveLobbies)

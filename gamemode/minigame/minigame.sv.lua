@@ -6,9 +6,7 @@ MinigameService = MinigameService or {}
 MinigameLobby = MinigameLobby or {}
 
 function MinigameService.CreateLobby(lobby)
-	lobby = setmetatable(table.Merge({
-		players = {}
-	}, lobby or {}), MinigameLobby)
+	lobby = setmetatable(table.Merge({players = {}}, lobby or {}), MinigameLobby)
 	lobby.id = #MinigameService.lobbies + 1
 	MinigameService.lobbies[lobby.id] = lobby
 	MinigameService.NetworkCreateLobby(lobby)
@@ -83,3 +81,24 @@ function MinigameService.NetworkLobbyRemovePlayer(lobby, ply)
 	net.WriteEntity(ply)
 	net.Broadcast()
 end
+
+util.AddNetworkString "RequestLobbies"
+util.AddNetworkString "Lobbies"
+function MinigameService.NetworkLobbies(_, ply)
+	net.Start "Lobbies"
+	net.WriteUInt(table.Count(MinigameService.lobbies), 8)
+
+	for k, lobby in pairs(MinigameService.lobbies) do
+		net.WriteUInt(k, 8)
+		net.WriteUInt(lobby.prototype.id, 8)
+		net.WriteEntity(lobby.host)
+		net.WriteUInt(#lobby.players, 8)
+
+		for _, ply in pairs(lobby.players) do
+			net.WriteEntity(ply)
+		end
+	end
+
+	net.Send(ply)
+end
+net.Receive("RequestLobbies", MinigameService.NetworkLobbies)
