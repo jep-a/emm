@@ -10,6 +10,10 @@ function MinigameService.CreateLobby(lobby, notify)
 
 	local lobby = setmetatable(table.Merge({players = {}}, lobby or {}), MinigameLobby)
 
+	if lobby.host then
+		lobby:AddPlayer(lobby.host, false)
+	end
+
 	for k, _ in pairs(lobby.prototype.player_classes) do
 		lobby[k] = lobby[k] or {}
 	end
@@ -121,3 +125,9 @@ function MinigameService.ReceiveLobbies()
 	end
 end
 net.Receive("Lobbies", MinigameService.ReceiveLobbies)
+
+function MinigameService.RequestCreateLobby(proto)
+	net.Start "RequestCreateLobby"
+	net.WriteUInt(proto.id, 8)
+	net.SendToServer()
+end
