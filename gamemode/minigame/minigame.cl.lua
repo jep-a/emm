@@ -7,7 +7,16 @@ MinigameLobby = MinigameLobby or {}
 
 function MinigameService.CreateLobby(lobby, notify)
 	notify = notify == nil and true or notify
-	MinigameService.lobbies[lobby.id] = setmetatable(table.Merge({players = {}}, lobby or {}), MinigameLobby)
+
+	local lobby = setmetatable(table.Merge({players = {}}, lobby or {}), MinigameLobby)
+
+	for k, _ in pairs(lobby.prototype.player_classes) do
+		lobby[k] = lobby[k] or {}
+	end
+
+	MinigameService.lobbies[lobby.id] = lobby
+
+	return lobby
 end
 
 function MinigameService.RemoveLobby(lobby)
@@ -82,6 +91,7 @@ function MinigameService.ReceiveLobbies()
 		local proto_id = net.ReadUInt(8)
 		local host = net.ReadEntity()
 		local ply_count = net.ReadUInt(8)
+		local proto = MinigameService.Prototype(proto_id)
 		local plys = {}
 
 		for i = 1, ply_count do
@@ -89,12 +99,25 @@ function MinigameService.ReceiveLobbies()
 			table.insert(plys, ply)
 		end
 
-		MinigameService.CreateLobby({
+		local ply_class_tabs = {}
+		for ply_class_key, _ in pairs(proto.player_classes) do
+			local ply_class_plys = {}
+			local ply_class_count = net.ReadUInt(8)
+
+			for i = 1, ply_class_count do
+				local ply = net.ReadEntity()
+				table.insert(ply_class_plys, ply)
+			end
+
+			ply_class_tabs[ply_class_key] = ply_class_plys
+		end
+
+		MinigameService.CreateLobby(table.Merge({
 			id = lobby_id,
-			prototype = MinigameService.Prototype(proto_id),
+			prototype = proto,
 			host = host,
 			players = plys
-		}, false)
+		}, ply_class_tabs), false)
 	end
 end
 net.Receive("Lobbies", MinigameService.ReceiveLobbies)

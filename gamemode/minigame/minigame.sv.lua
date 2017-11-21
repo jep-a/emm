@@ -8,8 +8,14 @@ MinigameLobby = MinigameLobby or {}
 function MinigameService.CreateLobby(lobby)
 	lobby = setmetatable(table.Merge({players = {}}, lobby or {}), MinigameLobby)
 	lobby.id = #MinigameService.lobbies + 1
+
+	for k, _ in pairs(lobby.prototype.player_classes) do
+		lobby[k] = {}
+	end
+
 	MinigameService.lobbies[lobby.id] = lobby
 	MinigameService.NetworkCreateLobby(lobby)
+
 	return lobby
 end
 
@@ -96,6 +102,13 @@ function MinigameService.NetworkLobbies(_, ply)
 
 		for _, ply in pairs(lobby.players) do
 			net.WriteEntity(ply)
+		end
+
+		for ply_class_key, _ in pairs(lobby.prototype.player_classes) do
+			net.WriteUInt(#lobby[ply_class_key], 8)
+			for _, ply in pairs(lobby[ply_class_key]) do
+				net.WriteEntity(ply)
+			end
 		end
 	end
 
