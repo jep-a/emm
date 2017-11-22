@@ -1,10 +1,20 @@
 SlideService = SlideService or {}
 SlideService.TraceHullMins = Vector(-16, -16, 0)
 SlideService.TraceHullMaxs = Vector(16, 16, 0)
-SlideService.MinRampSlideSpeedSqr = 700 * 700
-SlideService.MinSurfRamp = 0.71
-SlideService.HoverHeight = 2
 
+
+-- # Properties
+
+function SlideService.InitPlayerProperties(ply)
+	ply.slide_surf_minimum = 0.71
+	ply.slide_hover_height = 2
+	ply.slide_down_ramps = false
+end
+hook.Add(
+	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
+	"SlideService.InitPlayerProperties",
+	SlideService.InitPlayerProperties
+)
 
 -- # Utility
 
@@ -23,16 +33,16 @@ function SlideService.GetGroundTrace(position, distance)
 	}
 end
 
-function SlideService.ShouldSlide(velocity, tr)
-	if not tr.HitWorld or tr.HitNormal.z == 1 then
+function SlideService.ShouldSlide(velocity, tr, slide_surf_minimum, surf_down_ramps)
+	if not tr.HitWorld then
 		return false
 	end
 
-	if tr.HitNormal.z < SlideService.MinSurfRamp then
+	if tr.HitNormal.z < slide_surf_minimum then
 		return true
 	end
 
-	return velocity.z > 130
+	return velocity.z > 130 or (surf_down_ramps and velocity.z < -130)
 end
 
 
@@ -40,8 +50,7 @@ end
 
 function SlideService.RampFallDamageFix(ply) 
 	local tr = SlideService.GetGroundTrace(ply:GetLocalPos(), 10)
-	
-	if SlideService.ShouldSlide(SlideService.Clip(ply:GetVelocity(), tr.HitNormal), tr) then
+	if SlideService.ShouldSlide(SlideService.Clip(ply:GetVelocity(), tr.HitNormal), tr, ply.slide_surf_minimum, ply.surf_down_ramps) then
 		ply:SetGroundEntity(NULL)
 	end
 end
@@ -49,11 +58,10 @@ hook.Add("OnPlayerHitGround", "SlideService.RampFallDamageFix", SlideService.Ram
 
 function SlideService.RampFix(ply, mv)
 	local pos = mv:GetOrigin()
-	local tr = SlideService.GetGroundTrace(pos, SlideService.HoverHeight)
+	local tr = SlideService.GetGroundTrace(pos, ply.slide_hover_height)
 	local velocity = SlideService.Clip(mv:GetVelocity(), tr.HitNormal)
-	if (SlideService.ShouldSlide(velocity, tr)) then
-		if (IsFirstTimePredicted()) then print("activated") end
-		pos.z = tr.HitPos.z + SlideService.HoverHeight
+	if (SlideService.ShouldSlide(velocity, tr, ply.slide_surf_minimum, ply.surf_down_ramps)) then
+		pos.z = tr.HitPos.z + ply.slide_hover_height
 		mv:SetVelocity(velocity)
 		mv:SetOrigin(pos)
 		ply:SetGroundEntity(NULL)
