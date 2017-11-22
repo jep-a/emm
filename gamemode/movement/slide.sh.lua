@@ -16,6 +16,7 @@ hook.Add(
 	SlideService.InitPlayerProperties
 )
 
+
 -- # Utility
 
 function SlideService.Clip(velocity, plane)
@@ -36,13 +37,11 @@ end
 function SlideService.ShouldSlide(velocity, tr, slide_surf_minimum, surf_down_ramps)
 	if not tr.HitWorld then
 		return false
-	end
-
-	if tr.HitNormal.z < slide_surf_minimum then
+	elseif tr.HitNormal.z <= slide_surf_minimum then
 		return true
+	else 
+		return velocity.z > 130 or (surf_down_ramps and velocity.z < -130)
 	end
-
-	return velocity.z > 130 or (surf_down_ramps and velocity.z < -130)
 end
 
 
