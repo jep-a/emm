@@ -7,7 +7,7 @@ SlideService.TraceHullMaxs = Vector(16, 16, 0)
 
 function SlideService.InitPlayerProperties(ply)
 	ply.slide_surf_minimum = 0.71
-	ply.slide_hover_height = 2
+	ply.slide_hover_height = 1
 	ply.slide_down_ramps = false
 end
 hook.Add(

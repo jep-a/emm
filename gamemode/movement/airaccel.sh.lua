@@ -79,10 +79,6 @@ function AiraccelService.SetupAiraccel(ply, move)
 			move:SetVelocity(new_vel)
 			AiraccelService.ReduceStamina(ply, vel_diff * ply.airaccel_velocity_cost)
 		end
-
-		if (IsFirstTimePredicted()) then
-			print(ply.stamina.airaccel:GetStamina())
-		end
 	else
 		if IsFirstTimePredicted() and ply.airaccel_started then
 			if CLIENT then PredictedSoundService.PlaySound(ply, ply.airaccel_sound, 100, 75, 0.2) end
