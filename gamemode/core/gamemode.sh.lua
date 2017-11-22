@@ -13,5 +13,5 @@ EMM.Include {
 	"movement/walljump",
 	"movement/wallslide",
 	"movement/airaccel",
-	"movement/ramp-fix"
+	"movement/slide"
 }
