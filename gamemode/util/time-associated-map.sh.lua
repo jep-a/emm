@@ -37,6 +37,10 @@ function TimeAssociatedMap:HasChecked()
 	return self.values[CurTime()] != nil
 end
 
+function TimeAssociatedMap:Set(value)
+	self.values[CurTime()] = value
+end
+
 
 -- # Auto cleanup
 

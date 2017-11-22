@@ -77,11 +77,11 @@ function AiraccelService.SetupAiraccel(ply, move)
 		local vel_diff, new_vel = AiraccelService.Velocity(ply, move)
 		if vel_diff > 0 then
 			move:SetVelocity(new_vel)
+			AiraccelService.ReduceStamina(ply, vel_diff * ply.airaccel_velocity_cost)
+		end
 
-			if IsFirstTimePredicted() then
-				ply.stamina.airaccel:ReduceStamina(vel_diff * ply.airaccel_velocity_cost)
-				print(ply.stamina.airaccel:GetStamina())
-			end
+		if (IsFirstTimePredicted()) then
+			print(ply.stamina.airaccel:GetStamina())
 		end
 	else
 		if IsFirstTimePredicted() and ply.airaccel_started then
