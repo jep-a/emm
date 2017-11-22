@@ -1,9 +1,5 @@
 TimeAssociatedMapService = TimeAssociatedMapService or {}
-
-
--- # Global values
-
-maps = maps or {}
+TimeAssociatedMapService.maps = TimeAssociatedMapService.maps or {}
 
 
 -- # Type definition
@@ -18,7 +14,7 @@ function TimeAssociatedMapService.CreateMap(cooldown, lookup_func)
 		values = {}
 	}, TimeAssociatedMap)
 
-	table.insert(maps, result)
+	table.insert(TimeAssociatedMapService.maps, result)
 
 	return result
 end
@@ -47,7 +43,7 @@ end
 function TimeAssociatedMapService.Cleanup()
 	local cur_time = CurTime()
 
-	for _, map in pairs(maps) do
+	for _, map in pairs(TimeAssociatedMapService.maps) do
 		for t, _ in pairs(map.values) do
 			if cur_time > t + map.cooldown  then
 				map.values[t] = nil

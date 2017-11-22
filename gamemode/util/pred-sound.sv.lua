@@ -2,6 +2,8 @@ PredictedSoundService = PredictedSoundService or {}
 PredictedSoundService.RegisteredSounds = PredictedSoundService.RegisteredSounds or {}
 
 
+-- # Server Sounds
+
 function PredictedSoundService.GetExclusiveFilter(ply)
 	local filter = RecipientFilter()
 	filter:AddAllPlayers()

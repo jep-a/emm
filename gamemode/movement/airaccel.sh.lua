@@ -80,6 +80,7 @@ function AiraccelService.SetupAiraccel(ply, move)
 
 			if IsFirstTimePredicted() then
 				ply.stamina.airaccel:ReduceStamina(vel_diff * ply.airaccel_velocity_cost)
+				print(ply.stamina.airaccel:GetStamina())
 			end
 		end
 	else
