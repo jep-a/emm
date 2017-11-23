@@ -14,5 +14,6 @@ EMM.Include {
 	"movement/walljump",
 	"movement/wallslide",
 	"movement/airaccel",
-	"minigame/minigame"
+	"minigame/minigame",
+	"jsui/jsui"
 }

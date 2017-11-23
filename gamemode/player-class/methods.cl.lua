@@ -10,6 +10,8 @@ function player_metatable:SetPlayerClass(ply_class)
 end
 
 function player_metatable:ClearPlayerClass()
-	self.player_class = nil
-	self:EndPlayerClass()
+	if self.player_class then
+		self.player_class = nil
+		self:EndPlayerClass()
+	end
 end

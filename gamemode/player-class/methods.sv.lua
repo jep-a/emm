@@ -12,8 +12,10 @@ function player_metatable:SetPlayerClass(ply_class)
 end
 
 function player_metatable:ClearPlayerClass()
-	self.player_class = nil
-	table.RemoveByValue(self.minigame_lobby[ply_class.key], self)
-	self:EndPlayerClass()
-	PlayerClassService.NetworkPlayerClass(self)
+	if self.player_class then
+		table.RemoveByValue(self.minigame_lobby[self.player_class.key], self)
+		self.player_class = nil
+		self:EndPlayerClass()
+		PlayerClassService.NetworkPlayerClass(self)
+	end
 end

@@ -9,7 +9,7 @@ function MinigameService.CreateLobby(lobby)
 	lobby = setmetatable(table.Merge({players = {}}, lobby or {}), MinigameLobby)
 	lobby.id = #MinigameService.lobbies + 1
 
-	if lobby.host then
+	if lobby.host and not table.HasValue(lobby.players, lobby.host) then
 		lobby:AddPlayer(lobby.host, false)
 	end
 
@@ -37,28 +37,34 @@ end
 function MinigameLobby:AddPlayer(ply, net)
 	net = net == nil and true or net
 
-	ply.minigame_lobby = self
-	table.insert(self.players, ply)
+	if not (self == ply.minigame_lobby) then
+		ply.minigame_lobby = self
+		table.insert(self.players, ply)
 
-	if net then
-		MinigameService.NetworkLobbyAddPlayer(self, ply)
+		if net then
+			MinigameService.NetworkLobbyAddPlayer(self, ply)
+		end
 	end
 end
 
 function MinigameLobby:RemovePlayer(ply, net)
 	net = net == nil and true or net
 
-	ply:ClearPlayerClass()
-	ply.minigame_lobby = nil
-	table.RemoveByValue(self.players, ply)
+	if self == ply.minigame_lobby then
+		ply:ClearPlayerClass()
+		ply.minigame_lobby = nil
+		table.RemoveByValue(self.players, ply)
 
-	if net then
-		MinigameService.NetworkLobbyRemovePlayer(self, ply)
+		if net then
+			MinigameService.NetworkLobbyRemovePlayer(self, ply)
+		end
 	end
 end
 
 
 -- # Networking
+
+-- ## Sending
 
 util.AddNetworkString "CreateLobby"
 function MinigameService.NetworkCreateLobby(lobby)
@@ -120,12 +126,34 @@ function MinigameService.NetworkLobbies(_, ply)
 end
 net.Receive("RequestLobbies", MinigameService.NetworkLobbies)
 
+-- # Requesting
+
 util.AddNetworkString "RequestCreateLobby"
 function MinigameService.ReceiveCreateLobby(_, ply)
 	local proto_id = net.ReadUInt(8)
-	Minigame.CreateLobby({
+	MinigameService.CreateLobby({
 		prototype = MinigameService.Prototype(proto_id),
-		host = ply
+		host = ply,
+		players = {host}
 	})
 end
 net.Receive("RequestCreateLobby", MinigameService.ReceiveCreateLobby)
+
+util.AddNetworkString "RequestRemoveLobby"
+function MinigameService.ReceiveRemoveLobby(_, ply)
+	MinigameService.RemoveLobby(ply.minigame_lobby)
+end
+net.Receive("RequestRemoveLobby", MinigameService.ReceiveRemoveLobby)
+
+util.AddNetworkString "RequestJoinLobby"
+function MinigameService.RequestJoinLobby(_, ply)
+	local lobby_id = net.ReadUInt(8)
+	MinigameService.lobbies[lobby_id]:AddPlayer(ply)
+end
+net.Receive("RequestJoinLobby", MinigameService.RequestJoinLobby)
+
+util.AddNetworkString "RequestLeaveLobby"
+function MinigameService.RequestLeaveLobby(_, ply)
+	ply.minigame_lobby:RemovePlayer(ply)
+end
+net.Receive("RequestLeaveLobby", MinigameService.RequestLeaveLobby)

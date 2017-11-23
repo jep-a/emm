@@ -7,18 +7,14 @@ MinigameLobby = MinigameLobby or {}
 
 function MinigameService.CreateLobby(lobby, notify)
 	notify = notify == nil and true or notify
-
 	local lobby = setmetatable(table.Merge({players = {}}, lobby or {}), MinigameLobby)
-
-	if lobby.host then
-		lobby:AddPlayer(lobby.host, false)
-	end
 
 	for k, _ in pairs(lobby.prototype.player_classes) do
 		lobby[k] = lobby[k] or {}
 	end
 
 	MinigameService.lobbies[lobby.id] = lobby
+	JSUI.AddLobby(lobby)
 
 	return lobby
 end
@@ -31,24 +27,47 @@ function MinigameService.RemoveLobby(lobby)
 	end
 
 	table.Empty(lobby)
+	JSUI.RemoveLobby(lobby)
+end
+
+function MinigameLobby:GetSanitized()
+	local sanitized_lobby = {}
+	sanitized_lobby.id = self.id
+	sanitized_lobby.minigamePrototype = self.prototype.id
+	sanitized_lobby.host = self.host:EntIndex()
+	sanitized_lobby.players = {}
+
+	for k, ply in pairs(self.players) do
+		sanitized_lobby.players[k] = ply:EntIndex()
+	end
+
+	return sanitized_lobby
 end
 
 function MinigameLobby:AddPlayer(ply, notify)
 	notify = notify == nil and true or notify
 
-	ply.minigame_lobby = self
-	table.insert(self.players, ply)
+	if not (self == ply.minigame_lobby) then
+		ply.minigame_lobby = self
+		table.insert(self.players, ply)
+		JSUI.AddLobbyPlayer(self, ply)
+	end
 end
 
 function MinigameLobby:RemovePlayer(ply, notify)
 	notify = notify == nil and true or notify
 
-	ply.minigame_lobby = nil
-	table.RemoveByValue(self.players, ply)
+	if self == ply.minigame_lobby then
+		ply.minigame_lobby = nil
+		table.RemoveByValue(self.players, ply)
+		JSUI.RemoveLobbyPlayer(self, ply)
+	end
 end
 
 
 -- # Networking
+
+-- ## Receiving
 
 function MinigameService.ReceiveCreateLobby()
 	local lobby_id = net.ReadUInt(8)
@@ -57,7 +76,8 @@ function MinigameService.ReceiveCreateLobby()
 	MinigameService.CreateLobby {
 		id = lobby_id,
 		prototype = MinigameService.Prototype(proto_id),
-		host = host
+		host = host,
+		players = {host}
 	}
 end
 net.Receive("CreateLobby", MinigameService.ReceiveCreateLobby)
@@ -121,11 +141,31 @@ function MinigameService.ReceiveLobbies()
 
 		MinigameService.CreateLobby(lobby, false)
 	end
+
+	hook.Run "ReceiveLobbies"
 end
 net.Receive("Lobbies", MinigameService.ReceiveLobbies)
+
+-- ## Requesting
 
 function MinigameService.RequestCreateLobby(proto)
 	net.Start "RequestCreateLobby"
 	net.WriteUInt(proto.id, 8)
+	net.SendToServer()
+end
+
+function MinigameService.RequestRemoveLobby()
+	net.Start "RequestRemoveLobby"
+	net.SendToServer()
+end
+
+function MinigameService.RequestJoinLobby(lobby)
+	net.Start "RequestJoinLobby"
+	net.WriteUInt(lobby.id, 8)
+	net.SendToServer()
+end
+
+function MinigameService.RequestLeaveLobby()
+	net.Start "RequestLeaveLobby"
 	net.SendToServer()
 end
