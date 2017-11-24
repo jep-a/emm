@@ -47,8 +47,8 @@ end
 function MinigameLobby:AddPlayer(ply, notify)
 	notify = notify == nil and true or notify
 
-	if not (self == ply.minigame_lobby) then
-		ply.minigame_lobby = self
+	if not (self == ply.lobby) then
+		ply.lobby = self
 		table.insert(self.players, ply)
 		JSUI.AddLobbyPlayer(self, ply)
 	end
@@ -57,8 +57,8 @@ end
 function MinigameLobby:RemovePlayer(ply, notify)
 	notify = notify == nil and true or notify
 
-	if self == ply.minigame_lobby then
-		ply.minigame_lobby = nil
+	if self == ply.lobby then
+		ply.lobby = nil
 		table.RemoveByValue(self.players, ply)
 		JSUI.RemoveLobbyPlayer(self, ply)
 	end

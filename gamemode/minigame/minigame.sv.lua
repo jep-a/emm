@@ -37,8 +37,8 @@ end
 function MinigameLobby:AddPlayer(ply, net)
 	net = net == nil and true or net
 
-	if not (self == ply.minigame_lobby) then
-		ply.minigame_lobby = self
+	if not (self == ply.lobby) then
+		ply.lobby = self
 		table.insert(self.players, ply)
 
 		if net then
@@ -50,9 +50,9 @@ end
 function MinigameLobby:RemovePlayer(ply, net)
 	net = net == nil and true or net
 
-	if self == ply.minigame_lobby then
+	if self == ply.lobby then
 		ply:ClearPlayerClass()
-		ply.minigame_lobby = nil
+		ply.lobby = nil
 		table.RemoveByValue(self.players, ply)
 
 		if net then
@@ -141,7 +141,7 @@ net.Receive("RequestCreateLobby", MinigameService.ReceiveCreateLobby)
 
 util.AddNetworkString "RequestRemoveLobby"
 function MinigameService.ReceiveRemoveLobby(_, ply)
-	MinigameService.RemoveLobby(ply.minigame_lobby)
+	MinigameService.RemoveLobby(ply.lobby)
 end
 net.Receive("RequestRemoveLobby", MinigameService.ReceiveRemoveLobby)
 
@@ -154,6 +154,6 @@ net.Receive("RequestJoinLobby", MinigameService.RequestJoinLobby)
 
 util.AddNetworkString "RequestLeaveLobby"
 function MinigameService.RequestLeaveLobby(_, ply)
-	ply.minigame_lobby:RemovePlayer(ply)
+	ply.lobby:RemovePlayer(ply)
 end
 net.Receive("RequestLeaveLobby", MinigameService.RequestLeaveLobby)

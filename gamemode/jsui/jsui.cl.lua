@@ -29,9 +29,9 @@ function JSUI.Reload()
 	JSUI.Init()
 
 	local ply = LocalPlayer()
-	if ply.minigame_lobby then
+	if ply.lobby then
 		JSUI.html:Call([[
-			app.store.setCurrentMinigameInstance(]]..ply.minigame_lobby.id..[[);
+			app.store.setCurrentMinigameInstance(]]..ply.lobby.id..[[);
 		]])
 	end
 end
