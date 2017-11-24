@@ -60,6 +60,11 @@ function MinigameLobby:RemovePlayer(ply, net)
 		end
 	end
 end
+hook.Add("PlayerDisconnected", "MinigameService.RemoveDisconnectedPlayer", function (ply)
+	if ply.lobby then
+		ply.lobby:RemovePlayer(ply)
+	end
+end)
 
 
 -- # Networking

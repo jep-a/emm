@@ -149,6 +149,9 @@ function JSUI.RemovePlayer(ply)
 		app.store.removePlayer(]]..ply:EntIndex()..[[);
 	]])
 end
+hook.Add("PlayerDisconnected", "JSUI.RemoveDisconnectedPlayer", function (ply)
+	JSUI.RemovePlayer(ply)
+end)
 
 
 -- # Minigames
