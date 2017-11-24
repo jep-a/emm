@@ -169,6 +169,7 @@ function JSUI.AddLobby(lobby)
 		end
 	end
 end
+hook.Add("CreateLobby", "JSUI.AddLobby", JSUI.AddLobby)
 
 function JSUI.RemoveLobby(lobby)
 	if JSUI.html then
@@ -177,6 +178,7 @@ function JSUI.RemoveLobby(lobby)
 		]])
 	end
 end
+hook.Add("RemoveLobby", "JSUI.RemoveLobby", JSUI.RemoveLobby)
 
 function JSUI.SetLobbyHost(lobby, ply)
 	if JSUI.html then
@@ -185,6 +187,7 @@ function JSUI.SetLobbyHost(lobby, ply)
 		]])
 	end
 end
+hook.Add("LobbySetHost", "JSUI.SetLobbyHost", JSUI.SetLobbyHost)
 
 function JSUI.AddLobbyPlayer(lobby, ply)
 	if JSUI.html then
@@ -199,6 +202,7 @@ function JSUI.AddLobbyPlayer(lobby, ply)
 		end
 	end
 end
+hook.Add("LobbyAddPlayer", "JSUI.AddLobbyPlayer", JSUI.AddLobbyPlayer)
 
 function JSUI.RemoveLobbyPlayer(lobby, ply)
 	if JSUI.html then
@@ -213,6 +217,7 @@ function JSUI.RemoveLobbyPlayer(lobby, ply)
 		end
 	end
 end
+hook.Add("LobbyRemovePlayer", "JSUI.RemoveLobbyPlayer", JSUI.RemoveLobbyPlayer)
 
 
 -- # Toggling

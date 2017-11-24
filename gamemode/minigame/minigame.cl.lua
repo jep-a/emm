@@ -14,12 +14,13 @@ function MinigameService.CreateLobby(lobby, notify)
 	end
 
 	MinigameService.lobbies[lobby.id] = lobby
-	JSUI.AddLobby(lobby)
+	hook.Run("CreateLobby", lobby)
 
 	return lobby
 end
 
 function MinigameService.RemoveLobby(lobby)
+	hook.Run("RemoveLobby", lobby)
 	MinigameService.lobbies[lobby.id] = nil
 
 	for _, ply in pairs(lobby.players) do
@@ -27,7 +28,6 @@ function MinigameService.RemoveLobby(lobby)
 	end
 
 	table.Empty(lobby)
-	JSUI.RemoveLobby(lobby)
 end
 
 function MinigameLobby:GetSanitized()
@@ -44,24 +44,23 @@ function MinigameLobby:GetSanitized()
 	return sanitized_lobby
 end
 
+function MinigameLobby:SetHost(ply)
+	self.host = ply
+	hook.Run("LobbySetHost", self, ply)
+end
+
 function MinigameLobby:AddPlayer(ply, notify)
 	notify = notify == nil and true or notify
-
-	if not (self == ply.lobby) then
-		ply.lobby = self
-		table.insert(self.players, ply)
-		JSUI.AddLobbyPlayer(self, ply)
-	end
+	ply.lobby = self
+	table.insert(self.players, ply)
+	hook.Run("LobbyAddPlayer", self, ply)
 end
 
 function MinigameLobby:RemovePlayer(ply, notify)
 	notify = notify == nil and true or notify
-
-	if self == ply.lobby then
-		ply.lobby = nil
-		table.RemoveByValue(self.players, ply)
-		JSUI.RemoveLobbyPlayer(self, ply)
-	end
+	hook.Run("LobbyRemovePlayer", self, ply)
+	ply.lobby = nil
+	table.RemoveByValue(self.players, ply)
 end
 
 
@@ -101,6 +100,13 @@ function MinigameService.LobbyRemovePlayer()
 	MinigameService.lobbies[lobby_id]:RemovePlayer(ply)
 end
 net.Receive("LobbyRemovePlayer", MinigameService.LobbyRemovePlayer)
+
+function MinigameService.LobbySetHost()
+	local lobby_id = net.ReadUInt(8)
+	local ply = net.ReadEntity()
+	MinigameService.lobbies[lobby_id]:SetHost(ply)
+end
+net.Receive("LobbySetHost", MinigameService.LobbySetHost)
 
 function MinigameService.RequestLobbies()
 	net.Start "RequestLobbies"

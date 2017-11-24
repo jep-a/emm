@@ -9,8 +9,14 @@ function MinigameService.CreateLobby(lobby)
 	lobby = setmetatable(table.Merge({players = {}}, lobby or {}), MinigameLobby)
 	lobby.id = #MinigameService.lobbies + 1
 
-	if lobby.host and not table.HasValue(lobby.players, lobby.host) then
-		lobby:AddPlayer(lobby.host, false)
+	if lobby.host then
+		if lobby.host.lobby then
+			lobby.host.lobby:RemovePlayer(lobby.host)
+		end
+
+		if not table.HasValue(lobby.players, lobby.host) then
+			lobby:AddPlayer(lobby.host, false)
+		end
 	end
 
 	for k, _ in pairs(lobby.prototype.player_classes) do
@@ -19,44 +25,69 @@ function MinigameService.CreateLobby(lobby)
 
 	MinigameService.lobbies[lobby.id] = lobby
 	MinigameService.NetworkCreateLobby(lobby)
+	hook.Run("CreateLobby", lobby)
 
 	return lobby
 end
 
 function MinigameService.RemoveLobby(lobby)
+	hook.Run("RemoveLobby", lobby)
 	MinigameService.lobbies[lobby.id] = nil
 
 	for _, ply in pairs(lobby.players) do
-		lobby:RemovePlayer(ply, false)
+		lobby:RemovePlayer(ply, false, true)
 	end
 
 	MinigameService.NetworkRemoveLobby(lobby)
 	table.Empty(lobby)
 end
 
+function MinigameLobby:SetHost(ply)
+	if self == ply.lobby and not (self.host == ply) then
+		self.host = ply
+		MinigameService.NetworkLobbySetHost(self, ply)
+		hook.Run("LobbySetHost", lobby, ply)
+	end
+end
+
 function MinigameLobby:AddPlayer(ply, net)
 	net = net == nil and true or net
 
 	if not (self == ply.lobby) then
+		if ply.lobby then
+			ply.lobby:RemovePlayer(ply)
+		end
+
 		ply.lobby = self
 		table.insert(self.players, ply)
 
 		if net then
 			MinigameService.NetworkLobbyAddPlayer(self, ply)
 		end
+
+		hook.Run("LobbyAddPlayer", lobby, ply)
 	end
 end
 
-function MinigameLobby:RemovePlayer(ply, net)
+function MinigameLobby:RemovePlayer(ply, net, force)
 	net = net == nil and true or net
 
 	if self == ply.lobby then
-		ply:ClearPlayerClass()
-		ply.lobby = nil
-		table.RemoveByValue(self.players, ply)
+		local suff_players = #self.players > 1
+		if force or suff_players then
+			hook.Run("LobbyRemovePlayer", lobby, ply)
+			ply.lobby = nil
+			table.RemoveByValue(self.players, ply)
 
-		if net then
-			MinigameService.NetworkLobbyRemovePlayer(self, ply)
+			if net then
+				MinigameService.NetworkLobbyRemovePlayer(self, ply)
+			end
+
+			if suff_players and self.host == ply then
+				self:SetHost(self.players[#self.players])
+			end
+		else
+			MinigameService.RemoveLobby(self)
 		end
 	end
 end
@@ -98,6 +129,14 @@ end
 util.AddNetworkString "LobbyRemovePlayer"
 function MinigameService.NetworkLobbyRemovePlayer(lobby, ply)
 	net.Start "LobbyRemovePlayer"
+	net.WriteUInt(lobby.id, 8)
+	net.WriteEntity(ply)
+	net.Broadcast()
+end
+
+util.AddNetworkString "LobbySetHost"
+function MinigameService.NetworkLobbySetHost(lobby, ply)
+	net.Start "LobbySetHost"
 	net.WriteUInt(lobby.id, 8)
 	net.WriteEntity(ply)
 	net.Broadcast()
