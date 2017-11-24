@@ -3,7 +3,7 @@
 util.AddNetworkString "PlayerInitialSpawn"
 hook.Add("PlayerInitialSpawn", "EMM.PlayerInitialSpawn", function (ply)
 	hook.Run("InitPlayerProperties", ply)
-	net.Start("PlayerInitialSpawn")
+	net.Start "PlayerInitialSpawn"
 	net.WriteUInt(ply:EntIndex(), 16)
 	net.Broadcast()
 end)
@@ -14,8 +14,18 @@ hook.Add("PlayerSpawn", "EMM.PlayerSpawn", function (ply)
 	ply:SetupCoreProperties()
 	ply:SetupModel()
 
-	net.Start("PlayerSpawn")
+	net.Start "PlayerSpawn"
 	net.WriteUInt(ply:EntIndex(), 16)
+	net.Broadcast()
+end)
+
+
+-- # Disconnecting
+
+util.AddNetworkString "PlayerDisconnected"
+hook.Add("PlayerDisconnected", "NetworkPlayerDisconnected", function (ply)
+	net.Start "PlayerDisconnected"
+	net.WriteEntity(ply)
 	net.Broadcast()
 end)
 
@@ -41,7 +51,7 @@ end)
 
 util.AddNetworkString "PrePlayerDeath"
 hook.Add("PrePlayerDeath", "NetworkPrePlayerDeath", function (ply, att)
-	net.Start("PrePlayerDeath")
+	net.Start "PrePlayerDeath"
 	net.WriteEntity(ply)
 	net.WriteEntity(att)
 	net.Broadcast()
@@ -53,7 +63,7 @@ end)
 
 util.AddNetworkString "PlayerDeath"
 hook.Add("PlayerDeath", "NetworkPlayerDeath", function (ply, infl, att)
-	net.Start("PlayerDeath")
+	net.Start "PlayerDeath"
 	net.WriteEntity(ply)
 	net.WriteEntity(infl)
 	net.WriteEntity(att)
@@ -72,7 +82,7 @@ end)
 
 util.AddNetworkString "PostPlayerDeath"
 hook.Add("PostPlayerDeath", "NetworkPostPlayerDeath", function (ply)
-	net.Start("PostPlayerDeath")
+	net.Start "PostPlayerDeath"
 	net.WriteEntity(ply)
 	net.Broadcast()
 end)

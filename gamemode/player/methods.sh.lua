@@ -1,4 +1,4 @@
-local player_metatable = FindMetaTable("Player")
+local player_metatable = FindMetaTable "Player"
 
 function player_metatable:SetupCoreProperties()
 	self:SetMaxHealth(self.max_health)
@@ -17,7 +17,7 @@ function player_metatable:SetupCoreProperties()
 end
 
 function player_metatable:SetupModel()
-	local mdl = self.model or player_manager.TranslatePlayerModel(self:GetInfo("cl_playermodel"))
+	local mdl = self.model or player_manager.TranslatePlayerModel(self:GetInfo "cl_playermodel")
 	util.PrecacheModel(mdl)
 	self:SetModel(mdl)
 end

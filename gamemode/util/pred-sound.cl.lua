@@ -1,7 +1,7 @@
 PredictedSoundService = PredictedSoundService or {}
 
 function PredictedSoundService.InitPlayerProperties(ply)
-	ply.predicted_sound_emitter = ClientsideModel("models/hunter/blocks/cube025x025x025.mdl")
+	ply.predicted_sound_emitter = ClientsideModel "models/hunter/blocks/cube025x025x025.mdl"
 	ply.predicted_sound_emitter:SetPos(ply:GetShootPos())
 	ply.predicted_sound_emitter:SetNoDraw(true)
 	ply.predicted_sound_emitter:SetParent(ply)
