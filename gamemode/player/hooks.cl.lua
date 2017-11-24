@@ -82,6 +82,14 @@ hook.Add("OnEntityCreated", "CallDelayedPlayerSpawnHooks", function (ent)
 end)
 
 
+-- # Disconnecting
+
+net.Receive("PlayerDisconnected", function ()
+	local ply = net.ReadEntity()
+	hook.Run("PlayerDisconnected", ply)
+end)
+
+
 -- # Death
 
 net.Receive("PrePlayerDeath", function ()

@@ -20,6 +20,16 @@ hook.Add("PlayerSpawn", "EMM.PlayerSpawn", function (ply)
 end)
 
 
+-- # Disconnecting
+
+util.AddNetworkString "PlayerDisconnected"
+hook.Add("PlayerDisconnected", "NetworkPlayerDisconnected", function (ply)
+	net.Start "PlayerDisconnected"
+	net.WriteEntity(ply)
+	net.Broadcast()
+end)
+
+
 -- # Properties
 
 hook.Add("InitPlayerProperties", "InitCorePlayerProperties", function (ply)
