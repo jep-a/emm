@@ -44,14 +44,6 @@ function AiraccelService.KeyPress(ply, key)
 end
 hook.Add("KeyPress", "AiraccelService.KeyPress", AiraccelService.KeyPress)
 
-function AiraccelService.KeyRelease(ply, key)
-	if IsFirstTimePredicted() and key == IN_SPEED and ply.airaccel_started then
-		if CLIENT then PredictedSoundService.PlaySound(ply, ply.airaccel_sound, 100, 75, 0.2) end
-		ply.airaccel_started = false
-	end
-end
-hook.Add("KeyRelease", "AiraccelService.KeyRelease", AiraccelService.KeyRelease)
-
 
 -- # Airacceling
 
