@@ -76,6 +76,7 @@ function AiraccelService.SetupAiraccel(ply, move)
 			if CLIENT then PredictedSoundService.PlaySound(ply, ply.airaccel_sound, 100, 75, 0.2) end
 			ply.airaccel_started = false
 		end
+
 		ply.stamina.airaccel:SetActive(false)
 	end
 end

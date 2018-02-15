@@ -1,10 +1,15 @@
 WalljumpService = WalljumpService or {}
 
 
--- # Time Mapped Variables
+-- # Time maps
 
-local last_walljump_time = last_walljump_time or TimeAssociatedMapService.CreateMap(2, function() return LocalPlayer().last_walljump_time end)
-local played_sound = played_sound or TimeAssociatedMapService.CreateMap(2, function() return true end)
+local last_walljump_time = last_walljump_time or TimeAssociatedMapService.CreateMap(2, function()
+	return LocalPlayer().last_walljump_time
+end)
+
+local played_sound = played_sound or TimeAssociatedMapService.CreateMap(2, function()
+	return true
+end)
 
 
 -- # Client-side prediction

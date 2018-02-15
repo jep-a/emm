@@ -91,7 +91,7 @@ function WalljumpService.SetupWalljump(ply, move)
 	if
 		ply:Alive() and
 		ply.can_walljump and
-		not WallslideService.IsWallsliding(ply) and
+		not WallslideService.Wallsliding(ply) and
 		move:KeyDown(IN_JUMP) and
 		WalljumpService.PressedWalljumpButtons(move:GetButtons(), move:GetOldButtons()) and
 		WalljumpService.CooledDown(ply)

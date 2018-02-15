@@ -34,7 +34,7 @@ function TimeAssociatedMap:Update(...)
 end
 
 function TimeAssociatedMap:HasChecked()
-	return self.values[CurTime()] != nil
+	return self.values[CurTime()] ~= nil
 end
 
 function TimeAssociatedMap:Set(value)
@@ -46,7 +46,6 @@ end
 
 function TimeAssociatedMapService.Cleanup()
 	local cur_time = CurTime()
-
 	for _, map in pairs(TimeAssociatedMapService.maps) do
 		for t, _ in pairs(map.values) do
 			if cur_time > t + map.cooldown  then

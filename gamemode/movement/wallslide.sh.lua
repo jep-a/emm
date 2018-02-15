@@ -77,7 +77,7 @@ function WallslideService.SetupWallslide(ply, move)
 			move:KeyDown(IN_ATTACK2) and
 			WallslideService.HasStamina(ply)
 		then
-			if not WallslideService.IsWallsliding(ply) and not WallslideService.StartedWallslide(ply) then
+			if not WallslideService.Wallsliding(ply) and not WallslideService.StartedWallslide(ply) then
 				ply.wallslide_velocity = ply:GetVelocity()
 				ply.last_wallslide_time = CurTime()
 				ply.wallsliding = true
@@ -88,7 +88,7 @@ function WallslideService.SetupWallslide(ply, move)
 			end
 
 			move:SetVelocity(WallslideService.Velocity(trace, WallslideService.LastWallslideTime(ply), WallslideService.WallslideVelocity(ply)))
-		elseif WallslideService.IsWallsliding(ply) and not WallslideService.FinishedWallslide(ply) then
+		elseif WallslideService.Wallsliding(ply) and not WallslideService.FinishedWallslide(ply) then
 			ply.wallsliding = false
 			ply.stamina.wallslide:SetActive(false)
 			PredictedSoundService.StopWallslideSound(ply)

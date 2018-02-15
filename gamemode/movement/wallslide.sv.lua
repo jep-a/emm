@@ -7,7 +7,7 @@ function WallslideService.HasStamina(ply)
 	return ply.stamina.wallslide:HasStamina()
 end
 
-function WallslideService.IsWallsliding(ply)
+function WallslideService.Wallsliding(ply)
 	return ply.wallsliding
 end
 

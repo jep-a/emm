@@ -59,7 +59,7 @@ function SlideService.RampFix(ply, mv)
 	local pos = mv:GetOrigin()
 	local tr = SlideService.GetGroundTrace(pos, ply.slide_hover_height)
 	local velocity = SlideService.Clip(mv:GetVelocity(), tr.HitNormal)
-	if (SlideService.ShouldSlide(velocity, tr, ply.slide_surf_minimum, ply.surf_down_ramps)) then
+	if SlideService.ShouldSlide(velocity, tr, ply.slide_surf_minimum, ply.surf_down_ramps) then
 		pos.z = tr.HitPos.z + ply.slide_hover_height
 		mv:SetVelocity(velocity)
 		mv:SetOrigin(pos)
