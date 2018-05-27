@@ -1,8 +1,8 @@
 local player_metatable = FindMetaTable("Player")
 
 function player_metatable:SetPlayerClass(ply_class)
-	if self:HasPlayerClass() then
-		self:EndPlayerClass()
+	if self.player_class then
+		self:ClearPlayerClass(false)
 	end
 
 	self.player_class = ply_class
@@ -11,11 +11,14 @@ function player_metatable:SetPlayerClass(ply_class)
 	PlayerClassService.NetworkPlayerClass(self, ply_class)
 end
 
-function player_metatable:ClearPlayerClass()
-	if self.player_class then
-		table.RemoveByValue(self.lobby[self.player_class.key], self)
-		self.player_class = nil
-		self:EndPlayerClass()
+function player_metatable:ClearPlayerClass(net)
+	net = net == nil and true or net
+
+	table.RemoveByValue(self.lobby[self.player_class.key], self)
+	self.player_class = nil
+	self:EndPlayerClass()
+
+	if net then
 		PlayerClassService.NetworkPlayerClass(self)
 	end
 end

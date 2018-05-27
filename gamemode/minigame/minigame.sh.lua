@@ -19,7 +19,8 @@ end
 function MinigameService.CreatePrototype(proto)
 	proto = setmetatable(table.Merge({
 		color = COLOR_WHITE,
-		player_classes = {}
+		player_classes = {},
+		hooks = {}
 	}, proto or {}), MinigamePrototype)
 	return proto
 end
@@ -42,6 +43,26 @@ function MinigamePrototype:AddPlayerClass(ply_class)
 	ply_class.key = ply_class.key or ply_class.name
 	ply_class.color = ply_class.color or self.color
 	self.player_classes[ply_class.key] = ply_class
+end
+
+function MinigameService.AddHook(lobby, hk_name, hk_id, func)
+	lobby.hooks[hk_name] = lobby.hooks[hk_name] or {}
+	lobby.hooks[hk_name][hk_id] = func
+end
+
+function MinigameService.RemoveHook(lobby, hk_name, hk_id)
+	lobby.hooks[hk_name][hk_id] = nil
+end
+
+function MinigameService.CallHook(lobby, hk_name, ...)
+	if lobby[hk_name] then
+		lobby[hk_name](lobby, ...)
+	end
+
+	lobby.hooks[hk_name] = lobby.hooks[hk_name] or {}
+	for _, hk in pairs(lobby.hooks[hk_name]) do
+		hk(...)
+	end
 end
 
 

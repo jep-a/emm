@@ -17,6 +17,7 @@ EMM.Include {
 	"movement/airaccel",
 	"movement/slide",
 	"minigame/minigame",
+	"minigame/tagging",
 	"camui/camui",
 	"jsui/jsui",
 	"hud/hud",

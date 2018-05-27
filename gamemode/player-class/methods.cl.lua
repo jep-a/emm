@@ -1,17 +1,17 @@
 local player_metatable = FindMetaTable("Player")
 
 function player_metatable:SetPlayerClass(ply_class)
-	if self:HasPlayerClass() then
-		self:EndPlayerClass()
+	if self.player_class then
+		self:ClearPlayerClass()
 	end
 
 	self.player_class = ply_class
+	table.insert(self.lobby[ply_class.key], self)
 	self:SetupPlayerClass()
 end
 
 function player_metatable:ClearPlayerClass()
-	if self.player_class then
-		self.player_class = nil
-		self:EndPlayerClass()
-	end
+	table.RemoveByValue(self.lobby[self.player_class.key], self)
+	self.player_class = nil
+	self:EndPlayerClass()
 end
