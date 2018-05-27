@@ -14,6 +14,7 @@ function MinigameService.CreateLobby(lobby, notify)
 	end
 
 	MinigameService.lobbies[lobby.id] = lobby
+	lobby.host.lobby = lobby
 	hook.Run("CreateLobby", lobby)
 
 	return lobby
