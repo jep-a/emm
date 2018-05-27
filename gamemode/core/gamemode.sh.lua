@@ -7,6 +7,7 @@ EMM.Include {
 	"util/palette",
 	"util/pred-sound",
 	"util/stamina",
+	"util/time-associated-map",
 	"player/hooks",
 	"player/methods",
 	"player-class/player-class",
@@ -14,6 +15,10 @@ EMM.Include {
 	"movement/walljump",
 	"movement/wallslide",
 	"movement/airaccel",
+	"movement/slide",
 	"minigame/minigame",
-	"jsui/jsui"
+	"camui/camui",
+	"jsui/jsui",
+	"hud/hud",
+	"hud/vardebug"
 }
