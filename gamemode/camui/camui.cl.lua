@@ -37,7 +37,7 @@ function CamUIService.Render()
 
 	local invalid_pnls = {}
 
-	for _, pnl in pairs(CamUIService.panels) do
+	for i, pnl in pairs(CamUIService.panels) do
 		if IsValid(pnl) then
 			CamUIService.RenderPanel(pnl)
 		else
@@ -45,8 +45,10 @@ function CamUIService.Render()
 		end
 	end
 
-	for _, pnl_i in pairs(invalid_pnls) do
-		table.remove(CamUIService.panels, pnl_i)
+	if #invalid_pnls > 0 then
+		for _, pnl_i in pairs(invalid_pnls) do
+			table.remove(CamUIService.panels, pnl_i)
+		end
 	end
 
 	cam.End3D()
