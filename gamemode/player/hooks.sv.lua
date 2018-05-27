@@ -14,6 +14,10 @@ hook.Add("PlayerSpawn", "EMM.PlayerSpawn", function (ply)
 	ply:SetupCoreProperties()
 	ply:SetupModel()
 
+	if ply.lobby then
+		MinigameService.CallHook(ply.lobby, "PlayerSpawn")
+	end
+
 	net.Start "PlayerSpawn"
 	net.WriteUInt(ply:EntIndex(), 16)
 	net.Broadcast()
@@ -46,6 +50,10 @@ end)
 -- # Death
 
 hook.Add("DoPlayerDeath", "PrePlayerDeath", function (ply, att, dmg)
+	if ply.lobby then
+		MinigameService.CallHook(ply.lobby, "PrePlayerDeath", att, dmg)
+	end
+
 	hook.Run("PrePlayerDeath", ply, att, dmg)
 end)
 
@@ -59,6 +67,12 @@ end)
 
 hook.Add("PrePlayerDeath", "CreateRagdoll", function (ply)
 	ply:CreateRagdoll()
+end)
+
+hook.Add("PlayerDeath", "MinigamePlayerDeath", function (ply, infl, att)
+	if ply.lobby then
+		MinigameService.CallHook(ply.lobby, "PlayerDeath", infl, att)
+	end
 end)
 
 util.AddNetworkString "PlayerDeath"

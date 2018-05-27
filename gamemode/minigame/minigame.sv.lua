@@ -65,7 +65,12 @@ function MinigameLobby:AddPlayer(ply, net)
 			MinigameService.NetworkLobbyAddPlayer(self, ply)
 		end
 
-		hook.Run("LobbyAddPlayer", lobby, ply)
+		MinigameService.CallHook(self, "PlayerJoin", ply)
+		hook.Run("LobbyAddPlayer", self, ply)
+
+		if self.required_players and (#self.players >= self.required_players) then
+			self:Start()
+		end
 	end
 end
 
@@ -75,9 +80,14 @@ function MinigameLobby:RemovePlayer(ply, net, force)
 	if self == ply.lobby then
 		local suff_players = #self.players > 1
 		if force or suff_players then
-			hook.Run("LobbyRemovePlayer", lobby, ply)
+			MinigameService.CallHook(self, "PlayerLeave", ply)
+			hook.Run("LobbyRemovePlayer", self, ply)
 			ply.lobby = nil
 			table.RemoveByValue(self.players, ply)
+
+			if self.required_players and (#self.players < self.required_players) then
+				self:Stop()
+			end
 
 			if net then
 				MinigameService.NetworkLobbyRemovePlayer(self, ply)
@@ -170,7 +180,7 @@ function MinigameService.NetworkLobbies(_, ply)
 end
 net.Receive("RequestLobbies", MinigameService.NetworkLobbies)
 
--- # Requesting
+-- ## Requesting
 
 util.AddNetworkString "RequestCreateLobby"
 function MinigameService.ReceiveCreateLobby(_, ply)
