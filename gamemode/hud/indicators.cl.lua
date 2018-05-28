@@ -47,25 +47,31 @@ vgui.Register("Indicator", Indicator, "EditablePanel")
 
 -- # Adding
 
-function IndicatorService.AddIndicator(lobby, ent)
-	if not (ent == LocalPlayer()) then
-		if IsValid(ent.indicator) then
-			ErrorNoHalt "still has indicator"
+function IndicatorService.AddIndicators(lobby, ply)
+	if ply == LocalPlayer() then
+		for _, _ply in pairs(lobby.players) do
+			if not (ply == _ply) then
+				_ply.indicator = vgui.Create "Indicator"
+				_ply.indicator.ent = _ply
+				IndicatorService.container:Add(_ply.indicator)
+			end
 		end
-
-		ent.indicator = vgui.Create "Indicator"
-		ent.indicator.ent = ent
-		IndicatorService.container:Add(ent.indicator)
+	else
+		ply.indicator = vgui.Create "Indicator"
+		ply.indicator.player = ply
+		IndicatorService.container:Add(ply.indicator)
 	end
 end
-hook.Add("LocalLobbyAddPlayer", "IndicatorService.AddIndicator", IndicatorService.AddIndicator)
+hook.Add("LocalLobbyAddPlayer", "IndicatorService.AddIndicators", IndicatorService.AddIndicators)
 
-function IndicatorService.RemoveIndicator(lobby, ent)
-	if not (ent == LocalPlayer()) then
-		ent.indicator:Remove()
+function IndicatorService.RemoveIndicators(lobby, ply)
+	if ply == LocalPlayer() then
+		IndicatorService.container:Clear()
+	else
+		ply.indicator:Remove()
 	end
 end
-hook.Add("LocalLobbyRemovePlayer", "IndicatorService.RemoveIndicator", IndicatorService.RemoveIndicator)
+hook.Add("LocalLobbyRemovePlayer", "IndicatorService.RemoveIndicators", IndicatorService.RemoveIndicators)
 
 
 -- # Init
