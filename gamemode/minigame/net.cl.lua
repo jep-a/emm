@@ -19,6 +19,20 @@ function MinigameService.ReceiveRemoveLobby()
 end
 net.Receive("RemoveLobby", MinigameService.ReceiveRemoveLobby)
 
+function MinigameService.LobbySetHost()
+	local lobby_id = net.ReadUInt(8)
+	local ply = net.ReadEntity()
+	MinigameService.lobbies[lobby_id]:SetHost(ply)
+end
+net.Receive("LobbySetHost", MinigameService.LobbySetHost)
+
+function MinigameService.LobbySetState()
+	local lobby_id = net.ReadUInt(8)
+	local state_id = net.ReadUInt(8)
+	MinigameService.lobbies[lobby_id]:SetState(MinigameService.State(MinigameService.lobbies[lobby_id], state_id))
+end
+net.Receive("LobbySetState", MinigameService.LobbySetState)
+
 function MinigameService.LobbyAddPlayer()
 	local lobby_id = net.ReadUInt(8)
 	local ply = net.ReadEntity()
@@ -32,13 +46,6 @@ function MinigameService.LobbyRemovePlayer()
 	MinigameService.lobbies[lobby_id]:RemovePlayer(ply)
 end
 net.Receive("LobbyRemovePlayer", MinigameService.LobbyRemovePlayer)
-
-function MinigameService.LobbySetHost()
-	local lobby_id = net.ReadUInt(8)
-	local ply = net.ReadEntity()
-	MinigameService.lobbies[lobby_id]:SetHost(ply)
-end
-net.Receive("LobbySetHost", MinigameService.LobbySetHost)
 
 function MinigameService.RequestLobbies()
 	net.Start "RequestLobbies"

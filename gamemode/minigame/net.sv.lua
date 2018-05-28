@@ -16,6 +16,22 @@ function MinigameService.NetworkRemoveLobby(lobby)
 	net.Broadcast()
 end
 
+util.AddNetworkString "LobbySetHost"
+function MinigameService.NetworkLobbySetHost(lobby, ply)
+	net.Start "LobbySetHost"
+	net.WriteUInt(lobby.id, 8)
+	net.WriteEntity(ply)
+	net.Broadcast()
+end
+
+util.AddNetworkString "LobbySetState"
+function MinigameService.NetworkLobbySetState(lobby)
+	net.Start "LobbySetState"
+	net.WriteUInt(lobby.id, 8)
+	net.WriteUInt(lobby.state.id, 8)
+	net.Broadcast()
+end
+
 util.AddNetworkString "LobbyAddPlayer"
 function MinigameService.NetworkLobbyAddPlayer(lobby, ply)
 	net.Start "LobbyAddPlayer"

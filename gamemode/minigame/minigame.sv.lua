@@ -27,6 +27,7 @@ function MinigameService.CreateLobby(lobby)
 	MinigameService.NetworkCreateLobby(lobby)
 	MinigameService.CallHook(lobby, "Init")
 	hook.Run("CreateLobby", lobby)
+	lobby:SetState(lobby.states[lobby.default_state])
 
 	return lobby
 end

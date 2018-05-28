@@ -18,6 +18,7 @@ EMM.Include {
 	"movement/slide",
 	"minigame/minigame",
 	"minigame/net",
+	"minigame/states",
 	"minigame/tagging",
 	"minigame/util",
 	"camui/camui",

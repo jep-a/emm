@@ -20,6 +20,8 @@ function MinigameService.CreatePrototype(proto)
 	proto = setmetatable(table.Merge({
 		color = COLOR_WHITE,
 		player_classes = {},
+		states = table.Copy(MinigameService.states),
+		default_state = "Waiting",
 		hooks = {}
 	}, proto or {}), MinigamePrototype)
 	return proto
@@ -45,13 +47,13 @@ function MinigamePrototype:AddPlayerClass(ply_class)
 	self.player_classes[ply_class.key] = ply_class
 end
 
-function MinigameService.AddHook(lobby, hk_name, hk_id, func)
-	lobby.hooks[hk_name] = lobby.hooks[hk_name] or {}
-	lobby.hooks[hk_name][hk_id] = func
+function MinigamePrototype:AddHook(hk_name, hk_id, func)
+	self.hooks[hk_name] = self.hooks[hk_name] or {}
+	self.hooks[hk_name][hk_id] = func
 end
 
-function MinigameService.RemoveHook(lobby, hk_name, hk_id)
-	lobby.hooks[hk_name][hk_id] = nil
+function MinigamePrototype:RemoveHook(hk_name, hk_id)
+	self.hooks[hk_name][hk_id] = nil
 end
 
 function MinigameService.CallHook(lobby, hk_name, ...)
