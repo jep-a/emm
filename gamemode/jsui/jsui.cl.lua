@@ -4,7 +4,7 @@ JSUI = JSUI or {}
 -- # Util
 
 function JSUI.Test()
-	JSUI.html:Call([[
+	JSUI.html:Call [[
 		for (i = 0; i < 1000; i++) {
 			setTimeout(function () {
 				console.luaPrint(i);
@@ -18,7 +18,7 @@ function JSUI.Test()
 				});
 			}, i * 100);
 		};
-	]])
+	]]
 end
 
 function JSUI.Reload()
@@ -141,7 +141,7 @@ function JSUI.SetPlayerName(data)
 		app.store.setPlayerName(]]..Player(data.userid):EntIndex()..[[, ']]..string.JavascriptSafe(data.newname)..[[');
 	]])
 end
-gameevent.Listen("player_changename")
+gameevent.Listen "player_changename"
 hook.Add("player_changename", "JSUI.SetPlayerName", JSUI.SetPlayerName)
 
 function JSUI.RemovePlayer(ply)
@@ -162,7 +162,7 @@ function JSUI.AddLobby(lobby)
 			app.store.addMinigameInstance(]]..util.TableToJSON(lobby:GetSanitized())..[[);
 		]])
 
-		if lobby.host == LocalPlayer() then
+		if lobby:IsLocal() then
 			JSUI.html:Call([[
 				app.store.setCurrentMinigameInstance(]]..lobby.id..[[);
 			]])
@@ -211,9 +211,9 @@ function JSUI.RemoveLobbyPlayer(lobby, ply)
 		]])
 
 		if ply == LocalPlayer() then
-			JSUI.html:Call([[
+			JSUI.html:Call [[
 				app.store.setCurrentMinigameInstance(undefined);
-			]])
+			]]
 		end
 	end
 end
@@ -227,9 +227,9 @@ function JSUI.Open()
 	gui.EnableScreenClicker(true)
 
 	JSUI.container:MoveToFront()
-	JSUI.html:Call([[
+	JSUI.html:Call [[
 		app.show();
-	]])
+	]]
 
 	return true
 end
@@ -240,9 +240,9 @@ function JSUI.Close()
 	gui.EnableScreenClicker(false)
 
 	JSUI.container:MoveToBack()
-	JSUI.html:Call([[
+	JSUI.html:Call [[
 		app.hide();
-	]])
+	]]
 
 	return true
 end

@@ -23,5 +23,7 @@ function player_metatable:ClearPlayerClass(net)
 	end
 end
 hook.Add("LobbyRemovePlayer", "ClearPlayerClass", function (_, ply)
-	ply:ClearPlayerClass()
+	if ply.player_class then
+		ply:ClearPlayerClass()
+	end
 end)

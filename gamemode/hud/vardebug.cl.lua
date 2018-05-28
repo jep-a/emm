@@ -38,7 +38,7 @@ function VarDebug:Paint(w, h)
 	local val = self.func and self.func() or self.accessor and ply[self.accessor](ply) or ply:GetTable()[self.variable] or "?"
 	local val_str = string.upper(istable(val) and table.ToString(val) or tostring(val))
 
-	surface.SetFont("VarDebugFont")
+	surface.SetFont "VarDebugFont"
 	local label_w, label_h = surface.GetTextSize(label)
 	local val_w, val_h = surface.GetTextSize(val_str)
 
@@ -48,7 +48,7 @@ function VarDebug:Paint(w, h)
 
 	local val_padding = 3
 	local val_x, val_y = label_w + (val_padding * 2) + 2, h/2 - val_h/2
-	surface.SetDrawColor(COLOR_FIRE)
+	surface.SetDrawColor(LocalPlayer().color or COLOR_GRAY)
 	surface.DrawRect(val_x - val_padding, val_y + 1, val_w + (val_padding * 2), val_h)
 	surface.SetTextPos(val_x, val_y)
 	surface.DrawText(val_str)
@@ -62,36 +62,43 @@ vgui.Register("VarDebug", VarDebug, "EditablePanel")
 function VarDebugService.Init()
 	local ply = LocalPlayer()
 
-	VarDebugService.container = vgui.Create("VarDebugContainer")
-	VarDebugService.side_container = vgui.Create("SideVarDebugContainer")
+	VarDebugService.container = vgui.Create "VarDebugContainer"
+	VarDebugService.side_container = vgui.Create "SideVarDebugContainer"
 	CamUIService.AddPanel(VarDebugService.container)
 	CamUIService.AddPanel(VarDebugService.side_container)
 
-	VarDebugService.health = vgui.Create("VarDebug")
+	VarDebugService.health = vgui.Create "VarDebug"
 	VarDebugService.health.accessor = "Health"
 	VarDebugService.container:Add(VarDebugService.health)
 
-	VarDebugService.speed = vgui.Create("VarDebug")
+	VarDebugService.speed = vgui.Create "VarDebug"
 	VarDebugService.speed.label = "Speed"
 	VarDebugService.speed.func = function () return math.Round(ply:GetVelocity():Length()/10) end
 	VarDebugService.container:Add(VarDebugService.speed)
 
-	VarDebugService.airaccel = vgui.Create("VarDebug")
+	VarDebugService.airaccel = vgui.Create "VarDebug"
 	VarDebugService.airaccel.label = "Airaccel"
 	VarDebugService.airaccel.func = function () return math.Round(ply.stamina.airaccel.amount) end
 	VarDebugService.container:Add(VarDebugService.airaccel)
 	
-	VarDebugService.lobby = vgui.Create("VarDebug")
+	VarDebugService.lobby = vgui.Create "VarDebug"
 	VarDebugService.lobby.label = "Lobby"
 	VarDebugService.lobby.func = function () return ply.lobby and ply.lobby.id end
 	VarDebugService.side_container:Add(VarDebugService.lobby)
 
-	VarDebugService.player_class = vgui.Create("VarDebug")
+	VarDebugService.player_class = vgui.Create "VarDebug"
 	VarDebugService.player_class.label = "Class"
 	VarDebugService.player_class.func = function () return ply.player_class and ply.player_class.name end
 	VarDebugService.side_container:Add(VarDebugService.player_class)
 end
 hook.Add("InitPostEntity", "VarDebugService.Init", VarDebugService.Init)
+
+function VarDebugService.AddDebugger(id, func)
+	VarDebugService[id] = vgui.Create "VarDebug"
+	VarDebugService[id].label = id
+	VarDebugService[id].func = func
+	VarDebugService.container:Add(VarDebugService[id])
+end
 
 function VarDebugService.Reload()
 	VarDebugService.container:Remove()

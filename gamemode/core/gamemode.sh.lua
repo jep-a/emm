@@ -17,10 +17,12 @@ EMM.Include {
 	"movement/airaccel",
 	"movement/slide",
 	"minigame/minigame",
+	"minigame/net",
 	"minigame/tagging",
 	"minigame/util",
 	"camui/camui",
 	"jsui/jsui",
 	"hud/hud",
-	"hud/vardebug"
+	"hud/vardebug",
+	"hud/indicators"
 }
