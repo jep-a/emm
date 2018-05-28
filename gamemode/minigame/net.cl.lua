@@ -74,16 +74,6 @@ function MinigameService.ReceiveLobbies()
 			lobby.players[i] = ply
 		end
 
-		for ply_class_key, _ in pairs(proto.player_classes) do
-			local ply_class_count = net.ReadUInt(8)
-			lobby[ply_class_key] = {}
-
-			for i = 1, ply_class_count do
-				local ply = net.ReadEntity()
-				lobby[ply_class_key][i] = ply
-			end
-		end
-
 		MinigameService.CreateLobby(lobby, false)
 	end
 

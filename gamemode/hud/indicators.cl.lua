@@ -13,36 +13,37 @@ vgui.Register("IndicatorContainer", IndicatorContainer, "EditablePanel")
 
 local Indicator = {}
 
-function Indicator:Init()
-	self:SetSize(24, 24)
-end
-
-function Indicator:Think()
-	if IsValid(self.ent) then
-		local pos = self.ent:WorldSpaceCenter()
-		local dist = LocalPlayer():EyePos():Distance(pos)
-
-		cam.Start3D()
-		local screen_pos = (pos + Vector(0, 0, Lerp(dist/600, 40, 45))):ToScreen()
-		cam.End3D()
-
-		local s = Lerp(dist/800, 64, 20)
-		local x, y = screen_pos.x, screen_pos.y - 6
-		self:SetSize(s, s)
-		self:SetPos(x - s/2, y - s/2)
-	else
-		self:Remove()
-	end
-end
-
 local indicator_material = Material("emm/indicator/arrow.png", "noclamp smooth")
 function Indicator:Paint(w, h)
-	surface.SetDrawColor(self.ent.color or COLOR_WHITE)
+	surface.SetDrawColor(self.ent and self.ent.color or COLOR_WHITE)
 	surface.SetMaterial(indicator_material)
 	surface.DrawTexturedRect(0, 0, w, h)
 end
 
 vgui.Register("Indicator", Indicator, "EditablePanel")
+
+
+-- # Calculating positions
+
+function IndicatorService.CalculatePos()
+	cam.Start3D()
+
+	local eye_pos = LocalPlayer():EyePos()
+	for _, indicator in pairs(IndicatorService.container:GetChildren()) do
+		local pos = indicator.ent:WorldSpaceCenter()
+		local dist = eye_pos:Distance(pos)
+		local screen_pos = (pos + Vector(0, 0, Lerp(dist/600, 40, 45))):ToScreen()
+		local s = Lerp(dist/800, 64, 20)
+		local x, y = screen_pos.x - (s/2), screen_pos.y - 6 - (s/2)
+		indicator:SetSize(s, s)
+		indicator:SetPos(x, y)
+	end
+
+	cam.End3D()
+end
+hook.Add("InitPostEntity", "IndicatorService.DrawOverlay", function ()
+	hook.Add("DrawOverlay", "IndicatorService.CalculatePos", IndicatorService.CalculatePos)
+end)
 
 
 -- # Adding
@@ -58,7 +59,7 @@ function IndicatorService.AddIndicators(lobby, ply)
 		end
 	else
 		ply.indicator = vgui.Create "Indicator"
-		ply.indicator.player = ply
+		ply.indicator.ent = ply
 		IndicatorService.container:Add(ply.indicator)
 	end
 end
@@ -72,6 +73,14 @@ function IndicatorService.RemoveIndicators(lobby, ply)
 	end
 end
 hook.Add("LocalLobbyRemovePlayer", "IndicatorService.RemoveIndicators", IndicatorService.RemoveIndicators)
+
+function IndicatorService.ReloadIndicators()
+	local ply = LocalPlayer()
+	if ply.lobby then
+		IndicatorService.AddIndicators(ply.lobby, ply)
+	end
+end
+hook.Add("OnReloaded", "IndicatorService.ReloadIndicators", IndicatorService.ReloadIndicators)
 
 
 -- # Init

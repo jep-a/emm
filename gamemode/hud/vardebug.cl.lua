@@ -86,6 +86,11 @@ function VarDebugService.Init()
 	VarDebugService.lobby.func = function () return ply.lobby and ply.lobby.id end
 	VarDebugService.side_container:Add(VarDebugService.lobby)
 
+	VarDebugService.state = vgui.Create "VarDebug"
+	VarDebugService.state.label = "State"
+	VarDebugService.state.func = function () return ply.lobby and ply.lobby.state and ply.lobby.state.name end
+	VarDebugService.side_container:Add(VarDebugService.state)
+
 	VarDebugService.player_class = vgui.Create "VarDebug"
 	VarDebugService.player_class.label = "Class"
 	VarDebugService.player_class.func = function () return ply.player_class and ply.player_class.name end

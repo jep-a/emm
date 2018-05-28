@@ -50,12 +50,14 @@ function JSUI.SanitizedPrototypes()
 	local sanitized_protos = {}
 
 	for _, proto in pairs(MinigameService.prototypes) do
-		local sanitized_proto = {}
-		sanitized_proto.id = proto.id
-		sanitized_proto.key = string.lower(proto.key)
-		sanitized_proto.name = proto.name
-		sanitized_proto.color = string.format([[#%02x%02x%02x]], proto.color.r, proto.color.g, proto.color.b)
-		sanitized_protos[tostring(proto.id)] = sanitized_proto
+		if proto.display then
+			local sanitized_proto = {}
+			sanitized_proto.id = proto.id
+			sanitized_proto.key = string.lower(proto.key)
+			sanitized_proto.name = proto.name
+			sanitized_proto.color = string.format([[#%02x%02x%02x]], proto.color.r, proto.color.g, proto.color.b)
+			sanitized_protos[tostring(proto.id)] = sanitized_proto
+		end
 	end
 
 	return sanitized_protos

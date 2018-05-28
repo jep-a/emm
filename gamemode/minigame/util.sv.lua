@@ -1,3 +1,11 @@
+function MinigameService.ClearPlayerClasses(plys)
+	for _, ply in pairs(plys) do
+		if ply.player_class then
+			ply:ClearPlayerClass()
+		end
+	end
+end
+
 function MinigameService.PickRandomPlayerClasses(plys, ply_count, ply_class, def_class, less_prob_plys, less_prob)
 	ply_count = ply_count or 1
 	less_prob = less_prob or 0.33

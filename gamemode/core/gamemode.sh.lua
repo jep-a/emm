@@ -11,6 +11,7 @@ EMM.Include {
 	"player/hooks",
 	"player/methods",
 	"player-class/player-class",
+	"player-class/net",
 	"player-class/methods",
 	"movement/walljump",
 	"movement/wallslide",

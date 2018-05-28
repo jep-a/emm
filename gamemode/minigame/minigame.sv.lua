@@ -6,17 +6,11 @@ MinigameService = MinigameService or {}
 MinigameLobby = MinigameLobby or {}
 
 function MinigameService.CreateLobby(lobby)
-	lobby = setmetatable(table.Merge({players = {}}, lobby or {}), MinigameLobby)
+	lobby = setmetatable(lobby or {}, MinigameLobby)
 	lobby.id = #MinigameService.lobbies + 1
 
-	if lobby.host then
-		if lobby.host.lobby then
-			lobby.host.lobby:RemovePlayer(lobby.host)
-		end
-
-		if not table.HasValue(lobby.players, lobby.host) then
-			lobby:AddPlayer(lobby.host, false)
-		end
+	for _, ply in pairs(lobby.players) do
+		ply.lobby = lobby
 	end
 
 	for k, _ in pairs(lobby.prototype.player_classes) do

@@ -71,13 +71,6 @@ function MinigameService.NetworkLobbies(_, ply)
 		for _, ply in pairs(lobby.players) do
 			net.WriteEntity(ply)
 		end
-
-		for ply_class_key, _ in pairs(lobby.prototype.player_classes) do
-			net.WriteUInt(#lobby[ply_class_key], 8)
-			for _, ply in pairs(lobby[ply_class_key]) do
-				net.WriteEntity(ply)
-			end
-		end
 	end
 
 	net.Send(ply)
@@ -90,10 +83,15 @@ net.Receive("RequestLobbies", MinigameService.NetworkLobbies)
 util.AddNetworkString "RequestCreateLobby"
 function MinigameService.ReceiveCreateLobby(_, ply)
 	local proto_id = net.ReadUInt(8)
+
+	if ply.lobby then
+		ply.lobby:RemovePlayer(ply)
+	end
+
 	MinigameService.CreateLobby({
 		prototype = MinigameService.Prototype(proto_id),
 		host = ply,
-		players = {host}
+		players = {ply}
 	})
 end
 net.Receive("RequestCreateLobby", MinigameService.ReceiveCreateLobby)
@@ -107,9 +105,11 @@ net.Receive("RequestRemoveLobby", MinigameService.ReceiveRemoveLobby)
 util.AddNetworkString "RequestJoinLobby"
 function MinigameService.RequestJoinLobby(_, ply)
 	local lobby_id = net.ReadUInt(8)
+
 	if ply.lobby then
 		ply.lobby:RemovePlayer(ply)
 	end
+
 	MinigameService.lobbies[lobby_id]:AddPlayer(ply)
 end
 net.Receive("RequestJoinLobby", MinigameService.RequestJoinLobby)

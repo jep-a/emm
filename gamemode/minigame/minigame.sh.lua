@@ -16,14 +16,22 @@ function MinigameService.Prototype(id)
 	end
 end
 
-function MinigameService.CreatePrototype(proto)
-	proto = setmetatable(table.Merge({
-		color = COLOR_WHITE,
+function MinigameService.CreatePrototype()
+	local bare_base = {
 		player_classes = {},
-		states = table.Copy(MinigameService.states),
-		default_state = "Waiting",
-		hooks = {}
-	}, proto or {}), MinigamePrototype)
+		states = {},
+		hooks = {},
+		state_hooks = {}
+	}
+
+	local base = table.Copy(MinigameService.prototypes.Base or {})
+	base.id = nil
+	base.name = nil
+	base.key = nil
+	base.display = true
+
+	proto = setmetatable(table.Merge(bare_base, base), MinigamePrototype)
+
 	return proto
 end
 
@@ -56,14 +64,32 @@ function MinigamePrototype:RemoveHook(hk_name, hk_id)
 	self.hooks[hk_name][hk_id] = nil
 end
 
+function MinigamePrototype:AddStateHook(state_key, hk_name, hk_id, func)
+	self.state_hooks[state_key] = self.state_hooks[state_key] or {}
+	self.state_hooks[state_key][hk_name] = self.state_hooks[state_key][hk_name] or {}
+	self.state_hooks[state_key][hk_name][hk_id] = func
+end
+
+function MinigamePrototype:RemoveStateHook(state_key, hk_name, hk_id)
+	self.state_hooks[state_key][hk_name][hk_id] = nil
+end
+
 function MinigameService.CallHook(lobby, hk_name, ...)
 	if lobby[hk_name] then
 		lobby[hk_name](lobby, ...)
 	end
 
 	lobby.hooks[hk_name] = lobby.hooks[hk_name] or {}
-	for _, hk in pairs(lobby.hooks[hk_name]) do
-		hk(...)
+	local hks = table.Copy(lobby.hooks[hk_name])
+
+	if lobby.state and lobby.state_hooks[lobby.state.key] and lobby.state_hooks[lobby.state.key][hk_name] then
+		for _, hk in pairs(lobby.state_hooks[lobby.state.key][hk_name]) do
+			table.insert(hks, hk)
+		end
+	end
+
+	for _, hk in pairs(hks) do
+		hk(lobby, ...)
 	end
 end
 

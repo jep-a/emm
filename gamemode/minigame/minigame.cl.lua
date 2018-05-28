@@ -9,12 +9,15 @@ function MinigameService.CreateLobby(lobby, notify)
 	notify = notify == nil and true or notify
 	local lobby = setmetatable(table.Merge({players = {}}, lobby or {}), MinigameLobby)
 
+	for _, ply in pairs(lobby.players) do
+		ply.lobby = lobby
+	end
+
 	for k, _ in pairs(lobby.prototype.player_classes) do
 		lobby[k] = lobby[k] or {}
 	end
 
 	MinigameService.lobbies[lobby.id] = lobby
-	lobby.host.lobby = lobby
 	MinigameService.CallHook(lobby, "Init")
 	hook.Run("CreateLobby", lobby)
 
