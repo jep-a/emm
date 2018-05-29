@@ -29,7 +29,8 @@ net.Receive("LobbySetHost", MinigameService.LobbySetHost)
 function MinigameService.LobbySetState()
 	local lobby_id = net.ReadUInt(8)
 	local state_id = net.ReadUInt(8)
-	MinigameService.lobbies[lobby_id]:SetState(MinigameService.State(MinigameService.lobbies[lobby_id], state_id))
+	local last_state_start = net.ReadFloat()
+	MinigameService.lobbies[lobby_id]:SetState(StateService.State(MinigameService.lobbies[lobby_id], state_id), last_state_start)
 end
 net.Receive("LobbySetState", MinigameService.LobbySetState)
 
@@ -58,13 +59,17 @@ function MinigameService.ReceiveLobbies()
 	for i = 1, lobby_count do
 		local lobby_id = net.ReadUInt(8)
 		local proto_id = net.ReadUInt(8)
+		local state_id = net.ReadUInt(8)
+		local last_state_start = net.ReadFloat()
 		local host = net.ReadEntity()
 		local ply_count = net.ReadUInt(8)
-		
+
 		local proto = MinigameService.Prototype(proto_id)
 		local lobby = {
 			id = lobby_id,
-			prototype = proto,
+			prototype = MinigameService.Prototype(proto_id),
+			state = StateService.State(proto, state_id),
+			last_state_start = last_state_start,
 			host = host,
 			players = {}
 		}

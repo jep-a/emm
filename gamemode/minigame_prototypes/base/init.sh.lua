@@ -11,7 +11,7 @@ MINIGAME:AddState {
 
 MINIGAME:AddState {
 	name = "Starting",
-	time = 5,
+	time = 3,
 	next = "Playing"
 }
 
@@ -22,7 +22,7 @@ MINIGAME:AddState {
 
 MINIGAME:AddState {
 	name = "Ending",
-	time = 5,
+	time = 3,
 	next = "Starting"
 }
 

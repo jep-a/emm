@@ -40,8 +40,8 @@ end
 MINIGAME:AddStateHook("Playing", "PlayerDeath", "ResetHunted", MINIGAME.ResetHunted)
 MINIGAME:AddStateHook("Playing", "PlayerLeave", "ResetHunted", MINIGAME.ResetHunted)
 
-function MINIGAME:Tag(hunted, hunter)
+MINIGAME:AddStateHook("Playing", "Tag", "SetHunted", function (self, hunted, hunter)
 	hunted:SetPlayerClass(self.player_classes.Hunter)
 	hunter:SetPlayerClass(self.player_classes.Hunted)
 	hunted:Kill()
-end
+end)

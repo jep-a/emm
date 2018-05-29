@@ -91,6 +91,18 @@ function VarDebugService.Init()
 	VarDebugService.state.func = function () return ply.lobby and ply.lobby.state and ply.lobby.state.name end
 	VarDebugService.side_container:Add(VarDebugService.state)
 
+	VarDebugService.state_time = vgui.Create "VarDebug"
+	VarDebugService.state_time.label = "Time"
+	VarDebugService.state_time.func = function ()
+		return
+			ply.lobby and
+			ply.lobby.state and
+			ply.lobby.state.time and
+			ply.lobby.last_state_start and
+			string.Trim(string.FormattedTime((ply.lobby.last_state_start + ply.lobby.state.time + 1) - CurTime(), "%2i:%02i"))
+	end
+	VarDebugService.side_container:Add(VarDebugService.state_time)
+
 	VarDebugService.player_class = vgui.Create "VarDebug"
 	VarDebugService.player_class.label = "Class"
 	VarDebugService.player_class.func = function () return ply.player_class and ply.player_class.name end

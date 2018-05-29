@@ -127,7 +127,7 @@ hook.Add("PlayerDeathThink", "Respawn", function (ply)
 end)
 
 
--- # Falling
+-- # Misc
 
 hook.Add("GetFallDamage", "Fall", function (ply, speed)
 	local speed = (speed - 580) * ply.fall_damage_mult
@@ -135,9 +135,6 @@ hook.Add("GetFallDamage", "Fall", function (ply, speed)
 	ply:ViewPunch(Angle(math.random(-view_punch, view_punch), math.random(-view_punch, view_punch), 0))
 	return speed
 end)
-
-
--- # Health Regeneration
 
 timer.Create("PlayerHealthRegeneration", 1, 0, function ()
 	for _, ply in pairs(player.GetAll()) do

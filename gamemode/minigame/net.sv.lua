@@ -29,6 +29,7 @@ function MinigameService.NetworkLobbySetState(lobby)
 	net.Start "LobbySetState"
 	net.WriteUInt(lobby.id, 8)
 	net.WriteUInt(lobby.state.id, 8)
+	net.WriteFloat(lobby.last_state_start)
 	net.Broadcast()
 end
 
@@ -65,6 +66,8 @@ function MinigameService.NetworkLobbies(_, ply)
 	for k, lobby in pairs(MinigameService.lobbies) do
 		net.WriteUInt(k, 8)
 		net.WriteUInt(lobby.prototype.id, 8)
+		net.WriteUInt(lobby.state.id, 8)
+		net.WriteFloat(lobby.last_state_start)
 		net.WriteEntity(lobby.host)
 		net.WriteUInt(#lobby.players, 8)
 
