@@ -44,6 +44,9 @@ end
 hook.Add("InitPostEntity", "IndicatorService.DrawOverlay", function ()
 	hook.Add("DrawOverlay", "IndicatorService.CalculatePos", IndicatorService.CalculatePos)
 end)
+hook.Add("OnReloaded", "IndicatorService.DrawOverlay", function ()
+	hook.Add("DrawOverlay", "IndicatorService.CalculatePos", IndicatorService.CalculatePos)
+end)
 
 
 -- # Adding
@@ -80,7 +83,6 @@ function IndicatorService.ReloadIndicators()
 		IndicatorService.AddIndicators(ply.lobby, ply)
 	end
 end
-hook.Add("OnReloaded", "IndicatorService.ReloadIndicators", IndicatorService.ReloadIndicators)
 
 
 -- # Init
@@ -93,5 +95,6 @@ hook.Add("InitPostEntity", "IndicatorService.Init", IndicatorService.Init)
 function IndicatorService.Reload()
 	IndicatorService.container:Remove()
 	IndicatorService.Init()
+	IndicatorService.ReloadIndicators()
 end
 hook.Add("OnReloaded", "IndicatorService", IndicatorService.Reload)

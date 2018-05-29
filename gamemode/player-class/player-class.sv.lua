@@ -1,1 +1,1 @@
-PlayerClassService = PlayerClassService or {}
+-- 

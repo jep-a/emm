@@ -24,11 +24,11 @@ function MINIGAME:StartStateWaiting()
 	MinigameService.ClearPlayerClasses(self.players)
 end
 
-function MINIGAME:StartStateStarting()
+function MINIGAME:StartStatePlaying()
 	self:PickRandomHunted()
 end
 
-MINIGAME:AddStateHook("Starting", "PlayerJoin", "SetHunter", function (self, ply)
+MINIGAME:AddStateHook("Playing", "PlayerJoin", "SetHunter", function (self, ply)
 	ply:SetPlayerClass(self.player_classes.Hunter)
 end)
 
@@ -37,8 +37,8 @@ function MINIGAME:ResetHunted(ply)
 		self:PickClosestHunted(ply)
 	end
 end
-MINIGAME:AddStateHook("Starting", "PlayerDeath", "ResetHunted", MINIGAME.ResetHunted)
-MINIGAME:AddStateHook("Starting", "PlayerLeave", "ResetHunted", MINIGAME.ResetHunted)
+MINIGAME:AddStateHook("Playing", "PlayerDeath", "ResetHunted", MINIGAME.ResetHunted)
+MINIGAME:AddStateHook("Playing", "PlayerLeave", "ResetHunted", MINIGAME.ResetHunted)
 
 function MINIGAME:Tag(hunted, hunter)
 	hunted:SetPlayerClass(self.player_classes.Hunter)

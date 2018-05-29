@@ -18,6 +18,7 @@ EMM.Include {
 	"movement/airaccel",
 	"movement/slide",
 	"minigame/minigame",
+	"minigame/lobbies",
 	"minigame/net",
 	"minigame/states",
 	"minigame/tagging",

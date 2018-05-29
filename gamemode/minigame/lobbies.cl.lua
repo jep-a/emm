@@ -1,8 +1,3 @@
-MinigameService = MinigameService or {}
-
-
--- # Lobbies
-
 MinigameLobby = MinigameLobby or {}
 
 function MinigameService.CreateLobby(lobby, notify)

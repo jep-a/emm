@@ -3,7 +3,7 @@ MinigameService.prototypes = MinigameService.prototypes or {}
 MinigameService.lobbies = MinigameService.lobbies or {}
 
 
--- # Prototypes
+-- # Prototypes/lobbies
 
 MinigamePrototype = MinigamePrototype or {}
 MinigamePrototype.__index = MinigamePrototype
@@ -93,9 +93,6 @@ function MinigameService.CallHook(lobby, hk_name, ...)
 	end
 end
 
-
--- # Lobbies
-
 MinigameLobby = MinigameLobby or {}
 
 function MinigameLobby:__index(key)
@@ -131,4 +128,11 @@ function MinigameService.LoadPrototypes()
 	end
 end
 hook.Add("Initialize", "MinigameService.LoadPrototypes", MinigameService.LoadPrototypes)
-hook.Add("OnReloaded", "MinigameService.LoadPrototypes", MinigameService.LoadPrototypes)
+hook.Add("OnReloaded", "MinigameService.ReloadPrototypes", MinigameService.LoadPrototypes)
+
+function MinigameService.ReloadLobbies()
+	for _, lobby in pairs(MinigameService.lobbies) do
+		lobby.prototype = MinigameService.prototypes[lobby.prototype.key]
+	end
+end
+hook.Add("OnReloaded", "MinigameService.ReloadLobbies", MinigameService.ReloadLobbies)

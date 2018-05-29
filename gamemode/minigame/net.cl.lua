@@ -1,4 +1,4 @@
--- ## Receiving
+-- # Receiving
 
 function MinigameService.ReceiveCreateLobby()
 	local lobby_id = net.ReadUInt(8)
@@ -81,7 +81,8 @@ function MinigameService.ReceiveLobbies()
 end
 net.Receive("Lobbies", MinigameService.ReceiveLobbies)
 
--- ## Requesting
+
+-- # Requesting
 
 function MinigameService.RequestCreateLobby(proto)
 	net.Start "RequestCreateLobby"

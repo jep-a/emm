@@ -1,4 +1,4 @@
--- ## Sending
+-- # Sending
 
 util.AddNetworkString "CreateLobby"
 function MinigameService.NetworkCreateLobby(lobby)
@@ -78,7 +78,7 @@ end
 net.Receive("RequestLobbies", MinigameService.NetworkLobbies)
 
 
--- ## Requesting
+-- # Requesting
 
 util.AddNetworkString "RequestCreateLobby"
 function MinigameService.ReceiveCreateLobby(_, ply)
