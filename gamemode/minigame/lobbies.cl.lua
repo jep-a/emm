@@ -38,7 +38,7 @@ end
 function MinigameLobby:GetSanitized()
 	local sanitized_lobby = {}
 	sanitized_lobby.id = self.id
-	sanitized_lobby.minigamePrototype = self.prototype.id
+	sanitized_lobby.prototype = self.prototype.id
 	sanitized_lobby.host = self.host:EntIndex()
 	sanitized_lobby.players = {}
 

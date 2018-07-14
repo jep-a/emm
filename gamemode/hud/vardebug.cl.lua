@@ -81,6 +81,11 @@ function VarDebugService.Init()
 	VarDebugService.airaccel.func = function () return math.Round(ply.stamina.airaccel.amount) end
 	VarDebugService.container:Add(VarDebugService.airaccel)
 	
+	VarDebugService.wallslide = vgui.Create "VarDebug"
+	VarDebugService.wallslide.label = "Wallslide"
+	VarDebugService.wallslide.func = function () return math.Round(ply.stamina.wallslide.amount) end
+	VarDebugService.container:Add(VarDebugService.wallslide)
+
 	VarDebugService.lobby = vgui.Create "VarDebug"
 	VarDebugService.lobby.label = "Lobby"
 	VarDebugService.lobby.func = function () return ply.lobby and ply.lobby.id end

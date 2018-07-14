@@ -21,6 +21,7 @@ EMM.Include {
 	"minigame/lobbies",
 	"minigame/net",
 	"minigame/states",
+	"minigame/modifier",
 	"minigame/tagging",
 	"minigame/util",
 	"camui/camui",

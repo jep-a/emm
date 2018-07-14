@@ -92,7 +92,7 @@ function MinigameService.ReceiveCreateLobby(_, ply)
 	end
 
 	MinigameService.CreateLobby({
-		prototype = MinigameService.Prototype(proto_id),
+		prototype = table.Copy(MinigameService.Prototype(proto_id)),
 		host = ply,
 		players = {ply}
 	})

@@ -7,12 +7,12 @@ function JSUI.Test()
 	JSUI.html:Call [[
 		for (i = 0; i < 1000; i++) {
 			setTimeout(function () {
-				console.luaPrint(i);
+				console.info(i);
 
-				app.state.removeMinigameInstance(1);
-				app.state.addMinigameInstance({
+				window.app.store.removeLobby(1);
+				window.app.store.lobbies.add({
 					id: 1,
-					minigamePrototype: 1,
+					prototype: 2,
 					host: 1,
 					players: [1]
 				});
@@ -31,7 +31,7 @@ function JSUI.Reload()
 	local ply = LocalPlayer()
 	if ply.lobby then
 		JSUI.html:Call([[
-			app.store.setCurrentMinigameInstance(]]..ply.lobby.id..[[);
+			window.app.store.lobbies.setCurrent(]]..ply.lobby.id..[[);
 		]])
 	end
 end
@@ -52,10 +52,19 @@ function JSUI.SanitizedPrototypes()
 	for _, proto in pairs(MinigameService.prototypes) do
 		if proto.display then
 			local sanitized_proto = {}
-			sanitized_proto.id = proto.id
+
+			sanitized_proto.id = math.Round(proto.id)
 			sanitized_proto.key = string.lower(proto.key)
 			sanitized_proto.name = proto.name
 			sanitized_proto.color = string.format([[#%02x%02x%02x]], proto.color.r, proto.color.g, proto.color.b)
+			sanitized_proto.modifiables = proto.modifiable_vars
+
+			sanitized_proto.playerClasses = {}
+
+			for k, ply_class in pairs(proto.player_classes) do
+				table.insert(sanitized_proto.playerClasses, {ply_class.name, {color = ply_class.color}})
+			end
+
 			sanitized_protos[tostring(proto.id)] = sanitized_proto
 		end
 	end
@@ -77,32 +86,38 @@ end
 -- # Init
 
 function JSUI.InitJavaScript()
-	JSUI.html:RunJavascript([[
-		var XMM_ENV = true;
-		var xmmLua = {};
-
-		var currentPlayerId = ]]..LocalPlayer():EntIndex()..[[;
-		var initialPlayersJson = ]]..util.TableToJSON(JSUI.SanitizedPlayers())..[[;
-		var initialMinigamePrototypesJson = ]]..util.TableToJSON(JSUI.SanitizedPrototypes())..[[;
-		var initialMinigameInstancesJson = ]]..util.TableToJSON(JSUI.SanitizedLobbies())..[[;
-	]])
-	JSUI.html:AddFunction("console", "luaPrint", print)
+	JSUI.html:AddFunction("console", "info", print)
 	JSUI.html:AddFunction("console", "debug", print)
 	JSUI.html:AddFunction("console", "error", print)
 	JSUI.html:AddFunction("console", "warn", print)
-	JSUI.html:AddFunction("xmmLua", "showPanel", function (bool)
+	JSUI.html:AddFunction("EMM", "togglePanel", function (bool)
 		JSUI.html:SetAlpha(bool and 255 or 0)
 		JSUI.html:SetPos(0, bool and 0 or -ScrH())
 	end)
-	JSUI.html:AddFunction("xmmLua", "requestMinigameInstanceCreate", function (proto_id)
-		MinigameService.RequestCreateLobby(MinigameService.Prototype(proto_id))
+	JSUI.html:AddFunction("EMM", "createLobby", function (id)
+		MinigameService.RequestCreateLobby(MinigameService.Prototype(id))
 	end)
-	JSUI.html:AddFunction("xmmLua", "requestMinigameInstanceJoin", function (lobby_id)
-		MinigameService.RequestJoinLobby(MinigameService.lobbies[lobby_id])
+	JSUI.html:AddFunction("EMM", "joinLobby", function (id)
+		MinigameService.RequestJoinLobby(MinigameService.lobbies[id])
 	end)
-	JSUI.html:AddFunction("xmmLua", "requestMinigameInstanceLeave", function (lobby_id)
-		MinigameService.RequestLeaveLobby(MinigameService.lobbies[lobby_id])
+	JSUI.html:AddFunction("EMM", "leaveLobby", function ()
+		MinigameService.RequestLeaveLobby()
 	end)
+	JSUI.html:AddFunction("EMM", "switchLobby", function (id)
+		if id == LocalPlayer().lobby.id then
+			MinigameService.RequestLeaveLobby()
+		else
+			MinigameService.RequestJoinLobby(MinigameService.lobbies[id])
+		end
+	end)
+	JSUI.html:RunJavascript([[
+		window.emmStore = {
+			clientID: ]]..LocalPlayer():EntIndex()..[[,
+			players: ]]..util.TableToJSON(JSUI.SanitizedPlayers())..[[,
+			prototypes: ]]..util.TableToJSON(JSUI.SanitizedPrototypes())..[[,
+			lobbies: ]]..util.TableToJSON(JSUI.SanitizedLobbies())..[[
+		}
+	]])
 end
 
 function JSUI.Init()
@@ -117,7 +132,7 @@ function JSUI.Init()
 	JSUI.html:SetAlpha(255)
 
 	JSUI.InitJavaScript()
-	JSUI.html:OpenURL "http://spektre.me/xmm/ui"
+	JSUI.html:OpenURL "http://emm-jsui.jep.sh/lobby-settings"
 end
 hook.Add("ReceiveLobbies", "JSUI.Init", JSUI.Init)
 
@@ -127,11 +142,11 @@ hook.Add("ReceiveLobbies", "JSUI.Init", JSUI.Init)
 function JSUI.AddPlayer(data)
 	if JSUI.html then
 		JSUI.html:Call([[
-			app.store.addPlayer({
+			window.app.store.players.add({
 				id: ]]..(data.index + 1)..[[,
-				steamId: ']]..util.SteamIDTo64(data.networkid)..[[',
+				steamID: ']]..util.SteamIDTo64(data.networkid)..[[',
 				name: ']]..string.JavascriptSafe(data.name)..[['
-			});
+			})
 		]])
 	end
 end
@@ -139,17 +154,13 @@ gameevent.Listen "player_info"
 hook.Add("player_info", "JSUI.AddPlayer", JSUI.AddPlayer)
 
 function JSUI.SetPlayerName(data)
-	JSUI.html:Call([[
-		app.store.setPlayerName(]]..Player(data.userid):EntIndex()..[[, ']]..string.JavascriptSafe(data.newname)..[[');
-	]])
+	JSUI.html:Call([[window.app.store.players.setName(]]..Player(data.userid):EntIndex()..[[, ']]..string.JavascriptSafe(data.newname)..[[')]])
 end
 gameevent.Listen "player_changename"
 hook.Add("player_changename", "JSUI.SetPlayerName", JSUI.SetPlayerName)
 
 function JSUI.RemovePlayer(ply)
-	JSUI.html:Call([[
-		app.store.removePlayer(]]..ply:EntIndex()..[[);
-	]])
+	JSUI.html:Call([[window.app.store.players.remove(]]..ply:EntIndex()..[[)]])
 end
 hook.Add("PlayerDisconnected", "JSUI.RemoveDisconnectedPlayer", function (ply)
 	JSUI.RemovePlayer(ply)
@@ -160,63 +171,35 @@ end)
 
 function JSUI.AddLobby(lobby)
 	if JSUI.html then
-		JSUI.html:Call([[
-			app.store.addMinigameInstance(]]..util.TableToJSON(lobby:GetSanitized())..[[);
-		]])
-
-		if lobby:IsLocal() then
-			JSUI.html:Call([[
-				app.store.setCurrentMinigameInstance(]]..lobby.id..[[);
-			]])
-		end
+		JSUI.html:Call([[window.app.store.lobbies.add(]]..util.TableToJSON(lobby:GetSanitized())..[[)]])
 	end
 end
 hook.Add("CreateLobby", "JSUI.AddLobby", JSUI.AddLobby)
 
 function JSUI.RemoveLobby(lobby)
 	if JSUI.html then
-		JSUI.html:Call([[
-			app.store.removeMinigameInstance(]]..lobby.id..[[);
-		]])
+		JSUI.html:Call([[window.app.store.lobbies.remove(]]..lobby.id..[[)]])
 	end
 end
 hook.Add("RemoveLobby", "JSUI.RemoveLobby", JSUI.RemoveLobby)
 
 function JSUI.SetLobbyHost(lobby, ply)
 	if JSUI.html then
-		JSUI.html:Call([[
-			app.store.setMinigameInstanceHost(]]..lobby.id..[[, ]]..ply:EntIndex()..[[);
-		]])
+		JSUI.html:Call([[window.app.store.lobbies.setHost(]]..lobby.id..[[, ]]..ply:EntIndex()..[[)]])
 	end
 end
 hook.Add("LobbySetHost", "JSUI.SetLobbyHost", JSUI.SetLobbyHost)
 
 function JSUI.AddLobbyPlayer(lobby, ply)
 	if JSUI.html then
-		JSUI.html:Call([[
-			app.store.addMinigameInstancePlayer(]]..lobby.id..[[, ]]..ply:EntIndex()..[[);
-		]])
-
-		if ply == LocalPlayer() then
-			JSUI.html:Call([[
-				app.store.setCurrentMinigameInstance(]]..lobby.id..[[);
-			]])
-		end
+		JSUI.html:Call([[window.app.store.lobbies.addPlayer(]]..lobby.id..[[, ]]..ply:EntIndex()..[[)]])
 	end
 end
 hook.Add("LobbyAddPlayer", "JSUI.AddLobbyPlayer", JSUI.AddLobbyPlayer)
 
 function JSUI.RemoveLobbyPlayer(lobby, ply)
 	if JSUI.html then
-		JSUI.html:Call([[
-			app.store.removeMinigameInstancePlayer(]]..lobby.id..[[, ]]..ply:EntIndex()..[[);
-		]])
-
-		if ply == LocalPlayer() then
-			JSUI.html:Call [[
-				app.store.setCurrentMinigameInstance(undefined);
-			]]
-		end
+		JSUI.html:Call([[window.app.store.lobbies.removePlayer(]]..lobby.id..[[, ]]..ply:EntIndex()..[[)]])
 	end
 end
 hook.Add("LobbyRemovePlayer", "JSUI.RemoveLobbyPlayer", JSUI.RemoveLobbyPlayer)
@@ -227,12 +210,8 @@ hook.Add("LobbyRemovePlayer", "JSUI.RemoveLobbyPlayer", JSUI.RemoveLobbyPlayer)
 function JSUI.Open()
 	RestoreCursorPosition()
 	gui.EnableScreenClicker(true)
-
 	JSUI.container:MoveToFront()
-	JSUI.html:Call [[
-		app.show();
-	]]
-
+	JSUI.html:Call [[window.app.show()]]
 	return true
 end
 -- hook.Add("OnSpawnMenuOpen", JSUI.Open)
@@ -240,12 +219,8 @@ end
 function JSUI.Close()
 	RememberCursorPosition()
 	gui.EnableScreenClicker(false)
-
 	JSUI.container:MoveToBack()
-	JSUI.html:Call [[
-		app.hide();
-	]]
-
+	JSUI.html:Call [[window.app.hide()]]
 	return true
 end
 -- hook.Add("OnSpawnMenuOpen", JSUI.Close)
