@@ -10,7 +10,7 @@ function AiraccelService.InitPlayerProperties(ply)
 	ply.airaccel_cooldown = 2
 	ply.airaccel_velocity_cost = 0.01
 	ply.airaccel_boost = 10000
-	ply.airaccel_default = 100
+	ply.airaccel_default = 66
 	ply.airaccel_sound = "player/suit_sprint.wav"
 end
 hook.Add(
