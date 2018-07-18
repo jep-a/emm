@@ -13,6 +13,7 @@ end
 
 function SpectateService.UnspectateCheck(ply, key)
 	if
+		IsFirstTimePredicted() and
 		ply:GetObserverMode() != 0 and
 		bit.band(SpectateService.UNSPECTATE_KEYS, key) != 0
 	then
