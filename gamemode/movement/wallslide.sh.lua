@@ -5,7 +5,7 @@ WallslideService = WallslideService or {}
 
 function WallslideService.InitPlayerProperties(ply)
 	ply.can_wallslide = true
-	ply.wallslide_distance = 30
+	ply.wallslide_distance = 40
 	ply.wallslide_regen_step = 0.25
 	ply.wallslide_decay_step = 0.25
 	ply.wallslide_cooldown = 2
