@@ -4,7 +4,7 @@ SavepointService = SavepointService or {}
 -- # Properties
 
 function SavepointService.InitPlayerProperties(ply)
-	ply.savepoint = nil
+	ply.savepoint = ply.savepoint or nil
 	ply.can_savepoint = true
 end
 hook.Add(
