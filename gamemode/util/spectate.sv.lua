@@ -6,6 +6,7 @@ SpectateService = SpectateService or {}
 function SavepointService.InitPlayerProperties(ply)
 	ply.spectate_savepoint = ply.spectate_savepoint or nil
 	ply.spectate_obs_mode = OBS_MODE_CHASE
+	ply.spectate_timeout = 0
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
@@ -32,6 +33,10 @@ end
 function SpectateService.Spectate(ply, cmd, args)
 	other = SpectateService.FindPlayerByName(args[1])
 
+	if ply.spectate_timeout > CurTime() then
+		return
+	end
+
 	if not other then
 		ply:ChatPrint("Player not found.")
 		return
@@ -45,6 +50,7 @@ function SpectateService.Spectate(ply, cmd, args)
 	ply.spectate_savepoint = SavepointService.CreateSavepoint(ply)
 	ply:SpectateEntity(cmd)
 	ply:Spectate(ply.spectate_obs_mode)
+	ply.spectate_timeout = CurTime() + 1
 end
 concommand.Add("emm_spectate", SpectateService.Spectate)
 
