@@ -9,6 +9,7 @@ EMM.Include {
 	"util/stamina",
 	"util/time-associated-map",
 	"util/savepoint",
+	"util/spectate",
 	"player/hooks",
 	"player/methods",
 	"movement/walljump",
