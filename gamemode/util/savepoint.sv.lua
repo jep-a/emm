@@ -4,7 +4,6 @@ SavepointService = SavepointService or {}
 -- # Properties
 
 function SavepointService.InitPlayerProperties(ply)
-	ply.savepoint = ply.savepoint or nil
 	ply.can_savepoint = true
 end
 hook.Add(
@@ -18,14 +17,14 @@ function SavepointService.CreateSavepoint(ply)
 	local savepoint = {}
 	savepoint.position = ply:GetPos()
 	savepoint.velocity = ply:GetVelocity()
-	savepoint.angles = ply:EyeAngles()
+	savepoint.angle = ply:EyeAngles()
 	return savepoint
 end
 
 function SavepointService.LoadSavepoint(ply, savepoint)
 	ply:SetPos(savepoint.position)
 	ply:SetVelocity(-ply:GetVelocity() + savepoint.velocity)
-	ply:SetEyeAngles(savepoint.angles)
+	ply:SetEyeAngles(savepoint.angle)
 end
 
 
@@ -45,4 +44,4 @@ function SavepointService.Loadpoint(ply, cmd, args)
 		SavepointService.LoadSavepoint(ply, ply.savepoint)
 	end
 end
-concommand.Add("emm_loadpoint", SavepointService.Loadpoint)
+concommand.Add("emm_loadsavepoint", SavepointService.Loadpoint)
