@@ -9,6 +9,7 @@ function AiraccelService.InitPlayerProperties(ply)
 	ply.airaccel_decay_step = 0.1
 	ply.airaccel_cooldown = 2
 	ply.airaccel_velocity_cost = 0.01
+	ply.airaccel_boost_velocity = 10000
 	ply.airaccel_sound = "player/suit_sprint.wav"
 end
 hook.Add(
@@ -47,13 +48,13 @@ hook.Add("KeyPress", "AiraccelService.KeyPress", AiraccelService.KeyPress)
 
 -- # Airacceling
 
-function AiraccelService.Velocity(ply, move)
+function AiraccelService.Velocity(ply, move, amount)
 	local fwd = move:GetMoveAngles():Forward()
 	local strafe_vel = (Vector(fwd.x, fwd.y, 0):GetNormalized() * move:GetForwardSpeed()) + (Vector(fwd.y, -fwd.x, 0):GetNormalized() * move:GetSideSpeed())
 	local strafe_vel_length = math.Clamp(strafe_vel:Length(), 0, 50)
 	local strafe_vel_norm = strafe_vel:GetNormalized()
 	local vel_diff = strafe_vel_length - move:GetVelocity():Dot(strafe_vel_norm)
-	return vel_diff, move:GetVelocity() + (strafe_vel_norm * math.Clamp(strafe_vel_length * 100, 0, vel_diff))
+	return vel_diff, move:GetVelocity() + (strafe_vel_norm * math.Clamp(strafe_vel_length * amount * FrameTime(), 0, vel_diff))
 end
 
 function AiraccelService.SetupAiraccel(ply, move)
@@ -66,7 +67,7 @@ function AiraccelService.SetupAiraccel(ply, move)
 	then
 		ply.stamina.airaccel:SetActive(true)
 
-		local vel_diff, new_vel = AiraccelService.Velocity(ply, move)
+		local vel_diff, new_vel = AiraccelService.Velocity(ply, move, ply.airaccel_boost_velocity)
 		if vel_diff > 0 then
 			move:SetVelocity(new_vel)
 			AiraccelService.ReduceStamina(ply, vel_diff * ply.airaccel_velocity_cost)
