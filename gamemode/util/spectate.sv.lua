@@ -1,11 +1,10 @@
 SpectateService = SpectateService or {}
-util.AddNetworkString("Spectate Keys Update")
+util.AddNetworkString("SpectateKeys")
 
 
 -- # Properties
 
 function SpectateService.InitPlayerProperties(ply)
-	ply.spectate_savepoint = ply.spectate_savepoint or nil
 	ply.spectate_obs_mode = OBS_MODE_CHASE
 	ply.spectate_timeout = 0
 	ply.spectators = {}
@@ -25,12 +24,10 @@ function SpectateService.FindPlayerByName(name)
 			return v
 		end
 	end
-
-	return nil
 end
 
-function SpectateService.NetworkButtons(buttons, players)
-	net.Start("Spectate Keys Update")
+function SpectateService.SendSpectateKeys(buttons, players)
+	net.Start("SpectateKeys")
 	net.WriteUInt(buttons, 24)
 	net.Send(players)
 end
@@ -39,13 +36,13 @@ end
 -- # Spectate
 
 function SpectateService.Spectate(ply, cmd, args)
-	other = SpectateService.FindPlayerByName(args[1])
+	local target = SpectateService.FindPlayerByName(args[1])
 
 	if ply.spectate_timeout > CurTime() then
 		return
 	end
 
-	if not other then
+	if not target then
 		ply:ChatPrint("Player not found.")
 		return
 	end
@@ -59,30 +56,30 @@ function SpectateService.Spectate(ply, cmd, args)
 		ply.spectate_savepoint = SavepointService.CreateSavepoint(ply)
 	end
 
-	ply:SpectateEntity(other)
+	ply:SpectateEntity(target)
 	ply:Spectate(ply.spectate_obs_mode)
 	ply.spectate_timeout = CurTime() + 1
-	SpectateService.NetworkButtons(other.buttons, ply)
-	table.insert(other.spectators, ply)
+	SpectateService.SendSpectateKeys(target.buttons, ply)
+	table.insert(target.spectators, ply)
 end
 concommand.Add("emm_spectate", SpectateService.Spectate)
 
-function SpectateService.Unspectate(ply)
+function SpectateService.UnSpectate(ply)
 	if ply:GetObserverMode() != OBS_MODE_NONE then
 		table.RemoveByValue(ply:GetObserverTarget().spectators, ply)
 		ply:UnSpectate()
 		SavepointService.LoadSavepoint(ply, ply.spectate_savepoint)
 	end
 end
-concommand.Add("emm_unspectate", SpectateService.Unspectate)
+concommand.Add("emm_unspectate", SpectateService.UnSpectate)
 
 function SpectateService.HandleDisconnect(ply)
 	if ply:GetObserverMode() != OBS_MODE_NONE then
-		SpectateService.Unspectate(ply)
+		SpectateService.UnSpectate(ply)
 	end
 
 	for _, v in pairs(ply.spectators) do
-		SpectateService.Unspectate(v)
+		SpectateService.UnSpectate(v)
 	end
 end
 hook.Add("PlayerDisconnected", "SpectateService.HandleDisconnect", SpectateService.HandleDisconnect)
@@ -90,12 +87,12 @@ hook.Add("PlayerDisconnected", "SpectateService.HandleDisconnect", SpectateServi
 
 -- # Button Networking
 
-function SpectateService.UpdateButtons(ply, cmovedata)
-	local buttons = cmovedata:GetButtons()
+function SpectateService.UpdateSpectateKeys(ply, move)
+	local buttons = move:GetButtons()
 
 	if buttons != ply.buttons then
 		ply.buttons = buttons
-		SpectateService.NetworkButtons(buttons, ply.spectators)
+		SpectateService.SendSpectateKeys(buttons, ply.spectators)
 	end
 end
-hook.Add("FinishMove", "SpectateService.UpdateButtons", SpectateService.UpdateButtons)
+hook.Add("FinishMove", "SpectateService.UpdateSpectateKeys", SpectateService.UpdateSpectateKeys)
