@@ -4,7 +4,7 @@ util.AddNetworkString("Spectate Keys Update")
 
 -- # Properties
 
-function SpectateService.InitPlayerProperties(ply)
+function SavepointService.InitPlayerProperties(ply)
 	ply.spectate_savepoint = ply.spectate_savepoint or nil
 	ply.spectate_obs_mode = OBS_MODE_CHASE
 	ply.spectate_timeout = 0
@@ -12,15 +12,15 @@ function SpectateService.InitPlayerProperties(ply)
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
-	"SpectateService.InitPlayerProperties",
-	SpectateService.InitPlayerProperties
+	"SavepointService.InitPlayerProperties",
+	SavepointService.InitPlayerProperties
 )
 
 
 -- # Util
 
 function SpectateService.FindPlayerByName(name)
-	for _, v in pairs(player.GetAll()) do
+	for k, v in pairs(player.GetAll()) do
 		if v:GetName() == name then
 			return v
 		end
@@ -55,10 +55,10 @@ function SpectateService.Spectate(ply, cmd, args)
 			ply:ChatPrint("You can't spectate in the air.")
 			return
 		end
-
+		
 		ply.spectate_savepoint = SavepointService.CreateSavepoint(ply)
 	end
-
+	
 	ply:SpectateEntity(other)
 	ply:Spectate(ply.spectate_obs_mode)
 	ply.spectate_timeout = CurTime() + 1

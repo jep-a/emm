@@ -83,7 +83,7 @@ function AiraccelService.SetupAiraccel(ply, move)
 		if vel_diff > 0 then
 			move:SetVelocity(new_vel)
 		end
-
+		
 		ply.stamina.airaccel:SetActive(false)
 	end
 end

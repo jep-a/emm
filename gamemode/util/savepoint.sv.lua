@@ -13,6 +13,7 @@ hook.Add(
 	SavepointService.InitPlayerProperties
 )
 
+
 -- # Util
 function SavepointService.CreateSavepoint(ply)
 	local savepoint = {}
@@ -33,7 +34,6 @@ end
 
 function SavepointService.Savepoint(ply, cmd, args)
 	if ply.can_savepoint then
-		ply:ChatPrint("Savepoint created!")
 		ply.savepoint = SavepointService.CreateSavepoint(ply)
 	end
 end
@@ -41,7 +41,6 @@ concommand.Add("emm_savepoint", SavepointService.Savepoint)
 
 function SavepointService.Loadpoint(ply, cmd, args)
 	if ply.can_savepoint and ply.savepoint then
-		ply:ChatPrint("Savepoint loaded!")
 		SavepointService.LoadSavepoint(ply, ply.savepoint)
 	end
 end
