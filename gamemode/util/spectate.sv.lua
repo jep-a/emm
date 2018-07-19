@@ -29,12 +29,6 @@ function SpectateService.FindPlayerByName(name)
 	return nil
 end
 
-function SpectateService.NetworkButtons(buttons, players)
-	net.Start("Spectate Keys Update")
-	net.WriteUInt(buttons, 24)
-	net.Send(players)
-end
-
 
 -- # Spectate
 
@@ -62,7 +56,6 @@ function SpectateService.Spectate(ply, cmd, args)
 	ply:SpectateEntity(other)
 	ply:Spectate(ply.spectate_obs_mode)
 	ply.spectate_timeout = CurTime() + 1
-	SpectateService.NetworkButtons(other.buttons, ply)
 	table.insert(other.spectators, ply)
 end
 concommand.Add("emm_spectate", SpectateService.Spectate)
@@ -94,8 +87,10 @@ function SpectateService.UpdateButtons(ply, cmovedata)
 	local buttons = cmovedata:GetButtons()
 
 	if buttons != ply.buttons then
-		ply.buttons = buttons
-		SpectateService.NetworkButtons(buttons, ply.spectators)
+		ply.buttons = buttons	
+		net.Start("Spectate Keys Update")
+		net.WriteUInt(buttons, 24)
+		net.Send(ply.spectators)
 	end
 end
 hook.Add("FinishMove", "SpectateService.UpdateButtons", SpectateService.UpdateButtons)
