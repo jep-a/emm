@@ -10,7 +10,6 @@ function AiraccelService.InitPlayerProperties(ply)
 	ply.airaccel_cooldown = 2
 	ply.airaccel_velocity_cost = 0.01
 	ply.airaccel_boost_velocity = 10000
-	ply.airaccel_default_velocity = 66
 	ply.airaccel_sound = "player/suit_sprint.wav"
 end
 hook.Add(
@@ -77,11 +76,6 @@ function AiraccelService.SetupAiraccel(ply, move)
 		if IsFirstTimePredicted() and ply.airaccel_started then
 			if CLIENT then PredictedSoundService.PlaySound(ply, ply.airaccel_sound, 100, 75, 0.2) end
 			ply.airaccel_started = false
-		end
-
-		local vel_diff, new_vel = AiraccelService.Velocity(ply, move, ply.airaccel_default_velocity)
-		if vel_diff > 0 then
-			move:SetVelocity(new_vel)
 		end
 
 		ply.stamina.airaccel:SetActive(false)
