@@ -5,9 +5,13 @@ GM.Website = "jep.sh"
 
 EMM.Include {
 	"util/palette",
+	"util/cubic-bezier",
+	"util/smooth-value",
 	"util/pred-sound",
 	"util/stamina",
 	"util/time-associated-map",
+	"util/savepoint",
+	"util/spectate",
 	"player/hooks",
 	"player/methods",
 	"player-class/player-class",
@@ -16,6 +20,7 @@ EMM.Include {
 	"movement/walljump",
 	"movement/wallslide",
 	"movement/airaccel",
+	"movement/airaccel-patch",
 	"movement/slide",
 	"minigame/minigame",
 	"minigame/lobbies",
