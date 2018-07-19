@@ -5,6 +5,8 @@ GM.Website = "jep.sh"
 
 EMM.Include {
 	"util/palette",
+	"util/cubic-bezier",
+	"util/smooth-value",
 	"util/pred-sound",
 	"util/stamina",
 	"util/time-associated-map",
@@ -17,6 +19,7 @@ EMM.Include {
 	"movement/wallslide",
 	"movement/airaccel",
 	"movement/slide",
+	"movement/airaccel-patch",
 	"camui/camui",
 	"hud/hud",
 	"hud/vardebug"

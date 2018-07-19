@@ -5,7 +5,7 @@ WallslideService = WallslideService or {}
 
 function WallslideService.InitPlayerProperties(ply)
 	ply.can_wallslide = true
-	ply.wallslide_distance = 30
+	ply.wallslide_distance = 40
 	ply.wallslide_regen_step = 0.25
 	ply.wallslide_decay_step = 0.25
 	ply.wallslide_cooldown = 2
@@ -67,12 +67,25 @@ function WallslideService.Velocity(trace, last_wallslide_time, wallslide_velocit
 	return new_move_vel
 end
 
+function WallslideService.ValidTrace(trace)
+	return trace.HitWorld and not trace.HitSky
+end
+
 function WallslideService.SetupWallslide(ply, move)
 	if ply:Alive() and ply.can_wallslide then
-		local trace = WallslideService.Trace(ply, ply:GetAimVector())
+		local aim = ply:GetAimVector()
+		local trace = WallslideService.Trace(ply, aim)
+
+		if not WallslideService.ValidTrace(trace) then
+			trace = WallslideService.Trace(ply, -aim)
+
+			if not WallslideService.ValidTrace(trace) then
+				trace = nil
+			end
+		end
+
 		if
-			trace.HitWorld and
-			not trace.HitSky and
+			trace and
 			not ply:OnGround() and
 			move:KeyDown(IN_ATTACK2) and
 			WallslideService.HasStamina(ply)
