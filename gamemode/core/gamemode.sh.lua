@@ -14,7 +14,6 @@ EMM.Include {
 	"movement/wallslide",
 	"movement/airaccel",
 	"movement/slide",
-	"commands/savepoint",
 	"camui/camui",
 	"hud/hud",
 	"hud/vardebug"
