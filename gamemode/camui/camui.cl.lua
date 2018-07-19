@@ -35,19 +35,15 @@ function CamUIService.Render()
 	LagEyeAngles()
 	cam.Start3D(cam_vector, lag_angle, 90)
 
-	local invalid_pnls = {}
+	for i, pnl in pairs(CamUIService.panels) do
+		if not IsValid(pnl) then
+			table.remove(CamUIService.panels, i)
+		end
+	end
 
 	for i, pnl in pairs(CamUIService.panels) do
 		if IsValid(pnl) then
 			CamUIService.RenderPanel(pnl)
-		else
-			table.insert(invalid_pnls, i)
-		end
-	end
-
-	if #invalid_pnls > 0 then
-		for _, pnl_i in pairs(invalid_pnls) do
-			table.remove(CamUIService.panels, pnl_i)
 		end
 	end
 

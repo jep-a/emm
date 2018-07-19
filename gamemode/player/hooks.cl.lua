@@ -62,6 +62,12 @@ hook.Add("PlayerInitialSpawn", "InitPlayerProperties", function (ply)
 	hook.Run("InitPlayerProperties", ply)
 end)
 
+hook.Add("PlayerSpawn", "MinigamePlayerSpawn", function (ply)
+	if ply.lobby then
+		MinigameService.CallHook(ply.lobby, "PlayerSpawn")
+	end
+end)
+
 hook.Add("PlayerSpawn", "PlayerProperties", function (ply)
 	hook.Run("PlayerProperties", ply)
 end)
@@ -95,7 +101,12 @@ end)
 net.Receive("PrePlayerDeath", function ()
 	local ply = net.ReadEntity()
 	local att = net.ReadEntity()
+
 	hook.Run("PrePlayerDeath", ply, att)
+
+	if ply.lobby then
+		MinigameService.CallHook(ply.lobby, "PrePlayerDeath", att)
+	end
 end)
 
 net.Receive("PlayerDeath", function ()

@@ -1,5 +1,6 @@
 HUDService = HUDService or {}
 
+
 -- # Panels
 
 local HUDContainer = {}
@@ -26,11 +27,12 @@ end
 
 vgui.Register("HUDCrosshair", HUDCrosshair, "EditablePanel")
 
+
 -- # Init
 
 function HUDService.Init()
-	HUDService.container = vgui.Create("HUDContainer")
-	HUDService.crosshair = vgui.Create("HUDCrosshair")
+	HUDService.container = vgui.Create "HUDContainer"
+	HUDService.crosshair = vgui.Create "HUDCrosshair"
 	HUDService.container:Add(HUDService.crosshair)
 end
 hook.Add("InitPostEntity", "HUDService.Init", HUDService.Init)

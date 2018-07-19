@@ -16,7 +16,7 @@ gamemode/
 
 ### Variables
 
-All variables that are not constants should be lowercase_snake_case. All constant variables should be UPPERCASE_SNAKE_CASE. All function parameters and local variables not inside the first scope should have shortened words when practical. The shortening of variable words should be consistent throughout the project.
+All variables that are not constants should be lowercase_snake_case. All constant variables should be UPPERCASE_SNAKE_CASE. All module-like and class-like tables should be UppercaseCamelCase. All function parameters and local variables not inside the first scope should have shortened words when practical. The shortening of variable words should be consistent throughout the project.
 
 ```lua
 global_variable = 1
@@ -27,9 +27,11 @@ local CONSTANT_VARIABLE = 4
 ```
 
 ```lua
--- 'Function' shortened to 'func', 'parameter ' shortened to 'param', and 'variable' shortened to 'var' inside a scope
+-- 'function' shortened to 'func', 'parameter ' shortened to 'param', and 'variable' shortened to 'var' inside a scope
 
-function Function(func_param)
+local Module = {}
+
+function Module.Function(func_param)
 	local var_in_func_scope = func_param
 end
 
