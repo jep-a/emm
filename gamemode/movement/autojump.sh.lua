@@ -1,29 +1,29 @@
-AutojumpService = AutojumpService or {}
+AutoJumpService = AutoJumpService or {}
 
 
 -- # Properties
 
-function AutojumpService.InitPlayerProperties(ply)
-	ply.can_autojump = true
+function AutoJumpService.InitPlayerProperties(ply)
+	ply.can_autojump = false
 	ply.force_autojump = false
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
-	"AutojumpService.InitPlayerProperties",
-	AutojumpService.InitPlayerProperties
+	"AutoJumpService.InitPlayerProperties",
+	AutoJumpService.InitPlayerProperties
 )
 
 
 -- # Autojump
 
-function AutojumpService.AutoJump(ply, cmd)
+function AutoJumpService.AutoJump(ply, move)
 	if 	
 		ply.can_autojump and
-		(cmd:KeyDown(IN_JUMP) or ply.force_autojump) and
+		(move:KeyDown(IN_JUMP) or ply.force_autojump) and
 		ply:IsOnGround()
 	then
-		cmd:SetOldButtons(bit.band(cmd:GetOldButtons(), bit.bnot(IN_JUMP)))
-		cmd:SetButtons(bit.bor(cmd:GetButtons(), IN_JUMP))
+		move:SetOldButtons(bit.band(move:GetOldButtons(), bit.bnot(IN_JUMP)))
+		move:SetButtons(bit.bor(move:GetButtons(), IN_JUMP))
 	end
 end
-hook.Add("SetupMove", "AutojumpService.AutoJump", AutojumpService.AutoJump)
+hook.Add("SetupMove", "AutoJumpService.AutoJump", AutoJumpService.AutoJump)

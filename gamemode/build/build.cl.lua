@@ -4,8 +4,11 @@ BuildService = BuildService or {}
 
 function BuildService.InitPlayerProperties(ply)
 	ply.can_build = true --= false
-	ply.max_objects = false
-    ply.in_build = false
+    ply.building = false
+	ply.max_buildmode_primitives = 10
+	ply.current_tool = {}
+	ply.tool_distance = 100
+	ply.snap_distance  = 6
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
@@ -13,16 +16,26 @@ hook.Add(
 	BuildService.InitPlayerProperties
 )
 
+EMM.Include {
+	"build/geometry",
+	"build/build-tools"
+}
+
+
 -- # Functions
-util.AddNetworkString "BuildService.RequestBuildmode"
+
 function BuildService.RequestBuildmode()
-	if not LocalPlayer().can_build then
-		chat.AddText( Color(255,0,0), "You are not allowed to build.")
+	local local_ply = LocalPlayer()
+
+	if not local_ply.can_build then
+		chat.AddText(Color(255,0,0), "You are not allowed to build.")
+
 		return
 	end
 
-	net.Start "BuildService.RequestBuildmode"
+	net.Start "Buildmode"
+	net.WriteBool(true)
 	net.SendToServer()
 
-	LocalPlayer().in_build = true
+	local_ply.building = true
 end
