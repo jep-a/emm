@@ -6,13 +6,13 @@ local AirAccelerationPatch = {}
 function AirAccelerationPatch.SetMoveType(ply, move)
 	local zvel = move:GetVelocity().z
 
-	if
+    if
 		zvel > 0
 		and zvel < 140
 		and ply:GetMoveType() == MOVETYPE_WALK
 	then
-		ply:SetMoveType(MOVETYPE_LADDER)
-	end
+        ply:SetMoveType(MOVETYPE_LADDER)
+    end
 end
 hook.Add("SetupMove", "AirAccelerationPatch.SetMoveType", AirAccelerationPatch.SetMoveType)
 
