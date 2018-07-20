@@ -68,9 +68,11 @@ function CheckpointStartMarker:Init(props)
 	self.beams = {}
 
 	self.size_multiplier = AnimatableValueService.CreateAnimatableValue(0.5)
+	self.opacity = AnimatableValueService.CreateAnimatableValue()
+	self.length = AnimatableValueService.CreateAnimatableValue(128, {smooth = true})
 
 	if props.angle then
-		self:CreateFadeBeam({direction = -Angle(0, props.angle, 0):Forward()})
+		self.angle_beam = self:CreateFadeBeam({direction = -Angle(0, props.angle, 0):Forward()})
 	else
 		self.angle = AnimatableValueService.CreateAnimatableValue(0, {
 			callback = function (value)
@@ -92,8 +94,6 @@ function CheckpointStartMarker:Init(props)
 			})
 		end
 	end
-
-	self.opacity = AnimatableValueService.CreateAnimatableValue()
 
 	self:CreateFadeBeam()
 
@@ -146,6 +146,10 @@ end
 function CheckpointStartMarker:Render()
 	render.SetColorMaterialIgnoreZ()
 	render.DrawSphere(self.position, 1, 8, 8, ColorAlpha(COLOR_YELLOW, self.opacity.current))
+
+	if self.angle_beam then
+		self.angle_beam.length = self.length.smooth
+	end
 
 	for _, beam in pairs(self.beams) do
 		beam:Render()
