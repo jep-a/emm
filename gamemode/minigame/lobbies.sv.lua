@@ -57,6 +57,7 @@ function MinigameLobby:RemovePlayer(ply, net, force)
 	net = net == nil and true or net
 
 	local suff_plys = #self.players > 1
+
 	if force or suff_plys then
 		MinigameService.CallHook(self, "PlayerLeave", ply)
 		hook.Run("LobbyRemovePlayer", self, ply)

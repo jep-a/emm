@@ -73,17 +73,23 @@ function VarDebugService.Init()
 
 	VarDebugService.speed = vgui.Create "VarDebug"
 	VarDebugService.speed.label = "Speed"
-	VarDebugService.speed.func = function () return math.Round(ply:GetVelocity():Length()/10) end
+	VarDebugService.speed.func = function ()
+		return math.Round(ply:GetVelocity():Length()/10)
+	end
 	VarDebugService.container:Add(VarDebugService.speed)
 
 	VarDebugService.airaccel = vgui.Create "VarDebug"
 	VarDebugService.airaccel.label = "Airaccel"
-	VarDebugService.airaccel.func = function () return math.Round(ply.stamina.airaccel.amount) end
+	VarDebugService.airaccel.func = function ()
+		return math.Round(ply.stamina.airaccel.amount)
+	end
 	VarDebugService.container:Add(VarDebugService.airaccel)
 	
 	VarDebugService.wallslide = vgui.Create "VarDebug"
 	VarDebugService.wallslide.label = "Wallslide"
-	VarDebugService.wallslide.func = function () return math.Round(ply.stamina.wallslide.amount) end
+	VarDebugService.wallslide.func = function ()
+		return math.Round(ply.stamina.wallslide.amount)
+	end
 	VarDebugService.container:Add(VarDebugService.wallslide)
 
 	VarDebugService.lobby = vgui.Create "VarDebug"
@@ -93,18 +99,21 @@ function VarDebugService.Init()
 
 	VarDebugService.state = vgui.Create "VarDebug"
 	VarDebugService.state.label = "State"
-	VarDebugService.state.func = function () return ply.lobby and ply.lobby.state and ply.lobby.state.name end
+	VarDebugService.state.func = function ()
+		return ply.lobby and ply.lobby.state and ply.lobby.state.name
+	end
 	VarDebugService.side_container:Add(VarDebugService.state)
 
 	VarDebugService.state_time = vgui.Create "VarDebug"
 	VarDebugService.state_time.label = "Time"
 	VarDebugService.state_time.func = function ()
-		return
+		return (
 			ply.lobby and
 			ply.lobby.state and
 			ply.lobby.state.time and
 			ply.lobby.last_state_start and
 			string.Trim(string.FormattedTime((ply.lobby.last_state_start + ply.lobby.state.time + 1) - CurTime(), "%2i:%02i"))
+		)
 	end
 	VarDebugService.side_container:Add(VarDebugService.state_time)
 

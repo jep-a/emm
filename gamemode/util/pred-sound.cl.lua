@@ -2,7 +2,7 @@ PredictedSoundService = PredictedSoundService or {}
 PredictedSoundService.Cache = PredictedSoundService.Cache or {}
 
 
--- # Client Sounds
+-- # Client sounds
 
 function PredictedSoundService.PlaySound(ply, sound_file, soundLevel, pitchPercent, volume, channel)
 	ply:EmitSound(sound_file, soundLevel, pitchPercent, volume, channel)

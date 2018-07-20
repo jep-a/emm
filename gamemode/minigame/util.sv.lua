@@ -11,8 +11,10 @@ function MinigameService.PickRandomPlayerClasses(plys, ply_count, ply_class, def
 	less_prob = less_prob or 0.33
 
 	local random_plys = {}
+
 	while #random_plys < ply_count do
 		local ply = plys[math.random(1, #plys)]
+
 		if not table.HasValue(random_plys, ply) then
 			if less_prob_plys and table.HasValue(less_prob_plys, ply) then
 				if math.random() > less_prob then

@@ -102,9 +102,10 @@ hook.Add("PostPlayerDeath", "NetworkPostPlayerDeath", function (ply)
 end)
 
 hook.Add("PlayerDeathThink", "Respawn", function (ply)
+	local cur_time = CurTime()
+	
 	local allow_spawn
 
-	local cur_time = CurTime()
 	if cur_time > (ply.last_death_time + ply.death_cooldown) then
 		allow_spawn = true
 
@@ -132,7 +133,9 @@ end)
 hook.Add("GetFallDamage", "Fall", function (ply, speed)
 	local speed = (speed - 580) * ply.fall_damage_mult
 	local view_punch = speed/20
+
 	ply:ViewPunch(Angle(math.random(-view_punch, view_punch), math.random(-view_punch, view_punch), 0))
+
 	return speed
 end)
 

@@ -3,29 +3,23 @@ SpectateService.unspectate_keys = bit.bor(IN_JUMP, IN_MOVELEFT, IN_MOVERIGHT, IN
 SpectateService.buttons = 0
 
 
--- # Util
+-- # Spectating
 
 function SpectateService.TargetKeyDown(key)
 	return bit.band(SpectateService.buttons, key)
 end
 
-
--- # Spectate
-
 function SpectateService.UnSpectateCheck(ply, key)
 	if
 		IsFirstTimePredicted() and
-		ply:GetObserverMode() != 0 and
-		bit.band(SpectateService.unspectate_keys, key) != 0
+		ply:GetObserverMode() ~= 0 and
+		bit.band(SpectateService.unspectate_keys, key) ~= 0
 	then
-		ply:ConCommand("emm_unspectate")
 		SpectateService.buttons = 0
+		ply:ConCommand("emm_unspectate")
 	end
 end
 hook.Add("KeyPress", "SpectateService.UnSpectateCheck", SpectateService.UnSpectateCheck)
-
-
--- # Button Networking
 
 function SpectateService.UpdateSpectateKeys()
 	SpectateService.buttons = net.ReadUInt(24)

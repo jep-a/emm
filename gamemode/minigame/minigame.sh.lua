@@ -80,6 +80,7 @@ function MinigameService.CallHook(lobby, hk_name, ...)
 	end
 
 	lobby.hooks[hk_name] = lobby.hooks[hk_name] or {}
+
 	local hks = table.Copy(lobby.hooks[hk_name])
 
 	if lobby.state and lobby.state_hooks[lobby.state.key] and lobby.state_hooks[lobby.state.key][hk_name] then
@@ -97,12 +98,13 @@ MinigameLobby = MinigameLobby or {}
 
 function MinigameLobby:__index(key)
 	local proto_mt_val = rawget(rawget(self, "prototype"), key)
-	if not (proto_mt_val == nil) then
+
+	if proto_mt_val ~= nil then
 		return proto_mt_val
 	end
 
 	local lobby_mt_val = rawget(MinigameLobby, key)
-	if not (lobby_mt_val == nil) then
+	if lobby_mt_val ~= nil then
 		return lobby_mt_val
 	end
 end
@@ -113,10 +115,13 @@ end
 local MINIGAME_PROTOTYPES_DIRECTORY = "minigame_prototypes/"
 local _, minigame_prototypes_dirs = file.Find(EMM_GAMEMODE_DIRECTORY..MINIGAME_PROTOTYPES_DIRECTORY.."*", "LUA")
 local minigame_fenv_metatable = {}
+
 minigame_fenv_metatable.__index = _G
+
 function MinigameService.LoadPrototypes()
 	for _, proto in pairs(minigame_prototypes_dirs) do
 		local proto_fenv = {}
+
 		proto_fenv.MINIGAME = MinigameService.CreatePrototype()
 		setmetatable(proto_fenv, minigame_fenv_metatable)
 
