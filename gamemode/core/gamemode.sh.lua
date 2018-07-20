@@ -5,6 +5,7 @@ GM.Website = "jep.sh"
 
 EMM.Include {
 	"util/palette",
+	"util/class",
 	"util/cubic-bezier",
 	"util/anim-value",
 	"util/pred-sound",
