@@ -29,6 +29,8 @@ EMM.Include {
 	"minigame/modifier",
 	"minigame/tagging",
 	"minigame/util",
+	"checkpoint/checkpoint",
+	"checkpoint/markers",
 	"camui/camui",
 	"jsui/jsui",
 	"hud/hud",

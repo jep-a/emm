@@ -44,7 +44,7 @@ function AnimatableValue:Init(value, props)
 
 	if props.callback then
 		self.checking_changes = true
-		self.callback = callback
+		self.callback = props.callback
 		self.debounce = debounce
 		self.last_change_time = CurTime()
 	end
@@ -134,7 +134,7 @@ function AnimatableValue:Animate()
 end
 
 function AnimatableValue:DetectChanges()
-	if (CurTime() > (self.last_change_time + self.debounce)) and (self.last_change ~= self.current) then
+	if CurTime() > (self.last_change_time + self.debounce) and self.last_change ~= self.current then
 		self.callback(self)
 		self.last_change = self.current
 		self.last_change_time = CurTime()

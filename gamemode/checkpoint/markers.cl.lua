@@ -14,7 +14,7 @@ function CheckpointMarkerFadeBeam:Init(props)
 	self.direction = direction or Vector(0, 0, 1)
 	self.length = length or 128
 	self.opacity = AnimatableValueService.CreateAnimatableValue()
-	self.opacity:To(opacity, 0.2)
+	self.opacity:AnimateTo(opacity, 0.2)
 end
 
 function CheckpointMarkerFadeBeam:Remove(instant)
@@ -22,10 +22,12 @@ function CheckpointMarkerFadeBeam:Remove(instant)
 		self.opacity:Remove()
 		self.parent.beams[self.id] = nil
 	else
-		self.opacity:To(0, {
+		self.opacity:AnimateTo(0, {
 			duration = 0.2,
 			remove = true,
-			callback = function () self:Remove(true) end
+			callback = function ()
+				self:Remove(true)
+			end
 		})
 	end
 end
@@ -95,8 +97,8 @@ function CheckpointStartMarker:Init(props)
 
 	self:CreateFadeBeam()
 
-	self.size_multiplier:To(1, 0.5, CubicBezier(0.5, -1, 0, 1))
-	self.opacity:To(255, 0.2)
+	self.size_multiplier:AnimateTo(1, 0.5, CubicBezier(0.5, -1, 0, 1))
+	self.opacity:AnimateTo(255, 0.2)
 end
 
 function CheckpointStartMarker:Remove(instant)
@@ -114,7 +116,7 @@ function CheckpointStartMarker:Remove(instant)
 			beam:Remove(true)
 		end
 	else
-		self.opacity:To(0, {
+		self.opacity:AnimateTo(0, {
 			duration = 0.1,
 			remove = true,
 			callback = function () self:Remove(true) end
