@@ -12,12 +12,15 @@ hook.Add(
 	SavepointService.InitPlayerProperties
 )
 
--- # Util
+
+-- # Saving/loading
+
 function SavepointService.CreateSavepoint(ply)
 	local savepoint = {}
 	savepoint.position = ply:GetPos()
 	savepoint.velocity = ply:GetVelocity()
 	savepoint.angle = ply:EyeAngles()
+
 	return savepoint
 end
 
@@ -27,21 +30,18 @@ function SavepointService.LoadSavepoint(ply, savepoint)
 	ply:SetEyeAngles(savepoint.angle)
 end
 
-
--- # Savepoint
-
-function SavepointService.Savepoint(ply, cmd, args)
+function SavepointService.RequestSavepoint(ply, cmd, args)
 	if ply.can_savepoint then
 		ply:ChatPrint("Savepoint created!")
 		ply.savepoint = SavepointService.CreateSavepoint(ply)
 	end
 end
-concommand.Add("emm_savepoint", SavepointService.Savepoint)
+concommand.Add("emm_savepoint", SavepointService.RequestSavepoint)
 
-function SavepointService.Loadpoint(ply, cmd, args)
+function SavepointService.RequestLoadSavepoint(ply, cmd, args)
 	if ply.can_savepoint and ply.savepoint then
 		ply:ChatPrint("Savepoint loaded!")
 		SavepointService.LoadSavepoint(ply, ply.savepoint)
 	end
 end
-concommand.Add("emm_loadsavepoint", SavepointService.Loadpoint)
+concommand.Add("emm_load_savepoint", SavepointService.RequestLoadSavepoint)

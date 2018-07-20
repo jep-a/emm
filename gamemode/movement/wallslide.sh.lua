@@ -57,13 +57,16 @@ function WallslideService.Trace(ply, dir)
 		endpos = ply_pos + (dir * ply.wallslide_distance),
 		filter = ply
 	}
+
 	return trace
 end
 
 function WallslideService.Velocity(trace, last_wallslide_time, wallslide_velocity)
 	local frac = math.Clamp(math.TimeFraction(last_wallslide_time, last_wallslide_time + 2, CurTime()), 0, 1)
+
 	local new_move_vel = ((1 - frac) * (wallslide_velocity * Vector(1, 1, 0))) + (frac * (trace.Normal * Vector(1, 1, 0.1)) * 400) - Vector(0, 0, 5)
 	new_move_vel.z = math.min(new_move_vel.z, 1)
+
 	return new_move_vel
 end
 
@@ -97,7 +100,10 @@ function WallslideService.SetupWallslide(ply, move)
 				ply.stamina.wallslide:SetActive(true)
 				ply.stamina.wallslide:ReduceStamina(ply.wallslide_init_cost)
 				PredictedSoundService.PlayWallslideSound(ply)
-				if CLIENT then WallslideService.UpdateWallsliding(ply) end
+
+				if CLIENT then
+					WallslideService.UpdateWallsliding(ply)
+				end
 			end
 
 			move:SetVelocity(WallslideService.Velocity(trace, WallslideService.LastWallslideTime(ply), WallslideService.WallslideVelocity(ply)))
@@ -105,7 +111,10 @@ function WallslideService.SetupWallslide(ply, move)
 			ply.wallsliding = false
 			ply.stamina.wallslide:SetActive(false)
 			PredictedSoundService.StopWallslideSound(ply)
-			if CLIENT then WallslideService.UpdateWallsliding(ply) end
+
+			if CLIENT then
+				WallslideService.UpdateWallsliding(ply)
+			end
 		end
 	end
 end

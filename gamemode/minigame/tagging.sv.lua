@@ -17,21 +17,25 @@ local function SequentialTableHasValue(tab, val)
 
 	return false
 end
+
 function TaggingService.Think()
 	for i = 1, #TaggingService.taggable_groups do
 		for _i = 1, #TaggingService.taggable_groups[i] do
 			local taggable = TaggingService.taggable_groups[i][_i]
+
 			if taggable.player_class and taggable.player_class.can_tag then
 				local ents = ents.FindInSphere(taggable:WorldSpaceCenter(), taggable.taggable_radius)
+
 				if
 					taggable:IsPlayer() and
 					taggable:Alive() and
-					(CurTime() > (taggable.last_tag_time + 0.1))
+					CurTime() > (taggable.last_tag_time + 0.1)
 				then
 					for __i = 1, #ents do
 						local ent = ents[__i]
+
 						if
-							not (taggable == ent) and
+							taggable ~= ent and
 							ent:IsPlayer() and
 							ent:Alive() and
 							taggable.lobby == ent.lobby and

@@ -2,32 +2,38 @@ local player_metatable = FindMetaTable("Player")
 
 local ent_metatable =  FindMetaTable("Entity")
 local ent_get_table = ent_metatable.GetTable
+
 function player_metatable:__index(key)
 	local tab = ent_get_table(self)
 
 	if tab then
 		local ply_class = tab.player_class
+
 		if ply_class then
 			local ply_class_val = ply_class[key]
-			if not (ply_class_val == nil) then
+
+			if ply_class_val ~= nil then
 				return ply_class_val
 			end
 		end
 	end
 
 	local ply_mt_val = player_metatable[key]
-	if not (ply_mt_val == nil) then
+
+	if ply_mt_val ~= nil then
 		return ply_mt_val
 	end
 
 	local ent_mt_val = ent_metatable[key]
-	if not (ent_mt_val == nil) then
+
+	if ent_mt_val ~= nil then
 		return ent_mt_val
 	end
 
 	if tab then
 		local tab_val = tab[key]
-		if not (tab_val == nil) then
+
+		if tab_val ~= nil then
 			return tab_val
 		end
 	end
@@ -40,7 +46,7 @@ function player_metatable:GetPlayerClass()
 end
 
 function player_metatable:HasPlayerClass()
-	return not (self.player_class == nil)
+	return self.player_class ~= nil
 end
 
 function player_metatable:SetupPlayerClass()

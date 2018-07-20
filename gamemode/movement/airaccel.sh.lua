@@ -54,6 +54,7 @@ function AiraccelService.Velocity(ply, move, amount)
 	local strafe_vel_length = math.Clamp(strafe_vel:Length(), 0, 50)
 	local strafe_vel_norm = strafe_vel:GetNormalized()
 	local vel_diff = strafe_vel_length - move:GetVelocity():Dot(strafe_vel_norm)
+
 	return vel_diff, move:GetVelocity() + (strafe_vel_norm * math.Clamp(strafe_vel_length * amount * FrameTime(), 0, vel_diff))
 end
 
@@ -68,13 +69,17 @@ function AiraccelService.SetupAiraccel(ply, move)
 		ply.stamina.airaccel:SetActive(true)
 
 		local vel_diff, new_vel = AiraccelService.Velocity(ply, move, ply.airaccel_boost_velocity)
+
 		if vel_diff > 0 then
 			move:SetVelocity(new_vel)
 			AiraccelService.ReduceStamina(ply, vel_diff * ply.airaccel_velocity_cost)
 		end
 	else
 		if IsFirstTimePredicted() and ply.airaccel_started then
-			if CLIENT then PredictedSoundService.PlaySound(ply, ply.airaccel_sound, 100, 75, 0.2) end
+			if CLIENT then
+				PredictedSoundService.PlaySound(ply, ply.airaccel_sound, 100, 75, 0.2)
+			end
+
 			ply.airaccel_started = false
 		end
 

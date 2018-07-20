@@ -33,7 +33,7 @@ MINIGAME:AddStateHook("Waiting", "PlayerJoin", "RequirePlayers", function (self,
 end)
 
 MINIGAME:AddHook("PlayerLeave", "RequirePlayers", function (self, ply)
-	if not (self.state == self.states.Waiting) and ((#self.players - 1) < self.required_players) then
+	if self.state ~= self.states.Waiting and (#self.players - 1) < self.required_players then
 		self:SetState(self.states.Waiting)
 	end
 end)

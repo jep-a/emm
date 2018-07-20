@@ -1,7 +1,8 @@
 function PlayerClassService.ReceivePlayerClass()
 	local ply = net.ReadEntity()
 	local id = net.ReadUInt(8)
-	if not (id == 0) then
+
+	if id ~= 0 then
 		ply:SetPlayerClass(PlayerClassService.MinigamePlayerClass(ply, id))
 	else
 		ply:ClearPlayerClass()
@@ -13,7 +14,8 @@ function PlayerClassService.ReceivePlayerClasses()
 	for i = 1, #player.GetAll() do
 		local ply = net.ReadEntity()
 		local id = net.ReadUInt(8)
-		if not (id == 0) then
+
+		if id ~= 0 then
 			ply:SetPlayerClass(PlayerClassService.MinigamePlayerClass(ply, id))
 		end
 	end
