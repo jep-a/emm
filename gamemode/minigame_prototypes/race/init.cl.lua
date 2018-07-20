@@ -1,0 +1,3 @@
+function MINIGAME:StartStatePlaying()
+	--
+end
