@@ -19,14 +19,19 @@ StaminaType = StaminaType or {}
 StaminaType.__index = StaminaType
 
 function StaminaService.CreateStaminaType()
-	return setmetatable({
-		active = false,
-		regen_step = 0.1,
-		decay_step = 0.1,
-		cooldown = 1,
-		amount = 100,
-		last_active = 0
-	}, StaminaType)
+	local instance = setmetatable({}, StaminaType)
+	instance:Init()
+
+	return instance
+end
+
+function StaminaType:Init()
+	self.active = false
+	self.amount = 100
+	self.regen_step = 0.1
+	self.decay_step = 0.1
+	self.cooldown = 1
+	self.last_active = 0
 end
 
 function StaminaType:GetStamina()
@@ -67,8 +72,9 @@ end
 function StaminaService.Update()
 	if IsFirstTimePredicted() then
 		local cur_time = CurTime()
+
 		for _, ply in pairs(SERVER and player.GetAll() or {LocalPlayer()}) do
-			for _, stamina_type in pairs(ply.stamina or {}) do
+			for _, stamina_type in pairs(ply.stamina) do
 				if stamina_type.active then
 					stamina_type:ReduceStamina(stamina_type.decay_step)
 				elseif cur_time > (stamina_type.last_active + stamina_type.cooldown) then

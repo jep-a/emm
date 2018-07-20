@@ -14,6 +14,10 @@ hook.Add("PlayerSpawn", "EMM.PlayerSpawn", function (ply)
 	ply:SetupCoreProperties()
 	ply:SetupModel()
 
+	if ply.lobby then
+		MinigameService.CallHook(ply.lobby, "PlayerSpawn")
+	end
+
 	net.Start "PlayerSpawn"
 	net.WriteUInt(ply:EntIndex(), 16)
 	net.Broadcast()
@@ -46,6 +50,10 @@ end)
 -- # Death
 
 hook.Add("DoPlayerDeath", "PrePlayerDeath", function (ply, att, dmg)
+	if ply.lobby then
+		MinigameService.CallHook(ply.lobby, "PrePlayerDeath", att, dmg)
+	end
+
 	hook.Run("PrePlayerDeath", ply, att, dmg)
 end)
 
@@ -59,6 +67,12 @@ end)
 
 hook.Add("PrePlayerDeath", "CreateRagdoll", function (ply)
 	ply:CreateRagdoll()
+end)
+
+hook.Add("PlayerDeath", "MinigamePlayerDeath", function (ply, infl, att)
+	if ply.lobby then
+		MinigameService.CallHook(ply.lobby, "PlayerDeath", infl, att)
+	end
 end)
 
 util.AddNetworkString "PlayerDeath"
@@ -88,9 +102,10 @@ hook.Add("PostPlayerDeath", "NetworkPostPlayerDeath", function (ply)
 end)
 
 hook.Add("PlayerDeathThink", "Respawn", function (ply)
+	local cur_time = CurTime()
+	
 	local allow_spawn
 
-	local cur_time = CurTime()
 	if cur_time > (ply.last_death_time + ply.death_cooldown) then
 		allow_spawn = true
 
@@ -113,17 +128,16 @@ hook.Add("PlayerDeathThink", "Respawn", function (ply)
 end)
 
 
--- # Falling
+-- # Misc
 
 hook.Add("GetFallDamage", "Fall", function (ply, speed)
 	local speed = (speed - 580) * ply.fall_damage_mult
 	local view_punch = speed/20
+
 	ply:ViewPunch(Angle(math.random(-view_punch, view_punch), math.random(-view_punch, view_punch), 0))
+
 	return speed
 end)
-
-
--- # Health Regeneration
 
 timer.Create("PlayerHealthRegeneration", 1, 0, function ()
 	for _, ply in pairs(player.GetAll()) do

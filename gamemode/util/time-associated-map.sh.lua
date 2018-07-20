@@ -2,35 +2,38 @@ TimeAssociatedMapService = TimeAssociatedMapService or {}
 TimeAssociatedMapService.maps = TimeAssociatedMapService.maps or {}
 
 
--- # Type definition
+-- # Class
 
 TimeAssociatedMap = TimeAssociatedMap or {}
 TimeAssociatedMap.__index = TimeAssociatedMap
 
 function TimeAssociatedMapService.CreateMap(cooldown, lookup_func)
-	local result = setmetatable({
-		cooldown = cooldown,
-		lookup_func = lookup_func,
-		values = {}
-	}, TimeAssociatedMap)
+	local instance = setmetatable({}, TimeAssociatedMap)
+	instance:Init(cooldown, lookup_func)
 
-	table.insert(TimeAssociatedMapService.maps, result)
+	table.insert(TimeAssociatedMapService.maps, instance)
 
-	return result
+	return instance
+end
+
+function TimeAssociatedMap:Init(cooldown, lookup_func)
+	self.cooldown = cooldown
+	self.lookup_func = lookup_func
+	self.values = {}
 end
 
 function TimeAssociatedMap:Value(...)
 	local cur_time = CurTime()
 
-	if self.values[cur_time] == nil then
-		self.values[cur_time] = self.lookup_func(args)
+	if not self.values[cur_time] then
+		self.values[cur_time] = self.lookup_func(...)
 	end
 
 	return self.values[cur_time]
 end
 
 function TimeAssociatedMap:Update(...)
-	self.values[CurTime()] = self.lookup_func(args)
+	self.values[CurTime()] = self.lookup_func(...)
 end
 
 function TimeAssociatedMap:HasChecked()
@@ -42,16 +45,17 @@ function TimeAssociatedMap:Set(value)
 end
 
 
--- # Auto cleanup
+-- # Cleanup
 
 function TimeAssociatedMapService.Cleanup()
 	local cur_time = CurTime()
+
 	for _, map in pairs(TimeAssociatedMapService.maps) do
-		for t, _ in pairs(map.values) do
-			if cur_time > t + map.cooldown  then
-				map.values[t] = nil
+		for time, _ in pairs(map.values) do
+			if cur_time > (time + map.cooldown)  then
+				map.values[time] = nil
 			end
 		end
 	end
 end
-hook.Add("Think", " TimeAssociatedMapService.Cleanup",  TimeAssociatedMapService.Cleanup)
+hook.Add("Think", "TimeAssociatedMapService.Cleanup",  TimeAssociatedMapService.Cleanup)

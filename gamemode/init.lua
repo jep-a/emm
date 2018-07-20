@@ -40,8 +40,6 @@ function EMM.Include(inc, inc_func)
 		if sh_inc_file or sv_inc_file then
 			MsgN("including "..inc)
 		else
-			MsgN("could not find include "..inc)
-
 			return
 		end
 
@@ -69,4 +67,6 @@ function EMM.AddResourceDirectory(dir)
 	end
 end
 
+EMM.AddResourceDirectory "materials/emm"
+EMM.AddResourceDirectory "resource/fonts"
 include "emm.lua"

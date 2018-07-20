@@ -14,6 +14,7 @@ end
 local function CallPlayerInitialSpawnHooks()
 	if init_post_ent then
 		local ply_index = net.ReadUInt(16)
+
 		CallPlayerSpawnHook(ply_index, function ()
 			hook.Run("PlayerInitialSpawn", Entity(ply_index))
 		end)
@@ -24,6 +25,7 @@ net.Receive("PlayerInitialSpawn", CallPlayerInitialSpawnHooks)
 local function CallPlayerSpawnHooks()
 	if init_post_ent then
 		local ply_index = net.ReadUInt(16)
+
 		CallPlayerSpawnHook(ply_index, function ()
 			local ply = Entity(ply_index)
 
@@ -41,6 +43,7 @@ hook.Add("InitPostEntity", "EMM.InitPostEntity", function ()
 	init_post_ent = true
 
 	local local_ply = LocalPlayer()
+
 	hook.Run("LocalPlayerInitialSpawn", local_ply)
 	hook.Run("LocalPlayerSpawn", local_ply)
 
@@ -60,6 +63,12 @@ end)
 
 hook.Add("PlayerInitialSpawn", "InitPlayerProperties", function (ply)
 	hook.Run("InitPlayerProperties", ply)
+end)
+
+hook.Add("PlayerSpawn", "MinigamePlayerSpawn", function (ply)
+	if ply.lobby then
+		MinigameService.CallHook(ply.lobby, "PlayerSpawn")
+	end
 end)
 
 hook.Add("PlayerSpawn", "PlayerProperties", function (ply)
@@ -95,13 +104,19 @@ end)
 net.Receive("PrePlayerDeath", function ()
 	local ply = net.ReadEntity()
 	local att = net.ReadEntity()
+
 	hook.Run("PrePlayerDeath", ply, att)
+
+	if ply.lobby then
+		MinigameService.CallHook(ply.lobby, "PrePlayerDeath", att)
+	end
 end)
 
 net.Receive("PlayerDeath", function ()
 	local ply = net.ReadEntity()
 	local infl = net.ReadEntity()
 	local att = net.ReadEntity()
+
 	hook.Run("PlayerDeath", ply, infl, att)
 end)
 

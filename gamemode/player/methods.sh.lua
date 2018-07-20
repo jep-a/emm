@@ -11,6 +11,7 @@ function player_metatable:SetupCoreProperties()
 	self:SetDuckSpeed(0.3)
 	self:SetUnDuckSpeed(0.3)
 	self:SetJumpPower(self.jump_power)
+	self:SetNoCollideWithTeammates(true)
 	self:AllowFlashlight(true)
 	self:ShouldDropWeapon(false)
 	self:SetAvoidPlayers(false)
@@ -18,6 +19,7 @@ end
 
 function player_metatable:SetupModel()
 	local mdl = self.model or player_manager.TranslatePlayerModel(self:GetInfo "cl_playermodel")
+
 	util.PrecacheModel(mdl)
 	self:SetModel(mdl)
 end
