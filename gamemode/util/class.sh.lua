@@ -1,19 +1,24 @@
 Class = {}
 
+function Class.TableID(tab)
+	return tostring(tab):gsub("table: ", "", 1)
+end
+
 function Class.New(super)
 	local class = {}
 	class.__index = class
+	class.static = {}
 
 	if super then
 		class.super = super
 		setmetatable(class, super)
 
-		if super.hooks then
-			class.hooks = {}
-			class.instances = {}
+		if super.static.hooks then
+			class.static.hooks = {}
+			class.static.instances = {}
 
-			for _, hk in pairs(super.hooks) do
-				Class.AddHook(class, hk.name, '_'..hk.id)
+			for _, hk in pairs(super.static.hooks) do
+				Class.AddHook(class, hk.name, hk.func_key)
 			end
 		end
 	end
@@ -21,8 +26,8 @@ function Class.New(super)
 	function class.New(...)
 		local instance = Class.Instance(class, ...)
 
-		if class.hooks then
-			table.insert(class.instances, instance)
+		if class.static.hooks then
+			table.insert(class.static.instances, instance)
 		end
 
 		return instance
@@ -42,42 +47,51 @@ function Class.Instance(class, ...)
 end
 
 function Class.SetupForHooks(class)
-	class.hooks = {}
-	class.instances = {}
+	class.static.hooks = {}
+	class.static.instances = {}
 
-	function class:RemoveHooks()
-		table.RemoveByValue(class.instances, self)
+	function class:DisconnectFromHooks()
+		table.RemoveByValue(class.static.instances, self)
+	end
+
+	function class:Finish()
+		self:DisconnectFromHooks()
 	end
 end
 
-function Class.AddHook(class, name, id)
-	if not class.hooks then
+function Class.AddHook(class, name, func_k)
+	func_k = func_k or name
+
+	if not class.static.hooks then
 		Class.SetupForHooks(class)
 	end
 
-	table.insert(class.hooks, {name = name, id = id})
+	table.insert(class.static.hooks, {name = name, func_key = func_k})
 
-	hook.Add(name, id, function (...)
-		for i = 1, #class.instances do
-			local instance = class.instances[i]
-			class[name](instance, ...)
+	hook.Add(name, Class.TableID(class).."."..func_k, function (...)
+		for i = 1, #class.static.instances do
+			local instance = class.static.instances[i]
+			class[func_k](instance, ...)
 		end
 	end)
 end
 
-function Class.RemoveHook(class, name, id)
-	for k, hk in pairs(class.hooks) do
+function Class.RemoveHook(class, name)
+	local func_k
+
+	for k, hk in pairs(class.static.hooks) do
 		if name == hk.name then
+			func_k = hk.func_key
 			table.remove(hk, k)
 
 			break
 		end
 	end
 
-	if #class.hooks < 1 then
-		class.hooks = false
-		class.instances = {}
+	if #class.static.hooks < 1 then
+		class.static.hooks = false
+		class.static.instances = {}
 	end
 
-	hook.Remove(name, id, class[name])
+	hook.Remove(name, Class.TableID(class).."."..func_k)
 end
