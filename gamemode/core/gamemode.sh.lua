@@ -10,7 +10,6 @@ EMM.Include {
 	"util/time-associated-map",
 	"util/savepoint",
 	"util/spectate",
-	"util/environment",
 	"player/hooks",
 	"player/methods",
 	"movement/walljump",
