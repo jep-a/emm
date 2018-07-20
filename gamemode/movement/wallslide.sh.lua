@@ -107,6 +107,7 @@ function WallslideService.SetupWallslide(ply, move)
 			end
 
 			move:SetVelocity(WallslideService.Velocity(trace, WallslideService.LastWallslideTime(ply), WallslideService.WallslideVelocity(ply)))
+			if SERVER then WallslideService.Effect(ply, trace) end
 		elseif WallslideService.Wallsliding(ply) and not WallslideService.FinishedWallslide(ply) then
 			ply.wallsliding = false
 			ply.stamina.wallslide:SetActive(false)
