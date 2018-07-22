@@ -33,5 +33,7 @@ EMM.Include {
 	"jsui/jsui",
 	"hud/hud",
 	"hud/vardebug",
-	"hud/indicators"
+	"hud/indicators",
+	"build/build",
+	"build/buildclasses"
 }
