@@ -21,6 +21,7 @@ EMM.Include {
 	"movement/walljump",
 	"movement/wallslide",
 	"movement/airaccel",
+	"movement/autojump",
 	"movement/airaccel-patch",
 	"movement/slide",
 	"minigame/minigame",
