@@ -121,6 +121,41 @@ function VarDebugService.Init()
 	VarDebugService.player_class.label = "Class"
 	VarDebugService.player_class.func = function () return ply.player_class and ply.player_class.name end
 	VarDebugService.side_container:Add(VarDebugService.player_class)
+
+	VarDebugService.can_build = vgui.Create "VarDebug"
+	VarDebugService.can_build.label = "Can Build"
+	VarDebugService.can_build.func = function ()
+		return LocalPlayer().can_build
+	end
+	VarDebugService.side_container:Add(VarDebugService.can_build)
+	
+	VarDebugService.building = vgui.Create "VarDebug"
+	VarDebugService.building.label = "Building"
+	VarDebugService.building.func = function ()
+		return LocalPlayer().building
+	end
+	VarDebugService.side_container:Add(VarDebugService.building)
+
+	VarDebugService.current_tool = vgui.Create "VarDebug"
+	VarDebugService.current_tool.label = "Current Tool"
+	VarDebugService.current_tool.func = function ()
+		return LocalPlayer().current_tool.show_name or ""
+	end
+	VarDebugService.side_container:Add(VarDebugService.current_tool)
+
+	VarDebugService.tool_distance = vgui.Create "VarDebug"
+	VarDebugService.tool_distance.label = "Tool distance"
+	VarDebugService.tool_distance.func = function ()
+		return LocalPlayer().tool_distance
+	end
+	VarDebugService.container:Add(VarDebugService.tool_distance)
+
+	VarDebugService.snap_distance = vgui.Create "VarDebug"
+	VarDebugService.snap_distance.label = "Snap distance"
+	VarDebugService.snap_distance.func = function ()
+		return LocalPlayer().snap_distance
+	end
+	VarDebugService.container:Add(VarDebugService.snap_distance)
 end
 hook.Add("InitPostEntity", "VarDebugService.Init", VarDebugService.Init)
 
