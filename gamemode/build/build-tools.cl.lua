@@ -4,14 +4,14 @@ function BuildService.HandleCurrentToolControls(local_ply,key)
 	if not local_ply.building then return end
 	local_ply.current_tool.Do[key]()
 end
-hook.add("KeyPress", "HandleToolControls", BuildService.HandleToolControls)
+hook.Add("KeyPress", "HandleToolControls", BuildService.HandleToolControls)
 
 function BuildService.RenderCurrentToolHUD()
     local local_ply = LocalPlayer()
     if not local_ply.building then return end
     local_ply.current_tool:Render()
 end
-hook.add("PostDrawTranslucentRenderables", "RenderCurrentToolHUD", BuildService.RenderCurrentToolHUD)
+hook.Add("PostDrawTranslucentRenderables", "RenderCurrentToolHUD", BuildService.RenderCurrentToolHUD)
 
 function BuildService.SnapToGrid(pos, snap_dist)
     if snap_dist == 0 then return pos end
