@@ -83,7 +83,21 @@ function BuildService.SnapToGrid(pos, snap_dist)
 end
 
 function BuildService.GetToolPosition()
-    return BuildService.SnapToGrid(EyePos()+EyeVector()*LocalPlayer().tool_distance,LocalPlayer().snap_distance)
+	local eye_pos = EyePos()
+	local eye_vec = EyeVector()
+	local local_ply = LocalPlayer()
+	local eye_trace = {}
+	util.TraceLine({
+		start = eye_pos,
+		endpos = eye_pos + eye_vec*local_ply.tool_distance,
+		filter = player.GetAll(),
+		output = eye_trace
+	})
+	if eye_trace.Hit then
+		return BuildService.SnapToGrid(trace_result.HitPos - eye_vec*local_ply.snap_distance/2)
+	else
+		return BuildService.SnapToGrid(trace_result.HitPos)
+	end
 end
 
 function BuildService.RegisterBuildTool(tool)
