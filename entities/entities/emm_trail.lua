@@ -10,7 +10,10 @@ function ENT:Initialize()
 	self:DrawShadow(false)
 
 	if SERVER then
-		self:SetSprite(util.SpriteTrail(self, 0, COLOR_WHITE, false, 25, 25, 4, 0.125, "emm/trail/flat.vmt"))
+		local sprite = util.SpriteTrail(self, 0, COLOR_WHITE, false, 25, 25, 4, 0.125, "emm/trail/flat.vmt")
+
+		self:SetSprite(sprite)
+		self:DeleteOnRemove(sprite)
 	end
 end
 
