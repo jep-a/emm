@@ -75,8 +75,10 @@ function BuildService.SnapToGrid(pos, snap_dist)
 
     local new_position = Vector()
 
-    for axis, value in pairs(pos) do
-        new_position[axis] = math.Round(value/snap_dist)
+	for axis, value in pairs(table.Sanitise({pos})[1]) do
+		if axis ~= "__type" then
+			new_position[axis] = math.Round(value/snap_dist)*snap_dist
+		end
     end
 
     return new_position
@@ -93,11 +95,14 @@ function BuildService.GetToolPosition()
 		filter = player.GetAll(),
 		output = eye_trace
 	})
-	if eye_trace.Hit then
-		return BuildService.SnapToGrid(trace_result.HitPos - eye_vec*local_ply.snap_distance/2)
-	else
-		return BuildService.SnapToGrid(trace_result.HitPos)
-	end
+
+	local snap_dist = local_ply.snap_distance
+	--if eye_trace.Hit then
+	--	return BuildService.SnapToGrid(eye_trace.HitPos - eye_vec*snap_dist/2,snap_dist)
+	--else
+	--	return BuildService.SnapToGrid(eye_trace.HitPos,snap_dist)
+	--end
+	return BuildService.SnapToGrid(eye_trace.HitPos,snap_dist)
 end
 
 function BuildService.RegisterBuildTool(tool)

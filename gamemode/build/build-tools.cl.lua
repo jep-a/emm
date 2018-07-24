@@ -23,5 +23,6 @@ function ToolType:OnMouseScroll(scroll_delta)
 end
 
 EMM.Include {
-    "build/tools/no-tool"
+    "build/tools/no-tool",
+    "build/tools/create-point"
 }

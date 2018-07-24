@@ -1,6 +1,6 @@
-local TOOL = ToolType:New()
+local TOOL = ToolType.New()
 
-TOOL.name           = "createpoint"
+TOOL.name           = "create-point"
 TOOL.show_name      = "Create Point"
 
 TOOL.description    = [[
@@ -11,5 +11,8 @@ TOOL.description    = [[
 TOOL.icon_path      = "materials/build/tool-icons/"..TOOL.name..".png"
 
 function TOOL:Render()
-    local pointPos = BuildService.GetToolPosition()
+    local point_pos = BuildService.GetToolPosition()
+    render.DrawWireframeSphere(point_pos, 5, 10, 10, Color(255,255,255,255))
 end
+
+BuildService.RegisterBuildTool(TOOL)
