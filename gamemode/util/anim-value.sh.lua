@@ -1,7 +1,3 @@
-AnimatableValueService = AnimatableValueService or {}
-AnimatableValueService.values = AnimatableValueService.values or {}
-
-
 -- # Util
 
 local DefaultEase = CubicBezier(0, 0.5, 0.35, 1)
@@ -13,19 +9,7 @@ end
 
 -- # Class
 
-AnimatableValue = {}
-AnimatableValue.__index = AnimatableValue
-
-function AnimatableValueService.CreateAnimatableValue(value, props)
-	local instance = setmetatable({}, AnimatableValue)
-	local id = #AnimatableValueService.values + 1
-
-	instance.id = id
-	instance:Init(value, props)
-	AnimatableValueService.values[id] = instance
-
-	return instance
-end
+AnimatableValue = Class.New()
 
 function AnimatableValue:Init(value, props)
 	value = value or 0
@@ -175,13 +159,4 @@ function AnimatableValue:Think()
 		self:Smooth()
 	end
 end
-
-
--- # Smoothing
-
-function AnimatableValueService.AnimatableValues()
-	for _, v in pairs(AnimatableValueService.values) do
-		v:Think()
-	end
-end
-hook.Add("Think", "AnimatableValueService.AnimatableValues", AnimatableValueService.AnimatableValues)
+Class.AddHook(AnimatableValue, "Think")
