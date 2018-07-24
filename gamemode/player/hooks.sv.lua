@@ -44,6 +44,7 @@ hook.Add("InitPlayerProperties", "InitCorePlayerProperties", function (ply)
 	ply.jump_power = 220
 	ply.fall_damage_mult = 0.0563
 	ply.death_cooldown = 2
+	ply.color = COLOR_WHITE
 end)
 
 
