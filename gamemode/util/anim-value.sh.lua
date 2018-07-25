@@ -127,6 +127,7 @@ end
 
 function AnimatableValue:Smooth()
 	local ang = isangle(self.current)
+	local color = IsColor(self.current)
 	local mult = FrameMultiplier()
 
 	if ang then
@@ -140,7 +141,9 @@ function AnimatableValue:Smooth()
 	self.smooth = self.last
 
 	if ang then
-		self.new = Angle((self.current.p * mult + self.last.p)/(mult + 1), (self.current.y * mult + self.last.y)/(mult + 1), 0)
+		self.new = Angle(((self.current.p * mult) + self.last.p)/(mult + 1), ((self.current.y * mult) + self.last.y)/(mult + 1), 0)
+	elseif color then
+		self.new = Color(((self.current.r * mult) + self.last.r)/(mult + 1), ((self.current.g * mult) + self.last.b)/(mult + 1), ((self.current.b * mult) + self.last.b)/(mult + 1), ((self.current.a * mult) + self.last.a)/(mult + 1))
 	else
 		self.new = ((self.current * mult) + self.last)/(mult + 1)
 	end
