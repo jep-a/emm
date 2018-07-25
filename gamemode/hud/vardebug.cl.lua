@@ -42,13 +42,13 @@ function VarDebug:Paint(w, h)
 	local label_w, label_h = surface.GetTextSize(label)
 	local val_w, val_h = surface.GetTextSize(val_str)
 
-	surface.SetTextColor(COLOR_WHITE)
+	surface.SetTextColor(LocalPlayer().color)
 	surface.SetTextPos(0, h/2 - label_h/2)
 	surface.DrawText(label)
 
 	local val_padding = 3
 	local val_x, val_y = label_w + (val_padding * 2) + 2, h/2 - val_h/2
-	surface.SetDrawColor(LocalPlayer().color or COLOR_GRAY)
+	surface.SetDrawColor(COLOR_GRAY)
 	surface.DrawRect(val_x - val_padding, val_y + 1, val_w + (val_padding * 2), val_h)
 	surface.SetTextPos(val_x, val_y)
 	surface.DrawText(val_str)
