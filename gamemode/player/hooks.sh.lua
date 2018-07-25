@@ -1,4 +1,4 @@
-hook.Add(SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties", "InitPlayerColor", function (ply)
+hook.Add("InitPlayerProperties", "InitPlayerColor", function (ply)
 	ply.color = COLOR_WHITE
 end)
 
