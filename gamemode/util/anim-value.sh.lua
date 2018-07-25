@@ -3,13 +3,17 @@
 local DefaultEase = CubicBezier(0, 0.5, 0.35, 1)
 
 local function FrameMultiplier()
-	return (1/FrameTime() - 20)/60
+	return (1/FrameTime() - 20)/5000
+end
+
+local function IsColor(color)
+	return istable(color) and color.r and color.g and color.b
 end
 
 
 -- # Class
 
-AnimatableValue = Class.New()
+AnimatableValue = AnimatableValue or Class.New()
 
 function AnimatableValue:Init(value, props)
 	value = value or 0
@@ -86,7 +90,7 @@ end
 
 function AnimatableValue:Remove()
 	self.animations = {}
-	AnimatableValueService.values[self.id] = nil
+	self:Finish()
 end
 
 function AnimatableValue:Animate()
@@ -118,7 +122,7 @@ function AnimatableValue:Animate()
 end
 
 function AnimatableValue:DetectChanges()
-	if (CurTime() > (self.last_change_time + self.debounce)) and (self.last_change ~= self.current) then
+	if CurTime() > (self.last_change_time + self.debounce) and self.last_change ~= self.current then
 		self.callback(self)
 		self.last_change = self.current
 		self.last_change_time = CurTime()
@@ -143,7 +147,7 @@ function AnimatableValue:Smooth()
 	if ang then
 		self.new = Angle(((self.current.p * mult) + self.last.p)/(mult + 1), ((self.current.y * mult) + self.last.y)/(mult + 1), 0)
 	elseif color then
-		self.new = Color(((self.current.r * mult) + self.last.r)/(mult + 1), ((self.current.g * mult) + self.last.b)/(mult + 1), ((self.current.b * mult) + self.last.b)/(mult + 1), ((self.current.a * mult) + self.last.a)/(mult + 1))
+		self.new = Color(((self.current.r * mult) + self.last.r)/(mult + 1), ((self.current.g * mult) + self.last.g)/(mult + 1), ((self.current.b * mult) + self.last.b)/(mult + 1), ((self.current.a * mult) + self.last.a)/(mult + 1))
 	else
 		self.new = ((self.current * mult) + self.last)/(mult + 1)
 	end
