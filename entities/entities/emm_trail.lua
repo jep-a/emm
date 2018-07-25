@@ -15,6 +15,8 @@ function ENT:Initialize()
 		self:SetSprite(sprite)
 		self:DeleteOnRemove(sprite)
 		self.width = AnimatableValue.New(20)
+	else
+		self.animated_color = AnimatableValue.New(COLOR_WHITE, {smooth = true})
 	end
 end
 
@@ -51,8 +53,10 @@ function ENT:Think()
 		local parent = self:GetParent()
 		local sprite = self:GetSprite()
 
+		self.animated_color.current = owner.color
+
 		if IsValid(sprite) then
-			sprite:SetColor(self:GetColor())
+			sprite:SetColor(self.animated_color.smooth)
 		end
 
 		local render_pos
