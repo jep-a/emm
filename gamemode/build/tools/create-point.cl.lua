@@ -16,11 +16,11 @@ function TOOL:Render()
     local point_pos = BuildService.GetToolPosition()
     render.DrawWireframeSphere(point_pos, 5, 10, 10, Color(255,255,255,255))
 
-    for _, point in pairs(BuildObjects.Points) do
-        if point.should_render then
-            point:Render()
-        end
-    end
+--    for _, point in pairs(BuildObjects.Points) do
+--        if point.should_render then
+--            point:Render()
+--        end
+--    end
 end
 
 TOOL.Control[IN_ATTACK] = function()
@@ -29,4 +29,5 @@ TOOL.Control[IN_ATTACK] = function()
     new_point.should_render = true
     table.insert(BuildObjects.Points, new_point)
 end
+
 BuildService.RegisterBuildTool(TOOL)
