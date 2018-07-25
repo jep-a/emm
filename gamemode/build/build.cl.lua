@@ -113,7 +113,12 @@ end
 
 function BuildService.ChangeBuildTool(toolname)
 	if BuildService.BuildTools[toolname] == nil then return end
-	LocalPlayer().current_tool = BuildService.BuildTools[toolname]
+	
+	local new_tool = BuildService.BuildTools[toolname]
+	local old_tool = LocalPlayer().current_tool
+	old_tool:OnChangeFrom()
+	old_tool = new_tool
+	new_tool:OnChangeTo()
 end
 
 EMM.Include {
