@@ -12,6 +12,12 @@ TOOL.description    = [[
 
 TOOL.icon_path      = "materials/build/tool-icons/"..TOOL.name..".png"
 
+function TOOL:OnChangeTo()
+    for _, point in pairs(BuildObjects.Points) do
+        point.should_render = true
+    end
+end
+
 function TOOL:Render()
     local point_pos = BuildService.GetToolPosition()
     render.DrawWireframeSphere(point_pos, 5, 10, 10, Color(255,255,255,255))
