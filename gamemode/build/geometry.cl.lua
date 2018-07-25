@@ -6,8 +6,6 @@ function GeometryType:Init()
     self.should_render = true
 end
 
---Class.AddHook(GeometryType, "PostDrawTranslucentRenderables", GeometryType.Render)
-
 -- ## Point
 
 GeometryPoint = Class.New(GeometryType)
@@ -15,6 +13,7 @@ GeometryPoint = Class.New(GeometryType)
 function GeometryPoint:Init()
 	self.super.Init(self)
 	self.pos = Vector()
+	self.should_render = true
 end
 
 function GeometryPoint:Render()
@@ -29,6 +28,7 @@ end
 function GeometryPoint:GetPos()
 	return self.pos
 end
+Class.AddHook(GeometryPoint, "PostDrawTranslucentRenderables", "Render")
 
 -- ## Face
 
