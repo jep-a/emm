@@ -4,11 +4,6 @@ ENT.Type = "anim"
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Entity", 0, "Sprite")
-	self:NetworkVar("Bool", 0, "Remove")
-
-	if SERVER then
-		self:NetworkVarNotify("Remove", self.StartRemove)
-	end
 end
 
 function ENT:Initialize()
@@ -19,27 +14,22 @@ function ENT:Initialize()
 
 		self:SetSprite(sprite)
 		self:DeleteOnRemove(sprite)
-	else
-		self.width = AnimatableValue.New(25)
+		self.width = AnimatableValue.New(20)
 	end
 end
 
 local REMOVE_DURATION = 4
 
 function ENT:StartRemove()
-	if SERVER then
-		local trail_pos = trail:GetPos()
+	local trail_pos = self:GetPos()
 
-		self:SetParent(nil)
-		self:SetPos(trail_pos)
-		self:SetRemove(true)
+	self:SetParent(nil)
+	self:SetPos(trail_pos)
+	self.width:AnimateTo(0, REMOVE_DURATION)
 
-		timer.Simple(REMOVE_DURATION, function ()
-			self:Remove()
-		end)
-	else
-		self.width:AnimateTo(0, REMOVE_DURATION)
-	end
+	timer.Simple(REMOVE_DURATION, function ()
+		self:Remove()
+	end)
 end
 
 function ENT:SetWidth(w)
@@ -54,12 +44,12 @@ end
 function ENT:Think()
 	self:NextThink(CurTime())
 
-	if CLIENT then
+	if SERVER then
+		self:SetWidth(self.width.current)
+	else
 		local owner = self:GetOwner()
 		local parent = self:GetParent()
 		local sprite = self:GetSprite()
-
-		self:SetWidth(self.width.current)
 
 		if IsValid(sprite) then
 			sprite:SetColor(self:GetColor())
