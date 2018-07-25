@@ -9,7 +9,9 @@ function TrailService.SetupTrail(ent)
 
 	ent.trail = trail
 end
+hook.Add("PlayerSpawn", "TrailService.SetupTrail", TrailService.SetupTrail)
 
 function TrailService.RemoveTrail(ent)
 	ent.trail:StartRemove()
 end
+hook.Add("DoPlayerDeath", "TrailService.RemoveTrail", TrailService.RemoveTrail)
