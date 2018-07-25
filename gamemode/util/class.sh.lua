@@ -66,7 +66,21 @@ function Class.AddHook(class, name, func_k)
 		Class.SetupForHooks(class)
 	end
 
-	table.insert(class.static.hooks, {name = name, func_key = func_k})
+	local existing_hk_k
+
+	for k, hk in pairs(class.static.hooks) do
+		if hk.name == name then
+			existing_hk_k = k
+
+			break
+		end
+	end
+
+	if existing_hk_k then
+		class.static.hooks[existing_hk_k].func_key = func_k
+	else
+		table.insert(class.static.hooks, {name = name, func_key = func_k})
+	end
 
 	hook.Add(name, Class.TableID(class).."."..func_k, function (...)
 		for i = 1, #class.static.instances do
