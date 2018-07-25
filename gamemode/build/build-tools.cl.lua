@@ -1,5 +1,3 @@
-BuildService.BuildTools = {}
-
 -- # Tool class
 
 ToolType = Class.New()

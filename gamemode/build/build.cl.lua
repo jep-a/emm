@@ -1,4 +1,11 @@
 BuildService = BuildService or {}
+BuildService.BuildTools = {}
+BuildService.BuildObjects = {
+	Points = {},
+	Edges = {},
+	Faces = {},
+	Primitives = {}
+}
 
 -- # Properties
 
@@ -97,11 +104,6 @@ function BuildService.GetToolPosition()
 	})
 
 	local snap_dist = local_ply.snap_distance
-	--if eye_trace.Hit then
-	--	return BuildService.SnapToGrid(eye_trace.HitPos - eye_vec*snap_dist/2,snap_dist)
-	--else
-	--	return BuildService.SnapToGrid(eye_trace.HitPos,snap_dist)
-	--end
 	return BuildService.SnapToGrid(eye_trace.HitPos,snap_dist)
 end
 
