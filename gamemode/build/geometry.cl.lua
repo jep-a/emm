@@ -1,5 +1,3 @@
-
-
 -- # Classes
 
 GeometryType = Class.New()
@@ -8,7 +6,7 @@ function GeometryType:Init()
     self.should_render = true
 end
 
-Class.AddHook(GeometryType, "PostDrawTranslucentRenderables", GeometryType.Render)
+--Class.AddHook(GeometryType, "PostDrawTranslucentRenderables", GeometryType.Render)
 
 -- ## Point
 
@@ -16,11 +14,12 @@ GeometryPoint = Class.New(GeometryType)
 
 function GeometryPoint:Init()
 	self.super.Init(self)
-
 	self.pos = Vector()
 end
 
 function GeometryPoint:Render()
+	render.SetColorMaterial()
+	render.DrawSphere(self.pos, 5, 20, 20, Color(255,255,255))
 end
 
 function GeometryPoint:SetPos(position)
