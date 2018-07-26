@@ -58,12 +58,17 @@ function BuildService.HandleCurrentToolControls(ucmd)
 	local tool = local_ply.current_tool
 	local button_flag = ucmd:GetButtons()
 
-	for key, control_hook in pairs(tool.Control) do
+	for key, press_hook in pairs(tool.Press) do
 		if (bit.band(key, button_flag) ~= 0) and (not BuildService.KeyWasDown(key)) then
-			control_hook()
+			press_hook()
 			ucmd:RemoveKey(key) --Suppress the button by removing the bit flag
-		end
-	end
+        end
+    end
+    for key, release_hook in pairs(tool.Release) do
+        if (bit.band(key, button_flag) == 0) and (BuildService.KeyWasDown(key)) then
+			release_hook()
+        end
+    end
 	local_ply.last_button_flag = button_flag
 
 	local mouse_delta = ucmd:GetMouseWheel()

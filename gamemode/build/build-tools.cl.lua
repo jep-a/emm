@@ -4,7 +4,8 @@ ToolType = Class.New()
 
 function ToolType:Init()
     self.description = "Base tool"
-    self.Control = {} --Table of control functions
+    self.Press = {}
+    self.Release = {}
     self.name = "base"
     self.show_name = "Base Tool"
 end

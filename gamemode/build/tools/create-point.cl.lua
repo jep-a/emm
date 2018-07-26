@@ -11,14 +11,12 @@ TOOL.description    = [[
 ]]
 
 function TOOL:OnEquip()
-    print(TOOL.show_name.." equipped.")
     for _, point in pairs(BuildObjects.Points) do
         point.should_render = true
     end
 end
 
 function TOOL:OnHolster()
-    print(TOOL.show_name.." holstered.")
     for _, point in pairs(BuildObjects.Points) do
         point.should_render = false
     end
@@ -29,7 +27,7 @@ function TOOL:Render()
     render.DrawWireframeSphere(point_pos, 5, 10, 10, Color(255,255,255,255))
 end
 
-TOOL.Control[IN_ATTACK] = function()
+TOOL.Press[IN_ATTACK] = function()
     local new_point = GeometryPoint.New()
     new_point:SetPos(BuildService.GetToolPosition())
     new_point.should_render = true
