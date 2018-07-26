@@ -17,6 +17,7 @@ function GeometryPoint:Init()
 end
 
 function GeometryPoint:Render()
+    if self.should_render == false then return end
 	render.SetColorMaterial()
 	render.DrawSphere(self.pos, 5, 20, 20, Color(255,255,255))
 end
