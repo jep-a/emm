@@ -36,6 +36,12 @@ function ENT:StartRemove()
 	})
 end
 
+function ENT:OnRemove()
+	if CLIENT then
+		self.animated_color:Finish()
+	end
+end
+
 function ENT:SetWidth(w)
 	local sprite = self:GetSprite()
 
