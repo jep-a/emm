@@ -19,6 +19,12 @@ function ToolType:OnMouseScroll(scroll_delta)
     return true --Suppresses whatever the mousewheel is bound to
 end
 
+function ToolType:OnHolster()
+end
+
+function ToolType:OnEquip()
+end
+
 function ToolType:GetIconPath()
     return "materials/emm/build/tool-icons/"..self.name..".png"
 end
