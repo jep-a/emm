@@ -17,7 +17,7 @@ end
 hook.Add("SetupMove", "AiraccelPatch.SetMoveType",AiraccelPatch.SetMoveType)
 
 function AiraccelPatch.RemoveLadderSound(sound)
-	if sound.Entity then
+	if sound.Entity:IsValid() then
 		local z_vel = sound.Entity:GetVelocity().z
 
 		if
