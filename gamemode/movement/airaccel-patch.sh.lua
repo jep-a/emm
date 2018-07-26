@@ -17,12 +17,12 @@ end
 hook.Add("SetupMove", "AiraccelPatch.SetMoveType",AiraccelPatch.SetMoveType)
 
 function AiraccelPatch.RemoveLadderSound(sound)
-	if sound.Entity:IsValid() then
+	if IsValid(sound.Entity) then
 		local z_vel = sound.Entity:GetVelocity().z
 
 		if
-			z_vel > 0 and
-			z_vel < 140 and
+			z_vel ~= 200 and
+			z_vel ~= -200 and
 			string.StartWith(sound.SoundName, "player/footsteps/ladder")
 		then
 			  return false
