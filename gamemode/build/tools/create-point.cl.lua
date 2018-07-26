@@ -10,9 +10,17 @@ TOOL.description    = [[
     Scroll up and down to change the distance of the point.
 ]]
 
-function TOOL:OnChangeTo()
+function TOOL:OnEquip()
+    print(TOOL.show_name.." equipped.")
     for _, point in pairs(BuildObjects.Points) do
         point.should_render = true
+    end
+end
+
+function TOOL:OnHolster()
+    print(TOOL.show_name.." holstered.")
+    for _, point in pairs(BuildObjects.Points) do
+        point.should_render = false
     end
 end
 
