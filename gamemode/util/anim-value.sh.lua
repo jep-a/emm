@@ -48,14 +48,14 @@ function AnimatableValue:GetAnimationEndTime()
 	return end_time
 end
 
-function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay, remove, callback)
+function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay, finish, callback)
 	local duration
 
 	if istable(props_or_duration) then
 		duration = props_or_duration.duration or 0.2
 		ease = props_or_duration.ease or DefaultEase
 		delay = props_or_duration.delay or 0
-		remove = props_or_duration.remove
+		finish = props_or_duration.finish
 		callback = props_or_duration.callback
 	else
 		duration = props_or_duration or 0.2
@@ -81,16 +81,16 @@ function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay, remove
 		end_time = start_time + duration + delay,
 		ease = ease,
 		delay = delay,
-		remove = remove,
+		finish = finish,
 		callback = callback
 	})
 
 	return self
 end
 
-function AnimatableValue:Remove()
+function AnimatableValue:Finish()
 	self.animations = {}
-	self:Finish()
+	self:DisconnectFromHooks()
 end
 
 function AnimatableValue:Animate()
@@ -114,8 +114,8 @@ function AnimatableValue:Animate()
 				first_anim.callback(first_anim)
 			end
 
-			if first_anim.remove then
-				self:Remove()
+			if first_anim.finish then
+				self:Finish()
 			end
 		end
 	end

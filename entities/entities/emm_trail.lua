@@ -27,11 +27,13 @@ function ENT:StartRemove()
 
 	self:SetParent(nil)
 	self:SetPos(trail_pos)
-	self.width:AnimateTo(0, REMOVE_DURATION)
-
-	timer.Simple(REMOVE_DURATION, function ()
-		self:Remove()
-	end)
+	self.width:AnimateTo(0, {
+		duration = REMOVE_DURATION,
+		finish = true,
+		callback = function ()
+			self:Remove()
+		end
+	})
 end
 
 function ENT:SetWidth(w)
