@@ -37,5 +37,6 @@ EMM.Include {
 	"hud/hud",
 	"hud/vardebug",
 	"hud/indicators",
-	"build/build"
+	"build/build",
+	"build/build-util"
 }
