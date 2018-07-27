@@ -32,5 +32,6 @@ end
 
 EMM.Include {
     "build/tools/no-tool",
-    "build/tools/create-point"
+    "build/tools/create-point",
+    "build/tool/create-edge"
 }
