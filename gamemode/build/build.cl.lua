@@ -82,19 +82,19 @@ function BuildService.HandleCurrentToolControls(ucmd)
 end
 hook.Add("CreateMove", "HandleCurrentToolControls", BuildService.HandleCurrentToolControls)
 
-function BuildService.SnapToGrid(pos, snap_dist)
-    if snap_dist == 0 then return pos end
-
-    local new_position = Vector()
-
-	for axis, value in pairs(table.Sanitise({pos})[1]) do
-		if axis ~= "__type" then
-			new_position[axis] = math.Round(value/snap_dist)*snap_dist
-		end
-    end
-
-    return new_position
-end
+--function BuildService.SnapToGrid(pos, snap_dist)
+--    if snap_dist == 0 then return pos end
+--
+--    local new_position = Vector()
+--
+--	for axis, value in pairs(table.Sanitise({pos})[1]) do
+--		if axis ~= "__type" then
+--			new_position[axis] = math.Round(value/snap_dist)*snap_dist
+--		end
+--    end
+--
+--    return new_position
+--end
 
 function BuildService.GetToolPosition()
 	local eye_pos = EyePos()
@@ -109,7 +109,7 @@ function BuildService.GetToolPosition()
 	})
 
 	local snap_dist = local_ply.snap_distance
-	return BuildService.SnapToGrid(eye_trace.HitPos,snap_dist)
+	return BuildUtil.SnapToGrid(eye_trace.HitPos,snap_dist)
 end
 
 function BuildService.RegisterBuildTool(tool)
