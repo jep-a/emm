@@ -96,23 +96,8 @@ hook.Add("CreateMove", "HandleCurrentToolControls", BuildService.HandleCurrentTo
 --    return new_position
 --end
 
-function BuildService.GetToolPosition()
-	local eye_pos = EyePos()
-	local eye_vec = EyeVector()
-	local local_ply = LocalPlayer()
-	local eye_trace = {}
-	util.TraceLine({
-		start = eye_pos,
-		endpos = eye_pos + eye_vec*local_ply.tool_distance,
-		filter = player.GetAll(),
-		output = eye_trace
-	})
-
-	local snap_dist = local_ply.snap_distance
-	return BuildUtil.SnapToGrid(eye_trace.HitPos,snap_dist)
-end
-
 function BuildService.RegisterBuildTool(tool)
+	print(tool.name.." registered")
     BuildService.BuildTools[tool.name] = tool
 end
 
