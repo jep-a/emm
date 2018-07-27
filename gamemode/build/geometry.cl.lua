@@ -8,6 +8,8 @@ end
 
 -- ## Point
 
+local POINT_RADIUS = 5
+
 GeometryPoint = Class.New(GeometryType)
 
 function GeometryPoint:Init()
@@ -19,8 +21,12 @@ end
 function GeometryPoint:Render()
     if self.should_render == false then return end
 	render.SetColorMaterial()
-	render.DrawSphere(self.pos, 5, 20, 20, Color(255,255,255))
+	render.DrawSphere(self.pos, POINT_RADIUS, 20, 20, Color(255,255,255))
+
+	if not self:IsHovered() then return end
+	render.DrawWireframeSphere(self.pos, POINT_RADIUS+1, 20, 20, Color(255,0,255))
 end
+Class.AddHook(GeometryPoint, "PostDrawTranslucentRenderables", "Render")
 
 function GeometryPoint:SetPos(position)
 	self.pos = position
@@ -29,7 +35,12 @@ end
 function GeometryPoint:GetPos()
 	return self.pos
 end
-Class.AddHook(GeometryPoint, "PostDrawTranslucentRenderables", "Render")
+
+function GeometryPoint:IsHovered()
+	local box_corner = Vector(1,1,1)*(POINT_RADIUS/2)
+	local hit_pos,_,_ = util.IntersectRayWithOBB(EyePos(), EyeVector()*6000, self.pos, Angle(0), -box_corner, box_corner)
+	return (hit_pos ~= nil)
+end
 
 -- ## Face
 
