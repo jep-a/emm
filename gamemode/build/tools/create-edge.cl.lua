@@ -16,7 +16,7 @@ function TOOL:OnEquip()
     chat.AddText(self.description)
 end
 
-function TOOL.RenderCurrentEdge()
+function TOOL:RenderCurrentEdge()
     if not self.placing_edge then return end
 
     local start_pos = self.start_point
@@ -30,7 +30,16 @@ end
 
 function TOOL:Render()
     BuildUtil.RenderToolCursor()
-    TOOL.RenderCurrentEdge()
+    self:RenderCurrentEdge()
+end
+
+TOOL.Press[IN_ATTACK] = function()
+    self.placing_edge = true
+    self.start_point = BuildUtil.GetToolPosition
+end
+
+TOOL.Release[IN_ATTACK] = function()
+    self.placing_edge = false
 end
 
 BuildService.RegisterBuildTool(TOOL)
