@@ -59,6 +59,9 @@ TOOL.Release[IN_ATTACK] = function()
     new_edge.should_render = true
     new_edge.points = new_points
 
+    new_points[1]:AttachEdge(new_edge)
+    new_points[2]:AttachEdge(new_edge)
+
     BuildService.AddEdge(new_edge)
 end
 

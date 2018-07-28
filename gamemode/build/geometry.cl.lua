@@ -17,6 +17,7 @@ function GeometryPoint:Init()
 	self.pos = Vector()
 	self.should_render = false
 	self.clickable = false
+	self.attached_edges = {}
 end
 
 function GeometryPoint:Render()
@@ -43,6 +44,15 @@ function GeometryPoint:IsHovered()
 	return (hit_pos ~= nil)
 end
 
+function GeometryPoint:AttachEdge(edge)
+	if table.HasValue(self.attached_edges, edge) then return end
+	table.insert(self.attached_edges,edge)
+end
+
+function GeometryPoint:Detach(edge)
+	table.RemoveByValue(self.attached_edges, edge)
+end
+
 -- ## Edge
 local EDGE_SELECT_RADIUS = 2
 GeometryEdge = Class.New(GeometryType)
@@ -58,7 +68,7 @@ end
 function GeometryEdge:Render()
     if self.should_render == false then return end
     render.SetColorMaterial()
-    if self:IsHovered() then
+    if self:LookingAt() ~= nil then
         render.DrawBeam(self.points[1]:GetPos(), self.points[2]:GetPos(), 1, 0, 1, COLOR_RED)
     else
         render.DrawBeam(self.points[1]:GetPos(), self.points[2]:GetPos(), 1, 0, 1, COLOR_WHITE)
@@ -74,7 +84,7 @@ function GeometryEdge:GetPos()
 	return self.pos
 end
 
-function GeometryEdge:IsHovered()
+function GeometryEdge:LookingAt()
     local start_pos = self.points[1]:GetPos()
     local end_pos = self.points[2]:GetPos()
     local edge_vec = end_pos - start_pos
@@ -86,7 +96,7 @@ function GeometryEdge:IsHovered()
 
     box_corner = Vector(edge_length/2, EDGE_SELECT_RADIUS, EDGE_SELECT_RADIUS)
 	local hit_pos,_,_ = util.IntersectRayWithOBB(EyePos(), EyeVector()*6000, (start_pos + end_pos)/2, angle, -box_corner, box_corner)
-	return (hit_pos ~= nil)
+	return hit_pos
 end
 
 -- ## Face
