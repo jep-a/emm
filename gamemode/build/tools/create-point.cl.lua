@@ -6,6 +6,8 @@ TOOL.name           = "create_point"
 TOOL.show_name      = "Create Point"
 
 TOOL.description    = [[
+    Create a point by clicking anywhere.
+    
     Left click to place a point.
     Scroll up and down to change the tool distance of the point.
 ]]
@@ -13,6 +15,10 @@ TOOL.description    = [[
 function TOOL:OnEquip()
     for _, point in pairs(BuildObjects.Points) do
         point.should_render = true
+    end
+    
+    for _, edge in pairs(BuildObjects.Edges) do
+        edge.should_render = false
     end
 
     chat.AddText(self.description)
@@ -25,12 +31,12 @@ function TOOL:OnHolster()
 end
 
 function TOOL:Render()
-    BuildUtil.RenderToolCursor()
+    BuildService.RenderToolCursor()
 end
 
 TOOL.Press[IN_ATTACK] = function()
     local new_point = GeometryPoint.New()
-    new_point:SetPos(BuildUtil.GetToolPosition())
+    new_point:SetPos(BuildService.GetToolPosition())
     new_point.should_render = true
     BuildService.AddPoint(new_point)
 end

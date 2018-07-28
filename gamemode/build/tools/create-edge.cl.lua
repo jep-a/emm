@@ -4,6 +4,8 @@ TOOL.name           = "create_edge"
 TOOL.show_name      = "Create Edge"
 
 TOOL.description    = [[
+    Create an edge by clicking and dragging.
+
     Left click and drag to create an edge between two points.
     Reload while dragging to cancel the edge.
     Scroll up and down to change the tool distance.
@@ -20,7 +22,7 @@ function TOOL:RenderCurrentEdge()
     if not self.placing_edge then return end
 
     local start_pos = self.start_point
-    local tool_pos = BuildUtil.GetToolPosition()
+    local tool_pos = BuildService.GetToolPosition()
 
     render.SetColorMaterial()
     render.DrawSphere(start_pos, 2, 10, 10, COLOR_WHITE)
@@ -29,16 +31,18 @@ function TOOL:RenderCurrentEdge()
 end
 
 function TOOL:Render()
-    BuildUtil.RenderToolCursor()
+    BuildService.RenderToolCursor()
     self:RenderCurrentEdge()
 end
 
 TOOL.Press[IN_ATTACK] = function()
     TOOL.placing_edge = true
-    TOOL.start_point = BuildUtil.GetToolPosition()
+    TOOL.start_point = BuildService.GetToolPosition()
 end
 
 TOOL.Release[IN_ATTACK] = function()
+    if not TOOL.placing_edge then return end
+
     TOOL.placing_edge = false
     local new_points = {
         GeometryPoint.New(),
@@ -46,7 +50,7 @@ TOOL.Release[IN_ATTACK] = function()
     }
 
     new_points[1]:SetPos(TOOL.start_point)
-    new_points[2]:SetPos(BuildUtil.GetToolPosition())
+    new_points[2]:SetPos(BuildService.GetToolPosition())
 
     BuildService.AddPoint(new_points[1])
     BuildService.AddPoint(new_points[2])
@@ -56,6 +60,10 @@ TOOL.Release[IN_ATTACK] = function()
     new_edge.points = new_points
 
     BuildService.AddEdge(new_edge)
+end
+
+TOOL.Release[IN_RELOAD] = function()
+    TOOL.placing_edge = false
 end
 
 BuildService.RegisterBuildTool(TOOL)
