@@ -44,7 +44,7 @@ function GeometryPoint:IsHovered()
 end
 
 -- ## Edge
-
+local EDGE_SELECT_RADIUS = 2
 GeometryEdge = Class.New(GeometryType)
 
 function GeometryEdge:Init()
@@ -58,7 +58,11 @@ end
 function GeometryEdge:Render()
     if self.should_render == false then return end
     render.SetColorMaterial()
-    render.DrawBeam(self.points[1]:GetPos(), self.points[2]:GetPos(), 1, 0, 1, COLOR_WHITE)
+    if self:IsHovered() then
+        render.DrawBeam(self.points[1]:GetPos(), self.points[2]:GetPos(), 1, 0, 1, COLOR_RED)
+    else
+        render.DrawBeam(self.points[1]:GetPos(), self.points[2]:GetPos(), 1, 0, 1, COLOR_WHITE)
+    end
 end
 Class.AddHook(GeometryEdge, "PostDrawTranslucentRenderables", "Render")
 
@@ -71,8 +75,17 @@ function GeometryEdge:GetPos()
 end
 
 function GeometryEdge:IsHovered()
-	local box_corner = Vector(1,1,1)*(POINT_RADIUS/2)
-	local hit_pos,_,_ = util.IntersectRayWithOBB(EyePos(), EyeVector()*6000, self.pos, Angle(0), -box_corner, box_corner)
+    local start_pos = self.points[1]:GetPos()
+    local end_pos = self.points[2]:GetPos()
+    local edge_vec = end_pos - start_pos
+    local edge_length = edge_vec:Length()
+
+    local pitch_ang = -math.deg(math.atan2(edge_vec.z, edge_vec:Length2D()))
+    local yaw_ang = math.deg(math.atan2(edge_vec.y, edge_vec.x))
+    local angle = Angle(pitch_ang, yaw_ang, 0)
+
+    box_corner = Vector(edge_length/2, EDGE_SELECT_RADIUS, EDGE_SELECT_RADIUS)
+	local hit_pos,_,_ = util.IntersectRayWithOBB(EyePos(), EyeVector()*6000, (start_pos + end_pos)/2, angle, -box_corner, box_corner)
 	return (hit_pos ~= nil)
 end
 
