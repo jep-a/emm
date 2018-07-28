@@ -31,6 +31,10 @@ function BuildUtil.GetToolPosition()
 end
 
 function BuildUtil.RenderToolCursor()
+    render.SetColorMaterial()
     local point_pos = BuildUtil.GetToolPosition()
     render.DrawWireframeSphere(point_pos, 2, 10, 10, Color(255,255,255,255))
+    
+    local trace_struct = util.QuickTrace(point_pos, Vector(0,0,-16000), ents.GetAll())
+    render.DrawBeam(point_pos, trace_struct.HitPos, 10, 0, 1, ColorAlpha(COLOR_WHITE, 100))
 end
