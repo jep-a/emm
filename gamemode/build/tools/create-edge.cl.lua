@@ -9,10 +9,10 @@ TOOL.description    = [[
     Scroll up and down to change the tool distance.
 ]]
 
-TOOL.placing_edge = false
-TOOL.start_point = Vector()
-
 function TOOL:OnEquip()
+    self.placing_edge = false
+    self.start_point = Vector(0)
+    
     chat.AddText(self.description)
 end
 
@@ -25,7 +25,7 @@ function TOOL:RenderCurrentEdge()
     render.SetColorMaterial()
     render.DrawSphere(start_pos, 2, 10, 10, COLOR_WHITE)
     render.DrawSphere(tool_pos, 2, 10, 10, COLOR_LAVENDER)
-    render.DrawLine(start_pos, tool_pos, COLOR_WHITE)
+    render.DrawBeam(start_pos, tool_pos, 1, 0, 1, Color(255,255,255,150))
 end
 
 function TOOL:Render()
@@ -34,12 +34,28 @@ function TOOL:Render()
 end
 
 TOOL.Press[IN_ATTACK] = function()
-    self.placing_edge = true
-    self.start_point = BuildUtil.GetToolPosition
+    TOOL.placing_edge = true
+    TOOL.start_point = BuildUtil.GetToolPosition()
 end
 
 TOOL.Release[IN_ATTACK] = function()
-    self.placing_edge = false
+    TOOL.placing_edge = false
+    local new_points = {
+        GeometryPoint.New(),
+        GeometryPoint.New()
+    }
+
+    new_points[1]:SetPos(TOOL.start_point)
+    new_points[2]:SetPos(BuildUtil.GetToolPosition())
+
+    BuildService.AddPoint(new_points[1])
+    BuildService.AddPoint(new_points[2])
+
+    local new_edge = GeometryEdge.New()
+    new_edge.should_render = true
+    new_edge.points = new_points
+
+    BuildService.AddEdge(new_edge)
 end
 
 BuildService.RegisterBuildTool(TOOL)

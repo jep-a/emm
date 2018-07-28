@@ -15,8 +15,8 @@ GeometryPoint = Class.New(GeometryType)
 function GeometryPoint:Init()
 	self.super.Init(self)
 	self.pos = Vector()
-	self.should_render = true
-	self.clickable = true
+	self.should_render = false
+	self.clickable = false
 end
 
 function GeometryPoint:Render()
@@ -50,13 +50,15 @@ GeometryEdge = Class.New(GeometryType)
 function GeometryEdge:Init()
 	self.super.Init(self)
 	self.pos = Vector()
-	self.should_render = true
-	self.clickable = true
+	self.should_render = false
+	self.clickable = false
 	self.points = {}
 end
 
 function GeometryEdge:Render()
     if self.should_render == false then return end
+    render.SetColorMaterial()
+    render.DrawBeam(self.points[1]:GetPos(), self.points[2]:GetPos(), 1, 0, 1, COLOR_WHITE)
 end
 Class.AddHook(GeometryEdge, "PostDrawTranslucentRenderables", "Render")
 

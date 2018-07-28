@@ -82,20 +82,6 @@ function BuildService.HandleCurrentToolControls(ucmd)
 end
 hook.Add("CreateMove", "HandleCurrentToolControls", BuildService.HandleCurrentToolControls)
 
---function BuildService.SnapToGrid(pos, snap_dist)
---    if snap_dist == 0 then return pos end
---
---    local new_position = Vector()
---
---	for axis, value in pairs(table.Sanitise({pos})[1]) do
---		if axis ~= "__type" then
---			new_position[axis] = math.Round(value/snap_dist)*snap_dist
---		end
---    end
---
---    return new_position
---end
-
 function BuildService.RegisterBuildTool(tool)
 	print(tool.name.." registered")
     BuildService.BuildTools[tool.name] = tool
@@ -107,6 +93,14 @@ function BuildService.ChangeBuildTool(toolname)
 	LocalPlayer().current_tool:OnHolster()
 	LocalPlayer().current_tool = new_tool
 	new_tool:OnEquip()
+end
+
+function BuildService.AddPoint(new_point)
+    table.insert(BuildService.BuildObjects.Points, new_point)
+end
+
+function BuildService.AddEdge(new_edge)
+    table.insert(BuildService.BuildObjects.Edges, new_edge)
 end
 
 EMM.Include {

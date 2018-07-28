@@ -32,7 +32,7 @@ TOOL.Press[IN_ATTACK] = function()
     local new_point = GeometryPoint.New()
     new_point:SetPos(BuildUtil.GetToolPosition())
     new_point.should_render = true
-    table.insert(BuildObjects.Points, new_point)
+    BuildService.AddPoint(new_point)
 end
 
 BuildService.RegisterBuildTool(TOOL)
