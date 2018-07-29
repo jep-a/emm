@@ -144,12 +144,14 @@ function BuildService.GetToolPosition()
 	return BuildService.SnapToGrid(eye_trace.HitPos,snap_dist)
 end
 
+BuildService.cursor = AnimatableValue.New(Vector(0, 0, 0), {smooth = true})
 function BuildService.RenderToolCursor()
     local CURSOR_INVISIBLE_SPEED = 50
     local speed_alpha = math.Clamp((CURSOR_INVISIBLE_SPEED-LocalPlayer():GetVelocity():Length()/10)/CURSOR_INVISIBLE_SPEED, 0, 1)*200
 
     render.SetColorMaterial()
-    local point_pos = BuildService.GetToolPosition()
+    BuildService.cursor.current = BuildService.GetToolPosition()
+    local point_pos = BuildService.cursor.smooth
     render.DrawWireframeSphere(point_pos, 2, 10, 10, ColorAlpha(COLOR_WHITE,speed_alpha))
     
     local ground_trace = util.QuickTrace(point_pos, Vector(0,0,-16000), ents.GetAll())
