@@ -145,16 +145,19 @@ function BuildService.GetToolPosition()
 end
 
 function BuildService.RenderToolCursor()
+    local CURSOR_INVISIBLE_SPEED = 50
+    local speed_alpha = math.Clamp((CURSOR_INVISIBLE_SPEED-LocalPlayer():GetVelocity():Length()/10)/CURSOR_INVISIBLE_SPEED, 0, 1)*200
+
     render.SetColorMaterial()
     local point_pos = BuildService.GetToolPosition()
-    render.DrawWireframeSphere(point_pos, 2, 10, 10, Color(255,255,255,255))
+    render.DrawWireframeSphere(point_pos, 2, 10, 10, ColorAlpha(COLOR_WHITE,speed_alpha))
     
     local ground_trace = util.QuickTrace(point_pos, Vector(0,0,-16000), ents.GetAll())
-    render.DrawLine(point_pos, ground_trace.HitPos, 10, 0, 1, COLOR_WHITE)
+    render.DrawLine(point_pos, ground_trace.HitPos, ColorAlpha(COLOR_WHITE,speed_alpha))
 
     local rad = 2*math.pi
     for i = 0, 1, 1/4 do
-        render.DrawLine(ground_trace.HitPos, ground_trace.HitPos + Vector(math.cos(i*rad), math.sin(i*rad),0)*20 , 10, 0, 1, COLOR_WHITE)
+        render.DrawLine(ground_trace.HitPos, ground_trace.HitPos + Vector(math.cos(i*rad), math.sin(i*rad),0)*20, ColorAlpha(COLOR_WHITE,speed_alpha))
     end
 end
 
