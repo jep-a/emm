@@ -94,7 +94,10 @@ TOOL.Release[IN_ATTACK] = function()
     edge_A:SetShouldRender(true)
     edge_B:SetShouldRender(true)
     edge_C:SetShouldRender(true)
-
+    
+    edge_A.clickable = true
+    edge_B.clickable = true
+    edge_C.clickable = true
     BuildService.RegisterEdges{edge_A, edge_B, edge_C}
     BuildService.RegisterPoints{point_A, point_B}
 
