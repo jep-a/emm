@@ -8,7 +8,7 @@ end
 
 -- ## Point
 
-local POINT_RADIUS = 5
+local POINT_RADIUS = 2
 
 GeometryPoint = Class.New(GeometryType)
 
@@ -23,10 +23,11 @@ end
 function GeometryPoint:Render()
     if self.should_render == false then return end
 	render.SetColorMaterial()
-	render.DrawSphere(self.pos, POINT_RADIUS, 20, 20, Color(255,255,255))
-
-	if not self:IsHovered() then return end
-	render.DrawWireframeSphere(self.pos, POINT_RADIUS+1, 20, 20, Color(255,0,255))
+    if self:IsHovered() then
+        render.DrawSphere(self.pos, POINT_RADIUS, 20, 20, COLOR_RED)
+    else
+        render.DrawSphere(self.pos, POINT_RADIUS, 20, 20, COLOR_WHITE)
+    end
 end
 Class.AddHook(GeometryPoint, "PostDrawTranslucentRenderables", "Render")
 
@@ -41,7 +42,7 @@ end
 function GeometryPoint:IsHovered()
 	local box_corner = Vector(1,1,1)*(POINT_RADIUS/2)
 	local hit_pos,_,_ = util.IntersectRayWithOBB(EyePos(), EyeVector()*6000, self.pos, Angle(0), -box_corner, box_corner)
-	return (hit_pos ~= nil)
+	return self.clickable and (hit_pos ~= nil) or nil
 end
 
 function GeometryPoint:AttachEdge(edge)
@@ -49,12 +50,14 @@ function GeometryPoint:AttachEdge(edge)
 	table.insert(self.attached_edges,edge)
 end
 
-function GeometryPoint:Detach(edge)
+function GeometryPoint:DetachEdge(edge)
 	table.RemoveByValue(self.attached_edges, edge)
 end
 
 -- ## Edge
+
 local EDGE_SELECT_RADIUS = 2
+
 GeometryEdge = Class.New(GeometryType)
 
 function GeometryEdge:Init()
@@ -76,12 +79,8 @@ function GeometryEdge:Render()
 end
 Class.AddHook(GeometryEdge, "PostDrawTranslucentRenderables", "Render")
 
-function GeometryEdge:SetPos(position)
-	self.pos = position
-end
-
-function GeometryEdge:GetPos()
-	return self.pos
+function GeometryEdge:GetCenter()
+    return (self.points[1]:GetPos() + self.points[2]:GetPos())/2
 end
 
 function GeometryEdge:LookingAt()
@@ -96,7 +95,7 @@ function GeometryEdge:LookingAt()
 
     box_corner = Vector(edge_length/2, EDGE_SELECT_RADIUS, EDGE_SELECT_RADIUS)
 	local hit_pos,_,_ = util.IntersectRayWithOBB(EyePos(), EyeVector()*6000, (start_pos + end_pos)/2, angle, -box_corner, box_corner)
-	return hit_pos
+	return self.clickable and hit_pos or nil
 end
 
 -- ## Face

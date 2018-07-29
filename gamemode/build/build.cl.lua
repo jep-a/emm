@@ -1,6 +1,6 @@
 BuildService = BuildService or {}
-BuildService.BuildTools = {}
-BuildService.BuildObjects = {
+BuildService.BuildTools = BuildService.BuildTools or {}
+BuildService.BuildObjects = BuildService.BuildObjects or {
 	Points = {},
 	Edges = {},
 	Faces = {},
@@ -11,7 +11,7 @@ BuildService.BuildObjects = {
 
 function BuildService.InitPlayerProperties(ply)
     ply.building = false
-	ply.can_build = false
+	ply.can_build = true --false
 	ply.current_tool = {}
 	ply.last_button_flag = 0
 	ply.max_buildmode_primitives = 10
@@ -45,6 +45,13 @@ function BuildService.RenderCurrentToolHUD()
     local_ply.current_tool:Render()
 end
 hook.Add("PostDrawTranslucentRenderables", "RenderCurrentToolHUD", BuildService.RenderCurrentToolHUD)
+
+function BuildService.HandleCurrentToolThink()
+    local local_ply = LocalPlayer()
+    if not local_ply.building then return end
+    local_ply.current_tool:Think()
+end
+hook.Add("Think", "HandleCurrentToolThink", BuildService.HandleCurrentToolThink)
 
 function BuildService.KeyWasDown(in_key)
 	--print(bit.band(LocalPlayer().last_button_flag,in_key) ~= 0)
@@ -95,13 +102,18 @@ function BuildService.ChangeBuildTool(toolname)
 	new_tool:OnEquip()
 end
 
-function BuildService.AddPoint(new_point)
-    table.insert(BuildService.BuildObjects.Points, new_point)
+function BuildService.RegisterPoints(new_points)
+    for _, new_point in pairs(new_points) do
+        table.insert(BuildService.BuildObjects.Points, new_point)
+    end
 end
 
-function BuildService.AddEdge(new_edge)
-    table.insert(BuildService.BuildObjects.Edges, new_edge)
+function BuildService.RegisterEdges(new_edges)
+    for _, new_edge in pairs(new_edges) do
+        table.insert(BuildService.BuildObjects.Edges, new_edge)
+    end
 end
+
 function BuildService.SnapToGrid(pos, snap_dist)
     if snap_dist == 0 then return pos end
 
@@ -137,11 +149,55 @@ function BuildService.RenderToolCursor()
     local point_pos = BuildService.GetToolPosition()
     render.DrawWireframeSphere(point_pos, 2, 10, 10, Color(255,255,255,255))
     
-    local trace_struct = util.QuickTrace(point_pos, Vector(0,0,-16000), ents.GetAll())
-    render.DrawBeam(point_pos, trace_struct.HitPos, 10, 0, 1, ColorAlpha(COLOR_WHITE, 100))
+    local ground_trace = util.QuickTrace(point_pos, Vector(0,0,-16000), ents.GetAll())
+    render.DrawLine(point_pos, ground_trace.HitPos, 10, 0, 1, COLOR_WHITE)
+
+    local rad = 2*math.pi
+    for i = 0, 1, 1/4 do
+        render.DrawLine(ground_trace.HitPos, ground_trace.HitPos + Vector(math.cos(i*rad), math.sin(i*rad),0)*20 , 10, 0, 1, COLOR_WHITE)
+    end
+end
+
+function BuildService.GetHoveredEdge()
+    local closest_edge = nil
+    local shortest_distance = -1
+    for _, edge in pairs(BuildService.BuildObjects.Edges) do
+        local edge_hit = edge:LookingAt()
+        if edge_hit ~= nil then
+            local edge_distance = edge:LookingAt():Distance(EyePos())
+            if shortest_distance < 0 or edge_distance < shortest_distance then
+                closest_edge = edge
+                shortest_distance = edge_distance
+            end
+        end
+    end
+
+    return closest_edge
+end
+
+function BuildService.LookAt(vec)
+    timer.Simple(0.001, function()
+        LocalPlayer():SetEyeAngles((vec - EyePos()):Angle())
+    end)
 end
 
 EMM.Include {
 	"build/geometry",
 	"build/build-tools"
 }
+
+concommand.Add("emm_build_changetool", function(ply, cmd, args, arg_str)
+    BuildService.ChangeBuildTool(args[1])
+end,
+function(cmd, args)
+    local tool_names = {}
+    for tool_name, tool in pairs(BuildService.BuildTools) do
+        table.insert(tool_names, cmd .. " " .. tool_name)
+    end
+
+    return tool_names
+end, nil, 1073741824)
+
+concommand.Add("emm_build_requestbuildmode", function(ply, cmd, args, arg_str)
+    BuildService.RequestBuildmode()
+end,nil, nil, 1073741824)

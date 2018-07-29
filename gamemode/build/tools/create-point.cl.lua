@@ -16,10 +16,6 @@ function TOOL:OnEquip()
     for _, point in pairs(BuildObjects.Points) do
         point.should_render = true
     end
-    
-    for _, edge in pairs(BuildObjects.Edges) do
-        edge.should_render = false
-    end
 
     chat.AddText(self.description)
 end
@@ -35,10 +31,10 @@ function TOOL:Render()
 end
 
 TOOL.Press[IN_ATTACK] = function()
-    local new_point = GeometryPoint.New()
-    new_point:SetPos(BuildService.GetToolPosition())
-    new_point.should_render = true
-    BuildService.AddPoint(new_point)
+    local point_A = GeometryPoint.New()
+    point_A:SetPos(BuildService.GetToolPosition())
+    point_A.should_render = true
+    BuildService.RegisterPoints{point_A}
 end
 
 BuildService.RegisterBuildTool(TOOL)

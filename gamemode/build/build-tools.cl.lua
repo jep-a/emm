@@ -13,6 +13,9 @@ end
 function ToolType:Render()
 end
 
+function ToolType:Think()
+end
+
 function ToolType:OnMouseScroll(scroll_delta)
     local local_ply = LocalPlayer()
     local tool_distance = local_ply.tool_distance
@@ -33,5 +36,6 @@ end
 EMM.Include {
     "build/tools/no-tool",
     "build/tools/create-point",
-    "build/tools/create-edge"
+    "build/tools/create-edge",
+    "build/tools/drag-edge"
 }

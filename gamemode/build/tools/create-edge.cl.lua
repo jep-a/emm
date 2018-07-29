@@ -15,7 +15,22 @@ function TOOL:OnEquip()
     self.placing_edge = false
     self.start_point = Vector(0)
     
+    for _, edge in pairs(BuildService.BuildObjects.Edges) do
+        edge.should_render = true
+        for _, point in pairs(edge.points) do
+            point.should_render = true
+        end
+    end
     chat.AddText(self.description)
+end
+
+function TOOL:OnHolster()
+    for _, edge in pairs(BuildService.BuildObjects.Edges) do
+        edge.should_render = false
+        for _, point in pairs(edge.points) do
+            point.should_render = false
+        end
+    end
 end
 
 function TOOL:RenderCurrentEdge()
@@ -44,25 +59,28 @@ TOOL.Release[IN_ATTACK] = function()
     if not TOOL.placing_edge then return end
 
     TOOL.placing_edge = false
-    local new_points = {
-        GeometryPoint.New(),
-        GeometryPoint.New()
+    
+    local point_A = GeometryPoint.New()
+    local point_B = GeometryPoint.New()
+
+    point_A:SetPos(TOOL.start_point)
+    point_B:SetPos(BuildService.GetToolPosition())
+
+    local edge_A = GeometryEdge.New()
+    edge_A.should_render = true
+    edge_A.points = {
+        point_A,
+        point_B
     }
 
-    new_points[1]:SetPos(TOOL.start_point)
-    new_points[2]:SetPos(BuildService.GetToolPosition())
+    point_A:AttachEdge(edge_A)
+    point_A.should_render = true
 
-    BuildService.AddPoint(new_points[1])
-    BuildService.AddPoint(new_points[2])
+    point_B:AttachEdge(edge_A)
+    point_B.should_render = true
 
-    local new_edge = GeometryEdge.New()
-    new_edge.should_render = true
-    new_edge.points = new_points
-
-    new_points[1]:AttachEdge(new_edge)
-    new_points[2]:AttachEdge(new_edge)
-
-    BuildService.AddEdge(new_edge)
+    BuildService.RegisterEdges{edge_A}
+    BuildService.RegisterPoints{point_A, point_B}
 end
 
 TOOL.Release[IN_RELOAD] = function()
