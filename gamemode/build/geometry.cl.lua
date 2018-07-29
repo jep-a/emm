@@ -54,6 +54,10 @@ function GeometryPoint:DetachEdge(edge)
 	table.RemoveByValue(self.attached_edges, edge)
 end
 
+function GeometryPoint:SetShouldRender(value)
+    self.should_render = true
+end
+
 -- ## Edge
 
 local EDGE_SELECT_RADIUS = 2
@@ -62,7 +66,6 @@ GeometryEdge = Class.New(GeometryType)
 
 function GeometryEdge:Init()
 	self.super.Init(self)
-	self.pos = Vector()
 	self.should_render = false
 	self.clickable = false
 	self.points = {}
@@ -98,12 +101,31 @@ function GeometryEdge:LookingAt()
 	return self.clickable and hit_pos or nil
 end
 
+function GeometryEdge:SetPoints(point_A, point_B)
+    if #self.points ~= 0 then return end
+    
+    self.points = {
+        point_A,
+        point_B
+    }
+    point_A:AttachEdge(self)
+    point_B:AttachEdge(self)
+end
+
+function GeometryEdge:SetShouldRender( value )
+    self.should_render = value
+    self.points[1]:SetShouldRender(value)
+    self.points[2]:SetShouldRender(value)
+end
+
 -- ## Face
 
 GeometryFace = Class.New(GeometryType)
 
 function GeometryFace:Init()
-	self.super.Init(self)
+    self.super.Init(self)
+    self.edges = {}
+    self.points = {}
 end
 
 function GeometryFace:Render()

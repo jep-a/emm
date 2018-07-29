@@ -81,36 +81,19 @@ TOOL.Release[IN_ATTACK] = function()
     local edge_A = GeometryEdge.New()
     local point_A = GeometryPoint.New()
     point_A:SetPos(TOOL.selected_edge.points[1]:GetPos() + TOOL.drag_rel)
-    edge_A.points = {
-        TOOL.selected_edge.points[1],
-        point_A
-    }
-    TOOL.selected_edge.points[1]:AttachEdge(edge_A)
-    point_A:AttachEdge(edge_A)
+    edge_A:SetPoints(TOOL.selected_edge.points[1], point_A)
     
     local edge_B = GeometryEdge.New()
     local point_B = GeometryPoint.New()
     point_B:SetPos(TOOL.selected_edge.points[2]:GetPos() + TOOL.drag_rel)
-    edge_B.points = {
-        TOOL.selected_edge.points[2],
-        point_B
-    }
-    TOOL.selected_edge.points[2]:AttachEdge(edge_B)
-    point_B:AttachEdge(edge_B)
+    edge_B:SetPoints(TOOL.selected_edge.points[2], point_B)
 
     local edge_C = GeometryEdge.New()
-    edge_C.points = {
-        point_A,
-        point_B
-    }
-    point_A:AttachEdge(edge_C)
-    point_B:AttachEdge(edge_C)
+    edge_C:SetPoints(point_A, point_B)
 
-    edge_A.should_render = true
-    edge_B.should_render = true
-    edge_C.should_render = true
-    point_A.should_render = true
-    point_B.should_render = true
+    edge_A:SetShouldRender(true)
+    edge_B:SetShouldRender(true)
+    edge_C:SetShouldRender(true)
 
     BuildService.RegisterEdges{edge_A, edge_B, edge_C}
     BuildService.RegisterPoints{point_A, point_B}
