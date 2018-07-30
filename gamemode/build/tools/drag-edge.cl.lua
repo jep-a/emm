@@ -77,7 +77,7 @@ end
 
 TOOL.Release[IN_ATTACK] = function()
     if not TOOL.dragging then return end 
-
+    
     local edge_A = GeometryEdge.New()
     local point_A = GeometryPoint.New()
     point_A:SetPos(TOOL.selected_edge.points[1]:GetPos() + TOOL.drag_rel)
@@ -91,15 +91,21 @@ TOOL.Release[IN_ATTACK] = function()
     local edge_C = GeometryEdge.New()
     edge_C:SetPoints(point_A, point_B)
 
-    edge_A:SetShouldRender(true)
-    edge_B:SetShouldRender(true)
-    edge_C:SetShouldRender(true)
+    --edge_A:SetShouldRender(true)
+    --edge_B:SetShouldRender(true)
+    --edge_C:SetShouldRender(true)
     
     edge_A.clickable = true
     edge_B.clickable = true
     edge_C.clickable = true
     BuildService.RegisterEdges{edge_A, edge_B, edge_C}
     BuildService.RegisterPoints{point_A, point_B}
+
+    face_A = GeometryFace.New()
+    face_A:SetPoints(point_A, point_B, TOOL.selected_edge.points[1], TOOL.selected_edge.points[2], false)
+    face_A:SetEdges(edge_A, edge_B, edge_C, TOOL.selected_edge)
+    face_A:SetShouldRender(true)
+    BuildService.RegisterFaces{face_A}
 
     TOOL.dragging = false
     TOOL.selected_edge = {}

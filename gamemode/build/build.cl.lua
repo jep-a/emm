@@ -16,7 +16,9 @@ function BuildService.InitPlayerProperties(ply)
 	ply.last_button_flag = 0
 	ply.max_buildmode_primitives = 10
 	ply.snap_distance  = 6
-	ply.tool_distance = 100
+    ply.tool_distance = 100
+    ply.draw_cursor_grid = true
+    ply.line_grid = true
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
@@ -115,6 +117,12 @@ function BuildService.RegisterEdges(new_edges)
     end
 end
 
+function BuildService.RegisterFaces(new_faces)
+    for _, new_face in pairs(new_faces) do
+        table.insert(BuildService.BuildObjects.Faces, new_face)
+    end
+end
+
 function BuildService.SnapToGrid(pos, snap_dist)
     if snap_dist == 0 then return pos end
 
@@ -150,8 +158,7 @@ function BuildService.RenderToolCursor()
     BuildService.cursor.current = BuildService.GetToolPosition()
     local CURSOR_INVISIBLE_SPEED = 50
     local GRID_RADIUS = 2
-    local DRAW_CURSOR_GRID = true
-
+    
     local speed_alpha_mul = math.Clamp((CURSOR_INVISIBLE_SPEED-LocalPlayer():GetVelocity():Length()/10)/CURSOR_INVISIBLE_SPEED, 0, 1)
     local snap_dist = LocalPlayer().snap_distance
     local cursor_pos = BuildService.cursor.smooth
@@ -160,7 +167,9 @@ function BuildService.RenderToolCursor()
     local rad = 2*math.pi
     local max_dist = GRID_RADIUS*snap_dist
     local line_length = max_dist/1.5
-
+    local draw_grid = LocalPlayer().draw_cursor_grid
+    local line_grid = LocalPlayer().line_grid
+    
     render.SetColorMaterial()
     render.DrawWireframeSphere(cursor_pos, 2, 10, 10, ColorAlpha(COLOR_WHITE,speed_alpha_mul*200), false)
     
@@ -170,27 +179,37 @@ function BuildService.RenderToolCursor()
         render.DrawLine(ground_trace.HitPos, ground_trace.HitPos + Vector(math.cos(i*rad), math.sin(i*rad),0)*20, ColorAlpha(COLOR_WHITE,speed_alpha_mul*200), false)
     end
 
-    if not DRAW_CURSOR_GRID then return end
+    if not draw_grid then return end
     for i = -GRID_RADIUS, GRID_RADIUS, 1 do
         for j = -GRID_RADIUS, GRID_RADIUS, 1 do
             local ioffset = j*snap_dist
             local joffset = i*snap_dist
             local line_center = cursor_snap + Vector(ioffset, joffset, 0)
             local dist_alpha = math.Clamp((max_dist - cursor_pos:Distance(line_center))/max_dist, 0, 1)^2*200
-            render.DrawLine(line_center - Vector(0,0,line_length), line_center + Vector(0,0,line_length), ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
-            --render.DrawSphere(line_center, 0.5, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+            if line_grid then
+                render.DrawLine(line_center - Vector(0,0,line_length), line_center + Vector(0,0,line_length), ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+            else
+                render.DrawSphere(line_center, 0.5, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+            end
 
             line_center = cursor_snap + Vector(ioffset, 0, joffset)
             dist_alpha = math.Clamp((max_dist - cursor_pos:Distance(line_center))/max_dist, 0, 1)^2*200
-            render.DrawLine(line_center - Vector(0,line_length,0), line_center + Vector(0,line_length,0), ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
-            --render.DrawSphere(line_center, 0.5, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+            if line_grid then
+                render.DrawLine(line_center - Vector(0,line_length,0), line_center + Vector(0,line_length,0), ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+            else
+                render.DrawSphere(line_center, 0.5, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+            end
 
             line_center = cursor_snap + Vector(0, ioffset, joffset)
             dist_alpha = math.Clamp((max_dist - cursor_pos:Distance(line_center))/max_dist, 0, 1)^2*200
-            render.DrawLine(line_center - Vector(line_length,0,0), line_center + Vector(line_length,0,0), ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
-            --render.DrawSphere(line_center, 0.5, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+            if line_grid then
+                render.DrawLine(line_center - Vector(line_length,0,0), line_center + Vector(line_length,0,0), ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+            else
+                render.DrawSphere(line_center, 0.5, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+            end
         end
     end
+
 end
 
 function BuildService.GetHoveredEdge()
@@ -239,4 +258,9 @@ end,nil, nil, 1073741824)
 
 concommand.Add("emm_build_snapdistance", function(ply, cmd, args, arg_str)
     LocalPlayer().snap_distance = tonumber(args[1])
+end,nil, nil, 1073741824)
+
+concommand.Add("emm_build_drawcursorgrid", function(ply, cmd, args, arg_str)
+    LocalPlayer().draw_cursor_grid = tobool(args[1])
+    LocalPlayer().line_grid = tobool(args[2])
 end,nil, nil, 1073741824)
