@@ -130,6 +130,8 @@ end
 
 function GeometryFace:Render()
 end
+Class.AddHook(GeometryFace, "PostDrawTranslucentRenderables", "Render")
+
 -- ## Primitive
 
 GeometryPrimitive = Class.New(GeometryType)

@@ -26,7 +26,7 @@ hook.Add(
 
 -- # Functions
 
-function BuildService.RequestBuildmode()
+function BuildService.StartBuildmode()
 	local local_ply = LocalPlayer()
 	if not local_ply.can_build then
 		chat.AddText(Color(255,0,0), "You are not allowed to build.")
@@ -39,7 +39,8 @@ function BuildService.RequestBuildmode()
 	local_ply.current_tool = BuildService.BuildTools["no_tool"]
 end
 
-function BuildService.RenderCurrentToolHUD()
+function BuildService.RenderCurrentToolHUD(drawing_depth, drawing_skybox)
+    if drawing_skybox then return end
     local local_ply = LocalPlayer()
     if not local_ply.building then return end
     local_ply.current_tool:Render()
@@ -129,9 +130,9 @@ function BuildService.SnapToGrid(pos, snap_dist)
 end
 
 function BuildService.GetToolPosition()
+    local local_ply = LocalPlayer()
 	local eye_pos = EyePos()
 	local eye_vec = EyeVector()
-	local local_ply = LocalPlayer()
 	local eye_trace = {}
 	util.TraceLine({
 		start = eye_pos,
@@ -146,20 +147,49 @@ end
 
 BuildService.cursor = AnimatableValue.New(Vector(0, 0, 0), {smooth = true})
 function BuildService.RenderToolCursor()
+    BuildService.cursor.current = BuildService.GetToolPosition()
     local CURSOR_INVISIBLE_SPEED = 50
-    local speed_alpha = math.Clamp((CURSOR_INVISIBLE_SPEED-LocalPlayer():GetVelocity():Length()/10)/CURSOR_INVISIBLE_SPEED, 0, 1)*200
+    local GRID_RADIUS = 2
+    local DRAW_CURSOR_GRID = true
+
+    local speed_alpha_mul = math.Clamp((CURSOR_INVISIBLE_SPEED-LocalPlayer():GetVelocity():Length()/10)/CURSOR_INVISIBLE_SPEED, 0, 1)
+    local snap_dist = LocalPlayer().snap_distance
+    local cursor_pos = BuildService.cursor.smooth
+    local cursor_snap = BuildService.SnapToGrid(cursor_pos,snap_dist)
+    local ground_trace = util.QuickTrace(cursor_pos, Vector(0,0,-16000), ents.GetAll())
+    local rad = 2*math.pi
+    local max_dist = GRID_RADIUS*snap_dist
+    local line_length = max_dist/1.5
 
     render.SetColorMaterial()
-    BuildService.cursor.current = BuildService.GetToolPosition()
-    local point_pos = BuildService.cursor.smooth
-    render.DrawWireframeSphere(point_pos, 2, 10, 10, ColorAlpha(COLOR_WHITE,speed_alpha))
+    render.DrawWireframeSphere(cursor_pos, 2, 10, 10, ColorAlpha(COLOR_WHITE,speed_alpha_mul*200), false)
     
-    local ground_trace = util.QuickTrace(point_pos, Vector(0,0,-16000), ents.GetAll())
-    render.DrawLine(point_pos, ground_trace.HitPos, ColorAlpha(COLOR_WHITE,speed_alpha))
+    render.DrawLine(cursor_pos, ground_trace.HitPos, ColorAlpha(COLOR_WHITE,speed_alpha_mul*200), false)
 
-    local rad = 2*math.pi
     for i = 0, 1, 1/4 do
-        render.DrawLine(ground_trace.HitPos, ground_trace.HitPos + Vector(math.cos(i*rad), math.sin(i*rad),0)*20, ColorAlpha(COLOR_WHITE,speed_alpha))
+        render.DrawLine(ground_trace.HitPos, ground_trace.HitPos + Vector(math.cos(i*rad), math.sin(i*rad),0)*20, ColorAlpha(COLOR_WHITE,speed_alpha_mul*200), false)
+    end
+
+    if not DRAW_CURSOR_GRID then return end
+    for i = -GRID_RADIUS, GRID_RADIUS, 1 do
+        for j = -GRID_RADIUS, GRID_RADIUS, 1 do
+            local ioffset = j*snap_dist
+            local joffset = i*snap_dist
+            local line_center = cursor_snap + Vector(ioffset, joffset, 0)
+            local dist_alpha = math.Clamp((max_dist - cursor_pos:Distance(line_center))/max_dist, 0, 1)^2*200
+            render.DrawLine(line_center - Vector(0,0,line_length), line_center + Vector(0,0,line_length), ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+            --render.DrawSphere(line_center, 0.5, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+
+            line_center = cursor_snap + Vector(ioffset, 0, joffset)
+            dist_alpha = math.Clamp((max_dist - cursor_pos:Distance(line_center))/max_dist, 0, 1)^2*200
+            render.DrawLine(line_center - Vector(0,line_length,0), line_center + Vector(0,line_length,0), ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+            --render.DrawSphere(line_center, 0.5, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+
+            line_center = cursor_snap + Vector(0, ioffset, joffset)
+            dist_alpha = math.Clamp((max_dist - cursor_pos:Distance(line_center))/max_dist, 0, 1)^2*200
+            render.DrawLine(line_center - Vector(line_length,0,0), line_center + Vector(line_length,0,0), ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+            --render.DrawSphere(line_center, 0.5, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+        end
     end
 end
 
@@ -203,6 +233,10 @@ function(cmd, args)
     return tool_names
 end, nil, 1073741824)
 
-concommand.Add("emm_build_requestbuildmode", function(ply, cmd, args, arg_str)
-    BuildService.RequestBuildmode()
+concommand.Add("emm_build_startbuildmode", function(ply, cmd, args, arg_str)
+    BuildService.StartBuildmode()
+end,nil, nil, 1073741824)
+
+concommand.Add("emm_build_snapdistance", function(ply, cmd, args, arg_str)
+    LocalPlayer().snap_distance = tonumber(args[1])
 end,nil, nil, 1073741824)
