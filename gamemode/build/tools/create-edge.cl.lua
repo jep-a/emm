@@ -53,6 +53,10 @@ end
 
 TOOL.Release[IN_ATTACK] = function()
     if not TOOL.placing_edge then return end
+    if TOOL.start_point:Distance(BuildService.GetToolPosition()) < 4 then 
+        TOOL.placing_edge = false
+        return 
+    end
 
     TOOL.placing_edge = false
     
