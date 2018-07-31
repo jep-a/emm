@@ -153,9 +153,35 @@ function BuildService.GetToolPosition()
 	return BuildService.SnapToGrid(eye_trace.HitPos,snap_dist)
 end
 
-BuildService.cursor = AnimatableValue.New(Vector(0, 0, 0), {smooth = true})
+BuildService.cursor = BuildService.cursor or AnimatableValue.New(Vector(0,0,0), {smooth = true})
+function BuildService.cursor:Smooth()
+	local ang = isangle(self.current)
+	local color = IsColor(self.current)
+	local mult = 0.9
+
+	if ang then
+		if (self.last.y < -90) and (self.current.y > 90) then
+			self.last.y = self.last.y + 360
+		elseif (self.last.y > 90) and (self.current.y < -90) then
+			self.last.y = self.last.y - 360
+		end
+	end
+
+	self.smooth = self.last
+
+	if ang then
+		self.new = Angle(((self.current.p * mult) + self.last.p)/(mult + 1), ((self.current.y * mult) + self.last.y)/(mult + 1), 0)
+	elseif color then
+		self.new = Color(((self.current.r * mult) + self.last.r)/(mult + 1), ((self.current.g * mult) + self.last.g)/(mult + 1), ((self.current.b * mult) + self.last.b)/(mult + 1), ((self.current.a * mult) + self.last.a)/(mult + 1))
+	else
+		self.new = ((self.current * mult) + self.last)/(mult + 1)
+	end
+
+	self.last = self.new
+end
+
 function BuildService.RenderToolCursor()
-    BuildService.cursor.current = BuildService.GetToolPosition()
+    BuildService.cursor.current = BuildService.GetToolPosition() and BuildService.GetToolPosition() or Vector(0,0,0)
     local CURSOR_INVISIBLE_SPEED = 50
     local GRID_RADIUS = 2
     
@@ -179,17 +205,17 @@ function BuildService.RenderToolCursor()
         render.DrawLine(ground_trace.HitPos, ground_trace.HitPos + Vector(math.cos(i*rad), math.sin(i*rad),0)*20, ColorAlpha(COLOR_WHITE,speed_alpha_mul*200), false)
     end
 
-    if not draw_grid then return end
+    if not draw_grid then return end 
     for i = -GRID_RADIUS, GRID_RADIUS, 1 do
         for j = -GRID_RADIUS, GRID_RADIUS, 1 do
-            local ioffset = j*snap_dist
-            local joffset = i*snap_dist
+            local ioffset = i*snap_dist
+            local joffset = j*snap_dist
             local line_center = cursor_snap + Vector(ioffset, joffset, 0)
             local dist_alpha = math.Clamp((max_dist - cursor_pos:Distance(line_center))/max_dist, 0, 1)^2*200
             if line_grid then
                 render.DrawLine(line_center - Vector(0,0,line_length), line_center + Vector(0,0,line_length), ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
             else
-                render.DrawSphere(line_center, 0.5, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+                render.DrawSphere(line_center, 0.04 * LocalPlayer().snap_distance, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
             end
 
             line_center = cursor_snap + Vector(ioffset, 0, joffset)
@@ -197,7 +223,7 @@ function BuildService.RenderToolCursor()
             if line_grid then
                 render.DrawLine(line_center - Vector(0,line_length,0), line_center + Vector(0,line_length,0), ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
             else
-                render.DrawSphere(line_center, 0.5, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+                render.DrawSphere(line_center, 0.04 * LocalPlayer().snap_distance, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
             end
 
             line_center = cursor_snap + Vector(0, ioffset, joffset)
@@ -205,11 +231,10 @@ function BuildService.RenderToolCursor()
             if line_grid then
                 render.DrawLine(line_center - Vector(line_length,0,0), line_center + Vector(line_length,0,0), ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
             else
-                render.DrawSphere(line_center, 0.5, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+                render.DrawSphere(line_center, 0.04 * LocalPlayer().snap_distance, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
             end
         end
     end
-
 end
 
 function BuildService.GetHoveredEdge()
