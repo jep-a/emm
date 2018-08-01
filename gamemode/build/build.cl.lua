@@ -47,7 +47,10 @@ function BuildService.RenderCurrentToolHUD(drawing_depth, drawing_skybox)
     if not local_ply.building then return end
     local_ply.current_tool:Render()
 end
-hook.Add("PostDrawTranslucentRenderables", "RenderCurrentToolHUD", BuildService.RenderCurrentToolHUD)
+hook.Add("PostDrawTranslucentRenderables", "RenderCurrentToolHUD", function(bDrawingDepth, bDrawingSkybox)
+    if bDrawingSkybox then return end
+    BuildService.RenderCurrentToolHUD()
+end)
 
 function BuildService.HandleCurrentToolThink()
     local local_ply = LocalPlayer()
@@ -139,8 +142,8 @@ end
 
 function BuildService.GetToolPosition()
     local local_ply = LocalPlayer()
-	local eye_pos = EyePos()
-	local eye_vec = EyeVector()
+	local eye_pos = local_ply:EyePos()
+	local eye_vec = local_ply:EyeAngles():Forward()
 	local eye_trace = {}
 	util.TraceLine({
 		start = eye_pos,
@@ -181,7 +184,8 @@ function BuildService.cursor:Smooth()
 end
 
 function BuildService.RenderToolCursor()
-    BuildService.cursor.current = BuildService.GetToolPosition() and BuildService.GetToolPosition() or Vector(0,0,0)
+    local tool_position = BuildService.GetToolPosition()
+    BuildService.cursor.current = tool_position and tool_position or Vector(0,0,0)
     local CURSOR_INVISIBLE_SPEED = 50
     local GRID_RADIUS = 2
     
@@ -204,7 +208,7 @@ function BuildService.RenderToolCursor()
     for i = 0, 1, 1/4 do
         render.DrawLine(ground_trace.HitPos, ground_trace.HitPos + Vector(math.cos(i*rad), math.sin(i*rad),0)*20, ColorAlpha(COLOR_WHITE,speed_alpha_mul*200), false)
     end
-
+    local dot_size = math.Clamp(0.04 * LocalPlayer().snap_distance, 0.5, 6)
     if not draw_grid then return end 
     for i = -GRID_RADIUS, GRID_RADIUS, 1 do
         for j = -GRID_RADIUS, GRID_RADIUS, 1 do
@@ -215,7 +219,7 @@ function BuildService.RenderToolCursor()
             if line_grid then
                 render.DrawLine(line_center - Vector(0,0,line_length), line_center + Vector(0,0,line_length), ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
             else
-                render.DrawSphere(line_center, 0.04 * LocalPlayer().snap_distance, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+                render.DrawSphere(line_center, dot_size, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
             end
 
             line_center = cursor_snap + Vector(ioffset, 0, joffset)
@@ -223,7 +227,7 @@ function BuildService.RenderToolCursor()
             if line_grid then
                 render.DrawLine(line_center - Vector(0,line_length,0), line_center + Vector(0,line_length,0), ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
             else
-                render.DrawSphere(line_center, 0.04 * LocalPlayer().snap_distance, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+                render.DrawSphere(line_center, dot_size, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
             end
 
             line_center = cursor_snap + Vector(0, ioffset, joffset)
@@ -231,7 +235,7 @@ function BuildService.RenderToolCursor()
             if line_grid then
                 render.DrawLine(line_center - Vector(line_length,0,0), line_center + Vector(line_length,0,0), ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
             else
-                render.DrawSphere(line_center, 0.04 * LocalPlayer().snap_distance, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
+                render.DrawSphere(line_center, dot_size, 10, 10, ColorAlpha(COLOR_WHITE, dist_alpha*speed_alpha_mul), false)
             end
         end
     end
@@ -243,7 +247,7 @@ function BuildService.GetHoveredEdge()
     for _, edge in pairs(BuildService.BuildObjects.Edges) do
         local edge_hit = edge:LookingAt()
         if edge_hit ~= nil then
-            local edge_distance = edge:LookingAt():Distance(EyePos())
+            local edge_distance = edge:LookingAt():Distance(LocalPlayer():EyePos())
             if shortest_distance < 0 or edge_distance < shortest_distance then
                 closest_edge = edge
                 shortest_distance = edge_distance
@@ -256,7 +260,8 @@ end
 
 function BuildService.LookAt(vec)
     timer.Simple(0.001, function()
-        LocalPlayer():SetEyeAngles((vec - EyePos()):Angle())
+        local local_ply = LocalPlayer()
+        local_ply:SetEyeAngles((vec - local_ply:EyePos()):Angle())
     end)
 end
 
@@ -286,6 +291,7 @@ concommand.Add("emm_build_snapdistance", function(ply, cmd, args, arg_str)
 end,nil, nil, 1073741824)
 
 concommand.Add("emm_build_drawcursorgrid", function(ply, cmd, args, arg_str)
-    LocalPlayer().draw_cursor_grid = tobool(args[1])
-    LocalPlayer().line_grid = tobool(args[2])
+    local local_ply = LocalPlayer()
+    local_ply.draw_cursor_grid = tobool(args[1])
+    local_ply.line_grid = tobool(args[2])
 end,nil, nil, 1073741824)

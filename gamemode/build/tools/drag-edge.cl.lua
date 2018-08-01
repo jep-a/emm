@@ -45,7 +45,7 @@ function TOOL:Render()
     local plane_origin = (edge_startpoint + edge_endpoint)/2
     local plane_normal = edge_endpoint - edge_startpoint
 
-    local plane_hitpos = util.IntersectRayWithPlane(EyePos(), EyeVector()*6000, plane_origin, plane_normal)
+    local plane_hitpos = util.IntersectRayWithPlane(LocalPlayer():EyePos(), LocalPlayer():EyeAngles():Forward()*6000, plane_origin, plane_normal)
 
     self.drag_rel = plane_hitpos and (plane_hitpos - plane_origin) or plane_origin
     

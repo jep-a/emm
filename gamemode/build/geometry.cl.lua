@@ -74,7 +74,7 @@ end
 
 function GeometryPoint:IsHovered()
 	local box_corner = Vector(1,1,1)*(POINT_RADIUS/2)
-	local hit_pos,_,_ = util.IntersectRayWithOBB(EyePos(), EyeVector()*6000, self.pos, Angle(0), -box_corner, box_corner)
+	local hit_pos,_,_ = util.IntersectRayWithOBB(LocalPlayer():EyePos(), LocalPlayer():EyeAngles():Forward()*6000, self.pos, Angle(0), -box_corner, box_corner)
 	return self.clickable and (hit_pos ~= nil) or nil
 end
 
@@ -139,7 +139,7 @@ function GeometryEdge:LookingAt()
     
     local angle = edge_vec:Angle()
     box_corner = Vector(edge_length/2, EDGE_SELECT_RADIUS, EDGE_SELECT_RADIUS)
-	local hit_pos,_,_ = util.IntersectRayWithOBB(EyePos(), EyeVector()*6000, (start_pos + end_pos)/2, angle, -box_corner, box_corner)
+	local hit_pos,_,_ = util.IntersectRayWithOBB(LocalPlayer():EyePos(), LocalPlayer():EyeAngles():Forward()*6000, (start_pos + end_pos)/2, angle, -box_corner, box_corner)
 	return self.clickable and hit_pos or nil
 end
 
@@ -315,7 +315,7 @@ function GeometryFace:LookingAt()
     select_radius = select_radius
 
     box_corner = Vector(2, select_radius/2, select_radius/2)
-	local hit_pos,_,_ = util.IntersectRayWithOBB(EyePos(), EyeVector()*6000, face_center, angle, -box_corner, box_corner)
+	local hit_pos,_,_ = util.IntersectRayWithOBB(LocalPlayer():EyePos(), LocalPlayer():EyeAngles():Forward()*6000, face_center, angle, -box_corner, box_corner)
 	return self.clickable and hit_pos or nil
 end
 
