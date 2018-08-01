@@ -18,6 +18,7 @@ AnimatableValue = AnimatableValue or Class.New()
 function AnimatableValue:Init(value, props)
 	value = value or 0
 	props = props or {}
+	smooth_multiplier = props.smooth_multiplier or 1
 	debounce = props.debounce or 0.2
 
 	self.animations = {}
@@ -25,6 +26,7 @@ function AnimatableValue:Init(value, props)
 
 	if props.smooth then
 		self.smoothing = true
+		self.smooth_multiplier = smooth_multiplier
 		self.smooth = value
 		self.last = value
 		self.new = value
@@ -32,7 +34,7 @@ function AnimatableValue:Init(value, props)
 
 	if props.callback then
 		self.checking_changes = true
-		self.callback = callback
+		self.callback = props.callback
 		self.debounce = debounce
 		self.last_change_time = CurTime()
 	end
@@ -132,7 +134,7 @@ end
 function AnimatableValue:Smooth()
 	local ang = isangle(self.current)
 	local color = IsColor(self.current)
-	local mult = FrameMultiplier()
+	local mult = FrameMultiplier() * self.smooth_multiplier
 
 	if ang then
 		if (self.last.y < -90) and (self.current.y > 90) then
