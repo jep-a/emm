@@ -18,24 +18,30 @@ AnimatableValue = AnimatableValue or Class.New()
 function AnimatableValue:Init(value, props)
 	value = value or 0
 	props = props or {}
-	smooth_multiplier = props.smooth_multiplier or 1
-	debounce = props.debounce or 0.2
 
 	self.animations = {}
 	self.current = value
 
 	if props.smooth then
 		self.smoothing = true
-		self.smooth_multiplier = smooth_multiplier
+		self.smooth_multiplier = props.smooth_multiplier or 1
 		self.smooth = value
 		self.last = value
 		self.new = value
 	end
 
+	local debounce = props.debounce
+
 	if props.callback then
+		debounce = debounce or 0.1
+	end
+
+	if debounce then
 		self.checking_changes = true
 		self.callback = props.callback
-		self.debounce = debounce
+		self.debounce_time = debounce
+		self.debounce = value
+		self.last_change = value
 		self.last_change_time = CurTime()
 	end
 end
@@ -124,8 +130,13 @@ function AnimatableValue:Animate()
 end
 
 function AnimatableValue:DetectChanges()
-	if CurTime() > (self.last_change_time + self.debounce) and self.last_change ~= self.current then
-		self.callback(self)
+	if CurTime() > (self.last_change_time + self.debounce_time) and self.last_change ~= self.current then
+		self.debounce = self.current
+
+		if self.callback then
+			self.callback(self)
+		end
+
 		self.last_change = self.current
 		self.last_change_time = CurTime()
 	end
