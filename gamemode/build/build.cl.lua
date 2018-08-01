@@ -182,10 +182,13 @@ function BuildService.cursor:Smooth()
 
 	self.last = self.new
 end
-
-function BuildService.RenderToolCursor()
+hook.Add("Think", "BuildCursorAnimThink", function()
+    if not LocalPlayer().building then return end
     local tool_position = BuildService.GetToolPosition()
     BuildService.cursor.current = tool_position and tool_position or Vector(0,0,0)
+end)
+
+function BuildService.RenderToolCursor()
     local CURSOR_INVISIBLE_SPEED = 50
     local GRID_RADIUS = 2
     
