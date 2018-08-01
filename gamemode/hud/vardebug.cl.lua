@@ -141,7 +141,7 @@ function VarDebugService.Init()
 	VarDebugService.current_tool.func = function ()
 		return LocalPlayer().current_tool.show_name or ""
 	end
-	VarDebugService.side_container:Add(VarDebugService.current_tool)
+	VarDebugService.container:Add(VarDebugService.current_tool)
 
 	VarDebugService.tool_distance = vgui.Create "VarDebug"
 	VarDebugService.tool_distance.label = "Tool distance"
@@ -155,7 +155,14 @@ function VarDebugService.Init()
 	VarDebugService.snap_distance.func = function ()
 		return LocalPlayer().snap_distance
 	end
-	VarDebugService.container:Add(VarDebugService.snap_distance)
+    VarDebugService.container:Add(VarDebugService.snap_distance)
+    
+    VarDebugService.drag_rel = vgui.Create "VarDebug"
+	VarDebugService.drag_rel.label = "Face Drag Rel"
+	VarDebugService.drag_rel.func = function ()
+		return LocalPlayer().current_tool.drag_rel and LocalPlayer().current_tool.drag_rel:Length() or 0
+	end
+	VarDebugService.container:Add(VarDebugService.drag_rel)
 end
 hook.Add("InitPostEntity", "VarDebugService.Init", VarDebugService.Init)
 

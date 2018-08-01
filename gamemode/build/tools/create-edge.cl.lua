@@ -39,11 +39,11 @@ function TOOL:Render()
     if not self.placing_edge then return end
     local start_pos = self.start_point
     local tool_pos = BuildService.cursor.smooth
-
+    
     render.SetColorMaterial()
     render.DrawSphere(start_pos, 2, 10, 10, COLOR_WHITE)
     render.DrawSphere(tool_pos, 2, 10, 10, COLOR_LAVENDER)
-    render.DrawBeam(start_pos, tool_pos, 1, 0, 1, Color(255,255,255,150))
+    render.DrawBeam(start_pos, tool_pos, 1, 0, 1, Color(255,255,255,1000))
 end
 
 TOOL.Press[IN_ATTACK] = function()

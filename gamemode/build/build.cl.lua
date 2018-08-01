@@ -18,7 +18,7 @@ function BuildService.InitPlayerProperties(ply)
 	ply.snap_distance  = 6
     ply.tool_distance = 100
     ply.draw_cursor_grid = true
-    ply.line_grid = true
+    ply.line_grid = false
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
@@ -152,8 +152,9 @@ function BuildService.GetToolPosition()
 		output = eye_trace
 	})
 
-	local snap_dist = local_ply.snap_distance
-	return BuildService.SnapToGrid(eye_trace.HitPos,snap_dist)
+    local snap_dist = local_ply.snap_distance
+    local hit_position = eye_trace.Hit and (eye_trace.HitPos + eye_trace.HitNormal*snap_dist) or eye_trace.HitPos
+	return BuildService.SnapToGrid(hit_position,snap_dist)
 end
 
 BuildService.cursor = BuildService.cursor or AnimatableValue.New(Vector(0,0,0), {smooth = true})
@@ -211,7 +212,7 @@ function BuildService.RenderToolCursor()
     for i = 0, 1, 1/4 do
         render.DrawLine(ground_trace.HitPos, ground_trace.HitPos + Vector(math.cos(i*rad), math.sin(i*rad),0)*20, ColorAlpha(COLOR_WHITE,speed_alpha_mul*200), false)
     end
-    local dot_size = math.Clamp(0.04 * LocalPlayer().snap_distance, 0.5, 6)
+    local dot_size = math.Clamp(0.04 * LocalPlayer().snap_distance, 0.5, 6) * math.Clamp(cursor_pos:Distance(LocalPlayer():EyePos())/100, 1, 10)
     if not draw_grid then return end 
     for i = -GRID_RADIUS, GRID_RADIUS, 1 do
         for j = -GRID_RADIUS, GRID_RADIUS, 1 do
