@@ -221,6 +221,23 @@ function BuildService.RenderToolCursor()
     end
 end
 
+function BuildService.GetHoveredPoint()
+    local closest_point = nil
+    local shortest_distance = -1
+    for _, point in pairs(BuildService.BuildObjects.Edges()) do
+        local point_hit = point:LookingAt()
+        if point_hit ~= nil then
+            local point_distance = point:LookingAt():Distance(LocalPlayer():EyePos())
+            if shortest_distance < 0 or point_distance < shortest_distance then
+                closest_point = point
+                shortest_distance = point_distance
+            end
+        end
+    end
+
+    return closest_point
+end
+
 function BuildService.GetHoveredEdge()
     local closest_edge = nil
     local shortest_distance = -1
@@ -236,6 +253,23 @@ function BuildService.GetHoveredEdge()
     end
 
     return closest_edge
+end
+
+function BuildService.GetHoveredFace()
+    local closest_face = nil
+    local shortest_distance = -1
+    for _, face in pairs(BuildService.BuildObjects.Faces) do
+        local face_hit = face:LookingAt()
+        if face_hit ~= nil then
+            local face_distance = face:LookingAt():Distance(LocalPlayer():EyePos())
+            if shortest_distance < 0 or face_distance < shortest_distance then
+                closest_face = face
+                shortest_distance = face_distance
+            end
+        end
+    end
+
+    return closest_face
 end
 
 function BuildService.LookAt(vec)

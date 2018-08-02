@@ -72,10 +72,14 @@ function GeometryPoint:GetPos()
 	return self.pos
 end
 
-function GeometryPoint:IsHovered()
+function GeometryPoint:LookingAt()
 	local box_corner = Vector(1,1,1)*(POINT_RADIUS/2)
 	local hit_pos,_,_ = util.IntersectRayWithOBB(LocalPlayer():EyePos(), LocalPlayer():EyeAngles():Forward()*6000, self.pos, Angle(0), -box_corner, box_corner)
-	return self.clickable and (hit_pos ~= nil) or nil
+	return hit_pos
+end
+
+function GeometryPoint:IsHovered()
+    return self.clickable and BuildService.GetHoveredPoint() == self
 end
 
 function GeometryPoint:AttachEdge(edge)
@@ -151,19 +155,11 @@ function GeometryEdge:TraceTo(origin, ray)
 end
 
 function GeometryEdge:LookingAt()
---    local start_pos = self.points[1]:GetPos()
---    local end_pos = self.points[2]:GetPos()
---    local edge_vec = end_pos - start_pos
---    local edge_length = edge_vec:Length()
---    
---    local angle = edge_vec:Angle()
---    box_corner = Vector(edge_length/2, EDGE_SELECT_RADIUS, EDGE_SELECT_RADIUS)
---	local hit_pos,_,_ = util.IntersectRayWithOBB(LocalPlayer():EyePos(), LocalPlayer():EyeAngles():Forward()*6000, (start_pos + end_pos)/2, angle, -box_corner, box_corner)
-	return self.clickable and self:TraceTo(LocalPlayer():EyePos(), LocalPlayer():EyeAngles():Forward()*6000) or nil
+	return self:TraceTo(LocalPlayer():EyePos(), LocalPlayer():EyeAngles():Forward()*6000)
 end
 
 function GeometryEdge:IsHovered()
-    return self:LookingAt() ~= nil
+    return self.clickable and BuildService.GetHoveredEdge() == self
 end
 
 function GeometryEdge:SetPoints(point_A, point_B)
@@ -341,8 +337,7 @@ function GeometryFace:LookingAt()
 end
 
 function GeometryFace:IsHovered()
-    print(self.clickable)
-    return (self:LookingAt() ~= nil) and self.clickable
+    return self.clickable and BuildService.GetHoveredFace() == self
 end
 
 
