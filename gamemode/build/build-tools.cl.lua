@@ -37,5 +37,6 @@ EMM.Include {
     "build/tools/no-tool",
     "build/tools/create-point",
     "build/tools/create-edge",
-    "build/tools/drag-edge"
+    "build/tools/drag-edge",
+    "build/tools/move-edge"
 }

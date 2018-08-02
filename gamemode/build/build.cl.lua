@@ -158,31 +158,7 @@ function BuildService.GetToolPosition()
 end
 
 BuildService.cursor = BuildService.cursor or AnimatableValue.New(Vector(0,0,0), {smooth = true})
-function BuildService.cursor:Smooth()
-	local ang = isangle(self.current)
-	local color = IsColor(self.current)
-	local mult = 0.9
-
-	if ang then
-		if (self.last.y < -90) and (self.current.y > 90) then
-			self.last.y = self.last.y + 360
-		elseif (self.last.y > 90) and (self.current.y < -90) then
-			self.last.y = self.last.y - 360
-		end
-	end
-
-	self.smooth = self.last
-
-	if ang then
-		self.new = Angle(((self.current.p * mult) + self.last.p)/(mult + 1), ((self.current.y * mult) + self.last.y)/(mult + 1), 0)
-	elseif color then
-		self.new = Color(((self.current.r * mult) + self.last.r)/(mult + 1), ((self.current.g * mult) + self.last.g)/(mult + 1), ((self.current.b * mult) + self.last.b)/(mult + 1), ((self.current.a * mult) + self.last.a)/(mult + 1))
-	else
-		self.new = ((self.current * mult) + self.last)/(mult + 1)
-	end
-
-	self.last = self.new
-end
+BuildService.cursor.smooth_multiplier = 5
 hook.Add("Think", "BuildCursorAnimThink", function()
     if not LocalPlayer().building then return end
     local tool_position = BuildService.GetToolPosition()

@@ -6,7 +6,9 @@ TOOL.show_name      = "Drag Edge"
 TOOL.description    = [[
     Create a face by dragging out an edge.
 
-    Click and drag an edge out.
+    Press left click and drag an edge out.
+    Press reload while dragging to cancel.
+    Press use while dragging to switch dragging modes.
 ]]
 
 function TOOL:OnEquip()
