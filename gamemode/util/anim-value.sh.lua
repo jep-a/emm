@@ -3,7 +3,7 @@
 local DefaultEase = CubicBezier(0, 0.5, 0.35, 1)
 
 local function FrameMultiplier()
-	return (1/FrameTime() - 20)/5000
+	return FrameTime() * 10
 end
 
 local function IsColor(color)
