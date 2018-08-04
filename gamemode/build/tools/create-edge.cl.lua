@@ -79,6 +79,11 @@ TOOL.Release[IN_ATTACK] = function()
     point_B:AttachEdge(edge_A)
     point_B.should_render = true
 
+    BuildService.AddUndoHistory("Created edge", {
+        point_A, point_B,
+        edge_A
+    })
+
     BuildService.RegisterEdges{edge_A}
     BuildService.RegisterPoints{point_A, point_B}
 end

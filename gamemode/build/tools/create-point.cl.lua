@@ -34,6 +34,8 @@ TOOL.Press[IN_ATTACK] = function()
     local point_A = GeometryPoint.New()
     point_A:SetPos(BuildService.GetToolPosition())
     point_A.should_render = true
+
+    BuildService.AddUndoHistory("Created point", {point_A})
     BuildService.RegisterPoints{point_A}
 end
 

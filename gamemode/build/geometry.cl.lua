@@ -35,8 +35,14 @@ GeometryType = Class.New()
 
 function GeometryType:Init()
     self.should_render = true
+    self.clickable = false
+    self.directory_table = {}
 end
 
+function GeometryType:Remove()
+    table.RemoveByValue(self.directory_table, self)
+    self:Finish()
+end
 -- ## Point
 
 GeometryPoint = Class.New(GeometryType)
@@ -45,7 +51,6 @@ function GeometryPoint:Init()
 	self.super.Init(self)
 	self.pos = Vector()
 	self.should_render = false
-	self.clickable = false
     self.attached_edges = {}
     self.attached_faces = {}
 end
@@ -111,7 +116,6 @@ GeometryEdge = Class.New(GeometryType)
 function GeometryEdge:Init()
 	self.super.Init(self)
 	self.should_render = false
-	self.clickable = false
     self.points = {}
     self.attached_faces = {}
 end
@@ -200,7 +204,6 @@ function GeometryFace:Init()
     self.points = {}
     self.should_render = false
     self.normal = Vector(0)
-    self.clickable = false
 end
 
 local FACE_SELECTION_COLOR = MixColors(FACE_DRAW_COLOR, SELECTION_TINT, FACE_TINT_STRENGTH)

@@ -144,6 +144,12 @@ if not TOOL.dragging then return end
     face_A:SetEdges(edge_A, edge_B, edge_C, TOOL.selected_edge)
     face_A:SetShouldRender(true)
     BuildService.RegisterFaces{face_A}
+
+    BuildService.AddUndoHistory("Dragged face", {
+        point_A, point_B,
+        edge_A, edge_B, edge_C,
+        face_A
+    })
     
     TOOL.dragging = false
     TOOL.selected_edge = {}

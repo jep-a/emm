@@ -1,11 +1,31 @@
 BuildService = BuildService or {}
 BuildService.BuildTools = BuildService.BuildTools or {}
+
 BuildService.BuildObjects = BuildService.BuildObjects or {
 	Points = {},
 	Edges = {},
 	Faces = {},
 	Primitives = {}
 }
+
+BuildService.cursor = BuildService.cursor or AnimatableValue.New(Vector(0,0,0), {smooth = true})
+BuildService.cursor.smooth_multiplier = 5
+BuildService.History = BuildService.History or {}
+
+surface.CreateFont( "HistTable", {
+    font = "Courier New",
+    weight = 500,
+    size = 20
+} )
+
+hook.Add("HUDPaint", "DrawHistory", function()
+    local str_history = "UNDO HISTORY\n\n"
+    for _,artifact in pairs(BuildService.History) do
+        str_history = str_history..artifact.action.."\n"
+    end
+
+    draw.DrawText(str_history, "HistTable", 0, 0, Color(255,255,255,255), TEXT_ALIGN_LEFT)
+end)
 
 -- # Properties
 
@@ -60,7 +80,6 @@ end
 hook.Add("Think", "HandleCurrentToolThink", BuildService.HandleCurrentToolThink)
 
 function BuildService.KeyWasDown(in_key)
-	--print(bit.band(LocalPlayer().last_button_flag,in_key) ~= 0)
 	return (bit.band(LocalPlayer().last_button_flag,in_key) ~= 0)
 end
 
@@ -101,28 +120,33 @@ function BuildService.RegisterBuildTool(tool)
 end
 
 function BuildService.ChangeBuildTool(toolname)
+    local local_ply = LocalPlayer()
+    if not local_ply.building then return end
 	if BuildService.BuildTools[toolname] == nil then return end
 	local new_tool = BuildService.BuildTools[toolname]
-	LocalPlayer().current_tool:OnHolster()
-	LocalPlayer().current_tool = new_tool
+	local_ply.current_tool:OnHolster()
+	local_ply.current_tool = new_tool
 	new_tool:OnEquip()
 end
 
 function BuildService.RegisterPoints(new_points)
     for _, new_point in pairs(new_points) do
         table.insert(BuildService.BuildObjects.Points, new_point)
+        new_point.directory_table = BuildService.BuildObjects.Points
     end
 end
 
 function BuildService.RegisterEdges(new_edges)
     for _, new_edge in pairs(new_edges) do
         table.insert(BuildService.BuildObjects.Edges, new_edge)
+        new_edge.directory_table = BuildService.BuildObjects.Edges
     end
 end
 
 function BuildService.RegisterFaces(new_faces)
     for _, new_face in pairs(new_faces) do
         table.insert(BuildService.BuildObjects.Faces, new_face)
+        new_face.directory_table = BuildService.BuildObjects.Faces
     end
 end
 
@@ -157,8 +181,6 @@ function BuildService.GetToolPosition()
 	return BuildService.SnapToGrid(hit_position,snap_dist)
 end
 
-BuildService.cursor = BuildService.cursor or AnimatableValue.New(Vector(0,0,0), {smooth = true})
-BuildService.cursor.smooth_multiplier = 5
 hook.Add("Think", "BuildCursorAnimThink", function()
     if not LocalPlayer().building then return end
     local tool_position = BuildService.GetToolPosition()
@@ -279,6 +301,27 @@ function BuildService.LookAt(vec)
     end)
 end
 
+function BuildService.AddUndoHistory(s_action, t_objects)
+    local artifact = {
+        action = s_action,
+        objects = t_objects
+    }
+    table.insert(BuildService.History, artifact)
+end
+
+function BuildService.Undo()
+    local artifact_index = #BuildService.History
+    if artifact_index == 0 then return end
+    
+    local artifact = BuildService.History[artifact_index]
+    
+    for _, object in pairs(artifact.objects) do
+        object:Remove()
+    end
+
+    table.remove(BuildService.History, artifact_index)
+end
+
 EMM.Include {
 	"build/geometry",
 	"build/build-tools"
@@ -308,4 +351,8 @@ concommand.Add("emm_build_drawcursorgrid", function(ply, cmd, args, arg_str)
     local local_ply = LocalPlayer()
     local_ply.draw_cursor_grid = tobool(args[1])
     local_ply.line_grid = tobool(args[2])
+end,nil, nil, 1073741824)
+
+concommand.Add("gmod_undo", function(ply, cmd, args, arg_str)
+    BuildService.Undo()
 end,nil, nil, 1073741824)

@@ -158,9 +158,10 @@ function VarDebugService.Init()
     VarDebugService.container:Add(VarDebugService.snap_distance)
     
     VarDebugService.drag_rel = vgui.Create "VarDebug"
-	VarDebugService.drag_rel.label = "Face Drag Rel"
-	VarDebugService.drag_rel.func = function ()
-		return LocalPlayer().current_tool.drag_rel and LocalPlayer().current_tool.drag_rel:Length() or 0
+	VarDebugService.drag_rel.label = "Last action"
+    VarDebugService.drag_rel.func = function ()
+        local last_artifact = #BuildService.History
+		return last_artifact > 0 and BuildService.History[#BuildService.History].action or "none"
 	end
 	VarDebugService.container:Add(VarDebugService.drag_rel)
 end
