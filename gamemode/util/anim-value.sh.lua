@@ -39,7 +39,13 @@ function AnimatableValue:Init(value, props)
 	if debounce then
 		self.checking_changes = true
 		self.callback = props.callback
+
+		if isnumber(debounce) then
 		self.debounce_time = debounce
+		else
+			self.debounce_time = 0.1
+		end
+
 		self.debounce = value
 		self.last_change = value
 		self.last_change_time = CurTime()
