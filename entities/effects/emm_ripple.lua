@@ -26,7 +26,7 @@ function EFFECT:Think()
 	return alive
 end
 
-local CIRCLE_MATERIAL = Material("emm/indicator/circle.png", "noclamp smooth")
+local CIRCLE_MATERIAL = Material("emm2/shapes/circle.png", "noclamp smooth")
 
 function EFFECT:Render()
 	local pos = self.origin + (self.normal/2)

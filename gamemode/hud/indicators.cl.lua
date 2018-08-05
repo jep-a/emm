@@ -13,7 +13,7 @@ vgui.Register("IndicatorContainer", IndicatorContainer, "EditablePanel")
 
 local Indicator = {}
 
-local indicator_material = Material("emm/indicator/arrow.png", "noclamp smooth")
+local indicator_material = Material("emm2/shapes/arrow.png", "noclamp smooth")
 
 function Indicator:Paint(w, h)
 	surface.SetDrawColor(self.ent and self.ent.color or COLOR_WHITE)

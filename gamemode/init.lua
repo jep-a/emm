@@ -67,6 +67,6 @@ function EMM.AddResourceDirectory(dir)
 	end
 end
 
-EMM.AddResourceDirectory "materials/emm"
+EMM.AddResourceDirectory "materials/emm2"
 EMM.AddResourceDirectory "resource/fonts"
 include "emm.lua"
