@@ -10,7 +10,7 @@ function ENT:Initialize()
 	self:DrawShadow(false)
 
 	if SERVER then
-		local sprite = util.SpriteTrail(self, 0, COLOR_WHITE, false, 25, 25, 4, 0.125, "emm/trail/flat.vmt")
+		local sprite = util.SpriteTrail(self, 0, COLOR_WHITE, false, 25, 25, 4, 0.125, "emm2/trail/flat.vmt")
 
 		self:SetSprite(sprite)
 		self:DeleteOnRemove(sprite)
@@ -88,7 +88,7 @@ function ENT:Think()
 
 				local trace = util.TraceLine({
 					start = pos,
-					endpos = pos + (eye_norm * Vector(-50, -50, 0)),
+					endpos = pos + (eye_norm * Vector(-70, -70, 0)),
 					mask = MASK_NPCWORLDSTATIC
 				})
 
