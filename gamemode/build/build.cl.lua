@@ -149,6 +149,13 @@ function BuildService.RegisterFaces(new_faces)
         new_face.directory_table = BuildService.BuildObjects.Faces
     end
 end
+function BuildService.RegisterPrimitives(new_primitives)
+    for _, new_primitive in pairs(new_primitives) do
+        table.insert(BuildService.BuildObjects.Primitives, new_primitive)
+        new_primitive.directory_table = BuildService.BuildObjects.Primitives
+    end
+end
+
 
 function BuildService.SnapToGrid(pos, snap_dist)
     if snap_dist == 0 then return pos end
@@ -292,6 +299,13 @@ function BuildService.GetHoveredFace()
     end
 
     return closest_face
+end
+
+function BuildService.GetHoveredPrimitive()
+    for _, primitive in pairs(BuildService.BuildObjects.Primitives) do
+        if primitive:IsHovered() then return primitive end
+    end
+    return nil
 end
 
 function BuildService.LookAt(vec)

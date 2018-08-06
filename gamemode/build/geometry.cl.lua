@@ -10,6 +10,9 @@ local EDGE_TINT_STRENGTH = 2000
 local FACE_DRAW_COLOR = COLOR_SKY
 local FACE_TINT_STRENGTH = 4
 
+local PRIM_DRAW_COLOR = COLOR_ORANGE
+local PRIM_TINT_STRENGTH = 3
+
 local SELECTION_TINT = COLOR_RED
 
 local QUAD_MATERIAL = CreateMaterial( "HUD_debugwhite", "UnlitGeneric", {
@@ -52,6 +55,7 @@ function GeometryPoint:Init()
 	self.pos = Vector()
 	self.should_render = false
     self.attached_edges = {}
+    self.attached_prims = {}
     self.attached_faces = {}
 end
 
@@ -105,8 +109,17 @@ function GeometryPoint:DetachFace(face)
 	table.RemoveByValue(self.attached_faces, face)
 end
 
+function GeometryPoint:AttachPrimitive(prim)
+	if table.HasValue(self.attached_prims, prim) then return end
+	table.insert(self.attached_prims,prim)
+end
+
+function GeometryPoint:DetachPrimitive(prim)
+	table.RemoveByValue(self.attached_prims, prim)
+end
+
 function GeometryPoint:SetShouldRender(value)
-    self.should_render = true
+    self.should_render = value
 end
 
 -- ## Edge
@@ -117,6 +130,7 @@ function GeometryEdge:Init()
 	self.super.Init(self)
 	self.should_render = false
     self.points = {}
+    self.attached_prims = {}
     self.attached_faces = {}
 end
 
@@ -177,7 +191,7 @@ function GeometryEdge:SetPoints(point_A, point_B)
     point_B:AttachEdge(self)
 end
 
-function GeometryEdge:SetShouldRender( value )
+function GeometryEdge:SetShouldRender(value)
     self.should_render = value
     for _, point in pairs(self.points) do
         point:SetShouldRender(value)
@@ -193,6 +207,15 @@ function GeometryEdge:DetachFace(face)
 	table.RemoveByValue(self.attached_faces, face)
 end
 
+function GeometryEdge:AttachPrimitive(prim)
+	if table.HasValue(self.attached_prims, prim) then return end
+	table.insert(self.attached_prims,prim)
+end
+
+function GeometryEdge:DetachPrimitive(prim)
+	table.RemoveByValue(self.attached_prims, prim)
+end
+
 
 -- ## Face
 
@@ -202,8 +225,8 @@ function GeometryFace:Init()
     self.super.Init(self)
     self.edges = {}
     self.points = {}
+    self.attached_prims = {}
     self.should_render = false
-    self.normal = Vector(0)
 end
 
 local FACE_SELECTION_COLOR = MixColors(FACE_DRAW_COLOR, SELECTION_TINT, FACE_TINT_STRENGTH)
@@ -225,15 +248,22 @@ function GeometryFace:Render()
     for _, edge in pairs(self.edges) do
         render.DrawLine(face_center, edge:GetCenter(), draw_color, true)
     end
-    
+    --render.DrawBeam(startPos, endPos, width, textureStart, textureEnd, color)
+    --render.DrawBeam(self.points[1]:GetPos(), self.points[2]:GetPos(),5,0,1, COLOR_RED)
+    --render.DrawBeam(self.points[1]:GetPos(), self.points[4]:GetPos(),5,0,1, COLOR_RED)
+
     render.SetMaterial(QUAD_MATERIAL)
     render.DrawQuad(self.points[1]:GetPos(), self.points[2]:GetPos(), self.points[3]:GetPos(), self.points[4]:GetPos(), ColorAlpha(draw_color,100))
     render.DrawQuad(self.points[4]:GetPos(), self.points[3]:GetPos(), self.points[2]:GetPos(), self.points[1]:GetPos(), ColorAlpha(draw_color,100))
+    --local aim_hitpos = util.IntersectRayWithPlane(LocalPlayer():EyePos(), LocalPlayer():EyeAngles():Forward()*6000, face_center, self:GetNormal())
+    --if aim_hitpos == nil then return nil end
+    --render.DrawLine(self.points[1]:GetPos(), aim_hitpos, COLOR_RED, true)
+    
 end
 Class.AddHook(GeometryFace, "PostDrawTranslucentRenderables", "Render")
 
 function GeometryFace:SetPoints(point_A, point_B, point_C, point_D, autodetect_edges)
-    if #self.points > 0 then return end
+    --if #self.points > 0 then return end
     self.points = {point_A, point_B, point_C, point_D}
 
     for _, point in pairs(self.points) do
@@ -275,36 +305,9 @@ function GeometryFace:SetEdges(edge_A, edge_B, edge_C, edge_D)
 end
 
 function GeometryFace:OrderPoints()
-    local edge_points = self.edges[1].points
-    local unkown_points = {}
-    for _, point in pairs(self.points) do
-        if point ~= edge_points[1] and point ~= edge_points[2] then
-            table.insert(unkown_points, point)
-        end
-    end
-    local origin = edge_points[1]:GetPos()
-    local starting_vector = edge_points[2]:GetPos() - edge_points[1]:GetPos()
-
-    table.sort(self.points, function(point_A, point_B)
-        local vector_A = point_A:GetPos() - origin
-        local vector_B = point_B:GetPos() - origin
-
-        if vector_B == Vector(0,0,0) then return true end --Move the origin to the top
-        if vector_B == starting_vector then return true end --Move the origin to the top
-        
-        local cross_A = starting_vector:Cross(vector_A):Length()
-        local cross_B = starting_vector:Cross(vector_B):Length()
-
-        return cross_B < cross_A --Move up points with lower angles
-    end)
-
-    local vector_i = self.points[2]:GetPos() - self.points[1]:GetPos()
-    local vector_j = self.points[3]:GetPos() - self.points[1]:GetPos()
-
-    self.normal = vector_i:Cross(vector_j):GetNormalized()
 end
 
-function GeometryFace:SetShouldRender( value )
+function GeometryFace:SetShouldRender(value)
     self.should_render = value
     for _, edge in pairs(self.edges) do
         edge:SetShouldRender(value)
@@ -321,38 +324,109 @@ end
 
 function GeometryFace:LookingAt()
     local face_center = self:GetCenter()
-    local aim_hitpos = util.IntersectRayWithPlane(LocalPlayer():EyePos(), LocalPlayer():EyeAngles():Forward()*6000, face_center, self.normal)
+    local aim_hitpos = util.IntersectRayWithPlane(LocalPlayer():EyePos(), LocalPlayer():EyeAngles():Forward()*6000, face_center, self:GetNormal())
     if aim_hitpos == nil then return nil end
+    
+    local origin = self.points[1]:GetPos()
+    local vector_u = self.points[2]:GetPos() - origin
+    local vector_v = self.points[4]:GetPos() - origin
+    local hit_rel = aim_hitpos - origin
+    local coord = Vector(hit_rel:Dot(vector_u)/vector_u:LengthSqr(),hit_rel:Dot(vector_v)/vector_v:LengthSqr(),0)
 
-    local edge_hits = 0
-    local test_ray = (self.edges[1]:GetCenter() - aim_hitpos)*16000
-    for _, edge in pairs(self.edges) do
-        if edge:TraceTo(aim_hitpos, test_ray) ~= nil then
-            edge_hits = edge_hits + 1
-        end
-    end
-
-    if edge_hits == 1 then
-        return aim_hitpos
-    else
-        return nil
-    end
+    local in_box = coord.x >= 0 and coord.y >= 0 and coord.x <= 1 and coord.y <= 1
+    --print(coord)
+    return in_box and aim_hitpos or nil
 end
 
 function GeometryFace:IsHovered()
     return self.clickable and BuildService.GetHoveredFace() == self
 end
 
+function GeometryFace:GetNormal()
+    local origin = self.points[1]:GetPos()
+    return (self.points[2]:GetPos() - origin):Cross(self.points[4]:GetPos() - origin):GetNormalized()
+end
+
+function GeometryFace:AttachPrimitive(prim)
+	if table.HasValue(self.attached_prims, prim) then return end
+	table.insert(self.attached_prims,prim)
+end
+
+function GeometryFace:DetachPrimitive(prim)
+	table.RemoveByValue(self.attached_prims, prim)
+end
 
 -- ## Primitive
 
 GeometryPrimitive = Class.New(GeometryType)
 
 function GeometryPrimitive:Init()
-	self.super.Init(self)
+    self.super.Init(self)
+    self.faces = {}
+    self.edges = {}
+    self.points = {}
 end
 
+local PRIM_SELECTION_COLOR = MixColors(PRIM_DRAW_COLOR, SELECTION_TINT, PRIM_TINT_STRENGTH)
 function GeometryPrimitive:Render()
+    if not self.should_render then return end
+    render.SetMaterial(QUAD_MATERIAL)
+    
+    local draw_color = Color(0,0,0)
+    if self:IsHovered() then
+        draw_color = PRIM_SELECTION_COLOR
+    else
+        draw_color = PRIM_DRAW_COLOR
+    end
+    for _, face in pairs(self.faces) do
+        render.DrawQuad(face.points[1]:GetPos(), face.points[2]:GetPos(), face.points[3]:GetPos(), face.points[4]:GetPos(), ColorAlpha(draw_color,100))
+        render.DrawQuad(face.points[4]:GetPos(), face.points[3]:GetPos(), face.points[2]:GetPos(), face.points[1]:GetPos(), ColorAlpha(draw_color,100))
+    end
+end
+Class.AddHook(GeometryPrimitive, "PostDrawTranslucentRenderables", "Render")
+
+function GeometryPrimitive:SetFaces(faces)
+    self.faces = faces
+    self.edges = {}
+    self.points = {}
+
+    for _, face in pairs(faces) do
+        face:AttachPrimitive(self)
+        --print(face)
+        for _,edge in pairs(face.edges) do
+            if not table.HasValue(self.edges, edge) then
+                table.insert(self.edges, edge)
+                edge:AttachPrimitive(self)
+            end
+        end
+        for _,point in pairs(face.points) do
+            if not table.HasValue(self.points, point) then
+                table.insert(self.points, point)
+                point:AttachPrimitive(self)
+            end
+        end
+    end
+end
+
+function GeometryPrimitive:LookingAt()
+    for _, edge in pairs(self.edges) do
+        if edge == BuildService.GetHoveredFace() then
+            return edge:LookingAt()
+        end
+    end
+
+    return nil
+end
+
+function GeometryPrimitive:IsHovered()
+    return self.clickable and BuildService.GetHoveredFace() == self
+end
+
+function GeometryPrimitive:SetShouldRender( value )
+    self.should_render = value
+    for _, edge in pairs(self.edges) do
+        edge.should_render = true
+    end
 end
 
 -- ## Primitve group

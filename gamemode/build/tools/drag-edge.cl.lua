@@ -19,26 +19,27 @@ function TOOL:OnEquip()
     self.saved_tool_distance = Vector(0,0,0)
     self.previous_cursor_position = Vector(0,0,0)
     self.plane_hitpos = Vector(0,0,0)
+    for _, face in pairs(BuildService.BuildObjects.Faces) do
+        face:SetShouldRender(true)
+    end
+
     for _, edge in pairs(BuildService.BuildObjects.Edges) do
-        edge.should_render = true
+        edge:SetShouldRender(true)
         edge.clickable = true
-        for _, point in pairs(edge.points) do
-            point.should_render = true
-        end
     end
 
     chat.AddText(self.description)
 end
 
 function TOOL:OnHolster()
-    for _, edge in pairs(BuildService.BuildObjects.Edges) do
-        edge.should_render = false
-        edge.clickable = false
-        for _, point in pairs(edge.points) do
-            point.should_render = false
-        end
+    for _, face in pairs(BuildService.BuildObjects.Faces) do
+        face:SetShouldRender(false)
     end
 
+    for _, edge in pairs(BuildService.BuildObjects.Edges) do
+        edge:SetShouldRender(false)
+        edge.clickable = false
+    end
     chat.AddText(self.description)
 end
 
@@ -140,9 +141,10 @@ if not TOOL.dragging then return end
     BuildService.RegisterPoints{point_A, point_B}
     
     face_A = GeometryFace.New()
-    face_A:SetPoints(point_A, point_B, TOOL.selected_edge.points[1], TOOL.selected_edge.points[2], false)
-    face_A:SetEdges(edge_A, edge_B, edge_C, TOOL.selected_edge)
+    face_A:SetPoints(point_A, point_B, TOOL.selected_edge.points[2], TOOL.selected_edge.points[1], false)
+    face_A:SetEdges(edge_C, edge_B, TOOL.selected_edge, edge_A)
     face_A:SetShouldRender(true)
+    face_A.normal = point_A:GetPos():Cross(point_B:GetPos()):GetNormalized()
     BuildService.RegisterFaces{face_A}
 
     BuildService.AddUndoHistory("Dragged face", {
