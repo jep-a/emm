@@ -1,6 +1,6 @@
 "UnlitGeneric"
 {
-	"$baseTexture" "xmm/trails/flat"
+	"$baseTexture" "emm2/trails/flat"
 
 	"$additive" 0
 	"$vertexcolor" 1
