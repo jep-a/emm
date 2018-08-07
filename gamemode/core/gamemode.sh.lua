@@ -14,6 +14,7 @@ EMM.Include {
 	"util/savepoint",
 	"util/spectate",
 	"util/trail",
+	"vgui/element",
 	"player/hooks",
 	"player/methods",
 	"player-class/player-class",
