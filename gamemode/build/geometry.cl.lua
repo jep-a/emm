@@ -10,7 +10,7 @@ local EDGE_TINT_STRENGTH = 2000
 local FACE_DRAW_COLOR = COLOR_SKY
 local FACE_TINT_STRENGTH = 4
 
-local PRIM_DRAW_COLOR = COLOR_ORANGE
+local PRIM_DRAW_COLOR = COLOR_GOLD
 local PRIM_TINT_STRENGTH = 3
 
 local SELECTION_TINT = COLOR_RED
@@ -409,9 +409,9 @@ function GeometryPrimitive:SetFaces(faces)
 end
 
 function GeometryPrimitive:LookingAt()
-    for _, edge in pairs(self.edges) do
-        if edge == BuildService.GetHoveredFace() then
-            return edge:LookingAt()
+    for _, face in pairs(self.faces) do
+        if face == BuildService.GetHoveredFace() then
+            return face:LookingAt()
         end
     end
 
@@ -419,7 +419,7 @@ function GeometryPrimitive:LookingAt()
 end
 
 function GeometryPrimitive:IsHovered()
-    return self.clickable and BuildService.GetHoveredFace() == self
+    return self.clickable and BuildService.GetHoveredPrimitive() == self
 end
 
 function GeometryPrimitive:SetShouldRender( value )

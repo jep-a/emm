@@ -303,7 +303,7 @@ end
 
 function BuildService.GetHoveredPrimitive()
     for _, primitive in pairs(BuildService.BuildObjects.Primitives) do
-        if primitive:IsHovered() then return primitive end
+        if primitive:LookingAt() ~= nil then return primitive end
     end
     return nil
 end
@@ -335,6 +335,19 @@ function BuildService.Undo()
 
     table.remove(BuildService.History, artifact_index)
 end
+
+function BuildService.SpawnPrimitive(vertices)
+    local vertices_json = util.TableToJSON(vertices)
+
+    net.Start("SpawnPrimitive")
+    net.WriteString(vertices_json)
+    net.SendToServer()
+end
+
+--net.Receive("BuildPhysics", function(len, ply)
+--    local primitive = net.ReadEntity()
+--    primitive:BuildPhysics()
+--end)
 
 EMM.Include {
 	"build/geometry",

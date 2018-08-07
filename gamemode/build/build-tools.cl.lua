@@ -38,5 +38,6 @@ EMM.Include {
     "build/tools/create-point",
     "build/tools/create-edge",
     "build/tools/drag-edge",
+    "build/tools/prim-sender",
     "build/tools/extrude-face"
 }
