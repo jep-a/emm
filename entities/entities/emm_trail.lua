@@ -10,11 +10,11 @@ function ENT:Initialize()
 	self:DrawShadow(false)
 
 	if SERVER then
-		local sprite = util.SpriteTrail(self, 0, COLOR_WHITE, false, 25, 25, 4, 0.125, "emm2/trail/flat.vmt")
+		local sprite = util.SpriteTrail(self, 0, COLOR_WHITE, false, 4, 4, 4, 0.125, "emm2/trails/flat.vmt")
 
 		self:SetSprite(sprite)
 		self:DeleteOnRemove(sprite)
-		self.width = AnimatableValue.New(20)
+		self.width = AnimatableValue.New(4)
 	else
 		self.animatable_color = AnimatableValue.New(COLOR_WHITE, {
 			smooth = true,
