@@ -2,38 +2,38 @@ CamUIService = CamUIService or {}
 CamUIService.panels = CamUIService.panels or {}
 
 
--- # Rendering
+-- # Setup
 
-local lag_angle = Angle(0, 0, 0)
-local last_angle = Angle(0, 0, 0)
-local current_angle
-local new_angle
-local function LagEyeAngles()
-	local frame_frac = (1/FrameTime() - 20)/60
-	local ang_div = Lerp(frame_frac, 15, 12)
-	local ang_mod = Lerp(frame_frac, 0.75, 0.1)
-	current_angle = LocalPlayer():EyeAngles()
+CamUIService.eye_angles_delta = AnimatableValue.New(Angle(0, 0, 0), {
+	smooth = true,
+	smooth_multiplier = 16,
+	smooth_delta_only = true
+})
 
-	if (last_angle.y < -90) and (current_angle.y > 90) then
-		last_angle.y = last_angle.y + 360
-	elseif (last_angle.y > 90) and (current_angle.y < -90) then
-		last_angle.y = last_angle.y - 360
+CamUIService.cam_angle = AnimatableValue.New(Angle(0, 0, 0), {
+	smooth = true,
+	generate = function ()
+		return CamUIService.eye_angles_delta.smooth
 	end
+})
 
-	lag_angle = Angle((current_angle.p - last_angle.p)/ang_div, (current_angle.y - last_angle.y)/ang_div, 0)
-	new_angle = Angle((current_angle.p * ang_mod + last_angle.p)/(ang_mod + 1), (current_angle.y * ang_mod + last_angle.y)/(ang_mod + 1), 0)
-	last_angle = new_angle
+function CamUIService.CalcView(ply, _, eye_ang)
+	CamUIService.eye_angles_delta.current = eye_ang
 end
+hook.Add("CalcView", "CamUIService.CalcView", CamUIService.CalcView)
 
-function CamUIService.AddPanel(pnl)
+function CamUIService.AddPanel(pnl, offset_cam_dist, offset_cam_ang)
+	pnl.offset_cam_distance = offset_cam_dist or 0
+	pnl.offset_cam_angle = offset_cam_ang or Angle(0, 0, 0)
 	pnl:SetPaintedManually(true)
 	table.insert(CamUIService.panels, pnl)
 end
 
-local cam_vector = Vector(0, -ScrW()/2, -ScrH()/2)
+
+-- # Rendering
+
 function CamUIService.Render()
-	LagEyeAngles()
-	cam.Start3D(cam_vector, lag_angle, 90)
+	cam.Start3D(Vector(0, -ScrW()/2, -ScrH()/2), CamUIService.cam_angle.smooth, 90)
 
 	for i, pnl in pairs(CamUIService.panels) do
 		if not IsValid(pnl) then
@@ -53,7 +53,16 @@ hook.Add("HUDPaint", "CamUIService.Render", CamUIService.Render)
 
 local cam_angle = Angle(0, -90, 90)
 function CamUIService.RenderPanel(pnl)
-	cam.Start3D2D(Vector(ScrW()/2, 0, 0), cam_angle, 1)
+	local offset_ang = pnl.offset_cam_angle
+	local scr_w = ScrW()
+	local scr_h = ScrH()
+	local scr_w_offset = scr_w/2
+	local scr_h_offset = scr_h/2
+
+	local offset_vec_a = Vector(scr_w_offset, scr_h_offset, 0)
+	offset_vec_a:Rotate(Angle(offset_ang.y, offset_ang.r, offset_ang.p))
+
+	cam.Start3D2D(Vector((scr_w_offset * (pnl.offset_cam_distance/100 + 1)) - offset_vec_a.z, -scr_w_offset + offset_vec_a.x, -scr_h_offset + offset_vec_a.y), cam_angle + Angle(offset_ang.r, -offset_ang.y, offset_ang.p), 1)
 	cam.IgnoreZ(true)
 	pnl:PaintManual()
 	cam.IgnoreZ(false)
