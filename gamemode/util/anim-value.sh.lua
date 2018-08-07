@@ -187,6 +187,18 @@ function AnimatableValue:Smooth()
 	self.last = self.new
 end
 
+function AnimatableValue:Freeze(duration)
+	self.frozen = true
+	self.freeze_time = CurTime()
+	self.freeze_duration = duration or 0.2
+	self.smoothing = false
+end
+
+function AnimatableValue:UnFreeze()
+	self.frozen = false
+	self.smoothing = true
+end
+
 function AnimatableValue:Think()
 	if self.generate then
 		self.current = self.generate(self.current)
@@ -200,6 +212,10 @@ function AnimatableValue:Think()
 
 	if self.smoothing then
 		self:Smooth()
+	end
+
+	if self.frozen and CurTime() > (self.freeze_time + self.freeze_duration) then
+		self:UnFreeze()
 	end
 end
 Class.AddHook(AnimatableValue, "Think")
