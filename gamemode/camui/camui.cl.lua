@@ -4,7 +4,7 @@ CamUIService.panels = CamUIService.panels or {}
 
 -- # Setup
 
-CamUIService.eye_angles_delta = AnimatableValue.New(Angle(0, 0, 0), {
+CamUIService.eye_angle = AnimatableValue.New(Angle(0, 0, 0), {
 	smooth = true,
 	smooth_multiplier = 16,
 	smooth_delta_only = true
@@ -13,16 +13,17 @@ CamUIService.eye_angles_delta = AnimatableValue.New(Angle(0, 0, 0), {
 CamUIService.cam_angle = AnimatableValue.New(Angle(0, 0, 0), {
 	smooth = true,
 	generate = function ()
-		return CamUIService.eye_angles_delta.smooth
+		return CamUIService.eye_angle.smooth
 	end
 })
 
 function CamUIService.CalcView(ply, _, eye_ang)
-	CamUIService.eye_angles_delta.current = eye_ang
+	CamUIService.eye_angle.current = eye_ang
 end
 hook.Add("CalcView", "CamUIService.CalcView", CamUIService.CalcView)
 
 function CamUIService.AddPanel(pnl, offset_cam_dist, offset_cam_ang)
+	pnl.camui_panel = true
 	pnl.offset_cam_distance = offset_cam_dist or 0
 	pnl.offset_cam_angle = offset_cam_ang or Angle(0, 0, 0)
 	pnl:SetPaintedManually(true)
@@ -64,7 +65,22 @@ function CamUIService.RenderPanel(pnl)
 
 	cam.Start3D2D(Vector((scr_w_offset * (pnl.offset_cam_distance/100 + 1)) - offset_vec_a.z, -scr_w_offset + offset_vec_a.x, -scr_h_offset + offset_vec_a.y), cam_angle + Angle(offset_ang.r, -offset_ang.y, offset_ang.p), 1)
 	cam.IgnoreZ(true)
+
+	local parent = pnl:GetParent()
+
+	if IsValid(parent) and not parent.camui_panel then
+		surface.SetAlphaMultiplier(parent:GetAlpha()/255)
+	end
+
 	pnl:PaintManual()
+	surface.SetAlphaMultiplier(1)
+
 	cam.IgnoreZ(false)
 	cam.End3D2D()
 end
+
+function CamUIService.ResetCamAngle()
+	CamUIService.cam_angle:Freeze()
+end
+hook.Add("LocalPlayerSpawn", "CamUIService.ResetCamAngle", CamUIService.ResetCamAngle)
+hook.Add("OnReloaded", "CamUIService.ResetCamAngle", CamUIService.ResetCamAngle)

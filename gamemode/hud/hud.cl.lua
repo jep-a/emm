@@ -18,7 +18,8 @@ function HUDService.CreateSection(dist, ang)
 	local element = HUDService.container:Add(Element.New {
 		layout_direction = DIRECTION_COLUMN,
 		width_percent = 1/3,
-		height_percent = 1
+		height_percent = 1,
+		alpha = 0
 	})
 
 	CamUIService.AddPanel(element.panel, dist, ang)
@@ -145,7 +146,7 @@ end
 
 function HUDMeter:OnValueChange(v)
 	if self.value_text then
-		if not self.hid_value and (self.hide_value_on_empty and v.current == 0) or (self.hide_value_on_full and v.current == self.value_divider) then
+		if not self.hid_value and ((self.hide_value_on_empty and v.current == 0) or (self.hide_value_on_full and v.current == self.value_divider)) then
 			self.value_text_container:AnimateAttribute("alpha", 0)
 			self.hid_value = true
 		elseif self.hid_value then
@@ -253,6 +254,7 @@ function HUDService.Reload()
 	HUDService.health_meter:Finish()
 	HUDService.container:Finish()
 	HUDService.Init()
+	HUDService.Show()
 end
 hook.Add("OnReloaded", "HUDService.Reload", HUDService.Reload)
 
@@ -263,3 +265,21 @@ function HUDService.ShouldDraw(name)
 	end
 end
 hook.Add("HUDShouldDraw", "HUDService.ShouldDraw", HUDService.ShouldDraw)
+
+function HUDService.Show()
+	HUDService.left_section:AnimateAttribute("alpha", 255)
+	HUDService.middle_section:AnimateAttribute("alpha", 255, {delay = 0.2})
+	HUDService.right_section:AnimateAttribute("alpha", 255, {delay = 0.4})
+end
+hook.Add("LocalPlayerSpawn", "HUDService.Show", HUDService.Show)
+
+function HUDService.Hide()
+	HUDService.left_section:AnimateAttribute("alpha", 0)
+	HUDService.middle_section:AnimateAttribute("alpha", 0, {delay = 0.2})
+	HUDService.right_section:AnimateAttribute("alpha", 0, {delay = 0.4})
+end
+hook.Add("PrePlayerDeath", "HUDService.Hide", function (ply)
+	if ply == LocalPlayer() then
+		HUDService.Hide()
+	end
+end)
