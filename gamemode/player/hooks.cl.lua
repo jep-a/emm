@@ -3,6 +3,10 @@
 local init_post_ent = false
 local queued_ent_created_hooks = {}
 
+hook.Add("OnReloaded", "ReloadInitPostEntity", function ()
+	init_post_ent = true
+end)
+
 local function CallPlayerSpawnHook(ply_index, func)
 	if IsValid(Entity(ply_index)) then
 		func()
