@@ -85,7 +85,10 @@ function Class.AddHook(class, name, func_k)
 	hook.Add(name, Class.TableID(class).."."..func_k, function (...)
 		for i = 1, #class.static.instances do
 			local instance = class.static.instances[i]
-			class[func_k](instance, ...)
+
+			if instance then
+				class[func_k](instance, ...)
+			end
 		end
 	end)
 end
