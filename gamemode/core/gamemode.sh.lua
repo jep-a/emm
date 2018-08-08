@@ -14,7 +14,6 @@ EMM.Include {
 	"util/savepoint",
 	"util/spectate",
 	"util/trail",
-	"vgui/element",
 	"player/hooks",
 	"player/methods",
 	"player-class/player-class",
@@ -33,10 +32,10 @@ EMM.Include {
 	"minigame/modifier",
 	"minigame/tagging",
 	"minigame/util",
-	"camui/camui",
-	"jsui/jsui",
-	"hud/hud",
-	"hud/vardebug",
-	"hud/indicators",
-	"build/build"
+	"ui/cam",
+	"ui/element",
+	"ui/vardebug",
+	"ui/hud",
+	"ui/indicators",
+	"ui/js"
 }
