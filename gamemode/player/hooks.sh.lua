@@ -7,7 +7,7 @@ hook.Add("PlayerProperties", "SetCollisionCheck", function (ply)
 end)
 
 hook.Add("ShouldCollide", "EMM.ShouldCollide", function (a, b)
-	if a.lobby and b.lobby and a.lobby == b.lobby then
+	if MinigameService.IsSharingLobby(a, b) then
 		return true
 	else
 		return false
