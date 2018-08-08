@@ -69,6 +69,21 @@ function ElementPanel:PaintRect(props)
 	surface.DrawRect(x, y, w, h)
 end
 
+function ElementPanel:PaintBorder(props)
+	props = props or {}
+
+	local w = props.width or self:GetAttribute "width"
+	local h = props.height or self:GetAttribute "height"
+	local color = props.color or self:GetAttribute "color"
+	local thickness = props.thickness or self:GetAttribute "border"
+
+	surface.SetDrawColor(color)
+	surface.DrawRect(0, 0, w, thickness)
+	surface.DrawRect(w - thickness, 0, thickness, h)
+	surface.DrawRect(0, h - thickness, w, thickness)
+	surface.DrawRect(0, 0, thickness, h)
+end
+
 function ElementPanel:Paint(w, h)
 	self:PaintRect {color = not self:GetAttribute "fill_color" and self:GetAttribute "background_color"}
 
@@ -78,8 +93,9 @@ function ElementPanel:Paint(w, h)
 		self:PaintTexture(mat)
 	end
 
-	-- surface.SetDrawColor(ColorAlpha(COLOR_RED, 100))
-	-- surface.DrawOutlinedRect(0, 0, w, h)
+	if self:GetAttribute "border" then
+		self:PaintBorder()
+	end
 end
 
 vgui.Register("ElementPanel", ElementPanel, "EditablePanel")
@@ -126,7 +142,8 @@ function Element:Init(props)
 	self.optional_attributes = {
 		width_percent = true,
 		height_percent = true,
-		angle = true
+		angle = true,
+		border = true
 	}
 
 	if props then
