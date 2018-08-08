@@ -247,7 +247,7 @@ function HUDService.Init()
 		end
 	})
 end
-hook.Add("InitPostEntity", "HUDService.Init", HUDService.Init)
+hook.Add("InitUI", "HUDService.Init", HUDService.Init)
 
 function HUDService.Reload()
 	HUDService.animatable_color:Finish()
@@ -283,3 +283,9 @@ hook.Add("PrePlayerDeath", "HUDService.Hide", function (ply)
 		HUDService.Hide()
 	end
 end)
+
+function HUDService.RenderHooks()
+	hook.Run "DrawIndicators"
+	hook.Run "DrawCamUI"
+end
+hook.Add("PostDrawHUD", "HUDService.RenderHooks", HUDService.RenderHooks)

@@ -50,7 +50,7 @@ function CamUIService.Render()
 
 	cam.End3D()
 end
-hook.Add("HUDPaint", "CamUIService.Render", CamUIService.Render)
+hook.Add("DrawCamUI", "CamUIService.Render", CamUIService.Render)
 
 local cam_angle = Angle(0, -90, 90)
 function CamUIService.RenderPanel(pnl)
