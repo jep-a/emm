@@ -140,7 +140,7 @@ function VarDebugService.Init()
 	end
 	VarDebugService.container:Add(VarDebugService.drag_rel)
 end
-hook.Add("InitPostEntity", "VarDebugService.Init", VarDebugService.Init)
+hook.Add("InitUI", "VarDebugService.Init", VarDebugService.Init)
 
 function VarDebugService.AddDebugger(id, func)
 	VarDebugService[id] = vgui.Create "VarDebug"
