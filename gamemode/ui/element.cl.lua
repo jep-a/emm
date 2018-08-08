@@ -71,7 +71,7 @@ end
 
 function ElementPanel:PaintBorder(props)
 	props = props or {}
-
+ 
 	local w = props.width or self:GetAttribute "width"
 	local h = props.height or self:GetAttribute "height"
 	local color = props.color or self:GetAttribute "color"
@@ -140,6 +140,7 @@ function Element:Init(props)
 	}
 
 	self.optional_attributes = {
+		duration = true,
 		width_percent = true,
 		height_percent = true,
 		angle = true,
@@ -216,13 +217,26 @@ function Element:SetAttribute(k, v)
 		else
 			attr[k].current = v
 		end
+	elseif self.setters[k] then
+		self.setters[k](self, static_attr, attr, v)
 	elseif self.optional_attributes[k] ~= nil then
 		if istable(v) and v.current then
 			attr[k] = v
 		else
 			attr[k] = AnimatableValue.New(v)
 		end
-	elseif k == "layout" then
+	else
+		static_attr[k] = v
+	end
+end
+
+Element.setters = {
+	duration = function (self, static_attr, attr, v)
+		static_attr.duration = v
+		static_attr.start_time = CurTime()
+	end,
+
+	layout = function (self, static_attr, attr, v)
 		static_attr.layout = v
 
 		local parent = self.parent
@@ -240,33 +254,47 @@ function Element:SetAttribute(k, v)
 				end
 			end
 		end
-	elseif k == "fit" then
+	end,
+
+	fit = function (self, static_attr, attr, v)
 		static_attr.fit_x = v
 		static_attr.fit_y = v
-	elseif k == "size" then
-		attr.width.current = v
-		attr.height.current = v
-	elseif k == "padding" then
+	end,
+
+	size = function (self, static_attr, attr, v)
+		attr.width = v
+		attr.height = v
+	end,
+
+	padding = function (self, static_attr, attr, v)
 		attr.padding_left.current = v
 		attr.padding_top.current = v
 		attr.padding_right.current = v
 		attr.padding_bottom.current = v
-	elseif k == "padding_x" then
+	end,
+
+	padding_x = function (self, static_attr, attr, v)
 		attr.padding_left.current = v
 		attr.padding_right.current = v
-	elseif k == "padding_y" then
+	end,
+
+	padding_y = function (self, static_attr, attr, v)
 		attr.padding_top.current = v
 		attr.padding_bottom.current = v
-	elseif k == "text_justification" then
+	end,
+
+	text_justification = function (self, static_attr, attr, v)
 		self:SetTextJustification(v)
-	elseif k == "font" then
+	end,
+
+	font = function (self, static_attr, attr, v)
 		self:SetFont(v)
-	elseif k == "text" then
+	end,
+
+	text = function (self, static_attr, attr, v)
 		self:SetText(v)
-	else
-		static_attr[k] = v
 	end
-end
+}
 
 function Element:SetAttributes(attr)
 	for k, v in pairs(attr) do
@@ -502,10 +530,19 @@ function Element:GenerateSize()
 	end
 end
 
+function Element:DetectEnd()
+	local duration = self:GetAttribute "duration"
+
+	if duration and CurTime() > (self:GetAttribute "start_time" + duration) then
+		self:Finish()
+	end
+end
+
 function Element:Think()
 	self.panel:SetSize(math.Round(self:GetAttribute "width"), math.Round(self:GetAttribute "height"))
 	self.panel:SetPos(math.Round(self:GetAttribute "x"), math.Round(self:GetAttribute "y"))
 	self.panel:SetAlpha(math.Round(self:GetAttribute "alpha"))
 	self.panel.text:SetTextColor(self:GetAttribute "color")
 	self:GenerateSize()
+	self:DetectEnd()
 end
