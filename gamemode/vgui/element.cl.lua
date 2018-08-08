@@ -43,11 +43,17 @@ function ElementPanel:PaintTexture(material, props)
 	local y = props.y or 0
 	local w = props.width or self:GetAttribute "width"
 	local h = props.height or self:GetAttribute "height"
+	local ang = props.angle or self:GetAttribute "angle"
 	local color = props.color or self:GetAttribute "color"
 
 	surface.SetDrawColor(color)
 	surface.SetMaterial(material)
-	surface.DrawTexturedRect(x, y, w, h)
+
+	if ang then
+		surface.DrawTexturedRectRotated(w/2, h/2, w, h, ang)
+	else
+		surface.DrawTexturedRect(x, y, w, h)
+	end
 end
 
 function ElementPanel:PaintRect(props)
@@ -85,11 +91,13 @@ Element = Element or Class.New()
 
 function Element:Init(props)
 	self.children = {}
+	self.layout_children = {}
 
 	self.panel = vgui.Create "ElementPanel"
 	self.panel.element = self
 
 	self.static_attributes = {
+		layout = true,
 		layout_justification_x = JUSTIFY_START,
 		layout_justification_y = JUSTIFY_START,
 		layout_direction = DIRECTION_ROW,
@@ -101,15 +109,15 @@ function Element:Init(props)
 	}
 
 	self.attributes = {
-		x = AnimatableValue.New(0),
-		y = AnimatableValue.New(0),
+		x = AnimatableValue.New(),
+		y = AnimatableValue.New(),
 		width = AnimatableValue.New(256),
 		height = AnimatableValue.New(64),
-		padding_left = AnimatableValue.New(0),
-		padding_top = AnimatableValue.New(0),
-		padding_right = AnimatableValue.New(0),
-		padding_bottom = AnimatableValue.New(0),
-		child_margin = AnimatableValue.New(0),
+		padding_left = AnimatableValue.New(),
+		padding_top = AnimatableValue.New(),
+		padding_right = AnimatableValue.New(),
+		padding_bottom = AnimatableValue.New(),
+		child_margin = AnimatableValue.New(),
 		color = AnimatableValue.New(COLOR_WHITE),
 		background_color = AnimatableValue.New(COLOR_BLACK_CLEAR),
 		alpha = AnimatableValue.New(255)
@@ -117,7 +125,8 @@ function Element:Init(props)
 
 	self.optional_attributes = {
 		width_percent = true,
-		height_percent = true
+		height_percent = true,
+		angle = true
 	}
 
 	if props then
@@ -132,13 +141,28 @@ function Element:Add(element)
 
 	table.insert(self.children, element)
 
+	if element:GetAttribute "layout" then
+		table.insert(self.layout_children, element)
+	end
+
 	return element
+end
+
+function Element:Clear()
+	for _, element in pairs(self.children) do
+		element:Finish()
+	end
 end
 
 function Element:Finish()
 	if not IsValid(self.panel) or self.panel.removing then
 		if self.parent then
 			table.RemoveByValue(self.parent.children, self)
+
+			if self:GetAttribute "layout" then
+				table.RemoveByValue(self.parent.layout_children, self)
+			end
+
 			self.parent = nil
 		end
 
@@ -181,9 +205,30 @@ function Element:SetAttribute(k, v)
 		else
 			attr[k] = AnimatableValue.New(v)
 		end
+	elseif k == "layout" then
+		static_attr.layout = v
+
+		local parent = self.parent
+
+		if parent then
+			local in_layout_children = table.HasValue(parent.layout_children, self)
+
+			if v then
+				if not in_layout_children then
+					table.insert(parent.layout_children, self)
+				end
+			else
+				if in_layout_children then
+					table.RemoveByValue(parent.layout_children, self)
+				end
+			end
+		end
 	elseif k == "fit" then
 		static_attr.fit_x = v
 		static_attr.fit_y = v
+	elseif k == "size" then
+		attr.width.current = v
+		attr.height.current = v
 	elseif k == "padding" then
 		attr.padding_left.current = v
 		attr.padding_top.current = v
@@ -272,7 +317,7 @@ function Element:StackChildren()
 	local adj_padding_start = self:GetAttribute(adj_prop_keys.padding_start)
 	local adj_padding_end = self:GetAttribute(adj_prop_keys.padding_end)
 
-	local children = self.children
+	local children = self.layout_children
 
 	local max_line_size = size - padding_start - padding_end
 
