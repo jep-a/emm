@@ -49,34 +49,30 @@ end)
 
 -- # Death
 
-hook.Add("DoPlayerDeath", "PrePlayerDeath", function (ply, att, dmg)
+util.AddNetworkString "PrePlayerDeath"
+hook.Add("DoPlayerDeath", "EMM.PrePlayerDeath", function (ply, att, dmg)
+	ply:CreateRagdoll()
+
 	if ply.lobby then
 		MinigameService.CallHook(ply.lobby, "PrePlayerDeath", att, dmg)
 	end
 
 	hook.Run("PrePlayerDeath", ply, att, dmg)
-end)
-
-util.AddNetworkString "PrePlayerDeath"
-hook.Add("PrePlayerDeath", "NetworkPrePlayerDeath", function (ply, att)
+	
 	net.Start "PrePlayerDeath"
 	net.WriteEntity(ply)
 	net.WriteEntity(att)
 	net.Broadcast()
 end)
 
-hook.Add("PrePlayerDeath", "CreateRagdoll", function (ply)
-	ply:CreateRagdoll()
-end)
+util.AddNetworkString "PlayerDeath"
+hook.Add("PlayerDeath", "EMM.PlayerDeath", function (ply, infl, att)
+	ply:FreezeMovement()
 
-hook.Add("PlayerDeath", "MinigamePlayerDeath", function (ply, infl, att)
 	if ply.lobby then
 		MinigameService.CallHook(ply.lobby, "PlayerDeath", infl, att)
 	end
-end)
 
-util.AddNetworkString "PlayerDeath"
-hook.Add("PlayerDeath", "NetworkPlayerDeath", function (ply, infl, att)
 	net.Start "PlayerDeath"
 	net.WriteEntity(ply)
 	net.WriteEntity(infl)
@@ -89,10 +85,6 @@ local function SetDeathTime(ply)
 end
 hook.Add("PlayerDeath", "DeathTime", SetDeathTime)
 hook.Add("PlayerSilentDeath", "SilentDeathTime", SetDeathTime)
-
-hook.Add("PlayerDeath", "FreezeMovement", function (ply)
-	ply:FreezeMovement()
-end)
 
 util.AddNetworkString "PostPlayerDeath"
 hook.Add("PostPlayerDeath", "NetworkPostPlayerDeath", function (ply)
