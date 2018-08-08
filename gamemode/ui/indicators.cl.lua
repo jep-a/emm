@@ -19,6 +19,13 @@ Indicator = Indicator or Class.New(Element)
 local indicator_material = Material("emm2/shapes/arrow.png", "noclamp smooth")
 
 function Indicator:Init(ent_or_vec)
+	self.super.Init(self, {
+		layout = false,
+		width_percent = 1,
+		height_percent = 1,
+		inherit_color = false
+	})
+
 	self.animatable_color = AnimatableValue.New(COLOR_WHITE, {
 		smooth = true,
 		generate = function ()
@@ -34,16 +41,9 @@ function Indicator:Init(ent_or_vec)
 		end
 	})
 
-	self.super.Init(self, {
-		layout = false,
-		width_percent = 1,
-		height_percent = 1,
-		inherit_color = false,
-
-		color = function ()
-			return self.animatable_color.smooth
-		end
-	})
+	self:SetAttribute("color", function ()
+		return self.animatable_color.smooth
+	end)
 
 	self.off_screen = AnimatableValue.New(false, {
 		generate = function ()
@@ -92,13 +92,13 @@ end
 function Indicator:Think()
 	self.super.Think(self)
 
-	local scr_w = ScrW()
-	local scr_h = ScrH()
-	local periph_radius = (scr_h/2) - 128
-	local x = self.world:GetAttribute "x"
-	local y = self.world:GetAttribute "y"
+	if self.off_screen.current then
+		local scr_w = ScrW()
+		local scr_h = ScrH()
+		local periph_radius = (scr_h/2) - 128
+		local x = self.world:GetAttribute "x"
+		local y = self.world:GetAttribute "y"
 
-	if 0 > x or x > scr_w or 0 > y or y > scr_h then
 		local ang = math.atan2(y - (scr_h/2), x - (scr_w/2)) * (180/math.pi)
 		local rad_ang = math.rad(ang)
 		local periph_x = (math.cos(rad_ang) * periph_radius) + (scr_w/2)
@@ -113,6 +113,7 @@ end
 function Indicator:Finish()
 	self.super.Finish(self)
 	self.animatable_color:Finish()
+	self.off_screen:Finish()
 end
 
 

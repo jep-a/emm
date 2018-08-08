@@ -4,13 +4,13 @@ CamUIService.panels = CamUIService.panels or {}
 
 -- # Setup
 
-CamUIService.eye_angle = AnimatableValue.New(Angle(0, 0, 0), {
+CamUIService.eye_angle = CamUIService.eye_angle or AnimatableValue.New(Angle(0, 0, 0), {
 	smooth = true,
 	smooth_multiplier = 16,
 	smooth_delta_only = true
 })
 
-CamUIService.cam_angle = AnimatableValue.New(Angle(0, 0, 0), {
+CamUIService.cam_angle = CamUIService.cam_angle or AnimatableValue.New(Angle(0, 0, 0), {
 	smooth = true,
 	generate = function ()
 		return CamUIService.eye_angle.smooth
