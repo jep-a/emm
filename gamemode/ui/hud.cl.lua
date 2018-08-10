@@ -9,8 +9,8 @@ function HUDService.CreateContainer()
 	return Element.New {
 		width_percent = 1,
 		height_percent = 1,
-		padding_x = 256,
-		padding_y = 64
+		padding_x = HUD_PADDING_X,
+		padding_y = HUD_PADDING_Y
 	}
 end
 
@@ -32,7 +32,8 @@ function HUDService.CreateQuadrant(section, props)
 		layout_direction = DIRECTION_COLUMN,
 		wrap = false,
 		width_percent = 1,
-		height_percent = 1/3
+		height_percent = 1/3,
+		child_margin = MARGIN
 	})
 
 	if props then
@@ -42,28 +43,19 @@ function HUDService.CreateQuadrant(section, props)
 	return element
 end
 
-surface.CreateFont("HUDMeterValue", {
-	font = "Roboto Mono",
-	size = 36,
-	weight = 700
-})
-
-surface.CreateFont("HUDMeterValueSmall", {
-	font = "Roboto Mono",
-	size = 22,
-	weight = 900
-})
+-- # HUD Meter
 
 HUDMeter = HUDMeter or Class.New(Element)
 
 function HUDMeter:Init(quadrant, props)
 	self.super.Init(self, {
 		layout_justification_x = JUSTIFY_CENTER,
-		layout_justification_y = JUSTIFY_CENTER,
-		layout_direction = DIRECTION_ROW,
-		wrap = true,
+		layout_justification_y = JUSTIFY_START,
+		layout_direction = DIRECTION_COLUMN,
+		wrap = false,
 		fit_y = true,
-		width_percent = 3/4
+		width_percent = HUD_METER_SIZE,
+		child_margin = MARGIN * 4
 	})
 
 	self.value_func = props.value_func
@@ -86,14 +78,13 @@ function HUDMeter:Init(quadrant, props)
 			layout_justification_y = JUSTIFY_START,
 			fit = true,
 			wrap = false,
-			padding_bottom = 8,
-			child_margin = 2
+			child_margin = HUD_METER_VALUE_TEXT_MARGIN
 		})
 
 		self.value_text = self.value_text_container:Add(Element.New {
 			fit = true,
-			padding_top = -8,
-			padding_bottom = -6,
+			crop_top = 0.25,
+			crop_bottom = 0.125,
 			font = "HUDMeterValue"
 		})
 	end
@@ -112,8 +103,9 @@ function HUDMeter:Init(quadrant, props)
 	})
 
 	self:Add(Element.New {
-		width = 64,
-		height = 64,
+		width = HUD_ICON_SIZE,
+		height = HUD_ICON_SIZE,
+		crop_y = 0.25,
 		material = props.icon_material
 	})
 end
@@ -176,9 +168,9 @@ function HUDService.Init()
 		return HUDService.animatable_color.smooth
 	end)
 
-	HUDService.left_section = HUDService.CreateSection(15, Angle(0, -10, 0))
-	HUDService.middle_section = HUDService.CreateSection(10.75)
-	HUDService.right_section = HUDService.CreateSection(15, Angle(0, 10, 0))
+	HUDService.left_section = HUDService.CreateSection(HUD_SIDE_DISTANCE, Angle(0, -HUD_SIDE_ANGLE, 0))
+	HUDService.middle_section = HUDService.CreateSection(HUD_MIDDLE_DISTANCE)
+	HUDService.right_section = HUDService.CreateSection(HUD_SIDE_DISTANCE, Angle(0, HUD_SIDE_ANGLE, 0))
 
 	HUDService.quadrant_a = HUDService.CreateQuadrant(HUDService.left_section)
 	HUDService.quadrant_b = HUDService.CreateQuadrant(HUDService.middle_section, {layout_justification_x = JUSTIFY_CENTER})
@@ -227,15 +219,15 @@ function HUDService.Init()
 
 	HUDService.speed_meter.value_text_container:Add(Element.New {
 		fit = true,
-		padding_top = -4,
+		crop_y = 0.2,
 		text = "0",
 		font = "HUDMeterValueSmall"
 	})
 
 	HUDService.speed_meter.value_text_container:Add(Element.New {
+		self_adjacent_justification = JUSTIFY_END,
 		fit = true,
-		padding_top = 4,
-		padding_bottom = -3,
+		crop_y = 0.1,
 		text = "u/s",
 		font = "HUDMeterValueSmall"
 	})
@@ -268,15 +260,15 @@ hook.Add("HUDShouldDraw", "HUDService.ShouldDraw", HUDService.ShouldDraw)
 
 function HUDService.Show()
 	HUDService.left_section:AnimateAttribute("alpha", 255)
-	HUDService.middle_section:AnimateAttribute("alpha", 255, {delay = 0.2})
-	HUDService.right_section:AnimateAttribute("alpha", 255, {delay = 0.4})
+	HUDService.middle_section:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
+	HUDService.right_section:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION * 2})
 end
 hook.Add("LocalPlayerSpawn", "HUDService.Show", HUDService.Show)
 
 function HUDService.Hide()
 	HUDService.left_section:AnimateAttribute("alpha", 0)
-	HUDService.middle_section:AnimateAttribute("alpha", 0, {delay = 0.2})
-	HUDService.right_section:AnimateAttribute("alpha", 0, {delay = 0.4})
+	HUDService.middle_section:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION})
+	HUDService.right_section:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION * 2})
 end
 hook.Add("PrePlayerDeath", "HUDService.Hide", function (ply)
 	if ply == LocalPlayer() then
