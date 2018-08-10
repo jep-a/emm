@@ -6,7 +6,7 @@ CamUIService.panels = CamUIService.panels or {}
 
 CamUIService.eye_angle = CamUIService.eye_angle or AnimatableValue.New(Angle(0, 0, 0), {
 	smooth = true,
-	smooth_multiplier = 16,
+	smooth_multiplier = CAMUI_SMOOTH_MULTIPLIER,
 	smooth_delta_only = true
 })
 
@@ -35,6 +35,7 @@ end
 
 function CamUIService.Render()
 	cam.Start3D(Vector(0, -ScrW()/2, -ScrH()/2), CamUIService.cam_angle.smooth, 90)
+	surface.DisableClipping(false)
 
 	for i, pnl in pairs(CamUIService.panels) do
 		if not IsValid(pnl) then
@@ -49,6 +50,7 @@ function CamUIService.Render()
 	end
 
 	cam.End3D()
+	surface.DisableClipping(true)
 end
 hook.Add("DrawCamUI", "CamUIService.Render", CamUIService.Render)
 
@@ -57,13 +59,13 @@ function CamUIService.RenderPanel(pnl)
 	local offset_ang = pnl.offset_cam_angle
 	local scr_w = ScrW()
 	local scr_h = ScrH()
-	local scr_w_offset = scr_w/2
-	local scr_h_offset = scr_h/2
+	local half_scr_w = scr_w/2
+	local half_scr_h = scr_h/2
 
-	local offset_vec_a = Vector(scr_w_offset, scr_h_offset, 0)
+	local offset_vec_a = Vector(half_scr_w, half_scr_h, 0)
 	offset_vec_a:Rotate(Angle(offset_ang.y, offset_ang.r, offset_ang.p))
 
-	cam.Start3D2D(Vector((scr_w_offset * (pnl.offset_cam_distance/100 + 1)) - offset_vec_a.z, -scr_w_offset + offset_vec_a.x, -scr_h_offset + offset_vec_a.y), cam_angle + Angle(offset_ang.r, -offset_ang.y, offset_ang.p), 1)
+	cam.Start3D2D(Vector((half_scr_w * ((pnl.offset_cam_distance/100) + 1)) - offset_vec_a.z, -half_scr_w + offset_vec_a.x, -half_scr_h + offset_vec_a.y), cam_angle + Angle(offset_ang.r, -offset_ang.y, offset_ang.p), 1)
 	cam.IgnoreZ(true)
 
 	local parent = pnl:GetParent()
