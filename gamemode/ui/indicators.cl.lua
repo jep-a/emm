@@ -20,7 +20,7 @@ local indicator_material = Material("emm2/shapes/arrow.png", "noclamp smooth")
 local circle_material = Material("emm2/shapes/circle.png", "noclamp smooth")
 
 function Indicator:Init(ent_or_vec)
-	self.super.Init(self, {
+	Indicator.super.Init(self, {
 		layout = false,
 		width_percent = 1,
 		height_percent = 1,
@@ -91,7 +91,7 @@ function Indicator:Init(ent_or_vec)
 end
 
 function Indicator:Think()
-	self.super.Think(self)
+	Indicator.super.Think(self)
 
 	if self.off_screen.current then
 		local scr_w = ScrW()
@@ -114,7 +114,7 @@ function Indicator:Think()
 end
 
 function Indicator:Finish()
-	self.super.Finish(self)
+	Indicator.super.Finish(self)
 	self.animatable_color:Finish()
 	self.off_screen:Finish()
 end

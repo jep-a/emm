@@ -23,7 +23,6 @@ local function IsAnimatableValue(anim_v)
 	return is_anim_v
 end
 
-
 function Element:SetAttribute(k, v)
 	local static_attr = self.static_attributes
 	local attr = self.attributes
@@ -42,7 +41,7 @@ function Element:SetAttribute(k, v)
 	elseif self.setters[k] then
 		self.setters[k](self, static_attr, attr, v)
 	elseif self.optional_attributes[k] ~= nil then
-		if istable(v) and v.current then
+		if IsAnimatableValue(v) then
 			attr[k] = v
 		else
 			attr[k] = AnimatableValue.New(v)
