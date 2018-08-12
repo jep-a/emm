@@ -41,3 +41,6 @@ surface.CreateFont("Notification", {
 	size = 24,
 	weight = 900
 })
+
+BAR_WIDTH = 256
+BAR_HEIGHT = 64

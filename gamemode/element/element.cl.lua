@@ -54,6 +54,7 @@ function Element:Init(props)
 		width_percent = true,
 		height_percent = true,
 		angle = true,
+		text_color = true,
 		border = true
 	}
 
@@ -127,9 +128,9 @@ function Element:Think()
 
 	self:GenerateSize()
 	self:DetectEnd()
-	
+
 	self.panel:SetSize(self:GetFinalWidth(), self:GetFinalHeight())
 	self.panel:SetPos(math.Round(self:GetAttribute "x"), math.Round(self:GetAttribute "y"))
 	self.panel:SetAlpha(math.Round(self:GetAttribute "alpha"))
-	self.panel.text:SetTextColor(self:GetAttribute "color")
+	self.panel.text:SetTextColor(self:GetAttribute "text_color" or self:GetAttribute "color")
 end

@@ -48,7 +48,7 @@ end
 HUDMeter = HUDMeter or Class.New(Element)
 
 function HUDMeter:Init(quadrant, props)
-	self.super.Init(self, {
+	HUDMeter.super.Init(self, {
 		layout_justification_x = JUSTIFY_CENTER,
 		layout_justification_y = JUSTIFY_START,
 		layout_direction = DIRECTION_COLUMN,
@@ -111,12 +111,12 @@ function HUDMeter:Init(quadrant, props)
 end
 
 function HUDMeter:Finish()
-	self.super.Finish(self)
+	HUDMeter.super.Finish(self)
 	self.debounced_value:Finish()
 end
 
 function HUDMeter:Think()
-	self.super.Think(self)
+	HUDMeter.super.Think(self)
 
 	local value = self.value_func()
 
