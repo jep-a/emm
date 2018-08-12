@@ -344,11 +344,12 @@ function BuildService.SpawnPrimitive(vertices)
     net.SendToServer()
 end
 
---net.Receive("BuildPhysics", function(len, ply)
---    local primitive = net.ReadEntity()
---    primitive:BuildPhysics()
---end)
-
+net.Receive("BuildPrimPhysics", function()
+    local primitive = net.ReadEntity()
+    local world_vertices = util.JSONToTable(net.ReadString())
+    print(primitive)
+    primitive:BuildPhysics(world_vertices)
+end)
 EMM.Include {
 	"build/geometry",
 	"build/build-tools"

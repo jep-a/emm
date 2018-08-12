@@ -20,13 +20,17 @@ net.Receive("Buildmode", function(len, ply)
 end)
 
 util.AddNetworkString "SpawnPrimitive"
+util.AddNetworkString "BuildPrimPhysics"
 net.Receive("SpawnPrimitive", function(len, ply)
     local world_vertices_json = net.ReadString()
     local world_vertices = util.JSONToTable(world_vertices_json)
     local primitive = ents.Create("emm_primitive")
-    print(primitive)
-    for i = 1, 8 do
-        primitive:SetNWVector(tostring(i), world_vertices[i])
-    end
-    primitive:BuildPhysics()
+    
+    primitive:BuildPhysics(world_vertices)
+    timer.Simple(0.1, function()
+        net.Start("BuildPrimPhysics")
+        net.WriteEntity(primitive)
+        net.WriteString(world_vertices_json)
+        net.Broadcast()
+    end)
 end)
