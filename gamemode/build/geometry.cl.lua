@@ -51,7 +51,7 @@ end
 GeometryPoint = Class.New(GeometryType)
 
 function GeometryPoint:Init()
-	self.super.Init(self)
+	GeometryPoint.super.Init(self)
 	self.pos = Vector()
 	self.should_render = false
     self.attached_edges = {}
@@ -127,7 +127,7 @@ end
 GeometryEdge = Class.New(GeometryType)
 
 function GeometryEdge:Init()
-	self.super.Init(self)
+	GeometryEdge.super.Init(self)
 	self.should_render = false
     self.points = {}
     self.attached_prims = {}
@@ -222,7 +222,7 @@ end
 GeometryFace = Class.New(GeometryType)
 
 function GeometryFace:Init()
-    self.super.Init(self)
+    GeometryFace.super.Init(self)
     self.edges = {}
     self.points = {}
     self.attached_prims = {}
@@ -361,7 +361,7 @@ end
 GeometryPrimitive = Class.New(GeometryType)
 
 function GeometryPrimitive:Init()
-    self.super.Init(self)
+    GeometryPrimitive.super.Init(self)
     self.faces = {}
     self.edges = {}
     self.points = {}
@@ -434,5 +434,5 @@ end
 GeometryPrimitiveGroup = Class.New(GeometryType)
 
 function GeometryPrimitiveGroup:Init()
-	self.super.Init(self)
+	GeometryPrimitiveGroup.super.Init(self)
 end
