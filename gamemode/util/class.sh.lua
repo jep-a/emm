@@ -1,5 +1,32 @@
 Class = {}
 
+function Class.InstanceOf(instance, class)
+	local instance_of
+
+	local current_class = getmetatable(instance)
+
+	if current_class then
+		if class == current_class then
+			instance_of = true
+		else
+			while current_class.super do
+				local super = current_class.super
+
+				if class == super then
+					instance_of = true
+
+					break
+				else
+					current_class = super
+					instance_of = false
+				end
+			end
+		end
+	end
+
+	return instance_of
+end
+
 function Class.TableID(tab)
 	return tostring(tab):gsub("table: ", "", 1)
 end
