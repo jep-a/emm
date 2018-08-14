@@ -89,18 +89,7 @@ function HUDMeter:Init(quadrant, props)
 		})
 	end
 
-	local bar_container = self:Add(Element.New {
-		layout_justification_x = JUSTIFY_CENTER,
-		width_percent = 1,
-		height = LINE_THICKNESS,
-		background_color = COLOR_BACKGROUND
-	})
-
-	self.bar = bar_container:Add(Element.New {
-		width_percent = AnimatableValue.New(0, {smooth = true}),
-		height_percent = 1,
-		fill_color = true
-	})
+	self.bar = self:Add(MeterBar.New())
 
 	self:Add(Element.New {
 		width = HUD_ICON_SIZE,
@@ -129,7 +118,7 @@ function HUDMeter:Think()
 	end
 	
 	self.debounced_value.current = value
-	self.bar:SetAttribute("width_percent", math.Clamp(width_percent, 0, 1))
+	self.bar:SetPercent(width_percent)
 
 	if self.value_text then
 		self.value_text:SetText(self.debounced_value.debounce)

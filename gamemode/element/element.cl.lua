@@ -50,7 +50,8 @@ function Element:Init(props)
 	}
 
 	self.optional_attributes = {
-		duration = true,	
+		duration = true,
+		overlay = true,
 		width_percent = true,
 		height_percent = true,
 		angle = true,

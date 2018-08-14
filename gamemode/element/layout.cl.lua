@@ -260,16 +260,33 @@ end
 
 function Element:GenerateSize()
 	local parent = self.parent
+	local overlay = self:GetAttribute "overlay"
 	local width_percent = self:GetAttribute "width_percent"
 	local height_percent = self:GetAttribute "height_percent"
 
 	if parent then
 		if width_percent then
-			self:SetAttribute("width", math.Round((self.parent:GetAttribute "width" - self.parent:GetAttribute "padding_left" - self.parent:GetAttribute "padding_right") * width_percent))
+			local padding
+
+			if overlay then
+				padding = 0
+			else
+				padding = self.parent:GetAttribute "padding_left" + self.parent:GetAttribute "padding_right"
+			end
+
+			self:SetAttribute("width", math.Round((self.parent:GetAttribute "width" - padding) * width_percent))
 		end
 
 		if height_percent then
-			self:SetAttribute("height", math.Round((self.parent:GetAttribute "height" - self.parent:GetAttribute "padding_top" - self.parent:GetAttribute "padding_bottom") * height_percent))
+			local padding
+
+			if overlay then
+				padding = 0
+			else
+				padding = self.parent:GetAttribute "padding_top" + self.parent:GetAttribute "padding_bottom"
+			end
+
+			self:SetAttribute("height", math.Round((self.parent:GetAttribute "height" - padding) * height_percent))
 		end
 	else
 		if width_percent then
