@@ -36,7 +36,7 @@ INDICATOR_WORLD_SIZE = 24
 INDICATOR_PERIPHERAL_SIZE = 40
 INDICATOR_COASTER_SIZE = 150
 
-surface.CreateFont("Notification", {
+surface.CreateFont("TextBar", {
 	font = "Roboto",
 	size = 24,
 	weight = 900

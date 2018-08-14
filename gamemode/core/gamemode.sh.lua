@@ -4,6 +4,7 @@ GM.Email = "hello@jep.sh"
 GM.Website = "jep.sh"
 
 EMM.Include {
+	"util/util",
 	"util/palette",
 	"util/class",
 	"util/cubic-bezier",

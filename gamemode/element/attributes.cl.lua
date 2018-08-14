@@ -11,18 +11,6 @@ function Element:SetText(text)
 	self.panel:InvalidateLayout()
 end
 
-local function IsAnimatableValue(anim_v)
-	local is_anim_v
-
-	if getmetatable(anim_v) == AnimatableValue then
-		is_anim_v = true
-	else
-		is_anim_v = false
-	end
-
-	return is_anim_v
-end
-
 function Element:SetAttribute(k, v)
 	local static_attr = self.static_attributes
 	local attr = self.attributes
@@ -30,7 +18,7 @@ function Element:SetAttribute(k, v)
 	if static_attr[k] ~= nil then
 		static_attr[k] = v
 	elseif attr[k] ~= nil then
-		if IsAnimatableValue(v) then
+		if Class.InstanceOf(v, AnimatableValue) then
 			attr[k]:Finish()
 			attr[k] = v
 		elseif isfunction(v) then
@@ -41,7 +29,7 @@ function Element:SetAttribute(k, v)
 	elseif self.setters[k] then
 		self.setters[k](self, static_attr, attr, v)
 	elseif self.optional_attributes[k] ~= nil then
-		if IsAnimatableValue(v) then
+		if Class.InstanceOf(v, AnimatableValue) then
 			attr[k] = v
 		else
 			attr[k] = AnimatableValue.New(v)
