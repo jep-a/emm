@@ -6,10 +6,6 @@ local function FrameMultiplier()
 	return FrameTime() * 10
 end
 
-local function IsColor(color)
-	return istable(color) and color.r and color.g and color.b
-end
-
 
 -- # Class
 
