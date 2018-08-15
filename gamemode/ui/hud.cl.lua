@@ -1,7 +1,5 @@
 HUDService = HUDService or {}
 
-local LINE_THICKNESS = 4
-
 
 -- # Factories
 
@@ -43,98 +41,11 @@ function HUDService.CreateQuadrant(section, props)
 	return element
 end
 
--- # HUD Meter
-
-HUDMeter = HUDMeter or Class.New(Element)
-
-function HUDMeter:Init(quadrant, props)
-	HUDMeter.super.Init(self, {
-		layout_justification_x = JUSTIFY_CENTER,
-		layout_justification_y = JUSTIFY_START,
-		layout_direction = DIRECTION_COLUMN,
-		wrap = false,
-		fit_y = true,
-		width_percent = HUD_METER_SIZE,
-		child_margin = MARGIN * 4
-	})
-
-	self.value_func = props.value_func
-	self.bar_value_func = props.bar_value_func
-	self.value_divider = props.value_divider or 100
-
-	self.debounced_value = AnimatableValue.New(0, {
-		callback = function (v)
-			self:OnValueChange(v)
-		end
-	})
-
-	self.hide_value_on_empty = props.hide_value_on_empty
-	self.hide_value_on_full = props.hide_value_on_full
-
-	HUDService["quadrant_"..quadrant]:Add(self)
-
-	if props.show_value then
-		self.value_text_container = self:Add(Element.New {
-			layout_justification_y = JUSTIFY_START,
-			fit = true,
-			wrap = false,
-			child_margin = HUD_METER_VALUE_TEXT_MARGIN
-		})
-
-		self.value_text = self.value_text_container:Add(Element.New {
-			fit = true,
-			crop_top = 0.25,
-			crop_bottom = 0.125,
-			font = "HUDMeterValue"
-		})
-	end
-
-	self.bar = self:Add(MeterBar.New())
-
-	self:Add(Element.New {
-		width = HUD_ICON_SIZE,
-		height = HUD_ICON_SIZE,
-		crop_y = 0.25,
-		material = props.icon_material
-	})
-end
-
-function HUDMeter:Finish()
-	HUDMeter.super.Finish(self)
-	self.debounced_value:Finish()
-end
-
-function HUDMeter:Think()
-	HUDMeter.super.Think(self)
-
-	local value = self.value_func()
-
-	local width_percent
-	
-	if self.bar_value_func then
-		width_percent = self.bar_value_func()
-	else
-		width_percent = value/self.value_divider
-	end
-	
-	self.debounced_value.current = value
-	self.bar:SetPercent(width_percent)
-
-	if self.value_text then
-		self.value_text:SetText(self.debounced_value.debounce)
-	end
-end
-
-function HUDMeter:OnValueChange(v)
-	if self.value_text then
-		if not self.hid_value and ((self.hide_value_on_empty and v.current == 0) or (self.hide_value_on_full and v.current == self.value_divider)) then
-			self.value_text_container:AnimateAttribute("alpha", 0)
-			self.hid_value = true
-		elseif self.hid_value then
-			self.value_text_container:AnimateAttribute("alpha", 255)
-			self.hid_value = false
-		end
-	end
+function HUDService.CreateCrosshairContainer()
+	return Element.New {
+		width = 128,
+		height = 128
+	}
 end
 
 
@@ -144,14 +55,7 @@ local health_icon_material = Material("emm2/hud/health.png", "noclamp smooth")
 local speed_icon_material = Material("emm2/hud/speed.png", "noclamp smooth")
 local airaccel_icon_material = Material("emm2/hud/airaccel.png", "noclamp smooth")
 
-function HUDService.Init()
-	HUDService.animatable_color = AnimatableValue.New(COLOR_WHITE, {
-		smooth = true,
-		generate = function ()
-			return LocalPlayer().color
-		end
-	})
-
+function HUDService.InitContainers()
 	HUDService.container = HUDService.CreateContainer()
 	HUDService.container:SetAttribute("color", function ()
 		return HUDService.animatable_color.smooth
@@ -183,27 +87,36 @@ function HUDService.Init()
 		layout_justification_y = JUSTIFY_END
 	})
 
+	HUDService.crosshair_container = HUDService.quadrant_e:Add(HUDService.CreateCrosshairContainer())
+end
+
+function HUDService.InitMeters()
+	local function Health()
+		return LocalPlayer():Health()
+	end
+
+	local function Speed()
+		return math.Round(LocalPlayer():GetVelocity():Length2D()/10)
+	end
+
+	local function Airaccel()
+		return LocalPlayer().stamina.airaccel.amount
+	end
+
 	HUDService.health_meter = HUDMeter.New("g", {
 		show_value = true,
 		hide_value_on_empty = true,
 		hide_value_on_full = true,
 		icon_material = health_icon_material,
-
-		value_func = function ()
-			return LocalPlayer():Health()
-		end
+		value_func = Health
 	})
 
 	HUDService.speed_meter = HUDMeter.New("h", {
 		show_value = true,
 		hide_value_on_empty = true,
 		icon_material = speed_icon_material,
-
-		value_func = function ()
-			return math.Round(LocalPlayer():GetVelocity():Length2D()/10)
-		end,
-
-		value_divider = 700
+		value_func = Speed,
+		value_divider = HUD_SPEED_METER_DIVIDER
 	})
 
 	HUDService.speed_meter.value_text_container:Add(Element.New {
@@ -223,16 +136,40 @@ function HUDService.Init()
 
 	HUDService.airaccel_meter = HUDMeter.New("i", {
 		icon_material = airaccel_icon_material,
-		value_func = function ()
-			return LocalPlayer().stamina.airaccel.amount
+		value_func = Airaccel
+	})
+
+	HUDService.crosshair_container:Add(CrosshairMeter.New {
+		angle = CROSSHAIR_METER_ARC_ANGLE,
+		value_func = Health
+	})
+
+	HUDService.crosshair_container:Add(CrosshairMeter.New {
+		value_func = Speed,
+		value_divider = HUD_SPEED_METER_DIVIDER
+	})
+
+	HUDService.crosshair_container:Add(CrosshairMeter.New {
+		angle = -CROSSHAIR_METER_ARC_ANGLE,
+		value_func = Airaccel
+	})
+end
+
+function HUDService.Init()
+	HUDService.animatable_color = AnimatableValue.New(COLOR_WHITE, {
+		smooth = true,
+		generate = function ()
+			return LocalPlayer().color
 		end
 	})
+
+	HUDService.InitContainers()
+	HUDService.InitMeters()
 end
 hook.Add("InitUI", "HUDService.Init", HUDService.Init)
 
 function HUDService.Reload()
 	HUDService.animatable_color:Finish()
-	HUDService.health_meter:Finish()
 	HUDService.container:Finish()
 	HUDService.Init()
 	HUDService.Show()

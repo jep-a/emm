@@ -24,7 +24,7 @@ function ElementPanel:Think()
 end
 
 function ElementPanel:Paint()
-	self.element:Paint(self:GetAttribute "width", self:GetAttribute "height")
+	self.element:Paint()
 end
 
 vgui.Register("ElementPanel", ElementPanel, "EditablePanel")
