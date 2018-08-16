@@ -30,34 +30,49 @@ function Element:Init(props)
 		fill_color = false
 	}
 
-	self.attributes = {
-		x = AnimatableValue.New(),
-		y = AnimatableValue.New(),
-		width = AnimatableValue.New(),
-		height = AnimatableValue.New(),
-		padding_left = AnimatableValue.New(),
-		padding_top = AnimatableValue.New(),
-		padding_right = AnimatableValue.New(),
-		padding_bottom = AnimatableValue.New(),
-		crop_left = AnimatableValue.New(),
-		crop_top = AnimatableValue.New(),
-		crop_right = AnimatableValue.New(),
-		crop_bottom = AnimatableValue.New(),
-		child_margin = AnimatableValue.New(),
-		color = AnimatableValue.New(COLOR_WHITE),
-		background_color = AnimatableValue.New(COLOR_BLACK_CLEAR),
-		alpha = AnimatableValue.New(255)
+	local anim_attr = {
+		"x",
+		"y",
+		"width",
+		"height",
+		"padding_left",
+		"padding_top",
+		"padding_right",
+		"padding_bottom",
+		"crop_left",
+		"crop_top",
+		"crop_right",
+		"crop_bottom",
+		"child_margin",
+
+		color = COLOR_WHITE,
+		background_color = COLOR_BLACK_CLEAR,
+		alpha = 255
 	}
 
-	self.optional_attributes = {
-		duration = true,
-		overlay = true,
-		width_percent = true,
-		height_percent = true,
-		angle = true,
-		text_color = true,
-		border = true
+	self.attributes = {}
+
+	for k, v in pairs(anim_attr) do
+		if isnumber(k) then
+			self.attributes[v] = AnimatableValue.New()
+		else
+			self.attributes[k] = AnimatableValue.New(v)
+		end
+	end
+
+	local opt_attr = {
+		"duration",
+		"overlay",
+		"width_percent",
+		"height_percent",
+		"angle",
+		"text_color",
+		"border"
 	}
+
+	for _, k in pairs(opt_attr) do
+		self.optional_attributes[k] = true
+	end
 
 	if props then
 		self:SetAttributes(props)
