@@ -30,7 +30,6 @@ function HUDMeter:Init(quadrant, props)
 
 	if props.show_value then
 		self.value_text_container = self:Add(Element.New {
-			layout_justification_y = JUSTIFY_START,
 			fit = true,
 			wrap = false,
 			child_margin = HUD_METER_VALUE_TEXT_MARGIN
@@ -102,6 +101,11 @@ function CrosshairMeter:Init(props)
 
 	CrosshairMeter.super.Init(self, {
 		layout = false,
+		origin_position = true,
+		origin_justification_x = JUSTIFY_CENTER,
+		origin_justification_y = JUSTIFY_CENTER,
+		position_justification_x = JUSTIFY_CENTER,
+		position_justification_y = JUSTIFY_CENTER,
 		width_percent = 1,
 		height_percent = 1,
 		background_color = COLOR_BACKGROUND
@@ -110,8 +114,45 @@ function CrosshairMeter:Init(props)
 	self.angle = props.angle or 0
 	self.value_func = props.value_func
 	self.value_divider = props.value_divider or 100
+	
+	self.debounced_value = AnimatableValue.New(0, {
+		callback = function (v)
+			self:OnValueChange(v)
+		end
+	})
+
+	self.hide_value_on_empty = props.hide_value_on_empty
+	self.hide_value_on_full = props.hide_value_on_full
 
 	self.percent = AnimatableValue.New(0, {smooth = true})
+
+	if props.show_value then
+		self.value_text_container = self:Add(Element.New {
+			layout = false,
+			origin_position = true,
+			origin_justification_x = JUSTIFY_CENTER,
+			origin_justification_y = JUSTIFY_END,
+			position_justification_x = JUSTIFY_CENTER,
+			position_justification_y = JUSTIFY_END,
+			fit = true,
+			wrap = false,
+			child_margin = MARGIN/4
+		})
+
+		self.value_text = self.value_text_container:Add(Element.New {
+			fit = true,
+			crop_y = 0.125,
+			font = "CrosshairMeterValue",
+			text = "100"
+		})
+
+		self.value_text_container:Add(Element.New {
+			fit = true,
+			crop_y = 0.125,
+			font = "CrosshairMeterValueSmall",
+			text = "0"
+		})
+	end
 end
 
 local circle_material = Material("emm2/shapes/circle.png", "noclamp smooth")
@@ -119,12 +160,24 @@ local circle_material = Material("emm2/shapes/circle.png", "noclamp smooth")
 function CrosshairMeter:Think()
 	CrosshairMeter.super.Think(self)
 
-	self.percent.current = self.value_func()/self.value_divider
+	local value = self.value_func()
+
+	self.debounced_value.current = value
+	self.percent.current = value/self.value_divider
+
+	if self.value_text then
+		self.value_text:SetText(self.debounced_value.debounce)
+	end
+end
+
+function CrosshairMeter:OnValueChange(v)
+	HUDMeter.OnValueChange(self, v)
 end
 
 function CrosshairMeter:Paint()
 	local half_w = self:GetAttribute "width"/2
 	local half_h = self:GetAttribute "height"/2
+	local radius = half_w - CROSSHAIR_METER_ARC_PADDING
 	local half_arc = CROSSHAIR_METER_ARC_LENGTH/2
 	local ang = self.angle + 90 - half_arc
 	
@@ -142,7 +195,7 @@ function CrosshairMeter:Paint()
 	render.SetStencilZFailOperation(STENCILOPERATION_REPLACE)
 
 	surface.SetDrawColor(COLOR_WHITE)
-	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, half_w - LINE_THICKNESS, CROSSHAIR_METER_ARC_LENGTH, ang, 40))
+	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, radius - LINE_THICKNESS, CROSSHAIR_METER_ARC_LENGTH, ang, 64))
 
 	render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_NOTEQUAL)
 	render.SetStencilPassOperation(STENCILOPERATION_KEEP)
@@ -150,17 +203,18 @@ function CrosshairMeter:Paint()
 	render.SetStencilZFailOperation(STENCILOPERATION_KEEP)
 
 	surface.SetDrawColor(self:GetAttribute "background_color")
-	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, half_w, CROSSHAIR_METER_ARC_LENGTH, ang, 40))
+	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, radius, CROSSHAIR_METER_ARC_LENGTH, ang, 64))
 
 	local percent = (self.percent.smooth * CROSSHAIR_METER_ARC_LENGTH) - 1
 
 	surface.SetDrawColor(self:GetAttribute "color")
-	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, half_w, percent, ang + half_arc - (percent/2), CROSSHAIR_METER_ARC_LENGTH * 8))
+	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, radius, percent, ang + half_arc - (percent/2), CROSSHAIR_METER_ARC_LENGTH * 8))
 
 	render.SetStencilEnable(false)
 end
 
 function CrosshairMeter:Finish()
 	CrosshairMeter.super.Finish(self)
+	self.debounced_value:Finish()
 	self.percent:Finish()
 end

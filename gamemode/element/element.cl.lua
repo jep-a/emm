@@ -19,6 +19,11 @@ function Element:Init(props)
 
 	self.static_attributes = {
 		layout = true,
+		origin_position = false,
+		origin_justification_x = JUSTIFY_START,
+		origin_justification_y = JUSTIFY_START,
+		position_justification_x = JUSTIFY_START,
+		position_justification_y = JUSTIFY_START,
 		self_adjacent_justification = JUSTIFY_INHERIT,
 		layout_justification_x = JUSTIFY_START,
 		layout_justification_y = JUSTIFY_START,
@@ -69,6 +74,8 @@ function Element:Init(props)
 		"text_color",
 		"border"
 	}
+
+	self.optional_attributes = {}
 
 	for _, k in pairs(opt_attr) do
 		self.optional_attributes[k] = true
@@ -136,6 +143,10 @@ function Element:DetectEnd()
 end
 
 function Element:Think()
+	if self.parent and self:GetAttribute "origin_position" then
+		self:PositionFromOrigin()
+	end
+
 	if #self.layout_children > 0 then
 		self:StackChildren()
 	else

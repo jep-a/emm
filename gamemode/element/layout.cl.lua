@@ -30,6 +30,63 @@ function Element:GetFinalHeight()
 	return RoundClamp(h - (self:GetYCropOffset() + (h * self:GetAttribute "crop_bottom")))
 end
 
+function Element:PositionFromOrigin()
+	local x_origin_justify = self:GetAttribute "origin_justification_x"
+	local y_origin_justify = self:GetAttribute "origin_justification_y"
+	local x_pos_justify = self:GetAttribute "position_justification_x"
+	local y_pos_justify = self:GetAttribute "position_justification_y"
+
+	local parent = self.parent
+	local parent_w = parent:GetAttribute "width"
+	local parent_h = parent:GetAttribute "height"
+
+	local w = self:GetFinalWidth()
+	local h = self:GetFinalHeight()
+
+	local start_x
+
+	if x_origin_justify == JUSTIFY_START then
+		start_x = 0
+	elseif x_origin_justify == JUSTIFY_CENTER then
+		start_x = parent_w/2
+	elseif x_origin_justify == JUSTIFY_END then
+		start_x = parent_w
+	end
+
+	local start_y
+
+	if y_origin_justify == JUSTIFY_START then
+		start_y = 0
+	elseif y_origin_justify == JUSTIFY_CENTER then
+		start_y = parent_h/2
+	elseif y_origin_justify == JUSTIFY_END then
+		start_y = parent_h
+	end
+
+	local offset_x
+
+	if x_pos_justify == JUSTIFY_START then
+		offset_x = 0
+	elseif x_pos_justify == JUSTIFY_CENTER then
+		offset_x = -w/2
+	elseif x_pos_justify == JUSTIFY_END then
+		offset_x = -w
+	end
+
+	local offset_y
+
+	if y_pos_justify == JUSTIFY_START then
+		offset_y = 0
+	elseif y_pos_justify == JUSTIFY_CENTER then
+		offset_y = -h/2
+	elseif y_pos_justify == JUSTIFY_END then
+		offset_y = -h
+	end
+
+	self:SetAttribute("x", start_x + offset_x)
+	self:SetAttribute("y", start_y + offset_y)
+end
+
 local axis_property_keys = {
 	[DIRECTION_ROW] = {
 		position = "x",

@@ -43,8 +43,14 @@ end
 
 function HUDService.CreateCrosshairContainer()
 	return Element.New {
-		width = 128,
-		height = 128
+		layout = false,
+		origin_position = true,
+		origin_justification_x = JUSTIFY_CENTER,
+		origin_justification_y = JUSTIFY_CENTER,
+		position_justification_x = JUSTIFY_CENTER,
+		position_justification_y = JUSTIFY_CENTER,
+		width = CROSSHAIR_CONTAINER_SIZE,
+		height = CROSSHAIR_CONTAINER_SIZE
 	}
 end
 
@@ -87,7 +93,7 @@ function HUDService.InitContainers()
 		layout_justification_y = JUSTIFY_END
 	})
 
-	HUDService.crosshair_container = HUDService.quadrant_e:Add(HUDService.CreateCrosshairContainer())
+	HUDService.crosshair_container = HUDService.container:Add(HUDService.CreateCrosshairContainer())
 end
 
 function HUDService.InitMeters()
@@ -145,6 +151,8 @@ function HUDService.InitMeters()
 	})
 
 	HUDService.crosshair_container:Add(CrosshairMeter.New {
+		show_value = true,
+		hide_value_on_empty = true,
 		value_func = Speed,
 		value_divider = HUD_SPEED_METER_DIVIDER
 	})
@@ -185,6 +193,7 @@ end
 hook.Add("HUDShouldDraw", "HUDService.ShouldDraw", HUDService.ShouldDraw)
 
 function HUDService.Show()
+	HUDService.crosshair_container:AnimateAttribute("alpha", 255)
 	HUDService.left_section:AnimateAttribute("alpha", 255)
 	HUDService.middle_section:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
 	HUDService.right_section:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION * 2})
@@ -192,6 +201,7 @@ end
 hook.Add("LocalPlayerSpawn", "HUDService.Show", HUDService.Show)
 
 function HUDService.Hide()
+	HUDService.crosshair_container:AnimateAttribute("alpha", 0)
 	HUDService.left_section:AnimateAttribute("alpha", 0)
 	HUDService.middle_section:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION})
 	HUDService.right_section:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION * 2})
