@@ -1,90 +1,5 @@
 HUDService = HUDService or {}
 
-
--- # Factories
-
-function HUDService.CreateContainer()
-	return Element.New {
-		width_percent = 1,
-		height_percent = 1,
-		padding_x = HUD_PADDING_X,
-		padding_y = HUD_PADDING_Y
-	}
-end
-
-function HUDService.CreateSection(dist, ang)
-	local element = HUDService.container:Add(Element.New {
-		layout_direction = DIRECTION_COLUMN,
-		width_percent = 1/3,
-		height_percent = 1,
-		alpha = 0
-	})
-
-	CamUIService.AddPanel(element.panel, dist, ang)
-
-	return element
-end
-
-function HUDService.CreateQuadrant(section, props)
-	local element = section:Add(Element.New {
-		layout_direction = DIRECTION_COLUMN,
-		wrap = false,
-		width_percent = 1,
-		height_percent = 1/3,
-		child_margin = MARGIN
-	})
-
-	if props then
-		element:SetAttributes(props)
-	end
-
-	return element
-end
-
-function HUDService.CreateCrosshairContainer()
-	return Element.New {
-		layout = false,
-		origin_position = true,
-		origin_justification_x = JUSTIFY_CENTER,
-		origin_justification_y = JUSTIFY_CENTER,
-		position_justification_x = JUSTIFY_CENTER,
-		position_justification_y = JUSTIFY_CENTER,
-		width = CROSSHAIR_CONTAINER_SIZE,
-		height = CROSSHAIR_CONTAINER_SIZE
-	}
-end
-
-function HUDService.CreateCrosshairMeter(props)
-	return HUDService.crosshair_container:Add(CrosshairMeter.New(props))
-end
-
-function HUDService.CreateCrosshairLine(props)
-	local element = HUDService.crosshair_container:Add(Element.New {
-		layout = false,
-		origin_position = true,
-		border = 1
-	})
-
-	if props.orientation == DIRECTION_ROW then
-		element:SetAttributes {
-			width = CROSSHAIR_LINE_LENGTH,
-			height = LINE_THICKNESS
-		}
-	else
-		element:SetAttributes {
-			width = LINE_THICKNESS,
-			height = CROSSHAIR_LINE_LENGTH
-		}
-	end
-
-	element:SetAttributes(props)
-
-	return element
-end
-
-
--- # Init
-
 local health_icon_material = Material("emm2/hud/health.png", "noclamp smooth")
 local speed_icon_material = Material("emm2/hud/speed.png", "noclamp smooth")
 local airaccel_icon_material = Material("emm2/hud/airaccel.png", "noclamp smooth")
@@ -122,6 +37,7 @@ function HUDService.InitContainers()
 	})
 
 	HUDService.crosshair_container = HUDService.container:Add(HUDService.CreateCrosshairContainer())
+	HUDService.crosshair_lines_container = HUDService.crosshair_container:Add(HUDService.CreateCrosshairLinesContainer())
 end
 
 function HUDService.InitMeters()
@@ -202,6 +118,19 @@ function HUDService.InitCrosshair()
 		origin_justification_x = JUSTIFY_END,
 		origin_justification_y = JUSTIFY_CENTER,
 		position_justification_x = JUSTIFY_END,
+		position_justification_y = JUSTIFY_CENTER
+	}
+
+	HUDService.CreateCrosshairLine {
+		origin_justification_x = JUSTIFY_CENTER,
+		origin_justification_y = JUSTIFY_END,
+		position_justification_x = JUSTIFY_CENTER,
+		position_justification_y = JUSTIFY_END,
+	}
+
+	HUDService.CreateCrosshairLine {
+		orientation = DIRECTION_ROW,
+		origin_justification_y = JUSTIFY_CENTER,
 		position_justification_y = JUSTIFY_CENTER
 	}
 end

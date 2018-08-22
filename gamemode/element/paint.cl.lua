@@ -33,12 +33,12 @@ end
 
 function Element:PaintBorder(props)
 	props = props or {}
- 
+
 	local w = props.width or self:GetAttribute "width"
 	local h = props.height or self:GetAttribute "height"
 	w = w - ((w * self:GetAttribute "crop_left") + (w * self:GetAttribute "crop_right"))
 	h = h - ((h * self:GetAttribute "crop_top") + (h * self:GetAttribute "crop_bottom"))
-	local color = props.color or self:GetAttribute "color"
+	local color = props.color or self:GetAttribute "border_color" or self:GetAttribute "color"
 	local thickness = props.thickness or self:GetAttribute "border"
 
 	surface.SetDrawColor(color)
