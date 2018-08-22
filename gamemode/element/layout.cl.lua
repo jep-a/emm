@@ -83,8 +83,8 @@ function Element:PositionFromOrigin()
 		offset_y = -h
 	end
 
-	self:SetAttribute("x", start_x + offset_x)
-	self:SetAttribute("y", start_y + offset_y)
+	self:SetAttribute("x", math.floor(start_x + offset_x))
+	self:SetAttribute("y", math.floor(start_y + offset_y))
 end
 
 local axis_property_keys = {

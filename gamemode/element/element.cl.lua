@@ -72,7 +72,8 @@ function Element:Init(props)
 		"height_percent",
 		"angle",
 		"text_color",
-		"border"
+		"border",
+		"border_color"
 	}
 
 	self.optional_attributes = {}

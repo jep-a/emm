@@ -195,7 +195,7 @@ function CrosshairMeter:Paint()
 	render.SetStencilZFailOperation(STENCILOPERATION_REPLACE)
 
 	surface.SetDrawColor(COLOR_WHITE)
-	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, radius - LINE_THICKNESS, CROSSHAIR_METER_ARC_LENGTH, ang, 64))
+	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, radius - LINE_THICKNESS, CROSSHAIR_METER_ARC_LENGTH, ang, 720))
 
 	render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_NOTEQUAL)
 	render.SetStencilPassOperation(STENCILOPERATION_KEEP)
@@ -203,7 +203,7 @@ function CrosshairMeter:Paint()
 	render.SetStencilZFailOperation(STENCILOPERATION_KEEP)
 
 	surface.SetDrawColor(self:GetAttribute "background_color")
-	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, radius, CROSSHAIR_METER_ARC_LENGTH, ang, 64))
+	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, radius, CROSSHAIR_METER_ARC_LENGTH, ang, 720))
 
 	local percent = (self.percent.smooth * CROSSHAIR_METER_ARC_LENGTH) - 1
 
