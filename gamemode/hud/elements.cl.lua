@@ -208,7 +208,7 @@ function CrosshairMeter:Paint()
 	local percent = (self.percent.smooth * CROSSHAIR_METER_ARC_LENGTH) - 1
 
 	surface.SetDrawColor(self:GetAttribute "color")
-	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, radius, percent, ang + half_arc - (percent/2), CROSSHAIR_METER_ARC_LENGTH * 8))
+	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, radius, percent, ang + half_arc - (percent/2), 720)
 
 	render.SetStencilEnable(false)
 end
