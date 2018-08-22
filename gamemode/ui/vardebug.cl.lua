@@ -67,31 +67,6 @@ function VarDebugService.Init()
 	CamUIService.AddPanel(VarDebugService.container)
 	CamUIService.AddPanel(VarDebugService.side_container)
 
-	VarDebugService.health = vgui.Create "VarDebug"
-	VarDebugService.health.accessor = "Health"
-	VarDebugService.container:Add(VarDebugService.health)
-
-	VarDebugService.speed = vgui.Create "VarDebug"
-	VarDebugService.speed.label = "Speed"
-	VarDebugService.speed.func = function ()
-		return math.Round(ply:GetVelocity():Length()/10)
-	end
-	VarDebugService.container:Add(VarDebugService.speed)
-
-	VarDebugService.airaccel = vgui.Create "VarDebug"
-	VarDebugService.airaccel.label = "Airaccel"
-	VarDebugService.airaccel.func = function ()
-		return math.Round(ply.stamina.airaccel.amount)
-	end
-	VarDebugService.container:Add(VarDebugService.airaccel)
-	
-	VarDebugService.wallslide = vgui.Create "VarDebug"
-	VarDebugService.wallslide.label = "Wallslide"
-	VarDebugService.wallslide.func = function ()
-		return math.Round(ply.stamina.wallslide.amount)
-	end
-	VarDebugService.container:Add(VarDebugService.wallslide)
-
 	VarDebugService.lobby = vgui.Create "VarDebug"
 	VarDebugService.lobby.label = "Lobby"
 	VarDebugService.lobby.func = function () return ply.lobby and ply.lobby.id end
@@ -122,7 +97,7 @@ function VarDebugService.Init()
 	VarDebugService.player_class.func = function () return ply.player_class and ply.player_class.name end
 	VarDebugService.side_container:Add(VarDebugService.player_class)
 end
-hook.Add("InitPostEntity", "VarDebugService.Init", VarDebugService.Init)
+hook.Add("InitUI", "VarDebugService.Init", VarDebugService.Init)
 
 function VarDebugService.AddDebugger(id, func)
 	VarDebugService[id] = vgui.Create "VarDebug"

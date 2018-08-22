@@ -6,17 +6,13 @@ local function FrameMultiplier()
 	return FrameTime() * 10
 end
 
-local function IsColor(color)
-	return istable(color) and color.r and color.g and color.b
-end
-
 
 -- # Class
 
 AnimatableValue = AnimatableValue or Class.New()
 
 function AnimatableValue:Init(value, props)
-	value = value or 0
+	value = value ~= nil and value or 0
 	props = props or {}
 
 	self.animations = {}
@@ -160,7 +156,7 @@ function AnimatableValue:Smooth()
 	local mult = FrameMultiplier() * self.smooth_multiplier
 
 	local curr = self.current
-	local last = self.last
+	local last = self.last or curr
 
 	if ang then
 		if (last.y < -90) and (curr.y > 90) then

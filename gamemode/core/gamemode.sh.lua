@@ -4,6 +4,7 @@ GM.Email = "hello@jep.sh"
 GM.Website = "jep.sh"
 
 EMM.Include {
+	"util/util",
 	"util/palette",
 	"util/class",
 	"util/cubic-bezier",
@@ -32,9 +33,22 @@ EMM.Include {
 	"minigame/modifier",
 	"minigame/tagging",
 	"minigame/util",
-	"camui/camui",
-	"jsui/jsui",
+	"element/element",
+	"element/panel",
+	"element/attributes",
+	"element/setters",
+	"element/layout",
+	"element/paint",
+	"ui/variables",
+	"ui/util",
+	"ui/cam",
+	"ui/vardebug",
+	"ui/elements",
+	"ui/indicators",
+	"ui/notifications",
+	"ui/js",
+	"hud/variables",
 	"hud/hud",
-	"hud/vardebug",
-	"hud/indicators"
+	"hud/elements",
+	"hud/factories"
 }
