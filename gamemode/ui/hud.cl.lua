@@ -54,6 +54,34 @@ function HUDService.CreateCrosshairContainer()
 	}
 end
 
+function HUDService.CreateCrosshairMeter(props)
+	return HUDService.crosshair_container:Add(CrosshairMeter.New(props))
+end
+
+function HUDService.CreateCrosshairLine(props)
+	local element = HUDService.crosshair_container:Add(Element.New {
+		layout = false,
+		origin_position = true,
+		border = 1
+	})
+
+	if props.orientation == DIRECTION_ROW then
+		element:SetAttributes {
+			width = CROSSHAIR_LINE_LENGTH,
+			height = LINE_THICKNESS
+		}
+	else
+		element:SetAttributes {
+			width = LINE_THICKNESS,
+			height = CROSSHAIR_LINE_LENGTH
+		}
+	end
+
+	element:SetAttributes(props)
+
+	return element
+end
+
 
 -- # Init
 
@@ -145,22 +173,37 @@ function HUDService.InitMeters()
 		value_func = Airaccel
 	})
 
-	HUDService.crosshair_container:Add(CrosshairMeter.New {
+	HUDService.CreateCrosshairMeter {
 		angle = CROSSHAIR_METER_ARC_ANGLE,
 		value_func = Health
-	})
+	}
 
-	HUDService.crosshair_container:Add(CrosshairMeter.New {
+	HUDService.CreateCrosshairMeter {
 		show_value = true,
 		hide_value_on_empty = true,
 		value_func = Speed,
 		value_divider = HUD_SPEED_METER_DIVIDER
-	})
+	}
 
-	HUDService.crosshair_container:Add(CrosshairMeter.New {
+	HUDService.CreateCrosshairMeter {
 		angle = -CROSSHAIR_METER_ARC_ANGLE,
 		value_func = Airaccel
-	})
+	}
+end
+
+function HUDService.InitCrosshair()
+	HUDService.CreateCrosshairLine {
+		origin_justification_x = JUSTIFY_CENTER,
+		position_justification_x = JUSTIFY_CENTER
+	}
+
+	HUDService.CreateCrosshairLine {
+		orientation = DIRECTION_ROW,
+		origin_justification_x = JUSTIFY_END,
+		origin_justification_y = JUSTIFY_CENTER,
+		position_justification_x = JUSTIFY_END,
+		position_justification_y = JUSTIFY_CENTER
+	}
 end
 
 function HUDService.Init()
@@ -173,6 +216,7 @@ function HUDService.Init()
 
 	HUDService.InitContainers()
 	HUDService.InitMeters()
+	HUDService.InitCrosshair()
 end
 hook.Add("InitUI", "HUDService.Init", HUDService.Init)
 
