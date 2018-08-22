@@ -331,7 +331,7 @@ function Element:GenerateSize()
 				padding = self.parent:GetAttribute "padding_left" + self.parent:GetAttribute "padding_right"
 			end
 
-			self:SetAttribute("width", math.Round((self.parent:GetAttribute "width" - padding) * width_percent))
+			self:SetAttribute("width", math.floor((self.parent:GetAttribute "width" - padding) * width_percent))
 		end
 
 		if height_percent then
@@ -343,15 +343,15 @@ function Element:GenerateSize()
 				padding = self.parent:GetAttribute "padding_top" + self.parent:GetAttribute "padding_bottom"
 			end
 
-			self:SetAttribute("height", math.Round((self.parent:GetAttribute "height" - padding) * height_percent))
+			self:SetAttribute("height", math.floor((self.parent:GetAttribute "height" - padding) * height_percent))
 		end
 	else
 		if width_percent then
-			self:SetAttribute("width", math.Round(ScrW() * width_percent))
+			self:SetAttribute("width", math.floor(ScrW() * width_percent))
 		end
 
 		if height_percent then
-			self:SetAttribute("height", math.Round(ScrH() * height_percent))
+			self:SetAttribute("height", math.floor(ScrH() * height_percent))
 		end
 	end
 end
