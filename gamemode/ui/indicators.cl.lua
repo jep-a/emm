@@ -122,8 +122,10 @@ end
 
 -- # Init
 
-function IndicatorService.CalculatePositions(lobby, ply)
+function IndicatorService.CalculatePositions(ply, eye_pos)
 	local indicators = IndicatorService.container.children
+
+	cam.Start3D()
 
 	for i = 1, #indicators do
 		local indicator = indicators[i]
@@ -136,23 +138,21 @@ function IndicatorService.CalculatePositions(lobby, ply)
 			pos = indicator.position
 		end
 	
-		local eye_pos = LocalPlayer():EyePos()
-	
-		cam.Start3D()
 	
 		local dist = eye_pos:Distance(pos)
 		local screen_pos = (pos + Vector(0, 0, Lerp(dist/600, 40, 45))):ToScreen()
 		local size = Lerp(dist/800, INDICATOR_WORLD_SIZE * 2, INDICATOR_WORLD_SIZE)
 		local x, y = screen_pos.x - (size/2), screen_pos.y - 6 - (size/2)
 	
-		cam.End3D()
-	
+		
 		indicator.world:SetAttribute("x", x)
 		indicator.world:SetAttribute("y", y)
 		indicator.world:SetAttribute("size", size)
 	end
+
+	cam.End3D()
 end
-hook.Add("Think", "IndicatorService.CalculatePositions", IndicatorService.CalculatePositions)
+hook.Add("CalcView", "IndicatorService.CalculatePositions", IndicatorService.CalculatePositions)
 
 function IndicatorService.RenderCoasters()
 	local indicators = IndicatorService.container.children
