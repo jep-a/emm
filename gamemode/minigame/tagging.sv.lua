@@ -8,16 +8,6 @@ function TaggingService.InitPlayerProperties(ply)
 end
 hook.Add("InitPlayerProperties", "TaggingService.InitPlayerProperties", TaggingService.InitPlayerProperties)
 
-local function SequentialTableHasValue(tab, val)
-	for i = 1, #tab do
-		if val == tab[i] then
-			return true
-		end
-	end
-
-	return false
-end
-
 function TaggingService.Think()
 	for i = 1, #TaggingService.taggable_groups do
 		for _i = 1, #TaggingService.taggable_groups[i] do
@@ -53,20 +43,20 @@ function TaggingService.Think()
 end
 hook.Add("Think", "TaggingService.Think", TaggingService.Think)
 
-function TaggingService.CreateLobby(lobby)
+function TaggingService.InitLobby(lobby)
 	for k, player_class in pairs(lobby.player_classes) do
 		if player_class.can_tag then
 			table.insert(TaggingService.taggable_groups, lobby[k])
 		end
 	end
 end
-hook.Add("CreateLobby", "TaggingService.CreateLobby", TaggingService.CreateLobby)
+hook.Add("LobbyInit", "TaggingService.InitLobby", TaggingService.InitLobby)
 
-function TaggingService.RemoveLobby(lobby)
+function TaggingService.FinishLobby(lobby)
 	for k, player_class in pairs(lobby.player_classes) do
 		if player_class.can_tag then
 			table.RemoveByValue(TaggingService.taggable_groups, lobby[k])
 		end
 	end
 end
-hook.Add("RemoveLobby", "TaggingService.RemoveLobby", TaggingService.RemoveLobby)
+hook.Add("LobbyFinish", "TaggingService.FinishLobby", TaggingService.FinishLobby)

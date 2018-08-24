@@ -1,6 +1,6 @@
-StateService = StateService or {}
+MinigameStateService = MinigameStateService or {}
 
-function StateService.State(lobby, id)
+function MinigameStateService.State(lobby, id)
 	for _, state in pairs(lobby.states) do
 		if id == state.id then
 			return state
