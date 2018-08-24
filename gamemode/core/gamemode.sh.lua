@@ -49,6 +49,9 @@ EMM.Include {
 	"ui/js",
 	"hud/variables",
 	"hud/hud",
+	"hud/vardebug",
+	"hud/indicators",
+	"build/build",
 	"hud/elements",
 	"hud/factories"
 }
