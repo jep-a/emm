@@ -109,15 +109,6 @@ end)
 
 net.Receive("PlayerDisconnected", function ()
 	local ply = net.ReadEntity()
-
-	if ply.lobby then
-		if MinigameService.IsLocalLobby(ply) then
-			hook.Run("LocalLobbyPlayerDisconnected", ply.lobby, ply)
-		end
-
-		MinigameService.CallHook(ply.lobby, "PlayerDisconnected", ply)
-	end
-
 	hook.Run("PlayerDisconnected", ply)
 end)
 

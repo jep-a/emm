@@ -83,6 +83,8 @@ function MinigameLobby:AddPlayer(ply)
 	if self:IsLocal() then
 		hook.Run("LocalLobbyAddPlayer", self, ply)
 	end
+
+	MinigameService.CallHook(self, "PlayerJoin", ply)
 end
 
 function MinigameLobby:RemovePlayer(ply)
@@ -91,6 +93,8 @@ function MinigameLobby:RemovePlayer(ply)
 	if self:IsLocal() then
 		hook.Run("LocalLobbyRemovePlayer", self, ply)
 	end
+
+	MinigameService.CallHook(self, "PlayerLeave", ply)
 
 	ply.lobby = nil
 	table.RemoveByValue(self.players, ply)

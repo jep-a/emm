@@ -15,7 +15,8 @@ hook.Add("PlayerSpawn", "EMM.PlayerSpawn", function (ply)
 	ply:SetupModel()
 
 	if ply.lobby then
-		MinigameService.CallHook(ply.lobby, "PlayerSpawn")
+		MinigameService.CallHook(ply.lobby, "PlayerSpawn", ply)
+		MinigameService.CallHook(ply.lobby, "PlayerProperties", ply)
 	end
 
 	net.Start "PlayerSpawn"
