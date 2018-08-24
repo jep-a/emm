@@ -1,27 +1,21 @@
 function MINIGAME:PickRandomHunted(excluded_ply)
-	MinigameService.PickRandomPlayerClasses(self.players, 1, self.player_classes.Hunted, self.player_classes.Hunter, {excluded_ply}, 1)
+	MinigameService.PickRandomPlayerClasses(self, {
+		class_key = "Hunted",
+		rejected_class_key = "Hunter",
+		less_probable_players = {excluded_ply},
+		less_probable_player_chance = 1
+	})
 end
 
 function MINIGAME:PickClosestHunted(hunted)
-	local candidates = {}
-
-	for _, ply in pairs(self.players) do
-		if (ply.player_class == self.player_classes.Hunter) and ply:Alive() then
-			table.insert(candidates, ply)
-		end
-	end
-
-	local hunted_pos = hunted:WorldSpaceCenter()
-	table.sort(candidates, function (a, b)
-		return hunted_pos:Distance(a:WorldSpaceCenter()) < hunted_pos:Distance(b:WorldSpaceCenter())
-	end)
-
-	hunted:SetPlayerClass(self.player_classes.Hunter)
-	candidates[1]:SetPlayerClass(self.player_classes.Hunted)
+	MinigameService.PickClosestPlayerClass(self, hunted, {
+		class_key = "Hunted",
+		origin_player_class_key = "Hunter"
+	})
 end
 
 function MINIGAME:StartStateWaiting()
-	MinigameService.ClearPlayerClasses(self.players)
+	MinigameService.ClearPlayerClasses(self)
 end
 
 function MINIGAME:StartStatePlaying()
@@ -41,7 +35,5 @@ MINIGAME:AddStateHook("Playing", "PlayerDeath", "ResetHunted", MINIGAME.ResetHun
 MINIGAME:AddStateHook("Playing", "PlayerLeave", "ResetHunted", MINIGAME.ResetHunted)
 
 MINIGAME:AddStateHook("Playing", "Tag", "SetHunted", function (self, hunted, hunter)
-	hunted:SetPlayerClass(self.player_classes.Hunter)
-	hunter:SetPlayerClass(self.player_classes.Hunted)
-	hunted:Kill()
+	MinigameService.SwapPlayerClass(hunted, hunter, true)
 end)
