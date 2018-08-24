@@ -19,7 +19,7 @@ function TaggingService.Think()
 				if
 					taggable:IsPlayer() and
 					taggable:Alive() and
-					CurTime() > (taggable.last_tag_time + 0.1)
+					CurTime() > (taggable.last_tag_time + taggable.taggable_cooldown)
 				then
 					for __i = 1, #ents do
 						local ent = ents[__i]
