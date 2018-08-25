@@ -83,8 +83,10 @@ function Element:PositionFromOrigin()
 		offset_y = -h
 	end
 
-	self:SetAttribute("x", math.floor(start_x + offset_x))
-	self:SetAttribute("y", math.floor(start_y + offset_y))
+	self:SetAttributes {
+		x = math.floor(start_x + offset_x),
+		y = math.floor(start_y + offset_y)
+	}
 end
 
 local axis_property_keys = {
@@ -291,7 +293,7 @@ function Element:StackChildren()
 	end
 end
 
-function Element:LayoutText()
+function Element:LayoutText(new_text)
 	local text = self.panel.text
 
 	local padding_left = self:GetAttribute "padding_left"
@@ -300,16 +302,19 @@ function Element:LayoutText()
 	text.x = padding_left - self:GetXCropOffset()
 	text.y = padding_top - self:GetYCropOffset()
 
+	surface.SetFont(text:GetFont())
+	local text_w, text_h = surface.GetTextSize(new_text or text:GetText())
+
 	if self:GetAttribute "fit_x" then
+		self:SetAttribute("width", text_w + padding_left + self:GetAttribute "padding_right")
 		text:SizeToContentsX()
-		self:SetAttribute("width", text:GetWide() + padding_left + self:GetAttribute "padding_right")
 	else
 		text:SetWide(self:GetInnerWidth())
 	end
 
 	if self:GetAttribute "fit_y" then
+		self:SetAttribute("height", text_h + padding_top + self:GetAttribute "padding_bottom")
 		text:SizeToContentsY()
-		self:SetAttribute("height", text:GetTall() + padding_top + self:GetAttribute "padding_bottom")
 	else
 		text:SetTall(self:GetInnerHeight())
 	end
