@@ -18,6 +18,7 @@ function Element:Init(props)
 	self.panel.element = self
 
 	self.static_attributes = {
+		paint = true,
 		layout = true,
 		origin_position = false,
 		origin_justification_x = JUSTIFY_START,

@@ -27,6 +27,10 @@ function Indicator:Init(ent_or_vec)
 		inherit_color = false
 	})
 
+	self.x = 0
+	self.y = 0
+	self.world_alpha = AnimatableValue.New()
+
 	self.animatable_color = AnimatableValue.New(COLOR_WHITE, {
 		smooth = true,
 		generate = function ()
@@ -48,20 +52,15 @@ function Indicator:Init(ent_or_vec)
 
 	self.off_screen = AnimatableValue.New(false, {
 		generate = function ()
-			local scr_w = ScrW()
-			local scr_h = ScrH()
-			local x = self.world:GetAttribute "x"
-			local y = self.world:GetAttribute "y"
-		
-			return 0 > x or x > scr_w or 0 > y or y > scr_h
+			return 0 > self.x or self.x > ScrW() or 0 > self.y or self.y > ScrH()
 		end,
 
 		callback = function (anim_v)
 			if anim_v.current then
-				self.world:AnimateAttribute("alpha", 0)
+				self.world_alpha:AnimateTo(0)
 				self.peripheral:AnimateAttribute("alpha", 255)
 			else
-				self.world:AnimateAttribute("alpha", 255)
+				self.world_alpha:AnimateTo(255)
 				self.peripheral:AnimateAttribute("alpha", 0)
 			end
 		end
@@ -72,14 +71,6 @@ function Indicator:Init(ent_or_vec)
 	elseif isvector(ent_or_vec) then
 		self.position = ent_or_vec
 	end
-
-	self.world = self:Add(Element.New {
-		layout = false,
-		width = INDICATOR_WORLD_SIZE,
-		height = INDICATOR_WORLD_SIZE,
-		material = indicator_material,
-		alpha = 0
-	})
 
 	self.peripheral = self:Add(Element.New {
 		layout = false,
@@ -100,8 +91,8 @@ function Indicator:Think()
 		local half_scr_h = scr_h/2
 		local periph_radius = half_scr_h - HUD_PADDING_Y
 
-		local x = self.world:GetAttribute "x"
-		local y = self.world:GetAttribute "y"
+		local x = self.x
+		local y = self.y
 
 		local rad_ang = math.atan2(y - half_scr_h, x - half_scr_w)
 		local periph_x = (math.cos(rad_ang) * periph_radius) + half_scr_w
@@ -113,19 +104,29 @@ function Indicator:Think()
 	end
 end
 
+function Indicator:AnimateFinish()
+	self:AnimateAttribute("alpha", 0, {
+		duration = 1,
+		callback = function ()
+			Indicator.super.Finish(self)
+			self.world_alpha:Finish()
+			self.animatable_color:Finish()
+			self.off_screen:Finish()
+		end
+	})
+end
+
 function Indicator:Finish()
-	Indicator.super.Finish(self)
-	self.animatable_color:Finish()
-	self.off_screen:Finish()
+	self:AnimateFinish()
 end
 
 
 -- # Init
 
-function IndicatorService.CalculatePositions(ply, eye_pos)
+function IndicatorService.DrawWorldPositions(ply, eye_pos)
+	local eye_pos = LocalPlayer():EyePos()
 	local indicators = IndicatorService.container.children
-
-	cam.Start3D()
+	local container_alpha = IndicatorService.container:GetAttribute "alpha"
 
 	for i = 1, #indicators do
 		local indicator = indicators[i]
@@ -138,21 +139,35 @@ function IndicatorService.CalculatePositions(ply, eye_pos)
 			pos = indicator.position
 		end
 	
-	
 		local dist = eye_pos:Distance(pos)
+
+		cam.Start3D()
+
 		local screen_pos = (pos + Vector(0, 0, Lerp(dist/600, 40, 45))):ToScreen()
+	
+		cam.End3D()
+
 		local size = Lerp(dist/800, INDICATOR_WORLD_SIZE * 2, INDICATOR_WORLD_SIZE)
 		local x, y = screen_pos.x - (size/2), screen_pos.y - 6 - (size/2)
 	
-		
-		indicator.world:SetAttribute("x", x)
-		indicator.world:SetAttribute("y", y)
-		indicator.world:SetAttribute("size", size)
-	end
+		indicator.x = x
+		indicator.y = y
+	
+		surface.SetAlphaMultiplier(CombineAlphas(container_alpha, indicator:GetAttribute "alpha", indicator.world_alpha.current))
 
-	cam.End3D()
+		Element.PaintTexture(nil, indicator_material, {
+			x = x,
+			y = y,
+			angle = 0,
+			width = size,
+			height = size,
+			color = indicator:GetAttribute "color"
+		})
+
+		surface.SetAlphaMultiplier(1)
+	end
 end
-hook.Add("CalcView", "IndicatorService.CalculatePositions", IndicatorService.CalculatePositions)
+hook.Add("DrawIndicators", "IndicatorService.DrawWorldPositions", IndicatorService.DrawWorldPositions)
 
 function IndicatorService.RenderCoasters()
 	local indicators = IndicatorService.container.children
@@ -169,7 +184,7 @@ function IndicatorService.RenderCoasters()
 				mask = MASK_NPCWORLDSTATIC
 			}
 
-			local alpha = (indicator.world:GetAttribute "alpha" * Lerp(trace.Fraction * 8, 255, 50))/(255 ^ 2)
+			local alpha = CombineAlphas(indicator:GetAttribute "alpha", Lerp(trace.Fraction * 8, 255, 50))
 
 			if alpha > 0 then
 				cam.Start3D2D(trace.HitPos + (trace.HitNormal * Vector(0.5, 0.5, 0.5)), trace.HitNormal:Angle() + Angle(90, 0, 0), 0.25)
@@ -250,7 +265,7 @@ function IndicatorService.Hide()
 end
 hook.Add("LocalPlayerDeath", "IndicatorService.Hide", IndicatorService.Hide)
 
-function IndicatorService.Render()
+function IndicatorService.Draw()
 	IndicatorService.container.panel:PaintManual()
 end
-hook.Add("DrawIndicators", "IndicatorService.Render", IndicatorService.Render)
+hook.Add("DrawIndicators", "IndicatorService.Draw", IndicatorService.Draw)

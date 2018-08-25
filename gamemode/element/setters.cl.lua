@@ -77,6 +77,7 @@ Element.setters = {
 	end,
 
 	text = function (self, static_attr, attr, v)
+		self:LayoutText(v)
 		self:SetText(v)
 	end
 }

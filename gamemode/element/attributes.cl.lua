@@ -8,7 +8,6 @@ end
 
 function Element:SetText(text)
 	self.panel.text:SetText(text)
-	self.panel:InvalidateLayout()
 end
 
 function Element:SetAttribute(k, v)

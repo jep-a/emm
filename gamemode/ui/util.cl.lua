@@ -1,3 +1,15 @@
+function CombineAlphas(...)
+	local alphas = {...}
+
+	local prod = 1
+
+	for _, alpha in pairs(alphas) do
+		prod = prod * alpha
+	end
+
+	return prod/(255 ^ #alphas)
+end
+
 function GenerateSurfaceCircle(x, y, radius, arc, ang, quality)
 	local circle = {}
 

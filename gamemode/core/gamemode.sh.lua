@@ -46,11 +46,11 @@ EMM.Include {
 	"ui/cam",
 	"ui/vardebug",
 	"ui/elements",
-	"ui/indicators",
-	"ui/notifications",
 	"ui/js",
 	"hud/variables",
 	"hud/hud",
 	"hud/elements",
-	"hud/factories"
+	"hud/factories",
+	"hud/indicators",
+	"hud/notifications"
 }
