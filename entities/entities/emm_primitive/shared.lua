@@ -3,10 +3,6 @@ AddCSLuaFile()
 ENT.Type = "anim"
 ENT.Base = "base_anim"
 
-function ENT:Initialize()
-    ENT.lobby = 0
-end
-
 function ENT:BuildPhysics(world_vertices)
     --Builds a physics object from vertices created by the player
     local center = Vector(0)
@@ -22,12 +18,14 @@ function ENT:BuildPhysics(world_vertices)
     for _, vertex in pairs(world_vertices) do
         table.insert(local_vertices, self:WorldToLocal(vertex))
     end
-    PrintTable(local_vertices)
-    self:PhysicsInitConvex(local_vertices)
+--    PrintTable(local_vertices)
+    self:PhysicsInitMultiConvex({local_vertices})
     self:SetSolid(SOLID_VPHYSICS)
-    self:SetCollisionGroup(COLLISION_GROUP_NONE)
-    self:SetMoveType(MOVETYPE_NOCLIP)
+    self:SetMoveType(MOVETYPE_VPHYSICS)
     self:EnableCustomCollisions(true)
-    self:GetPhysicsObject():EnableMotion(false)
-    self:GetPhysicsObject():Wake()
+    phys_obj = self:GetPhysicsObject()
+    phys_obj:EnableMotion(false)
+    phys_obj:SetMass(50000)
+    phys_obj:SetContents(CONTENTS_SOLID)
+    phys_obj:Wake()
 end

@@ -4,6 +4,8 @@ AddCSLuaFile("shared.lua")
 include("shared.lua")
 
 function ENT:Initialize()
+    self:SetModel( "models/props_c17/oildrum001.mdl" )
+    self.lobby = 0
 end
 
 function ENT:SetupDataTables()
