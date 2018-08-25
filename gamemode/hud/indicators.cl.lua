@@ -104,16 +104,26 @@ function Indicator:Think()
 	end
 end
 
+function Indicator:AnimateFinish()
+	self:AnimateAttribute("alpha", 0, {
+		duration = 1,
+		callback = function ()
+			Indicator.super.Finish(self)
+			self.world_alpha:Finish()
+			self.animatable_color:Finish()
+			self.off_screen:Finish()
+		end
+	})
+end
+
 function Indicator:Finish()
-	Indicator.super.Finish(self)
-	self.animatable_color:Finish()
-	self.off_screen:Finish()
+	self:AnimateFinish()
 end
 
 
 -- # Init
 
-function IndicatorService.CalculatePositions(ply, eye_pos)
+function IndicatorService.DrawWorldPositions(ply, eye_pos)
 	local eye_pos = LocalPlayer():EyePos()
 	local indicators = IndicatorService.container.children
 	local container_alpha = IndicatorService.container:GetAttribute "alpha"
@@ -143,7 +153,7 @@ function IndicatorService.CalculatePositions(ply, eye_pos)
 		indicator.x = x
 		indicator.y = y
 	
-		surface.SetAlphaMultiplier((container_alpha * indicator.world_alpha.current)/(255 ^ 2))
+		surface.SetAlphaMultiplier(CombineAlphas(container_alpha, indicator:GetAttribute "alpha", indicator.world_alpha.current))
 
 		Element.PaintTexture(nil, indicator_material, {
 			x = x,
@@ -157,7 +167,7 @@ function IndicatorService.CalculatePositions(ply, eye_pos)
 		surface.SetAlphaMultiplier(1)
 	end
 end
-hook.Add("DrawIndicators", "IndicatorService.CalculatePositions", IndicatorService.CalculatePositions)
+hook.Add("DrawIndicators", "IndicatorService.DrawWorldPositions", IndicatorService.DrawWorldPositions)
 
 function IndicatorService.RenderCoasters()
 	local indicators = IndicatorService.container.children
@@ -174,7 +184,7 @@ function IndicatorService.RenderCoasters()
 				mask = MASK_NPCWORLDSTATIC
 			}
 
-			local alpha = Lerp(trace.Fraction * 8, 255, 50)/255
+			local alpha = CombineAlphas(indicator:GetAttribute "alpha", Lerp(trace.Fraction * 8, 255, 50))
 
 			if alpha > 0 then
 				cam.Start3D2D(trace.HitPos + (trace.HitNormal * Vector(0.5, 0.5, 0.5)), trace.HitNormal:Angle() + Angle(90, 0, 0), 0.25)
@@ -255,7 +265,7 @@ function IndicatorService.Hide()
 end
 hook.Add("LocalPlayerDeath", "IndicatorService.Hide", IndicatorService.Hide)
 
-function IndicatorService.Render()
+function IndicatorService.Draw()
 	IndicatorService.container.panel:PaintManual()
 end
-hook.Add("DrawIndicators", "IndicatorService.Render", IndicatorService.Render)
+hook.Add("DrawIndicators", "IndicatorService.Draw", IndicatorService.Draw)
