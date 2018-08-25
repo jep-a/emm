@@ -49,15 +49,17 @@ function Element:PaintBorder(props)
 end
 
 function Element:Paint()
-	self:PaintRect {color = not self:GetAttribute "fill_color" and self:GetAttribute "background_color"}
+	if self:GetAttribute "paint" then
+		self:PaintRect {color = not self:GetAttribute "fill_color" and self:GetAttribute "background_color"}
 
-	local mat = self:GetAttribute "material"
+		local mat = self:GetAttribute "material"
 
-	if mat then
-		self:PaintTexture(mat)
-	end
+		if mat then
+			self:PaintTexture(mat)
+		end
 
-	if self:GetAttribute "border" then
-		self:PaintBorder()
+		if self:GetAttribute "border" then
+			self:PaintBorder()
+		end
 	end
 end
