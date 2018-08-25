@@ -1,5 +1,3 @@
-MinigameLobby = MinigameLobby or {}
-
 function MinigameService.CreateLobby(props)
 	props = props or {}
 

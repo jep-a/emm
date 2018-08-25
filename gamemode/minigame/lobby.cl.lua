@@ -1,5 +1,3 @@
-MinigameLobby = MinigameLobby or {}
-
 function MinigameService.CreateLobby(props)
 	local lobby = MinigameLobby.New(props)
 	MinigameService.lobbies[lobby.id] = lobby
@@ -33,7 +31,7 @@ function MinigameLobby:Init(props)
 	end
 end
 
-function MinigameService:Finish()
+function MinigameLobby:Finish()
 	hook.Run("LobbyFinish", self)
 
 	if self:IsLocal() then
