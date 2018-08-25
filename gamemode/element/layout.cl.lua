@@ -170,20 +170,15 @@ function Element:StackChildren()
 			line_size = line_size + child_size
 
 			if i ~= 1 then
-				if i == 2 then
-					local first_child = children[1]
-					local cropped_first_child_margin = (
-						child_margin * (
-							1 - math.Clamp(first_child:GetAttribute(prop_keys.crop_start) + first_child:GetAttribute(prop_keys.crop_end), 0, 1)
-						)
+				local prev_child = children[i - 1]
+				local cropped_prev_child_margin = (
+					child_margin * (
+						1 - math.Clamp(prev_child:GetAttribute(prop_keys.crop_start) + prev_child:GetAttribute(prop_keys.crop_end), 0, 1)
 					)
+				)
 
-					child_positions[i] = child_positions[i] + cropped_first_child_margin
-					line_size = line_size + cropped_first_child_margin
-				else
-					child_positions[i] = child_positions[i] + child_margin
-					line_size = line_size + child_margin
-				end
+				child_positions[i] = child_positions[i] + cropped_prev_child_margin
+				line_size = line_size + cropped_prev_child_margin
 			end
 
 			if adj_child_size > adj_line_size then
