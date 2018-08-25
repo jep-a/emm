@@ -1,16 +1,28 @@
 MinigamePrototype = MinigamePrototype or Class.New()
 
+function MinigamePrototype:__newindex(k, v)
+	if not self.key and k == "name" then
+		rawset(self, "key", v)
+	end
+
+	rawset(self, k, v)
+end
+
 function MinigamePrototype:Init()
 	self.player_classes = {}
 	self.states = {}
 	self.hooks = {}
 	self.state_hooks = {}
+	self.event_hooks = {}
 	self.display = true
 	self.default_state = "Waiting"
 	self.required_players = 2
 
 	self:AddDefaultStates()
-	self:AddRequirePlayersHooks()
+
+	if SERVER then
+		self:AddRequirePlayersHooks()
+	end
 end
 
 function MinigamePrototype:AddPlayerClass(ply_class)

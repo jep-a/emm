@@ -31,3 +31,6 @@ MINIGAME:AddPlayerClass {
 MINIGAME:AddPlayerClass {
 	name = "Hunter"
 }
+
+MINIGAME:AddEvent("RandomHunted", {"entity"})
+MINIGAME:AddEvent("ResetHunted", {"entity", "entity"})

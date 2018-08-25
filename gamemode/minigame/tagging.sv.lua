@@ -1,4 +1,3 @@
-TaggingService = TaggingService or {}
 TaggingService.taggable_groups = TaggingService.taggable_groups or {}
 
 function TaggingService.InitPlayerProperties(ply)
@@ -34,6 +33,7 @@ function TaggingService.Think()
 						then
 							taggable.last_tag_time = CurTime()
 							MinigameService.CallHook(taggable.lobby, "Tag", taggable, ent)
+							MinigameEventService.Call(taggable.lobby, "Tag", taggable, ent)
 						end
 					end
 				end

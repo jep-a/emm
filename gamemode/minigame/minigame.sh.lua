@@ -11,8 +11,6 @@ function MinigameService.Prototype(id)
 end
 
 function MinigameService.RegisterPrototype(proto)
-	proto.key = proto.key or proto.name
-
 	if MinigameService.prototypes[proto.key] then
 		proto.id = MinigameService.prototypes[proto.key].id
 		table.Empty(MinigameService.prototypes[proto.key])
