@@ -18,7 +18,7 @@ function TaggingService.Tag(lobby, taggable, tagger)
 	MinigameEventService.Call(taggable.lobby, "Tag", taggable, tagger)
 
 	if taggable.player_class.swap_on_tag then
-		MinigameService.SwapPlayerClass(taggable, tagger, taggable.player_class.kill_on_tag)
+		MinigameService.SwapPlayerClass(taggable, tagger, taggable.player_class.kill_on_tag, taggable.player_class.kill_tagger_on_tag)
 	end
 end
 

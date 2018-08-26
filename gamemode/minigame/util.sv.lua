@@ -72,14 +72,18 @@ function MinigameService.PickClosestPlayerClass(lobby, origin_ply, props)
 	return closest_ply
 end
 
-function MinigameService.SwapPlayerClass(ply_a, ply_b, kill)
+function MinigameService.SwapPlayerClass(ply_a, ply_b, kill_ply_a, kill_ply_b)
 	local class_a = ply_a.player_class
 	local class_b = ply_b.player_class
 
 	ply_a:SetPlayerClass(class_b)
 	ply_b:SetPlayerClass(class_a)
 
-	if kill then
+	if kill_ply_a then
 		ply_a:Kill()
+	end
+
+	if kill_ply_b then
+		ply_b:Kill()
 	end
 end
