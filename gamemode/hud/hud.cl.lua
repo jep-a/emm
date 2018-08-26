@@ -18,22 +18,32 @@ function HUDService.InitContainers()
 	HUDService.quadrant_b = HUDService.CreateQuadrant(HUDService.middle_section, {layout_justification_x = JUSTIFY_CENTER})
 	HUDService.quadrant_c = HUDService.CreateQuadrant(HUDService.right_section, {layout_justification_x = JUSTIFY_END})
 	HUDService.quadrant_d = HUDService.CreateQuadrant(HUDService.left_section, {layout_justification_y = JUSTIFY_CENTER})
+
 	HUDService.quadrant_e = HUDService.CreateQuadrant(HUDService.middle_section, {
 		layout_justification_x = JUSTIFY_CENTER,
 		layout_justification_y = JUSTIFY_CENTER
 	})
+
 	HUDService.quadrant_f = HUDService.CreateQuadrant(HUDService.right_section, {
 		layout_justification_x = JUSTIFY_END,
 		layout_justification_y = JUSTIFY_CENTER
 	})
-	HUDService.quadrant_g = HUDService.CreateQuadrant(HUDService.left_section, {layout_justification_y = JUSTIFY_END})
+
+	HUDService.quadrant_g = HUDService.CreateQuadrant(HUDService.left_section, {
+		layout_justification_y = JUSTIFY_END,
+		alpha = 0
+	})
+
 	HUDService.quadrant_h = HUDService.CreateQuadrant(HUDService.middle_section, {
 		layout_justification_x = JUSTIFY_CENTER,
-		layout_justification_y = JUSTIFY_END
+		layout_justification_y = JUSTIFY_END,
+		alpha = 0
 	})
+
 	HUDService.quadrant_i = HUDService.CreateQuadrant(HUDService.right_section, {
 		layout_justification_x = JUSTIFY_END,
-		layout_justification_y = JUSTIFY_END
+		layout_justification_y = JUSTIFY_END,
+		alpha = 0
 	})
 
 	HUDService.crosshair_container = HUDService.container:Add(HUDService.CreateCrosshairContainer())
@@ -167,17 +177,17 @@ hook.Add("HUDShouldDraw", "HUDService.ShouldDraw", HUDService.ShouldDraw)
 
 function HUDService.Show()
 	HUDService.crosshair_container:AnimateAttribute("alpha", 255)
-	HUDService.left_section:AnimateAttribute("alpha", 255)
-	HUDService.middle_section:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
-	HUDService.right_section:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION * 2})
+	HUDService.quadrant_g:AnimateAttribute("alpha", 255)
+	HUDService.quadrant_h:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
+	HUDService.quadrant_i:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION * 2})
 end
 hook.Add("LocalPlayerSpawn", "HUDService.Show", HUDService.Show)
 
 function HUDService.Hide()
 	HUDService.crosshair_container:AnimateAttribute("alpha", 0)
-	HUDService.left_section:AnimateAttribute("alpha", 0)
-	HUDService.middle_section:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION})
-	HUDService.right_section:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION * 2})
+	HUDService.quadrant_g:AnimateAttribute("alpha", 0)
+	HUDService.quadrant_h:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION})
+	HUDService.quadrant_i:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION * 2})
 end
 hook.Add("PrePlayerDeath", "HUDService.Hide", function (ply)
 	if IsLocalPlayer(ply) then
