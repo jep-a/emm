@@ -48,8 +48,8 @@ end
 
 function MinigameLobby:SetHost(ply)
 	self.host = ply
-	MinigameNetworkService.SendLobbySetHost(self, ply)
-	hook.Run("LobbySetHost", lobby, ply)
+	MinigameNetworkService.SendLobbyHost(self, ply)
+	hook.Run("LobbyHostChange", lobby, ply)
 end
 
 function MinigameLobby:AddPlayer(ply)

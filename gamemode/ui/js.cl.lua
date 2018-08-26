@@ -197,7 +197,7 @@ function JSUI.SetLobbyHost(lobby, ply)
 		JSUI.html:Call([[window.app.store.lobbies.setHost(]]..lobby.id..[[, ]]..ply:EntIndex()..[[)]])
 	end
 end
-hook.Add("LobbySetHost", "JSUI.SetLobbyHost", JSUI.SetLobbyHost)
+hook.Add("LobbyHostChange", "JSUI.SetLobbyHost", JSUI.SetLobbyHost)
 
 function JSUI.AddLobbyPlayer(lobby, ply)
 	if JSUI.html then

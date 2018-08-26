@@ -19,9 +19,9 @@ function MinigameNetworkService.SendLobbyFinish(lobby)
 	net.Broadcast()
 end
 
-util.AddNetworkString "LobbySetHost"
-function MinigameNetworkService.SendLobbySetHost(lobby, ply)
-	net.Start "LobbySetHost"
+util.AddNetworkString "LobbyHost"
+function MinigameNetworkService.SendLobbyHost(lobby, ply)
+	net.Start "LobbyHost"
 	net.WriteUInt(lobby.id, 8)
 	net.WriteEntity(ply)
 	net.Broadcast()
