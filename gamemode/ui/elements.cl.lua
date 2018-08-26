@@ -16,7 +16,7 @@ function TextBar:Init(text, props)
 	end
 
 	if self:GetAttribute "fill_color" then
-		self:SetAttribute("text_color", COLOR_WHITE)
+		self:SetAttribute("text_color", COLOR_BACKGROUND)
 	end
 end
 
