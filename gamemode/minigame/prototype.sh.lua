@@ -40,9 +40,9 @@ function MinigamePrototype:Init()
 	}
 
 	self:AddDefaultStates()
+	self:AddDefaultHooks()
 
 	if SERVER then
-		self:AddDefaultHooks()
 		self:AddRequirePlayersHooks()
 	else
 		self:AddGlobalEventHooks()
@@ -101,5 +101,6 @@ end
 
 hook.Add("CreateGlobalMinigameEvents", "Default", function ()
 	MinigameEventService.Create("PickRandomPlayerClasses", {"entities"})
-	MinigameEventService.Create("ForfeitPlayerClass", {"entity", "entity"})
+	MinigameEventService.Create("PlayerClassForfeit", {"entity", "entity"})
+	MinigameEventService.Create("PlayerClassChangeFromDeath", {"entity"})
 end)
