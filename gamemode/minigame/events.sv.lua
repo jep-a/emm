@@ -1,4 +1,4 @@
-MinigameEventService.senders = {}
+MinigameEventService.senders = MinigameEventService.senders or {}
 
 local type_senders = {
 	boolean = net.WriteBool,
@@ -10,7 +10,15 @@ local type_senders = {
 	float = net.WriteFloat,
 	string = net.WriteString,
 	entity = net.WriteEntity,
-	vector = net.WriteVector
+	vector = net.WriteVector,
+
+	entities = function (ents)
+		net.WriteUInt(#ents, 8)
+
+		for _, ent in pairs(ents) do
+			net.WriteEntity(ent)
+		end
+	end,
 }
 
 function MinigameEventService.Create(name, struct)

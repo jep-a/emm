@@ -1,16 +1,27 @@
-MinigameEventService.receivers = {}
+MinigameEventService.receivers = MinigameEventService.receivers or {}
 
 local type_readers = {
 	boolean = net.ReadBool,
 
-	id = function (id)
-		return net.ReadUInt(8, id)
+	id = function ()
+		return net.ReadUInt(8)
 	end,
 
 	float = net.ReadFloat,
 	string = net.ReadString,
 	entity = net.ReadEntity,
-	vector = net.ReadVector
+	vector = net.ReadVector,
+	
+	entities = function ()
+		local ents = {}
+		local ent_count = net.ReadUInt(8)
+
+		for i = 1, ent_count do
+			table.insert(ents, net.ReadEntity())
+		end
+
+		return ents
+	end
 }
 
 function MinigameEventService.Create(name, struct)
@@ -47,10 +58,12 @@ function MinigameEventService.Call(lobby, name, ...)
 end
 
 function MinigamePrototype:AddEventHook(event_name, hk_id, func)
-	local proto_event_name = self.key.."."..event_name
+	if self.key then
+		event_name = self.key.."."..event_name
+	end
 
-	self.event_hooks[proto_event_name] = self.event_hooks[proto_event_name] or {}
-	self.event_hooks[proto_event_name][hk_id] = func
+	self.event_hooks[event_name] = self.event_hooks[event_name] or {}
+	self.event_hooks[event_name][hk_id] = func
 end
 
 function MinigamePrototype:RemoveEventHook(event_name, hk_id)

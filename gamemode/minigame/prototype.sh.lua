@@ -21,7 +21,10 @@ function MinigamePrototype:Init()
 	self:AddDefaultStates()
 
 	if SERVER then
+		self:AddDefaultHooks()
 		self:AddRequirePlayersHooks()
+	else
+		self:AddGlobalEventHooks()
 	end
 end
 
@@ -75,16 +78,7 @@ function MinigamePrototype:AddDefaultStates()
 	}
 end
 
-function MinigamePrototype:AddRequirePlayersHooks()
-	self:AddStateHook("Waiting", "PlayerJoin", "RequirePlayers", function (self, ply)
-		if #self.players >= self.required_players then
-			self:NextState()
-		end
-	end)
-
-	self:AddHook("PlayerLeave", "RequirePlayers", function (self, ply)
-		if self.state ~= self.states.Waiting and (#self.players - 1) < self.required_players then
-			self:SetState(self.states.Waiting)
-		end
-	end)
-end
+hook.Add("CreateGlobalMinigameEvents", "Default", function ()
+	MinigameEventService.Create("PickRandomPlayerClasses", {"entities"})
+	MinigameEventService.Create("ForfeitPlayerClass", {"entity", "entity"})
+end)

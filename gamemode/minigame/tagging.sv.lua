@@ -7,6 +7,21 @@ function TaggingService.InitPlayerProperties(ply)
 end
 hook.Add("InitPlayerProperties", "TaggingService.InitPlayerProperties", TaggingService.InitPlayerProperties)
 
+hook.Add("CreateGlobalMinigameEvents", "TaggingService", function ()
+	MinigameEventService.Create("Tag", {"entity", "entity"})
+end)
+
+function TaggingService.Tag(lobby, taggable, tagger)
+	taggable.last_tag_time = CurTime()
+
+	MinigameService.CallHook(taggable.lobby, "Tag", taggable, tagger)
+	MinigameEventService.Call(taggable.lobby, "Tag", taggable, tagger)
+
+	if taggable.player_class.swap_on_tag then
+		MinigameService.SwapPlayerClass(taggable, tagger, taggable.player_class.kill_on_tag)
+	end
+end
+
 function TaggingService.Think()
 	for i = 1, #TaggingService.taggable_groups do
 		for _i = 1, #TaggingService.taggable_groups[i] do
@@ -27,13 +42,11 @@ function TaggingService.Think()
 							taggable ~= ent and
 							ent:IsPlayer() and
 							ent:Alive() and
-							taggable.lobby == ent.lobby and
+							MinigameService.IsSharingLobby(taggable, ent) and
 							ent.player_class and
 							SequentialTableHasValue(taggable.player_class.can_tag, ent.player_class.key)
 						then
-							taggable.last_tag_time = CurTime()
-							MinigameService.CallHook(taggable.lobby, "Tag", taggable, ent)
-							MinigameEventService.Call(taggable.lobby, "Tag", taggable, ent)
+							TaggingService.Tag(taggable.lobby, taggable, ent)
 						end
 					end
 				end
