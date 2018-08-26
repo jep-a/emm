@@ -110,7 +110,9 @@ function JSUI.InitJavaScript()
 	end)
 
 	JSUI.html:AddFunction("EMM", "switchLobby", function (id)
-		if LocalPlayer().lobby and id == LocalPlayer().lobby.id then
+		local local_lobby = LocalPlayer().lobby
+
+		if local_lobby and id == local_lobby.id then
 			MinigameNetworkService.RequestLobbyLeave()
 		else
 			MinigameNetworkService.RequestLobbyJoin(MinigameService.lobbies[id])

@@ -35,7 +35,7 @@ local function CallPlayerSpawnHooks()
 
 		CallPlayerSpawnHook(ply_index, function ()
 			local ply = Entity(ply_index)
-			local is_local_ply = ply == LocalPlayer()
+			local is_local_ply = IsLocalPlayer(ply)
 
 			if is_local_ply then
 				hook.Run("LocalPlayerSpawn", ply)
@@ -120,7 +120,7 @@ net.Receive("PrePlayerDeath", function ()
 
 	hook.Run("PrePlayerDeath", ply, att)
 
-	if ply == LocalPlayer() then
+	if IsLocalPlayer(ply) then
 		hook.Run("LocalPrePlayerDeath", ply, att)
 	end
 
@@ -140,7 +140,7 @@ net.Receive("PlayerDeath", function ()
 
 	hook.Run("PlayerDeath", ply, infl, att)
 
-	if ply == LocalPlayer() then
+	if IsLocalPlayer(ply) then
 		hook.Run("LocalPlayerDeath", ply, infl, att)
 	end
 

@@ -201,7 +201,7 @@ end
 hook.Add("PreDrawOpaqueRenderables", "IndicatorService.RenderCoasters", IndicatorService.RenderCoasters)
 
 function IndicatorService.Add(lobby, ply)
-	if ply == LocalPlayer() then
+	if IsLocalPlayer(ply) then
 		for _, _ply in pairs(lobby.players) do
 			if ply ~= _ply then
 				_ply.indicator = Indicator.New(_ply)
@@ -227,7 +227,7 @@ hook.Add("LocalLobbyPlayerDeath", "IndicatorService.Remove", function (lobby, pl
 end)
 
 function IndicatorService.Clear(lobby, ply)
-	if ply == LocalPlayer() then
+	if IsLocalPlayer(ply) then
 		IndicatorService.container:Clear()
 	else
 		ply.indicator:Finish()

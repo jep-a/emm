@@ -83,7 +83,7 @@ function ENT:Think()
 				pos = self:GetPos()
 			end
 
-			if parent_is_valid and owner == LocalPlayer() and owner:Alive() then
+			if parent_is_valid and IsLocalPlayer(owner) and owner:Alive() then
 				local eye_norm = Angle(0, owner:EyeAngles().y, 0):Forward()
 
 				local trace = util.TraceLine({

@@ -180,7 +180,7 @@ function HUDService.Hide()
 	HUDService.right_section:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION * 2})
 end
 hook.Add("PrePlayerDeath", "HUDService.Hide", function (ply)
-	if ply == LocalPlayer() then
+	if IsLocalPlayer(ply) then
 		HUDService.Hide()
 	end
 end)
