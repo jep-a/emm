@@ -30,11 +30,18 @@ function MinigamePrototype:CheckIfNoPlayerClasses(ply, old_class)
 	end
 end
 
+function MinigamePrototype:SetPlayerClassOnDeath(ply)
+	if ply.player_class and ply.player_class.player_class_on_death then
+		ply:SetPlayerClass(self.player_classes[ply.player_class.player_class_on_death])
+	end
+end
+
 function MinigamePrototype:AddDefaultHooks()
 	self:AddHook("StartStateWaiting", "ClearPlayerClasses", self.ClearPlayerClasses)
 	self:AddHook("StartStatePlaying", "PickRandomPlayerClasses", self.PickRandomPlayerClasses)
 	self:AddStateHook("Playing", "PlayerJoin", "SetDefaultPlayerClass", self.SetDefaultPlayerClass)
 	self:AddStateHook("Playing", "PlayerDeath", "ForfeitPlayerClass", self.ForfeitPlayerClass)
+	self:AddStateHook("Playing", "PlayerDeath", "SetPlayerClassOnDeath", self.SetPlayerClassOnDeath)
 	self:AddStateHook("Playing", "PlayerLeave", "ForfeitPlayerClass", self.ForfeitPlayerClass)
 	self:AddStateHook("Playing", "PlayerClassChange", "EndIfNoPlayerClasses", self.CheckIfNoPlayerClasses)
 end
