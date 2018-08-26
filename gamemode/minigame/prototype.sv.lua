@@ -12,7 +12,9 @@ function MinigamePrototype:ForfeitPlayerClass(ply)
 			swap_player_class = true
 		})
 
-		MinigameEventService.Call(self, "ForfeitPlayerClass", ply, closest_ply)
+		if closest_ply then
+			MinigameEventService.Call(self, "ForfeitPlayerClass", ply, closest_ply)
+		end
 	end
 end
 
