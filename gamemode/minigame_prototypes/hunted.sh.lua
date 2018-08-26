@@ -11,6 +11,7 @@ MINIGAME:AddPlayerClass {
 	name = "Hunted",
 	color = COLOR_PEACH,
 	can_tag = {"Hunter"},
+	tag_victim = true,
 	swap_on_tag = true,
 	kill_on_tag = true,
 	swap_closest_on_death = true
