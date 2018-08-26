@@ -4,6 +4,14 @@ EMM.client_includes = {}
 
 EMM_GAMEMODE_DIRECTORY = "emm/gamemode/"
 
+function IsSharedFile(file)
+	return string.match(file, "sh.lua$")
+end
+
+function IsClientFile(file)
+	return string.match(file, "cl.lua$")
+end
+
 function EMM.Include(inc, inc_func)
 	inc_func = inc_func or include
 
@@ -13,8 +21,13 @@ function EMM.Include(inc, inc_func)
 		end
 	elseif isstring(inc) then
 		local inc_path = EMM_GAMEMODE_DIRECTORY..inc
+		local inc_file = file.Find(inc_path, "LUA")[1]
 		local sh_inc_file = file.Find(inc_path..".sh.lua", "LUA")[1]
 		local cl_inc_file = file.Find(inc_path..".cl.lua", "LUA")[1]
+
+		if inc_file and (IsSharedFile(inc_file) or IsClientFile(inc_file)) then
+			inc_func(inc_path)
+		end
 
 		if sh_inc_file then
 			inc_func(inc_path..".sh.lua")

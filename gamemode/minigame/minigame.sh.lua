@@ -45,21 +45,29 @@ end
 -- # Init
 
 local MINIGAME_PROTOTYPES_DIRECTORY = "minigame_prototypes/"
-local _, minigame_prototypes_dirs = file.Find(EMM_GAMEMODE_DIRECTORY..MINIGAME_PROTOTYPES_DIRECTORY.."*", "LUA")
+local minigame_prototype_files, minigame_prototype_dirs = file.Find(EMM_GAMEMODE_DIRECTORY..MINIGAME_PROTOTYPES_DIRECTORY.."*", "LUA")
 local minigame_fenv_metatable = {__index = _G}
 
+function MinigameService.LoadPrototype(path)
+	local proto_fenv = {}
+
+	proto_fenv.MINIGAME = MinigamePrototype.New()
+	setmetatable(proto_fenv, minigame_fenv_metatable)
+
+	setfenv(0, proto_fenv)
+	EMM.Include(path)
+	setfenv(0, _G)
+
+	MinigameService.RegisterPrototype(proto_fenv.MINIGAME)
+end
+
 function MinigameService.LoadPrototypes()
-	for _, proto in pairs(minigame_prototypes_dirs) do
-		local proto_fenv = {}
+	for _, proto in pairs(minigame_prototype_files) do
+		MinigameService.LoadPrototype(MINIGAME_PROTOTYPES_DIRECTORY..proto)
+	end
 
-		proto_fenv.MINIGAME = MinigamePrototype.New()
-		setmetatable(proto_fenv, minigame_fenv_metatable)
-
-		setfenv(0, proto_fenv)
-		EMM.Include(MINIGAME_PROTOTYPES_DIRECTORY..proto.."/init")
-		setfenv(0, _G)
-
-		MinigameService.RegisterPrototype(proto_fenv.MINIGAME)
+	for _, proto in pairs(minigame_prototype_dirs) do
+		MinigameService.LoadPrototype(MINIGAME_PROTOTYPES_DIRECTORY..proto.."/init")
 	end
 end
 hook.Add("Initialize", "MinigameService.LoadPrototypes", MinigameService.LoadPrototypes)

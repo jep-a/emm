@@ -7,13 +7,25 @@ EMM_GAMEMODE_DIRECTORY = "emm/gamemode/"
 AddCSLuaFile "cl_init.lua"
 AddCSLuaFile "emm.lua"
 
+function IsSharedFile(file)
+	return string.match(file, "sh.lua$")
+end
+
+function IsServerFile(file)
+	return string.match(file, "sv.lua$")
+end
+
+function IsClientFile(file)
+	return string.match(file, "cl.lua$")
+end
+
 function EMM.RequireClientsideLuaDirectory(dir)
 	dir = dir and string.TrimLeft(dir, "/") or ""
 
 	local files, child_dirs = file.Find(EMM_GAMEMODE_DIRECTORY..dir.."/*", "LUA")
 
 	for _, file in pairs(files) do
-		if string.match(file, "sh.lua$") or string.match(file, "cl.lua$") then
+		if IsSharedFile(file) or IsClientFile(file) then
 			MsgN("requiring client-side include "..dir.."/"..file)
 			AddCSLuaFile(EMM_GAMEMODE_DIRECTORY..dir.."/"..file)
 		end
@@ -34,13 +46,18 @@ function EMM.Include(inc, inc_func)
 		end
 	elseif isstring(inc) then
 		local inc_path = EMM_GAMEMODE_DIRECTORY..inc
+		local inc_file = file.Find(inc_path, "LUA")[1]
 		local sh_inc_file = file.Find(inc_path..".sh.lua", "LUA")[1]
 		local sv_inc_file = file.Find(inc_path..".sv.lua", "LUA")[1]
 
-		if sh_inc_file or sv_inc_file then
+		if inc_file or sh_inc_file or sv_inc_file then
 			MsgN("including "..inc)
 		else
 			return
+		end
+
+		if inc_file and (IsSharedFile(inc_file) or IsServerFile(inc_file)) then
+			inc_func(inc_path)
 		end
 
 		if sh_inc_file then
