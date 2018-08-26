@@ -18,18 +18,25 @@ function MinigamePrototype:ForfeitPlayerClass(ply)
 	end
 end
 
+function MinigamePrototype:SetDefaultPlayerClass(ply)
+	if self.default_player_class then
+		ply:SetPlayerClass(self.player_classes[self.default_player_class])
+	end
+end
+
+function MinigamePrototype:CheckIfNoPlayerClasses(ply, old_class)
+	if old_class and old_class.end_on_none and 1 > #self[old_class.key] then
+		self:NextState()
+	end
+end
+
 function MinigamePrototype:AddDefaultHooks()
-	self:AddHook("StartStateWaiting", "ClearPlayerClasses", MinigameService.ClearPlayerClasses)
-	self:AddHook("StartStatePlaying", "PickRandomPlayerClasses", MinigamePrototype.PickRandomPlayerClasses)
-
-	self:AddStateHook("Playing", "PlayerJoin", "SetDefaultPlayerClass", function (self, ply)
-		if self.default_player_class then
-			ply:SetPlayerClass(self.player_classes[self.default_player_class])
-		end
-	end)
-
-	self:AddStateHook("Playing", "PlayerDeath", "ForfeitPlayerClass", MinigamePrototype.ForfeitPlayerClass)
-	self:AddStateHook("Playing", "PlayerLeave", "ForfeitPlayerClass", MinigamePrototype.ForfeitPlayerClass)
+	self:AddHook("StartStateWaiting", "ClearPlayerClasses", self.ClearPlayerClasses)
+	self:AddHook("StartStatePlaying", "PickRandomPlayerClasses", self.PickRandomPlayerClasses)
+	self:AddStateHook("Playing", "PlayerJoin", "SetDefaultPlayerClass", self.SetDefaultPlayerClass)
+	self:AddStateHook("Playing", "PlayerDeath", "ForfeitPlayerClass", self.ForfeitPlayerClass)
+	self:AddStateHook("Playing", "PlayerLeave", "ForfeitPlayerClass", self.ForfeitPlayerClass)
+	self:AddStateHook("Playing", "PlayerClassChange", "EndIfNoPlayerClasses", self.CheckIfNoPlayerClasses)
 end
 
 function MinigamePrototype:AddRequirePlayersHooks()
