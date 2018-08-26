@@ -1,6 +1,7 @@
 MINIGAME.name = "Elimination"
-MINIGAME.color = COLOR_ORANGE
+MINIGAME.color = COLOR_PEACH
 MINIGAME.default_player_class = "Hunter"
+MINIGAME.required_players = 3
 
 MINIGAME.random_player_classes = {
 	class_key = "Hunter",
