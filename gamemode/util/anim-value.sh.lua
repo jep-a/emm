@@ -69,6 +69,7 @@ function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay, finish
 		delay = props_or_duration.delay or 0
 		finish = props_or_duration.finish
 		callback = props_or_duration.callback
+		stack = props_or_duration.stack
 	else
 		duration = props_or_duration or 0.2
 		ease = ease or DefaultEase
@@ -80,13 +81,13 @@ function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay, finish
 
 	local start_time
 
-	if last_anim then
+	if stack and last_anim then
 		start_time = last_anim.end_time
 	else
 		start_time = cur_time
 	end
 
-	table.insert(self.animations, {
+	local anim = {
 		start_value = self.current,
 		end_value = value,
 		start_time = start_time + delay,
@@ -95,7 +96,13 @@ function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay, finish
 		delay = delay,
 		finish = finish,
 		callback = callback
-	})
+	}
+
+	if stack then
+		table.insert(self.animations, anim)
+	else
+		self.animations[1] = anim
+	end
 
 	return self
 end

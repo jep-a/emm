@@ -9,7 +9,9 @@ function MinigameStateService.EndStateTimer(lobby)
 end
 
 function MinigameLobby:SetState(state)
-	if self.state and self.state.time then
+	local old_state = self.state
+
+	if old_state and old_state.time then
 		MinigameStateService.EndStateTimer(self)
 	end
 
@@ -20,8 +22,8 @@ function MinigameLobby:SetState(state)
 		MinigameStateService.StartStateTimer(self)
 	end
 
-	MinigameService.CallHook(self, "StartState"..state.name, state)
-	hook.Run("LobbyStateChange", lobby, state)
+	MinigameService.CallHook(self, "StartState"..state.name, old_state, state)
+	hook.Run("LobbyStateChange", lobby, old_state, state)
 	MinigameNetworkService.SendLobbyState(self)
 end
 

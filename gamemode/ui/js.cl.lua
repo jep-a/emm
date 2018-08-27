@@ -204,14 +204,14 @@ function JSUI.AddLobbyPlayer(lobby, ply)
 		JSUI.html:Call([[window.app.store.lobbies.addPlayer(]]..lobby.id..[[, ]]..ply:EntIndex()..[[)]])
 	end
 end
-hook.Add("LobbyAddPlayer", "JSUI.AddLobbyPlayer", JSUI.AddLobbyPlayer)
+hook.Add("LobbyPlayerJoin", "JSUI.AddLobbyPlayer", JSUI.AddLobbyPlayer)
 
 function JSUI.RemoveLobbyPlayer(lobby, ply)
 	if JSUI.html then
 		JSUI.html:Call([[window.app.store.lobbies.removePlayer(]]..lobby.id..[[, ]]..ply:EntIndex()..[[)]])
 	end
 end
-hook.Add("LobbyRemovePlayer", "JSUI.RemoveLobbyPlayer", JSUI.RemoveLobbyPlayer)
+hook.Add("LobbyPlayerLeave", "JSUI.RemoveLobbyPlayer", JSUI.RemoveLobbyPlayer)
 
 
 -- # Toggling

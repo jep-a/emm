@@ -157,3 +157,22 @@ end
 function NotificationService.PushCountdown(time, text)
 	HUDService.quadrant_b:Add(NotificationContainer.New(CountdownNotification.New(time, text), time - CurTime()))
 end
+
+local function FinishNotificationContainer(element)
+	if Class.InstanceOf(element, NotificationContainer) then
+		element:Finish()
+	end
+end
+
+function NotificationService.Clear(lobby, ply)
+	if IsLocalPlayer(ply) then
+		for _, element in pairs(HUDService.quadrant_b.children) do
+			FinishNotificationContainer(element)
+		end
+
+		for _, element in pairs(HUDService.quadrant_c.children) do
+			FinishNotificationContainer(element)
+		end
+	end
+end
+hook.Add("LocalLobbyPlayerLeave", "NotificationService.Clear", NotificationService.Clear)

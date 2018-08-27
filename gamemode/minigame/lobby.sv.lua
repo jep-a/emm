@@ -57,7 +57,7 @@ function MinigameLobby:AddPlayer(ply)
 	table.insert(self.players, ply)
 
 	MinigameNetworkService.SendLobbyPlayer(self, ply)
-	hook.Run("LobbyAddPlayer", self, ply)
+	hook.Run("LobbyPlayerJoin", self, ply)
 	MinigameService.CallHook(self, "PlayerJoin", ply)
 end
 
@@ -68,7 +68,7 @@ function MinigameLobby:RemovePlayer(ply, net, force)
 
 	if force or has_plys then
 		MinigameService.CallHook(self, "PlayerLeave", ply)
-		hook.Run("LobbyRemovePlayer", self, ply)
+		hook.Run("LobbyPlayerLeave", self, ply)
 
 		ply.lobby = nil
 		table.RemoveByValue(self.players, ply)
@@ -80,6 +80,8 @@ function MinigameLobby:RemovePlayer(ply, net, force)
 		if has_plys and self.host == ply then
 			self:SetHost(self.players[#self.players])
 		end
+
+		ply.leaving_lobby = nil
 	else
 		MinigameService.FinishLobby(self)
 	end

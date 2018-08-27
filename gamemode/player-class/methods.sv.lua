@@ -29,7 +29,7 @@ function player_metatable:ClearPlayerClass(net)
 		PlayerClassService.NetworkPlayerClass(self)
 	end
 end
-hook.Add("LobbyRemovePlayer", "ClearPlayerClass", function (_, ply)
+hook.Add("LobbyPlayerLeave", "ClearPlayerClass", function (_, ply)
 	if ply.player_class then
 		ply:ClearPlayerClass()
 	end

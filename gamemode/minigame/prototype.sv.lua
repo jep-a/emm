@@ -53,9 +53,9 @@ function MinigamePrototype:AddDefaultHooks()
 	self:AddHook("StartStateWaiting", "ClearPlayerClasses", MinigameService.ClearPlayerClasses)
 	self:AddHook("StartStatePlaying", "PickRandomPlayerClasses", self.PickRandomPlayerClasses)
 	self:AddStateHook("Playing", "PlayerJoin", "SetDefaultPlayerClass", self.SetDefaultPlayerClass)
+	self:AddStateHook("Playing", "PlayerLeave", "ForfeitPlayerClass", self.ForfeitPlayerClass)
 	self:AddStateHook("Playing", "PlayerDeath", "ForfeitPlayerClass", self.ForfeitPlayerClass)
 	self:AddStateHook("Playing", "PlayerDeath", "SetPlayerClassOnDeath", self.SetPlayerClassOnDeath)
-	self:AddStateHook("Playing", "PlayerLeave", "ForfeitPlayerClass", self.ForfeitPlayerClass)
 	self:AddStateHook("Playing", "PlayerClassChange", "EndIfNoPlayerClasses", self.CheckIfNoPlayerClasses)
 end
 

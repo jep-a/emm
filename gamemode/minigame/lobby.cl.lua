@@ -76,20 +76,20 @@ function MinigameLobby:AddPlayer(ply)
 	ply.lobby = self
 	table.insert(self.players, ply)
 
-	hook.Run("LobbyAddPlayer", self, ply)
+	hook.Run("LobbyPlayerJoin", self, ply)
 
 	if self:IsLocal() then
-		hook.Run("LocalLobbyAddPlayer", self, ply)
+		hook.Run("LocalLobbyPlayerJoin", self, ply)
 	end
 
 	MinigameService.CallHook(self, "PlayerJoin", ply)
 end
 
 function MinigameLobby:RemovePlayer(ply)
-	hook.Run("LobbyRemovePlayer", self, ply)
+	hook.Run("LobbyPlayerLeave", self, ply)
 
 	if self:IsLocal() then
-		hook.Run("LocalLobbyRemovePlayer", self, ply)
+		hook.Run("LocalLobbyPlayerLeave", self, ply)
 	end
 
 	MinigameService.CallHook(self, "PlayerLeave", ply)

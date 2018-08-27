@@ -213,7 +213,7 @@ function IndicatorService.Add(lobby, ply)
 		IndicatorService.container:Add(ply.indicator)
 	end
 end
-hook.Add("LocalLobbyAddPlayer", "IndicatorService.Add", IndicatorService.Add)
+hook.Add("LocalLobbyPlayerJoin", "IndicatorService.Add", IndicatorService.Add)
 hook.Add("LocalLobbyPlayerSpawn", "IndicatorService.Add", function (lobby, ply)
 	if ply ~= LocalPlayer() then
 		IndicatorService.Add(lobby, ply)
@@ -233,7 +233,7 @@ function IndicatorService.Clear(lobby, ply)
 		ply.indicator:Finish()
 	end
 end
-hook.Add("LocalLobbyRemovePlayer", "IndicatorService.Clear", IndicatorService.Clear)
+hook.Add("LocalLobbyPlayerLeave", "IndicatorService.Clear", IndicatorService.Clear)
 
 function IndicatorService.ReloadIndicators()
 	local ply = LocalPlayer()

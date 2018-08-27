@@ -38,8 +38,12 @@ function MinigamePrototype:NotifyPlayerClassChangeFromDeath(is_local_lobby, invo
 	end
 end
 
-function MinigamePrototype:NotifyWaitingForPlayers()
+function MinigamePrototype:NotifyWaitingForPlayers(old_state_or_ply, new_state)
 	local required_plys = self.required_players - #self.players
+
+	if old_state_or_ply == self.states.Waiting or (old_state_or_ply and new_state == self.states.Waiting) then
+		required_plys = required_plys + 1
+	end
 
 	if self:IsLocal() and required_plys > 0 then
 		NotificationService.PushText("waiting for "..required_plys.." more "..((required_plys == 1 and "person") or "people"))
