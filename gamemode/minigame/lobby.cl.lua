@@ -28,6 +28,10 @@ function MinigameLobby:Init(props)
 
 	if self:IsLocal() then
 		hook.Run("LocalLobbyInit", self)
+
+		if IsLocalPlayer(self.host) then
+			NotificationService.PushMetaText(MinigameService.HUDLobbyText(self), "Lobby")
+		end
 	end
 end
 
@@ -80,6 +84,10 @@ function MinigameLobby:AddPlayer(ply)
 
 	if self:IsLocal() then
 		hook.Run("LocalLobbyPlayerJoin", self, ply)
+
+		if IsLocalPlayer(ply) then
+			NotificationService.PushMetaText(MinigameService.HUDLobbyText(self), "Lobby")
+		end
 	end
 
 	MinigameService.CallHook(self, "PlayerJoin", ply)
@@ -90,6 +98,10 @@ function MinigameLobby:RemovePlayer(ply)
 
 	if self:IsLocal() then
 		hook.Run("LocalLobbyPlayerLeave", self, ply)
+
+		if IsLocalPlayer(ply) then
+			NotificationService.FinishSticky("Lobby")
+		end
 	end
 
 	MinigameService.CallHook(self, "PlayerLeave", ply)
@@ -97,3 +109,18 @@ function MinigameLobby:RemovePlayer(ply)
 	ply.lobby = nil
 	table.RemoveByValue(self.players, ply)
 end
+
+function MinigameService.HUDLobbyText(lobby)
+	local host = lobby.host
+
+	return (IsLocalPlayer(host) and "your" or host:GetName().."'s").." "..lobby.prototype.name.." lobby", "Lobby"
+end
+
+function MinigameService.InitHUDElements()
+	local lobby = LocalPlayer().lobby
+
+	if lobby then
+		NotificationService.PushMetaText(MinigameService.HUDLobbyText(lobby), "Lobby")
+	end
+end
+hook.Add("InitHUDElements", "MinigameService.InitHUDElements", MinigameService.InitHUDElements)
