@@ -4,7 +4,7 @@ function MinigameLobby:__index(key)
 	local proto = rawget(self, "prototype")
 
 	if proto then
-		local proto_mt_val = rawget(proto, key)
+		local proto_mt_val = proto[key]
 
 		if proto_mt_val ~= nil then
 			return proto_mt_val

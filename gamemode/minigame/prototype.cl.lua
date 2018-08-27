@@ -53,6 +53,8 @@ function MinigamePrototype:NotifyWaitingForPlayers(old_state_or_ply, new_state)
 end
 
 function MinigamePrototype:NotifyStateCountdown(old_state, new_state)
+	new_state = new_state or self.state
+
 	if self:IsLocal() and new_state.time and new_state.notify_countdown then
 		if self.countdown_notification then
 			self.countdown_notification:Finish()
@@ -84,3 +86,14 @@ function MinigamePrototype:AddGlobalEventHooks()
 
 	hook.Run("CreateGlobalMinigameEventHooks", self)
 end
+
+function MinigameService.ReloadStateCountdown(lobby, ply)
+	ply = ply or LocalPlayer()
+	lobby = lobby or ply.lobby
+
+	if IsLocalPlayer(ply) and lobby then
+		lobby:NotifyStateCountdown()
+	end
+end
+hook.Add("LocalLobbyPlayerJoin", "MinigameService.ReloadStateCountdown", MinigameService.ReloadStateCountdown)
+hook.Add("InitHUDElements", "MinigameService.ReloadStateCountdown", MinigameService.ReloadStateCountdown)
