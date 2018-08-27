@@ -22,8 +22,14 @@ end
 NotificationContainer = NotificationContainer or Class.New(Element)
 
 function NotificationContainer:Init(children, duration, key)
+	duration = duration or 3
+
+	if duration == 0 then
+		duration = nil
+	end
+
 	NotificationContainer.super.Init(self, {
-		duration = duration or 3,
+		duration = duration,
 		fit = true
 	})
 
@@ -178,10 +184,18 @@ function NotificationService.PushCountdown(time, text, key)
 	return HUDService.quadrant_b:Add(NotificationContainer.New(CountdownNotification.New(time, text), time - CurTime(), key))
 end
 
+function NotificationService.PushMetaText(text, key)
+	return HUDService.quadrant_a:Add(NotificationContainer.New(TextBar.New(text), 0, key))
+end
+
 local function FinishNotificationContainer(element)
 	if Class.InstanceOf(element, NotificationContainer) then
 		element:Finish()
 	end
+end
+
+function NotificationService.FinishSticky(key)
+	NotificationService.stickies[key]:Finish()
 end
 
 function NotificationService.Clear(lobby, ply)

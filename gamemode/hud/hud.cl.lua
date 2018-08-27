@@ -156,6 +156,8 @@ function HUDService.Init()
 	HUDService.InitContainers()
 	HUDService.InitMeters()
 	HUDService.InitCrosshair()
+
+	hook.Run("InitHUDElements")
 end
 hook.Add("InitUI", "HUDService.Init", HUDService.Init)
 
