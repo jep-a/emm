@@ -75,30 +75,6 @@ function MinigamePrototype:RemoveStateHook(state_key, hk_name, hk_id)
 	self.state_hooks[state_key][hk_name][hk_id] = nil
 end
 
-function MinigamePrototype:AddDefaultStates()
-	self:AddState {
-		name = "Waiting",
-		next = "Starting"
-	}
-	
-	self:AddState {
-		name = "Starting",
-		time = 3,
-		next = "Playing"
-	}
-	
-	self:AddState {
-		name = "Playing",
-		next = "Ending"
-	}
-	
-	self:AddState {
-		name = "Ending",
-		time = 3,
-		next = "Starting"
-	}
-end
-
 hook.Add("CreateGlobalMinigameEvents", "Default", function ()
 	MinigameEventService.Create("PickRandomPlayerClasses", {"entities"})
 	MinigameEventService.Create("PlayerClassForfeit", {"entity", "entity"})

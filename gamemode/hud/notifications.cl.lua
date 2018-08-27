@@ -86,7 +86,7 @@ function CountdownNotification:Init(end_time, text)
 
 	self.end_time = end_time
 
-	if text then
+	if text and #text > 0 then
 		self:Add(TextBar.New(text, {
 			width = BAR_WIDTH,
 			fit_x = false,
@@ -165,7 +165,7 @@ local function FinishNotificationContainer(element)
 end
 
 function NotificationService.Clear(lobby, ply)
-	if IsLocalPlayer(ply) then
+	if not lobby or IsLocalPlayer(ply) then
 		for _, element in pairs(HUDService.quadrant_b.children) do
 			FinishNotificationContainer(element)
 		end

@@ -22,6 +22,7 @@ function MinigameLobby:SetState(state)
 		MinigameStateService.StartStateTimer(self)
 	end
 
+	MinigameService.CallHook(self, "StartState", old_state, state)
 	MinigameService.CallHook(self, "StartState"..state.name, old_state, state)
 	hook.Run("LobbyStateChange", lobby, old_state, state)
 	MinigameNetworkService.SendLobbyState(self)

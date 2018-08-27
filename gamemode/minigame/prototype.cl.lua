@@ -39,18 +39,27 @@ function MinigamePrototype:NotifyPlayerClassChangeFromDeath(is_local_lobby, invo
 end
 
 function MinigamePrototype:NotifyWaitingForPlayers(old_state_or_ply, new_state)
-	local required_plys = self.required_players - #self.players
+	if self:IsLocal() then
+		local required_plys = self.required_players - #self.players
 
-	if old_state_or_ply == self.states.Waiting or (old_state_or_ply and new_state == self.states.Waiting) then
-		required_plys = required_plys + 1
+		if old_state_or_ply == self.states.Waiting or (old_state_or_ply and new_state == self.states.Waiting) then
+			required_plys = required_plys + 1
+		end
+
+		if required_plys > 0 then
+			NotificationService.PushText("waiting for "..required_plys.." more "..((required_plys == 1 and "person") or "people"))
+		end
 	end
+end
 
-	if self:IsLocal() and required_plys > 0 then
-		NotificationService.PushText("waiting for "..required_plys.." more "..((required_plys == 1 and "person") or "people"))
+function MinigamePrototype:NotifyTimedState(old_state, new_state)
+	if self:IsLocal() and new_state.time and new_state.notify_countdown then
+		NotificationService.PushCountdown(self.last_state_start + new_state.time, new_state.notify_countdown_text or string.lower(new_state.name).." in")
 	end
 end
 
 function MinigamePrototype:AddDefaultHooks()
+	self:AddHook("StartState", "Notification", self.NotifyTimedState)
 	self:AddHook("StartStateWaiting", "Notification", self.NotifyWaitingForPlayers)
 	self:AddStateHook("Waiting", "PlayerJoin", "Notification", self.NotifyWaitingForPlayers)
 end
