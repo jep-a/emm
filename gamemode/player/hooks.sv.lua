@@ -51,6 +51,35 @@ end)
 
 -- # Death
 
+function GM:PlayerDeath(ply, infl, att)
+	local att_valid = IsValid(att)
+	local infl_valid = IsValid(infl)
+
+	if att_valid and att:GetClass() == "trigger_hurt" then
+		att = ply
+	end
+
+	if att_valid and att:IsVehicle() and IsValid(att:GetDriver()) then
+		att = att:GetDriver()
+	end
+
+	if not infl_valid and att_valid then
+		infl = att
+	end
+
+	if infl_valid and infl == att and (infl:IsPlayer() or infl:IsNPC()) then
+		infl = infl:GetActiveWeapon()
+	
+		if not infl_valid then
+			infl = att
+		end
+	end
+end
+
+function GM:DoPlayerDeath( ply, att, dmg)
+	ply:CreateRagdoll()
+end
+
 util.AddNetworkString "PrePlayerDeath"
 hook.Add("DoPlayerDeath", "EMM.PrePlayerDeath", function (ply, att, dmg)
 	ply:CreateRagdoll()
