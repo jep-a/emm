@@ -13,6 +13,8 @@ end
 function MinigameLobby:Init(props)
 	self.id = props.id
 	self.prototype = props.prototype
+	self.state = props.state
+	self.last_state_start = props.last_state_start
 	self.host = props.host
 	self.players = props.players or {}
 
