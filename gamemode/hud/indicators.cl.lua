@@ -108,6 +108,10 @@ function Indicator:AnimateFinish()
 	self:AnimateAttribute("alpha", 0, {
 		duration = 1,
 		callback = function ()
+			if IsValid(self.entity) then
+				self.entity.indicator = nil
+			end
+
 			Indicator.super.Finish(self)
 			self.world_alpha:Finish()
 			self.animatable_color:Finish()
@@ -233,7 +237,7 @@ function IndicatorService.Clear(lobby, ply)
 		ply.indicator:Finish()
 	end
 end
-hook.Add("LocalLobbyPlayerLeave", "IndicatorService.Clear", IndicatorService.Clear)
+hook.Add("LocalLobbyRemovePlayer", "IndicatorService.Clear", IndicatorService.Clear)
 
 function IndicatorService.ReloadIndicators()
 	local ply = LocalPlayer()
