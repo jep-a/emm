@@ -52,14 +52,27 @@ function MinigamePrototype:NotifyWaitingForPlayers(old_state_or_ply, new_state)
 	end
 end
 
-function MinigamePrototype:NotifyTimedState(old_state, new_state)
+function MinigamePrototype:NotifyStateCountdown(old_state, new_state)
 	if self:IsLocal() and new_state.time and new_state.notify_countdown then
-		NotificationService.PushCountdown(self.last_state_start + new_state.time, new_state.notify_countdown_text or string.lower(new_state.name).." in")
+		if self.countdown_notification then
+			self.countdown_notification:Finish()
+			self.countdown_notification = nil
+		end
+
+		local text
+
+		if new_state.notify_countdown_text then
+			text = new_state.notify_countdown_text
+		else
+			text = string.lower(new_state.name).." in"
+		end
+
+		self.countdown_notification = NotificationService.PushCountdown(self.last_state_start + new_state.time, text, "StateCountdown")
 	end
 end
 
 function MinigamePrototype:AddDefaultHooks()
-	self:AddHook("StartState", "Notification", self.NotifyTimedState)
+	self:AddHook("StartState", "Notification", self.NotifyStateCountdown)
 	self:AddHook("StartStateWaiting", "Notification", self.NotifyWaitingForPlayers)
 	self:AddStateHook("Waiting", "PlayerJoin", "Notification", self.NotifyWaitingForPlayers)
 end

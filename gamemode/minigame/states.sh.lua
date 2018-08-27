@@ -22,7 +22,7 @@ function MinigamePrototype:AddDefaultStates()
 	
 	self:AddState {
 		name = "Starting",
-		time = 3,
+		time = 5,
 		next = "Playing",
 		notify_countdown = true
 	}
@@ -36,7 +36,7 @@ function MinigamePrototype:AddDefaultStates()
 	
 	self:AddState {
 		name = "Ending",
-		time = 3,
+		time = 5,
 		next = "Starting",
 		notify_countdown = true,
 		notify_countdown_text = "restarting in"
