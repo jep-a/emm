@@ -109,8 +109,12 @@ function Indicator:AnimateFinish()
 	self:AnimateAttribute("alpha", 0, {
 		duration = 1,
 		callback = function ()
-			if IsValid(self.entity) then
-				self.entity.indicator = nil
+			local ent = self.entity
+
+			if IsValid(ent) then
+				if self == ent.indicator then
+					ent.indicator = nil
+				end
 			end
 
 			Indicator.super.Finish(self)
@@ -241,7 +245,7 @@ function IndicatorService.Add(lobby, ply)
 end
 hook.Add("LocalLobbyPlayerJoin", "IndicatorService.Add", IndicatorService.Add)
 hook.Add("LocalLobbyPlayerSpawn", "IndicatorService.Add", function (lobby, ply)
-	if not IsLocalPlayer(ply) then
+	if not IsLocalPlayer(ply) and not ply.indicator then
 		IndicatorService.Add(lobby, ply)
 	end
 end)
@@ -255,7 +259,7 @@ end)
 function IndicatorService.Clear(lobby, ply)
 	if IsLocalPlayer(ply) then
 		IndicatorService.container:Clear()
-	else
+	elseif ply.indicator then
 		ply.indicator:Finish()
 	end
 end
