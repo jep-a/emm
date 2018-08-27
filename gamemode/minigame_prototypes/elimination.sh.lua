@@ -13,6 +13,7 @@ MINIGAME.random_player_classes = {
 MINIGAME:AddPlayerClass {
 	name = "Hunter",
 	can_tag = {"Hunted"},
+	minimum = 1,
 	recruit_on_tag = true
 }
 

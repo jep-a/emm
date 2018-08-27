@@ -9,10 +9,20 @@ function MinigamePrototype:PickRandomPlayerClasses()
 	end
 end
 
+function MinigamePrototype:ReplacePlayerClass(ply)
+	local ply_class = ply.player_class
+
+	if ply_class.minimum and ply_class.minimum > 0 and ply_class.minimum > (#self[ply_class.key] - 1) then
+		self:PickRandomPlayerClasses()
+	end
+end
+
 function MinigamePrototype:ForfeitPlayerClass(ply)
-	if ply.player_class and ply.player_class.swap_closest_on_death then
+	local ply_class = ply.player_class
+
+	if ply_class and ply_class.swap_closest_on_death then
 		local closest_ply = MinigameService.PickClosestPlayerClass(self, ply, {
-			blacklist_class_key = ply.player_class.key,
+			blacklist_class_key = ply_class.key,
 			swap_player_class = true
 		})
 
@@ -58,6 +68,7 @@ function MinigamePrototype:AddDefaultHooks()
 	self:AddHook("StartStatePlaying", "PickRandomPlayerClasses", self.PickRandomPlayerClasses)
 	self:AddStateHook("Playing", "PlayerJoin", "Respawn", self.Respawn)
 	self:AddStateHook("Playing", "PlayerJoin", "SetDefaultPlayerClass", self.SetDefaultPlayerClass)
+	self:AddStateHook("Playing", "PlayerLeave", "ReplacePlayerClass", self.ReplacePlayerClass)
 	self:AddStateHook("Playing", "PlayerLeave", "ForfeitPlayerClass", self.ForfeitPlayerClass)
 	self:AddStateHook("Playing", "PlayerDeath", "ForfeitPlayerClass", self.ForfeitPlayerClass)
 	self:AddStateHook("Playing", "PlayerDeath", "SetPlayerClassOnDeath", self.SetPlayerClassOnDeath)
