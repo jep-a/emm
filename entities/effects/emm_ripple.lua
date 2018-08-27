@@ -32,7 +32,15 @@ function EFFECT:Render()
 	local pos = self.origin + (self.normal/2)
 	local norm_ang = self.normal:Angle()
 
-	cam.IgnoreZ(IsValid(self.entity) and self.entity.indicator)
+	local ignore_z
+
+	if IsValid(self.entity) then
+		ignore_z = self.entity.indicator ~= nil
+	else
+		ignore_z = false
+	end
+
+	cam.IgnoreZ(ignore_z)
 	surface.SetAlphaMultiplier(self.alpha/255)
 	surface.SetMaterial(CIRCLE_MATERIAL)
 	surface.SetDrawColor(self.color)

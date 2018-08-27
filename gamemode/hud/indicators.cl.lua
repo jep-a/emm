@@ -29,6 +29,7 @@ function Indicator:Init(ent_or_vec)
 
 	self.x = 0
 	self.y = 0
+	self.distance = 0
 	self.world_alpha = AnimatableValue.New()
 
 	self.animatable_color = AnimatableValue.New(COLOR_WHITE, {
@@ -127,6 +128,29 @@ end
 
 -- # Init
 
+function IndicatorService.Sort(ply, eye_pos)
+	local eye_pos = LocalPlayer():EyePos()
+	local indicators = IndicatorService.container.children
+
+	for i = 1, #indicators do
+		local indicator = indicators[i]
+
+		local pos
+	
+		if IsValid(indicator.entity) then
+			pos = indicator.entity:WorldSpaceCenter()
+		elseif indicator.position then
+			pos = indicator.position
+		end
+	
+		indicator.distance = eye_pos:Distance(pos)
+		indicator.panel:SetZPos(i)
+	end
+
+	table.sort(indicators, function(a, b) return a.distance > b.distance end)
+end
+hook.Add("Think", "IndicatorService.Sort", IndicatorService.Sort)
+
 function IndicatorService.DrawWorldPositions(ply, eye_pos)
 	local eye_pos = LocalPlayer():EyePos()
 	local indicators = IndicatorService.container.children
@@ -142,16 +166,14 @@ function IndicatorService.DrawWorldPositions(ply, eye_pos)
 		elseif indicator.position then
 			pos = indicator.position
 		end
-	
-		local dist = eye_pos:Distance(pos)
 
 		cam.Start3D()
 
-		local screen_pos = (pos + Vector(0, 0, Lerp(dist/600, 40, 45))):ToScreen()
+		local screen_pos = (pos + Vector(0, 0, Lerp(indicator.distance/600, 40, 45))):ToScreen()
 	
 		cam.End3D()
 
-		local size = Lerp(dist/800, INDICATOR_WORLD_SIZE * 2, INDICATOR_WORLD_SIZE)
+		local size = Lerp(indicator.distance/800, INDICATOR_WORLD_SIZE * 2, INDICATOR_WORLD_SIZE)
 		local x, y = screen_pos.x - (size/2), screen_pos.y - 6 - (size/2)
 	
 		indicator.x = x
@@ -219,13 +241,13 @@ function IndicatorService.Add(lobby, ply)
 end
 hook.Add("LocalLobbyPlayerJoin", "IndicatorService.Add", IndicatorService.Add)
 hook.Add("LocalLobbyPlayerSpawn", "IndicatorService.Add", function (lobby, ply)
-	if ply ~= LocalPlayer() then
+	if not IsLocalPlayer(ply) then
 		IndicatorService.Add(lobby, ply)
 	end
 end)
 
 hook.Add("LocalLobbyPlayerDeath", "IndicatorService.Remove", function (lobby, ply)
-	if ply ~= LocalPlayer() then
+	if not IsLocalPlayer(ply) and ply.indicator then
 		ply.indicator:Finish()
 	end
 end)
@@ -237,7 +259,7 @@ function IndicatorService.Clear(lobby, ply)
 		ply.indicator:Finish()
 	end
 end
-hook.Add("LocalLobbyRemovePlayer", "IndicatorService.Clear", IndicatorService.Clear)
+hook.Add("LocalLobbyPlayerLeave", "IndicatorService.Clear", IndicatorService.Clear)
 
 function IndicatorService.ReloadIndicators()
 	local ply = LocalPlayer()
