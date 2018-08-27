@@ -1,3 +1,7 @@
+function MinigamePrototype:Respawn(ply)
+	ply:Spawn()
+end
+
 function MinigamePrototype:PickRandomPlayerClasses()
 	if self.random_player_classes then
 		local picked_plys = MinigameService.PickRandomPlayerClasses(self, self.random_player_classes)
@@ -52,6 +56,7 @@ end
 function MinigamePrototype:AddDefaultHooks()
 	self:AddHook("StartStateWaiting", "ClearPlayerClasses", MinigameService.ClearPlayerClasses)
 	self:AddHook("StartStatePlaying", "PickRandomPlayerClasses", self.PickRandomPlayerClasses)
+	self:AddStateHook("Playing", "PlayerJoin", "Respawn", self.Respawn)
 	self:AddStateHook("Playing", "PlayerJoin", "SetDefaultPlayerClass", self.SetDefaultPlayerClass)
 	self:AddStateHook("Playing", "PlayerLeave", "ForfeitPlayerClass", self.ForfeitPlayerClass)
 	self:AddStateHook("Playing", "PlayerDeath", "ForfeitPlayerClass", self.ForfeitPlayerClass)

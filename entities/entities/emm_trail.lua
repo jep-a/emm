@@ -28,7 +28,12 @@ end
 local REMOVE_DURATION = 4
 
 function ENT:StartRemove()
+	local owner = self:GetOwner()
 	local trail_pos = self:GetPos()
+
+	if IsValid(owner) then
+		owner.trail = nil
+	end
 
 	self:SetParent(nil)
 	self:SetPos(trail_pos)
