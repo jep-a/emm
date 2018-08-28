@@ -9,6 +9,7 @@ EMM.Include {
 	"util/class",
 	"util/cubic-bezier",
 	"util/anim-value",
+	"util/net",
 	"util/pred-sound",
 	"util/stamina",
 	"util/time-associated-map",

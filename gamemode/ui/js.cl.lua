@@ -98,24 +98,24 @@ function JSUI.InitJavaScript()
 	end)
 
 	JSUI.html:AddFunction("EMM", "createLobby", function (id)
-		MinigameNetworkService.RequestLobby(MinigameService.Prototype(id))
+		NetService.Send("RequestLobby", MinigameService.Prototype(id))
 	end)
 
 	JSUI.html:AddFunction("EMM", "joinLobby", function (id)
-		MinigameNetworkService.RequestLobbyJoin(MinigameService.lobbies[id])
+		NetService.Send("RequestLobbyJoin", MinigameService.lobbies[id])
 	end)
 
 	JSUI.html:AddFunction("EMM", "leaveLobby", function ()
-		MinigameNetworkService.RequestLobbyLeave()
+		NetService.Send "RequestLobbyLeave"
 	end)
 
 	JSUI.html:AddFunction("EMM", "switchLobby", function (id)
 		local local_lobby = LocalPlayer().lobby
 
 		if local_lobby and id == local_lobby.id then
-			MinigameNetworkService.RequestLobbyLeave()
+			NetService.Send "RequestLobbyLeave"
 		else
-			MinigameNetworkService.RequestLobbyJoin(MinigameService.lobbies[id])
+			NetService.Send("RequestLobbyJoin", MinigameService.lobbies[id])
 		end
 	end)
 

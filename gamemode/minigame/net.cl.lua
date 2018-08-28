@@ -3,89 +3,55 @@ MinigameNetworkService = MinigameNetworkService or {}
 
 -- # Receiving
 
-function MinigameNetworkService.ReceiveLobby()
-	local lobby_id = net.ReadUInt(8)
-	local proto_id = net.ReadUInt(8)
-	local host = net.ReadEntity()
-
+function MinigameNetworkService.ReceiveLobby(lobby_id, proto, host)
 	MinigameService.CreateLobby {
 		id = lobby_id,
-		prototype = MinigameService.Prototype(proto_id),
+		prototype = proto,
 		host = host,
 		players = {host}
 	}
 end
-net.Receive("Lobby", MinigameNetworkService.ReceiveLobby)
+NetService.Receive("Lobby", MinigameNetworkService.ReceiveLobby)
 
-function MinigameNetworkService.ReceiveLobbyFinish()
-	local lobby_id = net.ReadUInt(8)
-	MinigameService.FinishLobby(MinigameService.lobbies[lobby_id])
+function MinigameNetworkService.ReceiveLobbyState(lobby, state_id, last_state_start)
+	lobby:SetState(MinigameStateService.State(lobby, state_id), last_state_start)
 end
-net.Receive("LobbyFinish", MinigameNetworkService.ReceiveLobbyFinish)
+NetService.Receive("LobbyState", MinigameNetworkService.ReceiveLobbyState)
 
-function MinigameNetworkService.ReceiveLobbyHost()
-	local lobby_id = net.ReadUInt(8)
-	local ply = net.ReadEntity()
-
-	MinigameService.lobbies[lobby_id]:SetHost(ply)
-end
-net.Receive("LobbyHost", MinigameNetworkService.ReceiveLobbyHost)
-
-function MinigameNetworkService.ReceiveLobbyState()
-	local lobby_id = net.ReadUInt(8)
-	local state_id = net.ReadUInt(8)
-	local last_state_start = net.ReadFloat()
-
-	MinigameService.lobbies[lobby_id]:SetState(MinigameStateService.State(MinigameService.lobbies[lobby_id], state_id), last_state_start)
-end
-net.Receive("LobbyState", MinigameNetworkService.ReceiveLobbyState)
-
-function MinigameNetworkService.ReceiveLobbyPlayer()
-	local lobby_id = net.ReadUInt(8)
-	local ply = net.ReadEntity()
-
-	MinigameService.lobbies[lobby_id]:AddPlayer(ply)
-end
-net.Receive("LobbyPlayer", MinigameNetworkService.ReceiveLobbyPlayer)
-
-function MinigameNetworkService.ReceiveLobbyPlayerLeave()
-	local lobby_id = net.ReadUInt(8)
-	local ply = net.ReadEntity()
-
-	MinigameService.lobbies[lobby_id]:RemovePlayer(ply)
-end
-net.Receive("LobbyPlayerLeave", MinigameNetworkService.ReceiveLobbyPlayerLeave)
+NetService.Receive("LobbyFinish", MinigameService.FinishLobby)
+NetService.Receive("LobbyHost", MinigameLobby.SetHost)
+NetService.Receive("LobbyPlayer", MinigameLobby.AddPlayer)
+NetService.Receive("LobbyPlayerLeave", MinigameLobby.RemovePlayer)
 
 function MinigameNetworkService.RequestLobbies()
-	net.Start "RequestLobbies"
-	net.SendToServer()
+	NetService.Send "RequestLobbies"
 end
 hook.Add("InitPostEntity", "MinigameNetworkService.RequestLobbies", MinigameNetworkService.RequestLobbies)
 
 function MinigameNetworkService.ReceiveLobbies()
-	local lobby_count = net.ReadUInt(8)
+	local lobby_count = NetService.ReadID()
 
 	for i = 1, lobby_count do
-		local lobby_id = net.ReadUInt(8)
-		local proto_id = net.ReadUInt(8)
-		local state_id = net.ReadUInt(8)
+		local lobby_id = NetService.ReadID()
+		local proto_id = NetService.ReadID()
+		local state_id = NetService.ReadID()
 		local last_state_start = net.ReadFloat()
 		local host = net.ReadEntity()
-		local ply_count = net.ReadUInt(8)
+		local ply_count = NetService.ReadID()
 
 		local proto = MinigameService.Prototype(proto_id)
+
 		local lobby = {
 			id = lobby_id,
-			prototype = MinigameService.Prototype(proto_id),
+			prototype = proto,
 			state = MinigameStateService.State(proto, state_id),
 			last_state_start = last_state_start,
 			host = host,
 			players = {}
 		}
-		
+
 		for i = 1, ply_count do
-			local ply = net.ReadEntity()
-			lobby.players[i] = ply
+			lobby.players[i] = net.ReadEntity()
 		end
 
 		MinigameService.CreateLobby(lobby, false)
@@ -94,28 +60,3 @@ function MinigameNetworkService.ReceiveLobbies()
 	hook.Run "ReceiveLobbies"
 end
 net.Receive("Lobbies", MinigameNetworkService.ReceiveLobbies)
-
-
--- # Requesting
-
-function MinigameNetworkService.RequestLobby(proto)
-	net.Start "RequestLobby"
-	net.WriteUInt(proto.id, 8)
-	net.SendToServer()
-end
-
-function MinigameNetworkService.RequestLobbyFinish()
-	net.Start "RequestLobbyFinish"
-	net.SendToServer()
-end
-
-function MinigameNetworkService.RequestLobbyJoin(lobby)
-	net.Start "RequestLobbyJoin"
-	net.WriteUInt(lobby.id, 8)
-	net.SendToServer()
-end
-
-function MinigameNetworkService.RequestLobbyLeave()
-	net.Start "RequestLobbyLeave"
-	net.SendToServer()
-end

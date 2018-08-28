@@ -1,19 +1,16 @@
-function PlayerClassService.ReceivePlayerClass()
-	local ply = net.ReadEntity()
-	local id = net.ReadUInt(8)
-
+function PlayerClassService.ReceivePlayerClass(ply, id)
 	if id ~= 0 then
 		ply:SetPlayerClass(PlayerClassService.MinigamePlayerClass(ply, id))
 	else
 		ply:ClearPlayerClass()
 	end
 end
-net.Receive("PlayerClass", PlayerClassService.ReceivePlayerClass)
+NetService.Receive("PlayerClass", PlayerClassService.ReceivePlayerClass)
 
 function PlayerClassService.ReceivePlayerClasses()
 	for i = 1, #player.GetAll() do
 		local ply = net.ReadEntity()
-		local id = net.ReadUInt(8)
+		local id = NetService.ReadID()
 
 		if id ~= 0 then
 			ply:SetPlayerClass(PlayerClassService.MinigamePlayerClass(ply, id))
@@ -23,7 +20,6 @@ end
 net.Receive("PlayerClasses", PlayerClassService.ReceivePlayerClasses)
 
 function PlayerClassService.RequestPlayerClasses()
-	net.Start "RequestPlayerClasses"
-	net.SendToServer()
+	NetService.Send "RequestPlayerClasses"
 end
 hook.Add("ReceiveLobbies", "PlayerClassService.RequestPlayerClasses", PlayerClassService.RequestPlayerClasses)

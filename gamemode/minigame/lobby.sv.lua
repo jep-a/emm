@@ -29,7 +29,8 @@ function MinigameLobby:Init(props)
 		self[k] = {}
 	end
 
-	MinigameNetworkService.SendLobby(self)
+	print(self.id, self.prototype, self.host)
+	NetService.Send("Lobby", self.id, self.prototype, self.host)
 	hook.Run("LobbyInit", self)
 
 	self:SetState(self.states[self.default_state])
@@ -42,13 +43,13 @@ function MinigameLobby:Finish()
 		self:RemovePlayer(ply, false, true)
 	end
 
-	MinigameNetworkService.SendLobbyFinish(self)
+	NetService.Send("LobbyFinish", self)
 	table.Empty(self)
 end
 
 function MinigameLobby:SetHost(ply)
 	self.host = ply
-	MinigameNetworkService.SendLobbyHost(self, ply)
+	NetService.Send("LobbyHost", self, ply)
 	hook.Run("LobbyHostChange", lobby, ply)
 end
 
@@ -56,7 +57,7 @@ function MinigameLobby:AddPlayer(ply)
 	ply.lobby = self
 	table.insert(self.players, ply)
 
-	MinigameNetworkService.SendLobbyPlayer(self, ply)
+	NetService.Send("LobbyPlayer", self, ply)
 	hook.Run("LobbyPlayerJoin", self, ply)
 	MinigameService.CallHook(self, "PlayerJoin", ply)
 end
@@ -74,7 +75,7 @@ function MinigameLobby:RemovePlayer(ply, net, force)
 		table.RemoveByValue(self.players, ply)
 
 		if net then
-			MinigameNetworkService.SendLobbyPlayerLeave(self, ply)
+			NetService.Send("LobbyPlayerLeave", self, ply)
 		end
 
 		if has_plys and self.host == ply then
