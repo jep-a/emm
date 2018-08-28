@@ -32,6 +32,10 @@ NetService.type_readers = {
 		end
 
 		return ents
+	end,
+
+	player_index = function ()
+		return net.ReadUInt(16)
 	end
 }
 
@@ -53,6 +57,10 @@ NetService.type_writers = {
 		for _, ent in pairs(ents) do
 			net.WriteEntity(ent)
 		end
+	end,
+
+	player_index = function (ply)
+		net.WriteUInt(ply and ply:EntIndex() or 0, 16)
 	end
 }
 

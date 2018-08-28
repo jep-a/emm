@@ -15,10 +15,8 @@ local function CallPlayerSpawnHook(ply_index, func)
 	end
 end
 
-local function CallPlayerInitialSpawnHooks()
+local function CallPlayerInitialSpawnHooks(ply_index)
 	if init_post_ent then
-		local ply_index = net.ReadUInt(16)
-
 		CallPlayerSpawnHook(ply_index, function ()
 			local ply = Entity(ply_index)
 
@@ -27,12 +25,10 @@ local function CallPlayerInitialSpawnHooks()
 		end)
 	end
 end
-net.Receive("PlayerInitialSpawn", CallPlayerInitialSpawnHooks)
+NetService.Receive("PlayerInitialSpawn", CallPlayerInitialSpawnHooks)
 
-local function CallPlayerSpawnHooks()
+local function CallPlayerSpawnHooks(ply_index)
 	if init_post_ent then
-		local ply_index = net.ReadUInt(16)
-
 		CallPlayerSpawnHook(ply_index, function ()
 			local ply = Entity(ply_index)
 			local is_local_ply = IsLocalPlayer(ply)
@@ -67,7 +63,7 @@ local function CallPlayerSpawnHooks()
 		end)
 	end
 end
-net.Receive("PlayerSpawn", CallPlayerSpawnHooks)
+NetService.Receive("PlayerSpawn", CallPlayerSpawnHooks)
 
 hook.Add("InitPostEntity", "EMM.InitPostEntity", function ()
 	init_post_ent = true
@@ -106,18 +102,14 @@ end)
 
 -- # Disconnecting
 
-net.Receive("PlayerDisconnected", function ()
-	local ply = net.ReadEntity()
+NetService.Receive("PlayerDisconnected", function (ply)
 	hook.Run("PlayerDisconnected", ply)
 end)
 
 
 -- # Death
 
-net.Receive("PrePlayerDeath", function ()
-	local ply = net.ReadEntity()
-	local att = net.ReadEntity()
-
+NetService.Receive("PrePlayerDeath", function (ply, att)
 	hook.Run("PrePlayerDeath", ply, att)
 
 	if IsLocalPlayer(ply) then
@@ -133,11 +125,7 @@ net.Receive("PrePlayerDeath", function ()
 	end
 end)
 
-net.Receive("PlayerDeath", function ()
-	local ply = net.ReadEntity()
-	local infl = net.ReadEntity()
-	local att = net.ReadEntity()
-
+NetService.Receive("PlayerDeath", function (ply, infl, att)
 	hook.Run("PlayerDeath", ply, infl, att)
 
 	if IsLocalPlayer(ply) then
@@ -153,8 +141,7 @@ net.Receive("PlayerDeath", function ()
 	end
 end)
 
-net.Receive("PostPlayerDeath", function ()
-	local ply = net.ReadEntity()
+NetService.Receive("PostPlayerDeath", function (ply)
 	hook.Run("PostPlayerDeath", ply)
 
 	if LocalPlayer() == ply then
