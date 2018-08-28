@@ -147,8 +147,10 @@ function IndicatorService.Sort(ply, eye_pos)
 			pos = indicator.position
 		end
 	
-		indicator.distance = eye_pos:Distance(pos)
-		indicator.panel:SetZPos(i)
+		if pos then
+			indicator.distance = eye_pos:Distance(pos)
+			indicator.panel:SetZPos(i)
+		end
 	end
 
 	table.sort(indicators, function(a, b) return a.distance > b.distance end)
@@ -171,30 +173,32 @@ function IndicatorService.DrawWorldPositions(ply, eye_pos)
 			pos = indicator.position
 		end
 
-		cam.Start3D()
+		if pos then
+			cam.Start3D()
 
-		local screen_pos = (pos + Vector(0, 0, Lerp(indicator.distance/600, 40, 45))):ToScreen()
-	
-		cam.End3D()
+			local screen_pos = (pos + Vector(0, 0, Lerp(indicator.distance/600, 40, 45))):ToScreen()
+		
+			cam.End3D()
 
-		local size = Lerp(indicator.distance/800, INDICATOR_WORLD_SIZE * 2, INDICATOR_WORLD_SIZE)
-		local x, y = screen_pos.x - (size/2), screen_pos.y - 6 - (size/2)
-	
-		indicator.x = x
-		indicator.y = y
-	
-		surface.SetAlphaMultiplier(CombineAlphas(container_alpha, indicator:GetAttribute "alpha", indicator.world_alpha.current))
+			local size = Lerp(indicator.distance/800, INDICATOR_WORLD_SIZE * 2, INDICATOR_WORLD_SIZE)
+			local x, y = screen_pos.x - (size/2), screen_pos.y - 6 - (size/2)
+		
+			indicator.x = x
+			indicator.y = y
+		
+			surface.SetAlphaMultiplier(CombineAlphas(container_alpha, indicator:GetAttribute "alpha", indicator.world_alpha.current))
 
-		Element.PaintTexture(nil, indicator_material, {
-			x = x,
-			y = y,
-			angle = 0,
-			width = size,
-			height = size,
-			color = indicator:GetAttribute "color"
-		})
+			Element.PaintTexture(nil, indicator_material, {
+				x = x,
+				y = y,
+				angle = 0,
+				width = size,
+				height = size,
+				color = indicator:GetAttribute "color"
+			})
 
-		surface.SetAlphaMultiplier(1)
+			surface.SetAlphaMultiplier(1)
+		end
 	end
 end
 hook.Add("DrawIndicators", "IndicatorService.DrawWorldPositions", IndicatorService.DrawWorldPositions)
