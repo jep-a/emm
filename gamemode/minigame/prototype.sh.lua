@@ -44,8 +44,6 @@ function MinigamePrototype:Init()
 
 	if SERVER then
 		self:AddRequirePlayersHooks()
-	else
-		self:AddGlobalEventHooks()
 	end
 end
 
@@ -75,8 +73,8 @@ function MinigamePrototype:RemoveStateHook(state_key, hk_name, hk_id)
 	self.state_hooks[state_key][hk_name][hk_id] = nil
 end
 
-hook.Add("CreateGlobalMinigameEvents", "Default", function ()
-	MinigameEventService.Create("PickRandomPlayerClasses", {"entities"})
-	MinigameEventService.Create("PlayerClassForfeit", {"entity", "entity"})
-	MinigameEventService.Create("PlayerClassChangeFromDeath", {"entity"})
+hook.Add("CreateMinigameHookSchemas", "Default", function ()
+	MinigameNetService.CreateHookSchema("PickRandomPlayerClasses", {"entities"})
+	MinigameNetService.CreateHookSchema("PlayerClassForfeit", {"entity", "entity"})
+	MinigameNetService.CreateHookSchema("PlayerClassChangeFromDeath", {"entity"})
 end)

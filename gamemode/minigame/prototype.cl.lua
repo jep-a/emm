@@ -1,61 +1,53 @@
-function MinigamePrototype:NotifyRandomPlayerClassPicks(is_local_lobby, involves_local_ply, picked_plys)
-	if is_local_lobby then
-		local ply_class_name = self.player_classes[self.random_player_classes.class_key].name
+function MinigamePrototype:NotifyRandomPlayerClassPicks(involves_local_ply, picked_plys)
+	local ply_class_name = self.player_classes[self.random_player_classes.class_key].name
 
-		for _, ply in pairs(picked_plys) do
-			if IsLocalPlayer(ply) then
-				NotificationService.PushText("you've been picked as "..ply_class_name)
-			else
-				NotificationService.PushSideText(ply:GetName().." has been picked as "..ply_class_name)
-			end
-		end
-	end
-end
-
-function MinigamePrototype:NotifyPlayerClassForfeit(is_local_lobby, involves_local_ply, forfeiter, closest_ply)
-	if is_local_lobby then
-		local ply_class_name = closest_ply.player_class.name
-
-		if involves_local_ply then
-			local forfeiter_is_local_ply = IsLocalPlayer(forfeiter)
-
-			NotificationService.PushAvatarText(forfeiter_is_local_ply and closest_ply or forfeiter, forfeiter_is_local_ply and "forfeited "..ply_class_name.." to" or "inherited "..ply_class_name.." from")
+	for _, ply in pairs(picked_plys) do
+		if IsLocalPlayer(ply) then
+			NotificationService.PushText("you've been picked as "..ply_class_name)
 		else
-			NotificationService.PushSideText(closest_ply:GetName().." has inherited "..ply_class_name.." from "..forfeiter:GetName())
+			NotificationService.PushSideText(ply:GetName().." has been picked as "..ply_class_name)
 		end
 	end
 end
 
-function MinigamePrototype:NotifyPlayerClassChangeFromDeath(is_local_lobby, involves_local_ply, ply)
-	if is_local_lobby then
-		local ply_class_name = ply.player_class.name
+function MinigamePrototype:NotifyPlayerClassForfeit(involves_local_ply, forfeiter, closest_ply)
+	local ply_class_name = closest_ply.player_class.name
 
-		if involves_local_ply then
-			NotificationService.PushText("you have turned into a "..ply_class_name)
-		else
-			NotificationService.PushSideText(ply:GetName().." has died and turned into a "..ply_class_name)
-		end
+	if involves_local_ply then
+		local forfeiter_is_local_ply = IsLocalPlayer(forfeiter)
+
+		NotificationService.PushAvatarText(forfeiter_is_local_ply and closest_ply or forfeiter, forfeiter_is_local_ply and "forfeited "..ply_class_name.." to" or "inherited "..ply_class_name.." from")
+	else
+		NotificationService.PushSideText(closest_ply:GetName().." has inherited "..ply_class_name.." from "..forfeiter:GetName())
 	end
 end
 
-function MinigamePrototype:NotifyWaitingForPlayers(old_state_or_ply, new_state)
-	if self:IsLocal() then
-		local required_plys = self.required_players - #self.players
+function MinigamePrototype:NotifyPlayerClassChangeFromDeath(involves_local_ply, ply)
+	local ply_class_name = ply.player_class.name
 
-		if old_state_or_ply == self.states.Waiting or (old_state_or_ply and new_state == self.states.Waiting) then
-			required_plys = required_plys + 1
-		end
-
-		if required_plys > 0 then
-			NotificationService.PushText("waiting for "..required_plys.." more "..((required_plys == 1 and "person") or "people"))
-		end
+	if involves_local_ply then
+		NotificationService.PushText("you have turned into a "..ply_class_name)
+	else
+		NotificationService.PushSideText(ply:GetName().." has died and turned into a "..ply_class_name)
 	end
 end
 
-function MinigamePrototype:NotifyStateCountdown(old_state, new_state)
+function MinigamePrototype:NotifyWaitingForPlayers(involves_local_ply, old_state, new_state)
+	local required_plys = self.required_players - #self.players
+
+	if old_state == self.states.Waiting or (involves_local_ply and new_state == self.states.Waiting) then
+		required_plys = required_plys + 1
+	end
+
+	if required_plys > 0 then
+		NotificationService.PushText("waiting for "..required_plys.." more "..((required_plys == 1 and "person") or "people"))
+	end
+end
+
+function MinigamePrototype:NotifyStateCountdown(involves_local_ply, old_state, new_state)
 	new_state = new_state or self.state
 
-	if self:IsLocal() and new_state.time and new_state.notify_countdown then
+	if new_state.time and new_state.notify_countdown then
 		if self.countdown_notification then
 			self.countdown_notification:Finish()
 			self.countdown_notification = nil
@@ -73,18 +65,47 @@ function MinigamePrototype:NotifyStateCountdown(old_state, new_state)
 	end
 end
 
-function MinigamePrototype:AddDefaultHooks()
-	self:AddHook("StartState", "Notification", self.NotifyStateCountdown)
-	self:AddHook("StartStateWaiting", "Notification", self.NotifyWaitingForPlayers)
-	self:AddStateHook("Waiting", "PlayerJoin", "Notification", self.NotifyWaitingForPlayers)
+local function InvolvesLocalPlayer(...)
+	local local_ply = LocalPlayer()
+
+	local involves_local_ply
+
+	for _, v in pairs({...}) do
+		if local_ply == v or (istable(v) and table.HasValue(v, local_ply)) then
+			involves_local_ply = true
+
+			break
+		end
+	end
+
+	return involves_local_ply
 end
 
-function MinigamePrototype:AddGlobalEventHooks()
-	self:AddEventHook("PickRandomPlayerClasses", "Notification", self.NotifyRandomPlayerClassPicks)
-	self:AddEventHook("PlayerClassForfeit", "Notification", self.NotifyPlayerClassForfeit)
-	self:AddEventHook("PlayerClassChangeFromDeath", "Notification", self.NotifyPlayerClassChangeFromDeath)
+local function WrapNotificationFunc(func)
+	return function (lobby, ...)
+		if lobby:IsLocal() then
+			func(lobby, InvolvesLocalPlayer(...), ...)
+		end
+	end
+end
 
-	hook.Run("CreateGlobalMinigameEventHooks", self)
+function MinigamePrototype:AddHookNotification(hk_name, func)
+	self:AddHook(hk_name, "Notification", WrapNotificationFunc(func))
+end
+
+function MinigamePrototype:AddStateHookNotification(state_key, hk_name, func)
+	self:AddStateHook(state_key, hk_name, "Notification", WrapNotificationFunc(func))
+end
+
+function MinigamePrototype:AddDefaultHooks()
+	self:AddHookNotification("StartState", self.NotifyStateCountdown)
+	self:AddHookNotification("StartStateWaiting", self.NotifyWaitingForPlayers)
+	self:AddHookNotification("PickRandomPlayerClasses", self.NotifyRandomPlayerClassPicks)
+	self:AddHookNotification("PlayerClassForfeit", self.NotifyPlayerClassForfeit)
+	self:AddHookNotification("PlayerClassChangeFromDeath", self.NotifyPlayerClassChangeFromDeath)
+	self:AddStateHookNotification("Waiting", "PlayerJoin", self.NotifyWaitingForPlayers)
+
+	hook.Run("CreateMinigameHooks", self)
 end
 
 function MinigameService.ReloadStateCountdown(lobby, ply)

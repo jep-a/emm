@@ -28,16 +28,14 @@ function MinigameService.CallHook(lobby, hk_name, ...)
 
 	lobby.hooks[hk_name] = lobby.hooks[hk_name] or {}
 
-	local hks = table.Copy(lobby.hooks[hk_name])
+	for _, hk in pairs(lobby.hooks[hk_name]) do
+		hk(lobby, ...)
+	end
 
 	if lobby.state and lobby.state_hooks[lobby.state.key] and lobby.state_hooks[lobby.state.key][hk_name] then
 		for _, hk in pairs(lobby.state_hooks[lobby.state.key][hk_name]) do
-			table.insert(hks, hk)
+			hk(lobby, ...)
 		end
-	end
-
-	for _, hk in pairs(hks) do
-		hk(lobby, ...)
 	end
 end
 
@@ -69,6 +67,8 @@ function MinigameService.LoadPrototypes()
 	for _, proto in pairs(minigame_prototype_dirs) do
 		MinigameService.LoadPrototype(MINIGAME_PROTOTYPES_DIRECTORY..proto.."/init")
 	end
+
+	hook.Run "LoadMinigamePrototypes"
 end
 hook.Add("Initialize", "MinigameService.LoadPrototypes", MinigameService.LoadPrototypes)
 hook.Add("OnReloaded", "MinigameService.ReloadPrototypes", MinigameService.LoadPrototypes)

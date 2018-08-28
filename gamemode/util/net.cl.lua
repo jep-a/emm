@@ -15,7 +15,7 @@ function NetService.CreateReader(name, schema)
 		for i = 1, #schema do
 			table.insert(read, NetService.type_readers[schema[i]]())
 		end
-
+	
 		NetService.hooks[name](unpack(read))
 	end
 

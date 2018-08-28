@@ -11,11 +11,3 @@ end
 function IsColor(color)
 	return istable(color) and color.r and color.g and color.b
 end
-
-local local_ply
-
-function IsLocalPlayer(ply)
-	local_ply = local_ply or LocalPlayer()
-
-	return local_ply == ply
-end

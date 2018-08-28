@@ -1,16 +1,14 @@
-MinigameNetworkService = MinigameNetworkService or {}
-
 util.AddNetworkString "RequestLobbies"
 util.AddNetworkString "Lobbies"
 
-function MinigameNetworkService.SendLobbies(ply)
+function MinigameNetService.SendLobbies(ply)
 	net.Start "Lobbies"
 	net.WriteUInt(table.Count(MinigameService.lobbies), 8)
 
 	for k, lobby in pairs(MinigameService.lobbies) do
-		NetworkService.WriteID(k)
-		NetworkService.WriteID(lobby.prototype.id)
-		NetworkService.WriteID(lobby.state.id)
+		NetService.WriteID(k)
+		NetService.WriteID(lobby.prototype.id)
+		NetService.WriteID(lobby.state.id)
 		net.WriteFloat(lobby.last_state_start)
 		net.WriteEntity(lobby.host)
 		net.WriteUInt(#lobby.players, 8)
@@ -22,9 +20,9 @@ function MinigameNetworkService.SendLobbies(ply)
 
 	net.Send(ply)
 end
-NetService.Receive("RequestLobbies", MinigameNetworkService.SendLobbies)
+NetService.Receive("RequestLobbies", MinigameNetService.SendLobbies)
 
-function MinigameNetworkService.RequestLobby(ply, proto)
+function MinigameNetService.RequestLobby(ply, proto)
 	if ply.lobby then
 		ply.lobby:RemovePlayer(ply)
 	end
@@ -35,23 +33,27 @@ function MinigameNetworkService.RequestLobby(ply, proto)
 		players = {ply}
 	}
 end
-NetService.Receive("RequestLobby", MinigameNetworkService.RequestLobby)
+NetService.Receive("RequestLobby", MinigameNetService.RequestLobby)
 
-function MinigameNetworkService.RequestLobbyFinish(ply)
+function MinigameNetService.RequestLobbyFinish(ply)
 	MinigameService.FinishLobby(ply.lobby)
 end
-NetService.Receive("RequestLobbyFinish", MinigameNetworkService.RequestLobbyFinish)
+NetService.Receive("RequestLobbyFinish", MinigameNetService.RequestLobbyFinish)
 
-function MinigameNetworkService.RequestLobbyJoin(ply, lobby)
+function MinigameNetService.RequestLobbyJoin(ply, lobby)
 	if ply.lobby then
 		ply.lobby:RemovePlayer(ply)
 	end
 
 	lobby:AddPlayer(ply)
 end
-NetService.Receive("RequestLobbyJoin", MinigameNetworkService.RequestLobbyJoin)
+NetService.Receive("RequestLobbyJoin", MinigameNetService.RequestLobbyJoin)
 
-function MinigameNetworkService.RequestLobbyLeave(ply)
+function MinigameNetService.RequestLobbyLeave(ply)
 	ply.lobby:RemovePlayer(ply)
 end
-NetService.Receive("RequestLobbyLeave", MinigameNetworkService.RequestLobbyLeave)
+NetService.Receive("RequestLobbyLeave", MinigameNetService.RequestLobbyLeave)
+
+function MinigameNetService.CreateHookSchema(hk_name, schema)
+	NetService.CreateSchema("Minigame."..hk_name, table.Add({"minigame_lobby"}, schema))
+end

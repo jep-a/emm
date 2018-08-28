@@ -1,3 +1,5 @@
 TaggingService = TaggingService or {}
 
-MinigameEventService.Create("Tag", {"entity", "entity"})
+hook.Add("CreateMinigameHookSchemas", "TaggingService", function ()
+	MinigameNetService.CreateHookSchema("Tag", {"entity", "entity"})
+end)

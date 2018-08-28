@@ -5,7 +5,7 @@ end
 function MinigamePrototype:PickRandomPlayerClasses()
 	if self.random_player_classes then
 		local picked_plys = MinigameService.PickRandomPlayerClasses(self, self.random_player_classes)
-		MinigameEventService.Call(self, "PickRandomPlayerClasses", picked_plys)
+		MinigameService.CallNetHook(self, "PickRandomPlayerClasses", picked_plys)
 	end
 end
 
@@ -27,7 +27,7 @@ function MinigamePrototype:ForfeitPlayerClass(ply)
 		})
 
 		if closest_ply then
-			MinigameEventService.Call(self, "PlayerClassForfeit", ply, closest_ply)
+			MinigameService.CallNetHook(self, "PlayerClassForfeit", ply, closest_ply)
 		end
 	end
 end
@@ -47,7 +47,7 @@ end
 function MinigamePrototype:SetPlayerClassOnDeath(ply)
 	if ply.player_class and ply.player_class.player_class_on_death then
 		ply:SetPlayerClass(self.player_classes[ply.player_class.player_class_on_death])
-		MinigameEventService.Call(self, "PlayerClassChangeFromDeath", ply)
+		MinigameService.CallNetHook(self, "PlayerClassChangeFromDeath", ply)
 	end
 end
 

@@ -1,3 +1,5 @@
+MinigameNetService = MinigameNetService or {}
+
 NetService.type_readers.minigame_prototype = function ()
 	return MinigameService.Prototype(NetService.ReadID())
 end
@@ -26,3 +28,7 @@ NetService.CreateUpstreamSchema("RequestLobby", {"minigame_prototype"})
 NetService.CreateUpstreamSchema "RequestLobbyFinish"
 NetService.CreateUpstreamSchema("RequestLobbyJoin", {"minigame_lobby"})
 NetService.CreateUpstreamSchema "RequestLobbyLeave"
+
+hook.Add("LoadMinigamePrototypes", "CreateMinigameHookSchemas", function ()
+	hook.Run "CreateMinigameHookSchemas"
+end)

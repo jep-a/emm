@@ -1,9 +1,4 @@
-MinigameNetworkService = MinigameNetworkService or {}
-
-
--- # Receiving
-
-function MinigameNetworkService.ReceiveLobby(lobby_id, proto, host)
+function MinigameNetService.ReceiveLobby(lobby_id, proto, host)
 	MinigameService.CreateLobby {
 		id = lobby_id,
 		prototype = proto,
@@ -11,24 +6,24 @@ function MinigameNetworkService.ReceiveLobby(lobby_id, proto, host)
 		players = {host}
 	}
 end
-NetService.Receive("Lobby", MinigameNetworkService.ReceiveLobby)
+NetService.Receive("Lobby", MinigameNetService.ReceiveLobby)
 
-function MinigameNetworkService.ReceiveLobbyState(lobby, state_id, last_state_start)
+function MinigameNetService.ReceiveLobbyState(lobby, state_id, last_state_start)
 	lobby:SetState(MinigameStateService.State(lobby, state_id), last_state_start)
 end
-NetService.Receive("LobbyState", MinigameNetworkService.ReceiveLobbyState)
+NetService.Receive("LobbyState", MinigameNetService.ReceiveLobbyState)
 
 NetService.Receive("LobbyFinish", MinigameService.FinishLobby)
 NetService.Receive("LobbyHost", MinigameLobby.SetHost)
 NetService.Receive("LobbyPlayer", MinigameLobby.AddPlayer)
 NetService.Receive("LobbyPlayerLeave", MinigameLobby.RemovePlayer)
 
-function MinigameNetworkService.RequestLobbies()
+function MinigameNetService.RequestLobbies()
 	NetService.Send "RequestLobbies"
 end
-hook.Add("InitPostEntity", "MinigameNetworkService.RequestLobbies", MinigameNetworkService.RequestLobbies)
+hook.Add("InitPostEntity", "MinigameNetService.RequestLobbies", MinigameNetService.RequestLobbies)
 
-function MinigameNetworkService.ReceiveLobbies()
+function MinigameNetService.ReceiveLobbies()
 	local lobby_count = NetService.ReadID()
 
 	for i = 1, lobby_count do
@@ -59,4 +54,12 @@ function MinigameNetworkService.ReceiveLobbies()
 
 	hook.Run "ReceiveLobbies"
 end
-net.Receive("Lobbies", MinigameNetworkService.ReceiveLobbies)
+net.Receive("Lobbies", MinigameNetService.ReceiveLobbies)
+
+function MinigameNetService.CreateHookSchema(hk_name, schema)
+	NetService.CreateSchema("Minigame."..hk_name, table.Add({"minigame_lobby"}, schema))
+
+	NetService.Receive("Minigame."..hk_name, function (lobby, ...)
+		MinigameService.CallHook(lobby, hk_name, ...)
+	end)
+end
