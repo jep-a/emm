@@ -1,5 +1,6 @@
 function MinigameStateService.StartStateTimer(lobby)
 	timer.Create("MinigameStateService."..lobby.id, lobby.state.time, 1, function ()
+		MinigameService.CallNetHook(lobby, "StateExpired")
 		lobby:NextState()
 	end)
 end

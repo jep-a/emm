@@ -26,6 +26,10 @@ function MinigameService.CallHook(lobby, hk_name, ...)
 		lobby[hk_name](lobby, ...)
 	end
 
+	MinigameService.CallHookWithoutMethod(lobby, hk_name, ...)
+end
+
+function MinigameService.CallHookWithoutMethod(lobby, hk_name, ...)
 	lobby.hooks[hk_name] = lobby.hooks[hk_name] or {}
 
 	for _, hk in pairs(lobby.hooks[hk_name]) do

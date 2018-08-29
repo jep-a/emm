@@ -1,4 +1,4 @@
-function MinigamePrototype:NotifyRandomPlayerClassPicks(involves_local_ply, picked_plys)
+function MinigamePrototype:NotifyRandomPlayerClassesPicked(involves_local_ply, picked_plys)
 	local ply_class_name = self.player_classes[self.random_player_classes.class_key].name
 
 	for _, ply in pairs(picked_plys) do
@@ -100,7 +100,7 @@ end
 function MinigamePrototype:AddDefaultHooks()
 	self:AddHookNotification("StartState", self.NotifyStateCountdown)
 	self:AddHookNotification("StartStateWaiting", self.NotifyWaitingForPlayers)
-	self:AddHookNotification("PickRandomPlayerClasses", self.NotifyRandomPlayerClassPicks)
+	self:AddHookNotification("RandomPlayerClassesPicked", self.NotifyRandomPlayerClassesPicked)
 	self:AddHookNotification("PlayerClassForfeit", self.NotifyPlayerClassForfeit)
 	self:AddHookNotification("PlayerClassChangeFromDeath", self.NotifyPlayerClassChangeFromDeath)
 	self:AddStateHookNotification("Waiting", "PlayerJoin", self.NotifyWaitingForPlayers)

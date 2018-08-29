@@ -74,7 +74,8 @@ function MinigamePrototype:RemoveStateHook(state_key, hk_name, hk_id)
 end
 
 hook.Add("CreateMinigameHookSchemas", "Default", function ()
-	MinigameNetService.CreateHookSchema("PickRandomPlayerClasses", {"entities"})
+	MinigameNetService.CreateHookSchema "StateExpired"
+	MinigameNetService.CreateHookSchema("RandomPlayerClassesPicked", {"entities"})
 	MinigameNetService.CreateHookSchema("PlayerClassForfeit", {"entity", "entity"})
 	MinigameNetService.CreateHookSchema("PlayerClassChangeFromDeath", {"entity"})
 end)

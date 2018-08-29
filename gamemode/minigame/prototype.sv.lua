@@ -5,7 +5,7 @@ end
 function MinigamePrototype:PickRandomPlayerClasses()
 	if self.random_player_classes then
 		local picked_plys = MinigameService.PickRandomPlayerClasses(self, self.random_player_classes)
-		MinigameService.CallNetHook(self, "PickRandomPlayerClasses", picked_plys)
+		MinigameService.CallNetHook(self, "RandomPlayerClassesPicked", picked_plys)
 	end
 end
 
