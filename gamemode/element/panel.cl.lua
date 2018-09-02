@@ -19,6 +19,10 @@ function ElementPanel:OnRemove()
 	end
 end
 
+function ElementPanel:PerformLayout()
+	self.element:Layout()
+end
+
 function ElementPanel:Think()
 	self.element:Think()
 end

@@ -7,12 +7,26 @@ function Element:SetFont(font)
 end
 
 function Element:SetText(text)
-	self.panel.text:SetText(text)
+	text = tostring(text)
+	
+	local old_text = self.panel.text:GetText()
+
+	if text ~= old_text then
+		self.panel.text:SetText(text)
+		self:LayoutText(text)
+	end
 end
 
 function Element:SetAttribute(k, v)
 	local static_attr = self.static_attributes
 	local attr = self.attributes
+	local layout_invalidator = self.layout_invalidators[k]
+
+	local old_v
+
+	if layout_invalidator then
+		old_v = self:GetAttribute(k)
+	end
 
 	if static_attr[k] ~= nil then
 		static_attr[k] = v
@@ -35,6 +49,10 @@ function Element:SetAttribute(k, v)
 		end
 	else
 		static_attr[k] = v
+	end
+
+	if layout_invalidator and old_v and not self.laying_out and isnumber(v) and math.Round(v, 3) ~= math.Round(old_v, 3) then
+		self.panel:InvalidateLayout(true)
 	end
 end
 

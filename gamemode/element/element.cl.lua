@@ -58,14 +58,6 @@ function Element:Init(props)
 
 	self.attributes = {}
 
-	for k, v in pairs(anim_attr) do
-		if isnumber(k) then
-			self.attributes[v] = AnimatableValue.New()
-		else
-			self.attributes[k] = AnimatableValue.New(v)
-		end
-	end
-
 	local opt_attr = {
 		"duration",
 		"overlay",
@@ -81,6 +73,52 @@ function Element:Init(props)
 
 	for _, k in pairs(opt_attr) do
 		self.optional_attributes[k] = true
+	end
+
+	local layout_invalidators = {
+		"x",
+		"y",
+		"width",
+		"height",
+		"width_percent",
+		"height_percent",
+		"padding_left",
+		"padding_top",
+		"padding_right",
+		"padding_bottom",
+		"crop_left",
+		"crop_top",
+		"crop_right",
+		"crop_bottom",
+		"child_margin"
+	}
+
+	self.layout_invalidators = {}
+
+	for _, k in pairs(layout_invalidators) do
+		self.layout_invalidators[k] = true
+	end
+
+	for k, v in pairs(anim_attr) do
+		local props
+
+		if self.layout_invalidators[v] then
+			props = {
+				debounce = 1/60,
+	
+				callback = function ()
+					if self.panel then
+						self.panel:InvalidateLayout(true)
+					end
+				end
+			}
+		end
+
+		if isnumber(k) then
+			self.attributes[v] = AnimatableValue.New(0, props)
+		else
+			self.attributes[k] = AnimatableValue.New(v, props)
+		end
 	end
 
 	if props then
@@ -144,7 +182,9 @@ function Element:DetectEnd()
 	end
 end
 
-function Element:Think()
+function Element:Layout()
+	self.laying_out = true
+
 	if self.parent and self:GetAttribute "origin_position" then
 		self:PositionFromOrigin()
 	end
@@ -156,10 +196,20 @@ function Element:Think()
 	end
 
 	self:GenerateSize()
-	self:DetectEnd()
 
 	self.panel:SetSize(self:GetFinalWidth(), self:GetFinalHeight())
 	self.panel:SetPos(math.Round(self:GetAttribute "x"), math.Round(self:GetAttribute "y"))
+
+	if self:GetAttribute "layout" and self.parent then
+		self.parent.panel:InvalidateLayout(true)
+	end
+
+	self.laying_out = false
+end
+
+function Element:Think()
+	self:DetectEnd()
+
 	self.panel:SetAlpha(math.Round(self:GetAttribute "alpha"))
 	self.panel.text:SetTextColor(self:GetAttribute "text_color" or self:GetAttribute "color")
 end
