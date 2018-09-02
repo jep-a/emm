@@ -107,7 +107,7 @@ function Element:Init(props)
 				debounce = 1/60,
 	
 				callback = function ()
-					if self.panel then
+					if IsValid(self.panel) then
 						self.panel:InvalidateLayout(true)
 					end
 				end
