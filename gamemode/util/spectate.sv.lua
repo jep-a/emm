@@ -26,6 +26,7 @@ function SpectateService.FindPlayerByName(name)
 end
 
 util.AddNetworkString "SpectateKeys"
+
 function SpectateService.SendSpectateKeys(buttons, players)
 	net.Start "SpectateKeys"
 	net.WriteUInt(buttons, 24)

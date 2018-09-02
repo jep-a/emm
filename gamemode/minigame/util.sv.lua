@@ -20,6 +20,7 @@ function MinigameService.PickRandomPlayerClasses(lobby, props)
 	
 	local plys = MinigameService.FilterPlayers(lobby, props)
 	local picked_plys = {}
+	local rejected_plys = {}
 
 	while #picked_plys < ply_count do
 		local ply = plys[math.random(1, #plys)]
@@ -39,11 +40,12 @@ function MinigameService.PickRandomPlayerClasses(lobby, props)
 		if table.HasValue(picked_plys, ply) then
 			ply:SetPlayerClass(class)
 		elseif rejected_class then
+			table.insert(rejected_plys, ply)
 			ply:SetPlayerClass(rejected_class)
 		end
 	end
 
-	return picked_plys
+	return picked_plys, rejected_class
 end
 
 function MinigameService.PickClosestPlayerClass(lobby, origin_ply, props)
@@ -60,20 +62,28 @@ function MinigameService.PickClosestPlayerClass(lobby, origin_ply, props)
 	local closest_ply = MinigameService.ClosestPlayer(lobby, origin_ply, props)
 
 	if closest_ply then
-		closest_ply:SetPlayerClass(ply_classes[props.class_key])
+		if ply_classes[props.class_key] then
+			closest_ply:SetPlayerClass(ply_classes[props.class_key])
+		elseif props.swap_player_class then
+			MinigameService.SwapPlayerClass(origin_ply, closest_ply)
+		end
 	end
 
 	return closest_ply
 end
 
-function MinigameService.SwapPlayerClass(ply_a, ply_b, kill)
+function MinigameService.SwapPlayerClass(ply_a, ply_b, kill_ply_a, kill_ply_b)
 	local class_a = ply_a.player_class
 	local class_b = ply_b.player_class
 
 	ply_a:SetPlayerClass(class_b)
 	ply_b:SetPlayerClass(class_a)
 
-	if kill then
+	if kill_ply_a then
 		ply_a:Kill()
+	end
+
+	if kill_ply_b then
+		ply_b:Kill()
 	end
 end

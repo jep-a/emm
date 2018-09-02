@@ -1,3 +1,10 @@
+NetService.CreateSchema("PlayerInitialSpawn", {"player_index"})
+NetService.CreateSchema("PlayerSpawn", {"player_index"})
+NetService.CreateSchema("PlayerDisconnected", {"entity"})
+NetService.CreateSchema("PrePlayerDeath", {"entity", "entity"})
+NetService.CreateSchema("PlayerDeath", {"entity", "entity", "entity"})
+NetService.CreateSchema("PostPlayerDeath", {"entity"})
+
 hook.Add("InitPlayerProperties", "InitPlayerColor", function (ply)
 	ply.color = COLOR_WHITE
 end)

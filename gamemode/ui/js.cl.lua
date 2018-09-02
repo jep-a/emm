@@ -29,6 +29,7 @@ function JSUI.Reload()
 	JSUI.Init()
 
 	local ply = LocalPlayer()
+
 	if ply.lobby then
 		JSUI.html:Call([[
 			window.app.store.lobbies.setCurrent(]]..ply.lobby.id..[[);
@@ -90,26 +91,34 @@ function JSUI.InitJavaScript()
 	JSUI.html:AddFunction("console", "debug", print)
 	JSUI.html:AddFunction("console", "error", print)
 	JSUI.html:AddFunction("console", "warn", print)
+
 	JSUI.html:AddFunction("EMM", "togglePanel", function (bool)
 		JSUI.html:SetAlpha(bool and 255 or 0)
 		JSUI.html:SetPos(0, bool and 0 or -ScrH())
 	end)
+
 	JSUI.html:AddFunction("EMM", "createLobby", function (id)
-		MinigameService.RequestCreateLobby(MinigameService.Prototype(id))
+		NetService.Send("RequestLobby", MinigameService.Prototype(id))
 	end)
+
 	JSUI.html:AddFunction("EMM", "joinLobby", function (id)
-		MinigameService.RequestJoinLobby(MinigameService.lobbies[id])
+		NetService.Send("RequestLobbyJoin", MinigameService.lobbies[id])
 	end)
+
 	JSUI.html:AddFunction("EMM", "leaveLobby", function ()
-		MinigameService.RequestLeaveLobby()
+		NetService.Send "RequestLobbyLeave"
 	end)
+
 	JSUI.html:AddFunction("EMM", "switchLobby", function (id)
-		if LocalPlayer().lobby and id == LocalPlayer().lobby.id then
-			MinigameService.RequestLeaveLobby()
+		local local_lobby = LocalPlayer().lobby
+
+		if local_lobby and id == local_lobby.id then
+			NetService.Send "RequestLobbyLeave"
 		else
-			MinigameService.RequestJoinLobby(MinigameService.lobbies[id])
+			NetService.Send("RequestLobbyJoin", MinigameService.lobbies[id])
 		end
 	end)
+
 	JSUI.html:RunJavascript([[
 		window.emmStore = {
 			clientID: ]]..LocalPlayer():EntIndex()..[[,
@@ -132,7 +141,7 @@ function JSUI.Init()
 	JSUI.html:SetAlpha(255)
 
 	JSUI.InitJavaScript()
-	JSUI.html:OpenURL "http://emm-jsui.jep.sh/lobby-settings"
+	JSUI.html:OpenURL "http://emm-jsui.jep.sh"
 end
 hook.Add("ReceiveLobbies", "JSUI.Init", JSUI.Init)
 
@@ -174,35 +183,35 @@ function JSUI.AddLobby(lobby)
 		JSUI.html:Call([[window.app.store.lobbies.add(]]..util.TableToJSON(lobby:GetSanitized())..[[)]])
 	end
 end
-hook.Add("CreateLobby", "JSUI.AddLobby", JSUI.AddLobby)
+hook.Add("LobbyInit", "JSUI.AddLobby", JSUI.AddLobby)
 
-function JSUI.RemoveLobby(lobby)
+function JSUI.FinishLobby(lobby)
 	if JSUI.html then
 		JSUI.html:Call([[window.app.store.lobbies.remove(]]..lobby.id..[[)]])
 	end
 end
-hook.Add("RemoveLobby", "JSUI.RemoveLobby", JSUI.RemoveLobby)
+hook.Add("LobbyFinish", "JSUI.FinishLobby", JSUI.FinishLobby)
 
 function JSUI.SetLobbyHost(lobby, ply)
 	if JSUI.html then
 		JSUI.html:Call([[window.app.store.lobbies.setHost(]]..lobby.id..[[, ]]..ply:EntIndex()..[[)]])
 	end
 end
-hook.Add("LobbySetHost", "JSUI.SetLobbyHost", JSUI.SetLobbyHost)
+hook.Add("LobbyHostChange", "JSUI.SetLobbyHost", JSUI.SetLobbyHost)
 
 function JSUI.AddLobbyPlayer(lobby, ply)
 	if JSUI.html then
 		JSUI.html:Call([[window.app.store.lobbies.addPlayer(]]..lobby.id..[[, ]]..ply:EntIndex()..[[)]])
 	end
 end
-hook.Add("LobbyAddPlayer", "JSUI.AddLobbyPlayer", JSUI.AddLobbyPlayer)
+hook.Add("LobbyPlayerJoin", "JSUI.AddLobbyPlayer", JSUI.AddLobbyPlayer)
 
 function JSUI.RemoveLobbyPlayer(lobby, ply)
 	if JSUI.html then
 		JSUI.html:Call([[window.app.store.lobbies.removePlayer(]]..lobby.id..[[, ]]..ply:EntIndex()..[[)]])
 	end
 end
-hook.Add("LobbyRemovePlayer", "JSUI.RemoveLobbyPlayer", JSUI.RemoveLobbyPlayer)
+hook.Add("LobbyPlayerLeave", "JSUI.RemoveLobbyPlayer", JSUI.RemoveLobbyPlayer)
 
 
 -- # Toggling

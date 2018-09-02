@@ -97,7 +97,7 @@ function VarDebugService.Init()
 	VarDebugService.player_class.func = function () return ply.player_class and ply.player_class.name end
 	VarDebugService.side_container:Add(VarDebugService.player_class)
 end
-hook.Add("InitUI", "VarDebugService.Init", VarDebugService.Init)
+-- hook.Add("InitUI", "VarDebugService.Init", VarDebugService.Init)
 
 function VarDebugService.AddDebugger(id, func)
 	VarDebugService[id] = vgui.Create "VarDebug"
@@ -111,4 +111,4 @@ function VarDebugService.Reload()
 	VarDebugService.side_container:Remove()
 	VarDebugService.Init()
 end
-hook.Add("OnReloaded", "VarDebugService", VarDebugService.Reload)
+-- hook.Add("OnReloaded", "VarDebugService", VarDebugService.Reload)

@@ -1,6 +1,10 @@
 TrailService = TrailService or {}
 
 function TrailService.SetupTrail(ent)
+	if IsValid(ent.trail) then
+		ent.trail:StartRemove()
+	end
+
 	local trail = ents.Create("emm_trail")
 	trail:SetOwner(ent)
 	trail:SetPos(ent:GetPos())

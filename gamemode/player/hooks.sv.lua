@@ -1,36 +1,28 @@
 -- # Spawning
 
-util.AddNetworkString "PlayerInitialSpawn"
 hook.Add("PlayerInitialSpawn", "EMM.PlayerInitialSpawn", function (ply)
 	hook.Run("InitPlayerProperties", ply)
-	net.Start "PlayerInitialSpawn"
-	net.WriteUInt(ply:EntIndex(), 16)
-	net.Broadcast()
+	NetService.Send("PlayerInitialSpawn", ply)
 end)
 
-util.AddNetworkString "PlayerSpawn"
 hook.Add("PlayerSpawn", "EMM.PlayerSpawn", function (ply)
 	hook.Run("PlayerProperties", ply)
 	ply:SetupCoreProperties()
 	ply:SetupModel()
 
 	if ply.lobby then
-		MinigameService.CallHook(ply.lobby, "PlayerSpawn")
+		MinigameService.CallHook(ply.lobby, "PlayerSpawn", ply)
+		MinigameService.CallHook(ply.lobby, "PlayerProperties", ply)
 	end
 
-	net.Start "PlayerSpawn"
-	net.WriteUInt(ply:EntIndex(), 16)
-	net.Broadcast()
+	NetService.Send("PlayerSpawn", ply)
 end)
 
 
 -- # Disconnecting
 
-util.AddNetworkString "PlayerDisconnected"
 hook.Add("PlayerDisconnected", "NetworkPlayerDisconnected", function (ply)
-	net.Start "PlayerDisconnected"
-	net.WriteEntity(ply)
-	net.Broadcast()
+	NetService.Send("PlayerDisconnected", ply)
 end)
 
 
@@ -50,48 +42,62 @@ end)
 
 -- # Death
 
-util.AddNetworkString "PrePlayerDeath"
-hook.Add("DoPlayerDeath", "EMM.PrePlayerDeath", function (ply, att, dmg)
-	ply:CreateRagdoll()
+function GM:PlayerDeath(ply, infl, att)
+	local att_valid = IsValid(att)
+	local infl_valid = IsValid(infl)
 
+	if att_valid and att:GetClass() == "trigger_hurt" then
+		att = ply
+	end
+
+	if att_valid and att:IsVehicle() and IsValid(att:GetDriver()) then
+		att = att:GetDriver()
+	end
+
+	if not infl_valid and att_valid then
+		infl = att
+	end
+
+	if infl_valid and infl == att and (infl:IsPlayer() or infl:IsNPC()) then
+		infl = infl:GetActiveWeapon()
+	
+		if not infl_valid then
+			infl = att
+		end
+	end
+end
+
+function GM:DoPlayerDeath(ply, att, dmg)
+	ply:CreateRagdoll()
+end
+
+hook.Add("DoPlayerDeath", "EMM.PrePlayerDeath", function (ply, att, dmg)
 	if ply.lobby then
-		MinigameService.CallHook(ply.lobby, "PrePlayerDeath", att, dmg)
+		MinigameService.CallHook(ply.lobby, "PrePlayerDeath", ply, att, dmg)
 	end
 
 	hook.Run("PrePlayerDeath", ply, att, dmg)
-	
-	net.Start "PrePlayerDeath"
-	net.WriteEntity(ply)
-	net.WriteEntity(att)
-	net.Broadcast()
+	NetService.Send("PrePlayerDeath", ply, att)
 end)
 
-util.AddNetworkString "PlayerDeath"
 hook.Add("PlayerDeath", "EMM.PlayerDeath", function (ply, infl, att)
 	ply:FreezeMovement()
 
 	if ply.lobby then
-		MinigameService.CallHook(ply.lobby, "PlayerDeath", infl, att)
+		MinigameService.CallHook(ply.lobby, "PlayerDeath", ply, infl, att)
 	end
 
-	net.Start "PlayerDeath"
-	net.WriteEntity(ply)
-	net.WriteEntity(infl)
-	net.WriteEntity(att)
-	net.Broadcast()
+	NetService.Send("PlayerDeath", ply, infl, att)
 end)
 
 local function SetDeathTime(ply)
 	ply.last_death_time = CurTime()
 end
 hook.Add("PlayerDeath", "DeathTime", SetDeathTime)
-hook.Add("PlayerSilentDeath", "SilentDeathTime", SetDeathTime)
+hook.Add("PlayerSilentDeath", "DeathTime", SetDeathTime)
 
-util.AddNetworkString "PostPlayerDeath"
 hook.Add("PostPlayerDeath", "NetworkPostPlayerDeath", function (ply)
-	net.Start "PostPlayerDeath"
-	net.WriteEntity(ply)
-	net.Broadcast()
+	NetService.Send("PostPlayerDeath", ply)
 end)
 
 hook.Add("PlayerDeathThink", "Respawn", function (ply)

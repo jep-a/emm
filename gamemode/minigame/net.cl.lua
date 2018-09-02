@@ -1,88 +1,52 @@
--- # Receiving
-
-function MinigameService.ReceiveCreateLobby()
-	local lobby_id = net.ReadUInt(8)
-	local proto_id = net.ReadUInt(8)
-	local host = net.ReadEntity()
-
+function MinigameNetService.ReceiveLobby(lobby_id, proto, host)
 	MinigameService.CreateLobby {
 		id = lobby_id,
-		prototype = MinigameService.Prototype(proto_id),
+		prototype = proto,
 		host = host,
 		players = {host}
 	}
 end
-net.Receive("CreateLobby", MinigameService.ReceiveCreateLobby)
+NetService.Receive("Lobby", MinigameNetService.ReceiveLobby)
 
-function MinigameService.ReceiveRemoveLobby()
-	local lobby_id = net.ReadUInt(8)
-	MinigameService.RemoveLobby(MinigameService.lobbies[lobby_id])
+function MinigameNetService.ReceiveLobbyState(lobby, state_id, last_state_start)
+	lobby:SetState(MinigameStateService.State(lobby, state_id), last_state_start)
 end
-net.Receive("RemoveLobby", MinigameService.ReceiveRemoveLobby)
+NetService.Receive("LobbyState", MinigameNetService.ReceiveLobbyState)
 
-function MinigameService.LobbySetHost()
-	local lobby_id = net.ReadUInt(8)
-	local ply = net.ReadEntity()
+NetService.Receive("LobbyFinish", MinigameService.FinishLobby)
+NetService.Receive("LobbyHost", MinigameLobby.SetHost)
+NetService.Receive("LobbyPlayer", MinigameLobby.AddPlayer)
+NetService.Receive("LobbyPlayerLeave", MinigameLobby.RemovePlayer)
 
-	MinigameService.lobbies[lobby_id]:SetHost(ply)
+function MinigameNetService.RequestLobbies()
+	NetService.Send "RequestLobbies"
 end
-net.Receive("LobbySetHost", MinigameService.LobbySetHost)
+hook.Add("InitPostEntity", "MinigameNetService.RequestLobbies", MinigameNetService.RequestLobbies)
 
-function MinigameService.LobbySetState()
-	local lobby_id = net.ReadUInt(8)
-	local state_id = net.ReadUInt(8)
-	local last_state_start = net.ReadFloat()
-
-	MinigameService.lobbies[lobby_id]:SetState(StateService.State(MinigameService.lobbies[lobby_id], state_id), last_state_start)
-end
-net.Receive("LobbySetState", MinigameService.LobbySetState)
-
-function MinigameService.LobbyAddPlayer()
-	local lobby_id = net.ReadUInt(8)
-	local ply = net.ReadEntity()
-
-	MinigameService.lobbies[lobby_id]:AddPlayer(ply)
-end
-net.Receive("LobbyAddPlayer", MinigameService.LobbyAddPlayer)
-
-function MinigameService.LobbyRemovePlayer()
-	local lobby_id = net.ReadUInt(8)
-	local ply = net.ReadEntity()
-
-	MinigameService.lobbies[lobby_id]:RemovePlayer(ply)
-end
-net.Receive("LobbyRemovePlayer", MinigameService.LobbyRemovePlayer)
-
-function MinigameService.RequestLobbies()
-	net.Start "RequestLobbies"
-	net.SendToServer()
-end
-hook.Add("InitPostEntity", "MinigameService.RequestLobbies", MinigameService.RequestLobbies)
-
-function MinigameService.ReceiveLobbies()
-	local lobby_count = net.ReadUInt(8)
+function MinigameNetService.ReceiveLobbies()
+	local lobby_count = NetService.ReadID()
 
 	for i = 1, lobby_count do
-		local lobby_id = net.ReadUInt(8)
-		local proto_id = net.ReadUInt(8)
-		local state_id = net.ReadUInt(8)
+		local lobby_id = NetService.ReadID()
+		local proto_id = NetService.ReadID()
+		local state_id = NetService.ReadID()
 		local last_state_start = net.ReadFloat()
 		local host = net.ReadEntity()
-		local ply_count = net.ReadUInt(8)
+		local ply_count = NetService.ReadID()
 
 		local proto = MinigameService.Prototype(proto_id)
+
 		local lobby = {
 			id = lobby_id,
-			prototype = MinigameService.Prototype(proto_id),
-			state = StateService.State(proto, state_id),
+			prototype = proto,
+			state = MinigameStateService.State(proto, state_id),
 			last_state_start = last_state_start,
 			host = host,
 			players = {}
 		}
-		
+
 		for i = 1, ply_count do
-			local ply = net.ReadEntity()
-			lobby.players[i] = ply
+			lobby.players[i] = net.ReadEntity()
 		end
 
 		MinigameService.CreateLobby(lobby, false)
@@ -90,29 +54,12 @@ function MinigameService.ReceiveLobbies()
 
 	hook.Run "ReceiveLobbies"
 end
-net.Receive("Lobbies", MinigameService.ReceiveLobbies)
+net.Receive("Lobbies", MinigameNetService.ReceiveLobbies)
 
+function MinigameNetService.CreateHookSchema(hk_name, schema)
+	NetService.CreateSchema("Minigame."..hk_name, table.Add({"minigame_lobby"}, schema))
 
--- # Requesting
-
-function MinigameService.RequestCreateLobby(proto)
-	net.Start "RequestCreateLobby"
-	net.WriteUInt(proto.id, 8)
-	net.SendToServer()
-end
-
-function MinigameService.RequestRemoveLobby()
-	net.Start "RequestRemoveLobby"
-	net.SendToServer()
-end
-
-function MinigameService.RequestJoinLobby(lobby)
-	net.Start "RequestJoinLobby"
-	net.WriteUInt(lobby.id, 8)
-	net.SendToServer()
-end
-
-function MinigameService.RequestLeaveLobby()
-	net.Start "RequestLeaveLobby"
-	net.SendToServer()
+	NetService.Receive("Minigame."..hk_name, function (lobby, ...)
+		MinigameService.CallHook(lobby, hk_name, ...)
+	end)
 end

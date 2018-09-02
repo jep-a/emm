@@ -1,4 +1,5 @@
 NotificationService = NotificationService or {}
+NotificationService.stickies = NotificationService.stickies or {}
 
 
 -- # Elements
@@ -20,11 +21,29 @@ end
 
 NotificationContainer = NotificationContainer or Class.New(Element)
 
-function NotificationContainer:Init(children, duration)
+function NotificationContainer:Init(children, duration, key)
+	duration = duration or 3
+
+	if duration == 0 then
+		duration = nil
+	end
+
 	NotificationContainer.super.Init(self, {
-		duration = duration or 3,
+		duration = duration,
 		fit = true
 	})
+
+	if key then
+		self.key = key
+
+		local old_notif = NotificationService.stickies[key]
+
+		if old_notif then
+			old_notif:Finish()
+		end
+	
+		NotificationService.stickies[key] = self
+	end
 
 	if Class.InstanceOf(children, Element) then 
 		self:Add(children)
@@ -48,8 +67,15 @@ function NotificationContainer:AnimateFinish()
 
 	self:AnimateAttribute("crop_bottom", 1, {
 		duration = 1,
-		delay = 1,
 		callback = function ()
+			if self.key then
+				local curr_notif = NotificationService.stickies[key]
+
+				if curr_notif == self then
+					NotificationService.stickies[self.key] = nil
+				end
+			end
+
 			NotificationContainer.super.Finish(self)
 		end
 	})
@@ -86,7 +112,7 @@ function CountdownNotification:Init(end_time, text)
 
 	self.end_time = end_time
 
-	if text then
+	if text and #text > 0 then
 		self:Add(TextBar.New(text, {
 			width = BAR_WIDTH,
 			fit_x = false,
@@ -140,20 +166,47 @@ end
 -- # Element
 
 function NotificationService.PushSideText(text)
-	HUDService.quadrant_c:Add(NotificationContainer.New(TextBar.New(text, {
+	return HUDService.quadrant_c:Add(NotificationContainer.New(TextBar.New(text, {
 		padding = 0,
 		fill_color = false
 	})))
 end
 
 function NotificationService.PushText(text)
-	HUDService.quadrant_b:Add(NotificationContainer.New(TextBar.New(text)))
+	return HUDService.quadrant_b:Add(NotificationContainer.New(TextBar.New(text)))
 end
 
 function NotificationService.PushAvatarText(ply, text)
-	HUDService.quadrant_b:Add(NotificationContainer.New(AvatarNotification.New(ply, text)))
+	return HUDService.quadrant_b:Add(NotificationContainer.New(AvatarNotification.New(ply, text)))
 end
 
-function NotificationService.PushCountdown(time, text)
-	HUDService.quadrant_b:Add(NotificationContainer.New(CountdownNotification.New(time, text), time - CurTime()))
+function NotificationService.PushCountdown(time, text, key)
+	return HUDService.quadrant_b:Add(NotificationContainer.New(CountdownNotification.New(time, text), time - CurTime(), key))
 end
+
+function NotificationService.PushMetaText(text, key)
+	return HUDService.quadrant_a:Add(NotificationContainer.New(TextBar.New(text), 0, key))
+end
+
+local function FinishNotificationContainer(element)
+	if Class.InstanceOf(element, NotificationContainer) then
+		element:Finish()
+	end
+end
+
+function NotificationService.FinishSticky(key)
+	NotificationService.stickies[key]:Finish()
+end
+
+function NotificationService.Clear(lobby, ply)
+	if not lobby or IsLocalPlayer(ply) then
+		for _, element in pairs(HUDService.quadrant_b.children) do
+			FinishNotificationContainer(element)
+		end
+
+		for _, element in pairs(HUDService.quadrant_c.children) do
+			FinishNotificationContainer(element)
+		end
+	end
+end
+hook.Add("LocalLobbyPlayerLeave", "NotificationService.Clear", NotificationService.Clear)

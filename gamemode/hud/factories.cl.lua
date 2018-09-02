@@ -13,8 +13,7 @@ function HUDService.CreateSection(dist, ang)
 	local element = HUDService.container:Add(Element.New {
 		layout_direction = DIRECTION_COLUMN,
 		width_percent = 1/3,
-		height_percent = 1,
-		alpha = 0
+		height_percent = 1
 	})
 
 	CamUIService.AddPanel(element.panel, dist, ang)

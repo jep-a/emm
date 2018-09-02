@@ -1,6 +1,6 @@
-ModifierService = ModifierService or {}
+MinigameModifierService = MinigameModifierService or {}
 
-function ModifierService.ModifyVars(lobby, vars)
+function MinigameModifierService.ModifyVars(lobby, vars)
 	for k, v in pairs(vars) do
 		local modifiable
 

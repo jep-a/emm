@@ -29,6 +29,7 @@ function Indicator:Init(ent_or_vec)
 
 	self.x = 0
 	self.y = 0
+	self.distance = 0
 	self.world_alpha = AnimatableValue.New()
 
 	self.animatable_color = AnimatableValue.New(COLOR_WHITE, {
@@ -108,6 +109,14 @@ function Indicator:AnimateFinish()
 	self:AnimateAttribute("alpha", 0, {
 		duration = 1,
 		callback = function ()
+			local ent = self.entity
+
+			if IsValid(ent) then
+				if self == ent.indicator then
+					ent.indicator = nil
+				end
+			end
+
 			Indicator.super.Finish(self)
 			self.world_alpha:Finish()
 			self.animatable_color:Finish()
@@ -122,6 +131,31 @@ end
 
 
 -- # Init
+
+function IndicatorService.Sort(ply, eye_pos)
+	local eye_pos = LocalPlayer():EyePos()
+	local indicators = IndicatorService.container.children
+
+	for i = 1, #indicators do
+		local indicator = indicators[i]
+
+		local pos
+	
+		if IsValid(indicator.entity) then
+			pos = indicator.entity:WorldSpaceCenter()
+		elseif indicator.position then
+			pos = indicator.position
+		end
+	
+		if pos then
+			indicator.distance = eye_pos:Distance(pos)
+			indicator.panel:SetZPos(i)
+		end
+	end
+
+	table.sort(indicators, function(a, b) return a.distance > b.distance end)
+end
+hook.Add("Think", "IndicatorService.Sort", IndicatorService.Sort)
 
 function IndicatorService.DrawWorldPositions(ply, eye_pos)
 	local eye_pos = LocalPlayer():EyePos()
@@ -138,33 +172,33 @@ function IndicatorService.DrawWorldPositions(ply, eye_pos)
 		elseif indicator.position then
 			pos = indicator.position
 		end
-	
-		local dist = eye_pos:Distance(pos)
 
-		cam.Start3D()
+		if pos then
+			cam.Start3D()
 
-		local screen_pos = (pos + Vector(0, 0, Lerp(dist/600, 40, 45))):ToScreen()
-	
-		cam.End3D()
+			local screen_pos = (pos + Vector(0, 0, Lerp(indicator.distance/600, 40, 45))):ToScreen()
+		
+			cam.End3D()
 
-		local size = Lerp(dist/800, INDICATOR_WORLD_SIZE * 2, INDICATOR_WORLD_SIZE)
-		local x, y = screen_pos.x - (size/2), screen_pos.y - 6 - (size/2)
-	
-		indicator.x = x
-		indicator.y = y
-	
-		surface.SetAlphaMultiplier(CombineAlphas(container_alpha, indicator:GetAttribute "alpha", indicator.world_alpha.current))
+			local size = Lerp(indicator.distance/800, INDICATOR_WORLD_SIZE * 2, INDICATOR_WORLD_SIZE)
+			local x, y = screen_pos.x - (size/2), screen_pos.y - 6 - (size/2)
+		
+			indicator.x = x
+			indicator.y = y
+		
+			surface.SetAlphaMultiplier(CombineAlphas(container_alpha, indicator:GetAttribute "alpha", indicator.world_alpha.current))
 
-		Element.PaintTexture(nil, indicator_material, {
-			x = x,
-			y = y,
-			angle = 0,
-			width = size,
-			height = size,
-			color = indicator:GetAttribute "color"
-		})
+			Element.PaintTexture(nil, indicator_material, {
+				x = x,
+				y = y,
+				angle = 0,
+				width = size,
+				height = size,
+				color = indicator:GetAttribute "color"
+			})
 
-		surface.SetAlphaMultiplier(1)
+			surface.SetAlphaMultiplier(1)
+		end
 	end
 end
 hook.Add("DrawIndicators", "IndicatorService.DrawWorldPositions", IndicatorService.DrawWorldPositions)
@@ -201,7 +235,7 @@ end
 hook.Add("PreDrawOpaqueRenderables", "IndicatorService.RenderCoasters", IndicatorService.RenderCoasters)
 
 function IndicatorService.Add(lobby, ply)
-	if ply == LocalPlayer() then
+	if IsLocalPlayer(ply) then
 		for _, _ply in pairs(lobby.players) do
 			if ply ~= _ply then
 				_ply.indicator = Indicator.New(_ply)
@@ -213,27 +247,27 @@ function IndicatorService.Add(lobby, ply)
 		IndicatorService.container:Add(ply.indicator)
 	end
 end
-hook.Add("LocalLobbyAddPlayer", "IndicatorService.Add", IndicatorService.Add)
+hook.Add("LocalLobbyPlayerJoin", "IndicatorService.Add", IndicatorService.Add)
 hook.Add("LocalLobbyPlayerSpawn", "IndicatorService.Add", function (lobby, ply)
-	if ply ~= LocalPlayer() then
+	if not IsLocalPlayer(ply) and not ply.indicator then
 		IndicatorService.Add(lobby, ply)
 	end
 end)
 
 hook.Add("LocalLobbyPlayerDeath", "IndicatorService.Remove", function (lobby, ply)
-	if ply ~= LocalPlayer() then
+	if not IsLocalPlayer(ply) and ply.indicator then
 		ply.indicator:Finish()
 	end
 end)
 
 function IndicatorService.Clear(lobby, ply)
-	if ply == LocalPlayer() then
+	if IsLocalPlayer(ply) then
 		IndicatorService.container:Clear()
-	else
+	elseif ply.indicator then
 		ply.indicator:Finish()
 	end
 end
-hook.Add("LocalLobbyRemovePlayer", "IndicatorService.Clear", IndicatorService.Clear)
+hook.Add("LocalLobbyPlayerLeave", "IndicatorService.Clear", IndicatorService.Clear)
 
 function IndicatorService.ReloadIndicators()
 	local ply = LocalPlayer()
