@@ -141,7 +141,7 @@ function JSUI.Init()
 	JSUI.html:SetAlpha(255)
 
 	JSUI.InitJavaScript()
-	JSUI.html:OpenURL "http://emm-jsui.jep.sh/lobby-settings"
+	JSUI.html:OpenURL "http://emm-jsui.jep.sh"
 end
 hook.Add("ReceiveLobbies", "JSUI.Init", JSUI.Init)
 
