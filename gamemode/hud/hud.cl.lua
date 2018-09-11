@@ -183,7 +183,13 @@ function HUDService.Show()
 	HUDService.quadrant_h:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
 	HUDService.quadrant_i:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION * 2})
 end
-hook.Add("LocalPlayerSpawn", "HUDService.Show", HUDService.Show)
+
+hook.Add("LocalPlayerSpawn", "HUDService.Show", function ()
+	if not LobbyUIService.open then
+		HUDService.Show()
+	end
+end)
+
 hook.Add("OnSpawnMenuClose", "HUDService.Show", HUDService.Show)
 
 function HUDService.Hide()

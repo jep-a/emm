@@ -60,6 +60,8 @@ end
 hook.Add("OnReloaded", "LobbyUIService.Reload", LobbyUIService.Reload)
 
 function LobbyUIService.Open()
+	LobbyUIService.open = true
+
 	RestoreCursorPosition()
 	gui.EnableScreenClicker(true)
 	LobbyUIService.container.panel:MoveToFront()
@@ -69,6 +71,8 @@ function LobbyUIService.Open()
 end
 
 function LobbyUIService.Close()
+	LobbyUIService.open = false
+
 	RememberCursorPosition()
 	gui.EnableScreenClicker(false)
 	LobbyUIService.container.panel:MoveToBack()

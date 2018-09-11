@@ -292,7 +292,13 @@ hook.Add("OnReloaded", "IndicatorService.Reload", IndicatorService.Reload)
 function IndicatorService.Show()
 	IndicatorService.container:AnimateAttribute("alpha", 255)
 end
-hook.Add("LocalPlayerSpawn", "IndicatorService.Show", IndicatorService.Show)
+
+hook.Add("LocalPlayerSpawn", "IndicatorService.Show", function ()
+	if not LobbyUIService.open then
+		IndicatorService.Show()
+	end
+end)
+
 hook.Add("OnSpawnMenuClose", "IndicatorService.Show", IndicatorService.Show)
 
 function IndicatorService.Hide()
