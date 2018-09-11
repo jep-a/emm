@@ -52,6 +52,8 @@ EMM.Include {
 	"lobby-ui/lobby-ui",
 	"lobby-ui/elements",
 	"lobby-ui/factories",
+	"lobby-ui_elements/lobby-bar",
+	"lobby-ui_elements/lobby-card",
 	"hud/variables",
 	"hud/hud",
 	"hud/elements",

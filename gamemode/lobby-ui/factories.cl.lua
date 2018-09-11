@@ -1,3 +1,4 @@
+-- # Util
 
 function LobbyUIService.CreateHeader(text, fit)
 	local element = Element.New {
@@ -83,6 +84,60 @@ function LobbyUIService.CreateLabels(left_labels, right_labels)
 	return element
 end
 
+
+-- # Main elements
+
+function LobbyUIService.CreateContainer()
+	return Element.New {
+		width_percent = 1,
+		height_percent = 1,
+		padding = 64,
+		child_margin = MARGIN * 4,
+		alpha = 0
+	}
+end
+
+function LobbyUIService.CreateNewLobbySection()
+	return Element.New {
+		layout_direction = DIRECTION_COLUMN,
+		width = 256,
+		height_percent = 1,
+		child_margin = MARGIN * 4,
+		LobbyUIService.CreateHeader "Make a new lobby"
+	}
+end
+
+function LobbyUIService.CreatePrototypeList()
+	return Element.New {
+		layout_direction = DIRECTION_COLUMN,
+		fit_y = true,
+		width_percent = 1,
+		background_color = COLOR_GRAY
+	}
+end
+
+function LobbyUIService.CreatePrototypeBar(proto)
+	return ButtonBar.New {
+		color = proto.color,
+		material = Material("emm2/minigames/"..proto.key..".png", "nocull smooth"),
+		text = proto.name,
+		divider = true,
+
+		on_click = function (self)
+			NetService.Send("RequestLobby", proto)
+		end
+	}
+end
+
+function LobbyUIService.CreateLobbySection()
+	return Element.New {
+		width_percent = 0.25,
+		height_percent = 1,
+		child_margin = MARGIN * 4,
+		header = LobbyUIService.CreateHeader("No open lobbies", true)
+	}
+end
+
 function LobbyUIService.CreateLobbyList()
 	local element = Element.New {
 		layout_direction = DIRECTION_COLUMN,
@@ -100,15 +155,11 @@ function LobbyUIService.CreateLobbyList()
 	return element
 end
 
-function LobbyUIService.CreatePrototypeBar(proto)
-	return ButtonBar.New {
-		color = proto.color,
-		material = Material("emm2/minigames/"..proto.key..".png", "nocull smooth"),
-		text = proto.name,
-		divider = true,
-
-		on_click = function (self)
-			NetService.Send("RequestLobby", proto)
-		end
+function LobbyUIService.CreateLobbyCardSection()
+	return Element.New {
+		layout_direction = DIRECTION_COLUMN,
+		width = 256,
+		height_percent = 1,
+		child_margin = MARGIN * 4
 	}
 end

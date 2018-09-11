@@ -1,44 +1,42 @@
 LobbyUIService = LobbyUIService or {}
 
+
+-- # Util
+
+function LobbyUIService.SetLobbyListHeaderText(count)
+	local text
+
+	if count > 0 then
+		text = count.." open "..(count == 1 and "lobby" or "lobbies")
+	else
+		text = "No open lobbies"
+	end
+
+	LobbyUIService.lobby_section.header:SetText(string.upper(text))
+end
+
+function LobbyUIService.LobbyHostText(ply)
+	local text
+
+	if IsLocalPlayer(ply) then
+		text = "your lobby"
+	else
+		text = ply:GetName().."'s lobby"
+	end
+
+	return text
+end
+
+
+-- # Init
+
 function LobbyUIService.Init()
-	LobbyUIService.container = Element.New {
-		width_percent = 1,
-		height_percent = 1,
-		padding = 64,
-		child_margin = MARGIN * 4,
-		alpha = 0
-	}
-
-	LobbyUIService.new_lobby_section = LobbyUIService.container:Add(Element.New {
-		layout_direction = DIRECTION_COLUMN,
-		width = 256,
-		height_percent = 1,
-		child_margin = MARGIN * 4,
-		LobbyUIService.CreateHeader "Make a new lobby"
-	})
-
-	LobbyUIService.prototype_list = LobbyUIService.new_lobby_section:Add(Element.New {
-		layout_direction = DIRECTION_COLUMN,
-		fit_y = true,
-		width_percent = 1,
-		background_color = COLOR_GRAY
-	})
-
-	LobbyUIService.lobby_section = LobbyUIService.container:Add(Element.New {
-		width_percent = 0.25,
-		height_percent = 1,
-		child_margin = MARGIN * 4,
-		header = LobbyUIService.CreateHeader("No open lobbies", true)
-	})
-
+	LobbyUIService.container = LobbyUIService.CreateContainer()
+	LobbyUIService.new_lobby_section = LobbyUIService.container:Add(LobbyUIService.CreateNewLobbySection())
+	LobbyUIService.prototype_list = LobbyUIService.new_lobby_section:Add(LobbyUIService.CreatePrototypeList())
+	LobbyUIService.lobby_section = LobbyUIService.container:Add(LobbyUIService.CreateLobbySection())
 	LobbyUIService.lobby_list = LobbyUIService.lobby_section:Add(LobbyUIService.CreateLobbyList())
-
-	LobbyUIService.lobby_card_section = LobbyUIService.container:Add(Element.New {
-		layout_direction = DIRECTION_COLUMN,
-		width = 256,
-		height_percent = 1,
-		child_margin = MARGIN * 4
-	})
+	LobbyUIService.lobby_card_section = LobbyUIService.container:Add(LobbyUIService.CreateLobbyCardSection())
 
 	for _, proto in pairs(MinigameService.prototypes) do
 		LobbyUIService.prototype_list:Add(LobbyUIService.CreatePrototypeBar(proto))
@@ -89,41 +87,8 @@ function GM:OnSpawnMenuClose()
 	LobbyUIService.Close()
 end
 
-function LobbyUIService.SetLobbyListHeaderText(count)
-	local text
 
-	if count > 0 then
-		text = count.." open "..(count == 1 and "lobby" or "lobbies")
-	else
-		text = "No open lobbies"
-	end
-
-	LobbyUIService.lobby_section.header:SetText(string.upper(text))
-end
-
-function LobbyUIService.ProperPlayerName(ply)
-	local name
-
-	if IsLocalPlayer(ply) then
-		name = "you"
-	else
-		name = ply:GetName()
-	end
-
-	return name
-end
-
-function LobbyUIService.LobbyHostText(ply)
-	local text
-
-	if IsLocalPlayer(ply) then
-		text = "your lobby"
-	else
-		text = ply:GetName().."'s lobby"
-	end
-
-	return text
-end
+-- # Hooks
 
 function LobbyUIService.AddLobby(lobby)
 	if LobbyUIService.container then
@@ -167,7 +132,7 @@ hook.Add("LobbyFinish", "LobbyUIService.FinishLobby", LobbyUIService.FinishLobby
 
 function LobbyUIService.SetLobbyHost(lobby, ply)
 	if lobby.bar_element then
-		lobby.bar_element.host:SetText(LobbyUIService.ProperPlayerName(ply))
+		lobby.bar_element.host:SetText(ProperPlayerName(ply))
 	end
 
 	if lobby.card_element then
