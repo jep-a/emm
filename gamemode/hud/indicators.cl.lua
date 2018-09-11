@@ -293,11 +293,13 @@ function IndicatorService.Show()
 	IndicatorService.container:AnimateAttribute("alpha", 255)
 end
 hook.Add("LocalPlayerSpawn", "IndicatorService.Show", IndicatorService.Show)
+hook.Add("OnSpawnMenuClose", "IndicatorService.Show", IndicatorService.Show)
 
 function IndicatorService.Hide()
 	IndicatorService.container:AnimateAttribute("alpha", 0)
 end
 hook.Add("LocalPlayerDeath", "IndicatorService.Hide", IndicatorService.Hide)
+hook.Add("OnSpawnMenuOpen", "IndicatorService.Hide", IndicatorService.Hide)
 
 function IndicatorService.Draw()
 	IndicatorService.container.panel:PaintManual()

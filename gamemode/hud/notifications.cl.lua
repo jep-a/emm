@@ -4,9 +4,9 @@ NotificationService.stickies = NotificationService.stickies or {}
 
 -- # Elements
 
-function NotificationService.CreateFlash()
+function NotificationService.CreateFlash(duration)
 	local element = Element.New {
-		duration = ANIMATION_DURATION * 2,
+		duration = duration or (ANIMATION_DURATION * 2),
 		overlay = true,
 		layout = false,
 		width_percent = 1,
@@ -67,6 +67,7 @@ function NotificationContainer:AnimateFinish()
 
 	self:AnimateAttribute("crop_bottom", 1, {
 		duration = 1,
+
 		callback = function ()
 			if self.key then
 				local curr_notif = NotificationService.stickies[key]

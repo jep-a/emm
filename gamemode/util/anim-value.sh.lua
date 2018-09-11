@@ -101,7 +101,7 @@ function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay, finish
 	if stack then
 		table.insert(self.animations, anim)
 	else
-		self.animations[1] = anim
+		self.animations = {anim}
 	end
 
 	return self
@@ -118,7 +118,20 @@ function AnimatableValue:Animate()
 	if first_anim then
 		local time = math.TimeFraction(first_anim.start_time, first_anim.end_time, CurTime())
 		local eased_time = first_anim.ease(time)
-		local value = ((1 - eased_time) * first_anim.start_value) + (eased_time * first_anim.end_value)
+		local inverted_eased_time = 1 - eased_time
+
+		local value
+
+		if IsColor(self.current) then
+			value = Color(
+				(inverted_eased_time * first_anim.start_value.r) + (eased_time * first_anim.end_value.r),
+				(inverted_eased_time * first_anim.start_value.g) + (eased_time * first_anim.end_value.g),
+				(inverted_eased_time * first_anim.start_value.b) + (eased_time * first_anim.end_value.b),
+				(inverted_eased_time * first_anim.start_value.a) + (eased_time * first_anim.end_value.a)
+			)
+		else
+			value = (inverted_eased_time * first_anim.start_value) + (eased_time * first_anim.end_value)
+		end
 
 		self.current = value
 

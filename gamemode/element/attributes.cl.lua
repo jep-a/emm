@@ -1,3 +1,113 @@
+local animatable_attributes = {
+	"x",
+	"y",
+	"width",
+	"height",
+	"padding_left",
+	"padding_top",
+	"padding_right",
+	"padding_bottom",
+	"crop_left",
+	"crop_top",
+	"crop_right",
+	"crop_bottom",
+	"child_margin",
+
+	color = COLOR_WHITE,
+	background_color = COLOR_BLACK_CLEAR,
+	alpha = 255,
+	border = 0,
+	border_alpha = 255
+}
+
+local optional_attributes = {
+	"duration",
+	"overlay",
+	"width_percent",
+	"height_percent",
+	"angle",
+	"text_color",
+	"border_color",
+	"cursor"
+}
+
+local layout_invalidators = {
+	"x",
+	"y",
+	"width",
+	"height",
+	"width_percent",
+	"height_percent",
+	"padding_left",
+	"padding_top",
+	"padding_right",
+	"padding_bottom",
+	"crop_left",
+	"crop_top",
+	"crop_right",
+	"crop_bottom",
+	"child_margin"
+}
+
+function Element:InitAttributes()
+	self.static_attributes = {
+		paint = true,
+		layout = true,
+		origin_position = false,
+		origin_justification_x = JUSTIFY_START,
+		origin_justification_y = JUSTIFY_START,
+		position_justification_x = JUSTIFY_START,
+		position_justification_y = JUSTIFY_START,
+		self_adjacent_justification = JUSTIFY_INHERIT,
+		layout_justification_x = JUSTIFY_START,
+		layout_justification_y = JUSTIFY_START,
+		layout_direction = DIRECTION_ROW,
+		wrap = true,
+		fit_x = false,
+		fit_y = false,
+		inherit_color = true,
+		fill_color = false,
+		inherit_cursor = true,
+		bubble_mouse = true
+	}
+
+	self.optional_attributes = {}
+	
+	for _, k in pairs(optional_attributes) do
+		self.optional_attributes[k] = true
+	end
+	
+	self.layout_invalidators = {}
+	
+	for _, k in pairs(layout_invalidators) do
+		self.layout_invalidators[k] = true
+	end
+
+	self.attributes = {}
+
+	for k, v in pairs(animatable_attributes) do
+		local props
+
+		if self.layout_invalidators[v] then
+			props = {
+				debounce = 1/60,
+	
+				callback = function ()
+					if IsValid(self.panel) then
+						self.panel:InvalidateLayout(true)
+					end
+				end
+			}
+		end
+
+		if isnumber(k) then
+			self.attributes[v] = AnimatableValue.New(0, props)
+		else
+			self.attributes[k] = AnimatableValue.New(v, props)
+		end
+	end
+end
+
 function Element:SetTextJustification(justify)
 	self.panel.text:SetContentAlignment(justify)
 end
@@ -31,7 +141,10 @@ function Element:SetAttribute(k, v)
 	if static_attr[k] ~= nil then
 		static_attr[k] = v
 	elseif attr[k] ~= nil then
-		if Class.InstanceOf(v, AnimatableValue) then
+		if self.optional_attributes[k] ~= nil and v == false then
+			attr[k]:Finish()
+			attr[k] = nil
+		elseif Class.InstanceOf(v, AnimatableValue) then
 			attr[k]:Finish()
 			attr[k] = v
 		elseif isfunction(v) then
@@ -47,6 +160,14 @@ function Element:SetAttribute(k, v)
 		else
 			attr[k] = AnimatableValue.New(v)
 		end
+	elseif Class.InstanceOf(v, Element) then
+		local element = self:Add(v)
+
+		if isstring(k) then
+			self[k] = element
+		end
+	elseif self.reserved_states[k] then
+		self:AddState(k, v)
 	else
 		static_attr[k] = v
 	end

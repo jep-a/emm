@@ -178,24 +178,42 @@ end
 hook.Add("HUDShouldDraw", "HUDService.ShouldDraw", HUDService.ShouldDraw)
 
 function HUDService.Show()
-	HUDService.crosshair_container:AnimateAttribute("alpha", 255)
+	HUDService.crosshair_container:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
 	HUDService.quadrant_g:AnimateAttribute("alpha", 255)
 	HUDService.quadrant_h:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
 	HUDService.quadrant_i:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION * 2})
 end
 hook.Add("LocalPlayerSpawn", "HUDService.Show", HUDService.Show)
+hook.Add("OnSpawnMenuClose", "HUDService.Show", HUDService.Show)
 
 function HUDService.Hide()
-	HUDService.crosshair_container:AnimateAttribute("alpha", 0)
+	HUDService.crosshair_container:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION})
 	HUDService.quadrant_g:AnimateAttribute("alpha", 0)
 	HUDService.quadrant_h:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION})
 	HUDService.quadrant_i:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION * 2})
 end
+
 hook.Add("PrePlayerDeath", "HUDService.Hide", function (ply)
 	if IsLocalPlayer(ply) then
 		HUDService.Hide()
 	end
 end)
+
+hook.Add("OnSpawnMenuOpen", "HUDService.Hide", HUDService.Hide)
+
+function HUDService.ShowNotifications()
+	HUDService.quadrant_a:AnimateAttribute("alpha", 255)
+	HUDService.quadrant_b:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
+	HUDService.quadrant_c:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION * 2})
+end
+hook.Add("OnSpawnMenuClose", "HUDService.ShowNotifications", HUDService.ShowNotifications)
+
+function HUDService.HideNotifications()
+	HUDService.quadrant_a:AnimateAttribute("alpha", 0)
+	HUDService.quadrant_b:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION})
+	HUDService.quadrant_c:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION * 2})
+end
+hook.Add("OnSpawnMenuOpen", "HUDService.HideNotifications", HUDService.HideNotifications)
 
 function HUDService.RenderHooks()
 	hook.Run "DrawIndicators"

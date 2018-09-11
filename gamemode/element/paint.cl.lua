@@ -36,12 +36,15 @@ function Element:PaintBorder(props)
 
 	local w = props.width or self:GetAttribute "width"
 	local h = props.height or self:GetAttribute "height"
+
 	w = w - ((w * self:GetAttribute "crop_left") + (w * self:GetAttribute "crop_right"))
 	h = h - ((h * self:GetAttribute "crop_top") + (h * self:GetAttribute "crop_bottom"))
+
 	local color = props.color or self:GetAttribute "border_color" or self:GetAttribute "color"
+	local color_with_alpha = ColorAlpha(color, CombineAlphas(color.a, self:GetAttribute "border_alpha") * 255)
 	local thickness = props.thickness or self:GetAttribute "border"
 
-	surface.SetDrawColor(color)
+	surface.SetDrawColor(color_with_alpha)
 	surface.DrawRect(0, 0, w, thickness)
 	surface.DrawRect(w - thickness, 0, thickness, h)
 	surface.DrawRect(0, h - thickness, w, thickness)
@@ -57,7 +60,11 @@ function Element:Paint()
 		if mat then
 			self:PaintTexture(mat)
 		end
+	end
+end
 
+function Element:PaintOver()
+	if self:GetAttribute "paint" then
 		if self:GetAttribute "border" then
 			self:PaintBorder()
 		end

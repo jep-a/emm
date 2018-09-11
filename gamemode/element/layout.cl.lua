@@ -116,21 +116,29 @@ function Element:StackChildren()
 	local adj_prop_keys
 	local main_justify
 	local adj_justify
+	local crop_offset
+	local adj_crop_offset
 
 	if static_attr.layout_direction == DIRECTION_ROW then
 		adj_prop_keys = axis_property_keys[DIRECTION_COLUMN]
 		main_justify = static_attr.layout_justification_x
 		adj_justify = static_attr.layout_justification_y
+		crop_offset = self:GetXCropOffset()
+		adj_crop_offset = self:GetYCropOffset()
 	elseif static_attr.layout_direction == DIRECTION_COLUMN then
 		adj_prop_keys = axis_property_keys[DIRECTION_ROW]
 		main_justify = static_attr.layout_justification_y
 		adj_justify = static_attr.layout_justification_x
+		crop_offset = self:GetYCropOffset()
+		adj_crop_offset = self:GetXCropOffset()
 	end
 
+	local fit = static_attr[prop_keys.fit]
 	local size = self:GetAttribute(prop_keys.size)
 	local padding_start = self:GetAttribute(prop_keys.padding_start)
 	local padding_end = self:GetAttribute(prop_keys.padding_end)
 	local child_margin = self:GetAttribute "child_margin"
+	local adj_fit = static_attr[adj_prop_keys.fit]
 	local adj_size = self:GetAttribute(adj_prop_keys.size)
 	local adj_padding_start = self:GetAttribute(adj_prop_keys.padding_start)
 	local adj_padding_end = self:GetAttribute(adj_prop_keys.padding_end)
@@ -165,7 +173,7 @@ function Element:StackChildren()
 			adj_child_size = child:GetFinalWidth()
 		end
 
-		if not static_attr.wrap or max_line_size >= (line_size + child_size) then
+		if fit or not static_attr.wrap or max_line_size >= (line_size + child_size) then
 			child_positions[i] = line_size
 			line_size = line_size + child_size
 
@@ -241,11 +249,11 @@ function Element:StackChildren()
 		end
 	end
 
-	if static_attr[prop_keys.fit] then
+	if fit then
 		self:SetAttribute(prop_keys.size, largest_line_size + padding_start + padding_end)
 	end
 
-	if static_attr[adj_prop_keys.fit] then
+	if adj_fit then
 		self:SetAttribute(adj_prop_keys.size, total_adj_line_size + adj_padding_start + adj_padding_end)
 	end
 
@@ -258,7 +266,7 @@ function Element:StackChildren()
 
 		local child = children[i]
 
-		child:SetAttribute(prop_keys.position, line_start_positions[line] + child_positions[i])
+		child:SetAttribute(prop_keys.position, line_start_positions[line] + child_positions[i] - crop_offset)
 
 		if static_attr.layout_direction == DIRECTION_ROW then
 			adj_child_size = child:GetFinalHeight()
@@ -284,7 +292,7 @@ function Element:StackChildren()
 			adj_pos = adj_pos + adj_line_sizes[line] - adj_child_size
 		end
 
-		child:SetAttribute(adj_prop_keys.position, adj_pos)
+		child:SetAttribute(adj_prop_keys.position, adj_pos - adj_crop_offset)
 	end
 end
 

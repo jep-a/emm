@@ -234,10 +234,10 @@ function JSUI.Close()
 end
 -- hook.Add("OnSpawnMenuOpen", JSUI.Close)
 
-function GM:OnSpawnMenuOpen()
-	JSUI.Open()
-end
+-- function GM:OnSpawnMenuOpen()
+-- 	JSUI.Open()
+-- end
 
-function GM:OnSpawnMenuClose()
-	JSUI.Close()
-end
+-- function GM:OnSpawnMenuClose()
+-- 	JSUI.Close()
+-- end

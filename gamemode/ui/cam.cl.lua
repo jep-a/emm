@@ -37,6 +37,9 @@ function CamUIService.Render()
 	cam.Start3D(Vector(0, -ScrW()/2, -ScrH()/2), CamUIService.cam_angle.smooth, 90)
 	surface.DisableClipping(false)
 
+	render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+	render.PushFilterMin(TEXFILTER.ANISOTROPIC)
+
 	for i, pnl in pairs(CamUIService.panels) do
 		if not IsValid(pnl) then
 			table.remove(CamUIService.panels, i)
@@ -49,8 +52,11 @@ function CamUIService.Render()
 		end
 	end
 
+	render.PopFilterMin()
+	render.PopFilterMag()
 	cam.End3D()
 	surface.DisableClipping(true)
+
 end
 hook.Add("DrawCamUI", "CamUIService.Render", CamUIService.Render)
 

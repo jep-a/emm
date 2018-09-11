@@ -13,114 +13,13 @@ Element = Element or Class.New()
 function Element:Init(props)
 	self.children = {}
 	self.layout_children = {}
-
+	
 	self.panel = vgui.Create "ElementPanel"
 	self.panel.element = self
-
-	self.static_attributes = {
-		paint = true,
-		layout = true,
-		origin_position = false,
-		origin_justification_x = JUSTIFY_START,
-		origin_justification_y = JUSTIFY_START,
-		position_justification_x = JUSTIFY_START,
-		position_justification_y = JUSTIFY_START,
-		self_adjacent_justification = JUSTIFY_INHERIT,
-		layout_justification_x = JUSTIFY_START,
-		layout_justification_y = JUSTIFY_START,
-		layout_direction = DIRECTION_ROW,
-		wrap = true,
-		fit_x = false,
-		fit_y = false,
-		inherit_color = true,
-		fill_color = false
-	}
-
-	local anim_attr = {
-		"x",
-		"y",
-		"width",
-		"height",
-		"padding_left",
-		"padding_top",
-		"padding_right",
-		"padding_bottom",
-		"crop_left",
-		"crop_top",
-		"crop_right",
-		"crop_bottom",
-		"child_margin",
-
-		color = COLOR_WHITE,
-		background_color = COLOR_BLACK_CLEAR,
-		alpha = 255
-	}
-
-	self.attributes = {}
-
-	local opt_attr = {
-		"duration",
-		"overlay",
-		"width_percent",
-		"height_percent",
-		"angle",
-		"text_color",
-		"border",
-		"border_color"
-	}
-
-	self.optional_attributes = {}
-
-	for _, k in pairs(opt_attr) do
-		self.optional_attributes[k] = true
-	end
-
-	local layout_invalidators = {
-		"x",
-		"y",
-		"width",
-		"height",
-		"width_percent",
-		"height_percent",
-		"padding_left",
-		"padding_top",
-		"padding_right",
-		"padding_bottom",
-		"crop_left",
-		"crop_top",
-		"crop_right",
-		"crop_bottom",
-		"child_margin"
-	}
-
-	self.layout_invalidators = {}
-
-	for _, k in pairs(layout_invalidators) do
-		self.layout_invalidators[k] = true
-	end
-
-	for k, v in pairs(anim_attr) do
-		local props
-
-		if self.layout_invalidators[v] then
-			props = {
-				debounce = 1/60,
 	
-				callback = function ()
-					if IsValid(self.panel) then
-						self.panel:InvalidateLayout(true)
-					end
-				end
-			}
-		end
-
-		if isnumber(k) then
-			self.attributes[v] = AnimatableValue.New(0, props)
-		else
-			self.attributes[k] = AnimatableValue.New(v, props)
-		end
-	end
-
+	self:InitStates()
+	self:InitAttributes()
+	
 	if props then
 		self:SetAttributes(props)
 	end
@@ -128,13 +27,26 @@ end
 
 function Element:Add(element)
 	element.parent = self
+	element.last = true
 
 	self.panel:Add(element.panel)
 
-	table.insert(self.children, element)
+	local i = table.insert(self.children, element)
+
+	if i > 1 then
+		self.children[i - 1].last = nil
+	end
 
 	if element:GetAttribute "layout" then
 		table.insert(self.layout_children, element)
+	end
+
+	if element:GetAttribute "inherit_cursor" then
+		local cursor = self:GetAttribute "cursor"
+
+		if cursor then
+			element:SetAttribute("cursor", cursor)
+		end
 	end
 
 	return element
@@ -154,7 +66,11 @@ end
 
 function Element:Finish()
 	if self.parent then
-		table.RemoveByValue(self.parent.children, self)
+		local i = table.RemoveByValue(self.parent.children, self)
+
+		if i > 1 and self.last then
+			self.parent.children[i - 1].last = true
+		end
 
 		if self:GetAttribute "layout" then
 			table.RemoveByValue(self.parent.layout_children, self)
@@ -212,4 +128,25 @@ function Element:Think()
 
 	self.panel:SetAlpha(math.Round(self:GetAttribute "alpha"))
 	self.panel.text:SetTextColor(self:GetAttribute "text_color" or self:GetAttribute "color")
+end
+
+function Element:OnMousePressed(mouse)
+	if self.states.press then
+		local old_state = self.current_state
+
+		self:SetState "press"
+		self:AnimateState(old_state, ANIMATION_DURATION * 4)
+	end
+end
+
+function Element:OnMouseEntered()
+	if self.states.hover then
+		self:AnimateState "hover"
+	end
+end
+
+function Element:OnMouseExited()
+	if self.states.hover then
+		self:RevertState()
+	end
 end
