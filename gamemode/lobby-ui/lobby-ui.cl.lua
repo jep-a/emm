@@ -58,33 +58,44 @@ end
 hook.Add("OnReloaded", "LobbyUIService.Reload", LobbyUIService.Reload)
 
 function LobbyUIService.Open()
+	RememberCursorPosition()
+	RestoreCursorPosition()
+
+	if LobbyUIService.focused then
+		LobbyUIService.UnFocus()
+	end
+
 	LobbyUIService.open = true
 
-	RestoreCursorPosition()
 	gui.EnableScreenClicker(true)
+	LobbyUIService.container.panel:SetMouseInputEnabled(true)
 	LobbyUIService.container.panel:MoveToFront()
 	LobbyUIService.container:AnimateAttribute("alpha", 255)
-
-	return true
 end
 
 function LobbyUIService.Close()
-	LobbyUIService.open = false
-
 	RememberCursorPosition()
-	gui.EnableScreenClicker(false)
-	LobbyUIService.container.panel:MoveToBack()
-	LobbyUIService.container:AnimateAttribute("alpha", 0)
 
-	return true
+	if not LobbyUIService.focused then
+		LobbyUIService.open = false
+
+		gui.EnableScreenClicker(false)
+		LobbyUIService.container.panel:SetMouseInputEnabled(false)
+		LobbyUIService.container.panel:MoveToBack()
+		LobbyUIService.container:AnimateAttribute("alpha", 0)
+	end
 end
 
 function GM:OnSpawnMenuOpen()
 	LobbyUIService.Open()
+
+	return true
 end
 
 function GM:OnSpawnMenuClose()
 	LobbyUIService.Close()
+
+	return true
 end
 
 
@@ -215,7 +226,31 @@ function LobbyUIService.UnSelectLobby()
 	LobbyUIService.selected_lobby = nil
 end
 
-function LobbyUIService.Unfocus(panel)
+function LobbyUIService.Focus()
+	LobbyUIService.focused = true
+	LobbyUIService.container.panel:MakePopup()
+end
+
+function LobbyUIService.UnFocus()
+	LobbyUIService.focused = false
+	LobbyUIService.container.panel:SetKeyboardInputEnabled(false)
+end
+
+function LobbyUIService.FocusTextEntry(element)
+	if element.panel:HasParent(LobbyUIService.container.panel) then
+		LobbyUIService.Focus()
+	end
+end
+hook.Add("TextEntryFocus", "LobbyUIService.FocusTextEntry", LobbyUIService.FocusTextEntry)
+
+function LobbyUIService.UnFocusTextEntry(element)
+	if element.panel:HasParent(LobbyUIService.container.panel) then
+		LobbyUIService.UnFocus()
+	end
+end
+hook.Add("TextEntryUnFocus", "LobbyUIService.UnFocusTextEntry", LobbyUIService.UnFocusTextEntry)
+
+function LobbyUIService.MousePressed(panel)
 	if 
 		panel == LobbyUIService.container.panel or
 		panel == LobbyUIService.new_lobby_section.panel or
@@ -227,4 +262,4 @@ function LobbyUIService.Unfocus(panel)
 		end
 	end
 end
-hook.Add("VGUIMousePressed", "LobbyUIService.Unfocus", LobbyUIService.Unfocus)
+hook.Add("VGUIMousePressed", "LobbyUIService.MousePressed", LobbyUIService.MousePressed)
