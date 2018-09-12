@@ -45,7 +45,9 @@ function Element:PositionFromOrigin()
 
 	local start_x
 
-	if x_origin_justify == JUSTIFY_START then
+	if x_origin_justify == JUSTIFY_INHERIT then
+		start_x = self:GetAttribute "x"
+	elseif x_origin_justify == JUSTIFY_START then
 		start_x = 0
 	elseif x_origin_justify == JUSTIFY_CENTER then
 		start_x = parent_w/2
@@ -55,7 +57,9 @@ function Element:PositionFromOrigin()
 
 	local start_y
 
-	if y_origin_justify == JUSTIFY_START then
+	if y_origin_justify == JUSTIFY_INHERIT then
+		start_y = self:GetAttribute "y"
+	elseif y_origin_justify == JUSTIFY_START then
 		start_y = 0
 	elseif y_origin_justify == JUSTIFY_CENTER then
 		start_y = parent_h/2
