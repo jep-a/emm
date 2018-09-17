@@ -1,7 +1,6 @@
 Indicator = Indicator or Class.New(Element)
 
 local indicator_material = Material("emm2/shapes/arrow.png", "noclamp smooth")
-local circle_material = Material("emm2/shapes/circle.png", "noclamp smooth")
 
 function Indicator:Init(ent_or_vec)
 	Indicator.super.Init(self, {

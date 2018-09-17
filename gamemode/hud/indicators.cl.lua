@@ -1,5 +1,8 @@
 IndicatorService = IndicatorService or {}
 
+local indicator_material = Material("emm2/shapes/arrow.png", "noclamp smooth")
+local circle_material = Material("emm2/shapes/circle.png", "noclamp smooth")
+
 
 -- # Init
 
