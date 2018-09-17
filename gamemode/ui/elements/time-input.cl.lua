@@ -371,7 +371,8 @@ end
 function TimeInput:StopDragging()
 	TimeInput.super.StopDragging(self)
 
-	local v = self.slider.generated_options[self.slider.selected_option_index]
+	self:OnFocus()
+	self.panel.text:SetValue(self.slider.generated_options[self.slider.selected_option_index])
+	self.panel.text:OffsetCaretPos(max_time_digits)
 	self.slider:Finish()
-	self.panel.text:SetValue(v)
 end

@@ -6,7 +6,7 @@ function LobbyCard:Init(lobby)
 		origin_position = true,
 		layout_direction = DIRECTION_COLUMN,
 		fit_y = true,
-		width = 256,
+		width = COLUMN_WIDTH,
 		child_margin = MARGIN * 4,
 		alpha = 0,
 		header = LobbyUIService.CreateHeader(LobbyUIService.LobbyHostText(lobby.host))

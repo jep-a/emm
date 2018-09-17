@@ -100,7 +100,7 @@ end
 function LobbyUIService.CreateNewLobbySection()
 	return Element.New {
 		layout_direction = DIRECTION_COLUMN,
-		width = 256,
+		width = COLUMN_WIDTH,
 		height_percent = 1,
 		child_margin = MARGIN * 4,
 		LobbyUIService.CreateHeader "Make a new lobby"
@@ -158,7 +158,7 @@ end
 function LobbyUIService.CreateLobbyCardSection()
 	return Element.New {
 		layout_direction = DIRECTION_COLUMN,
-		width = 256,
+		width = COLUMN_WIDTH,
 		height_percent = 1,
 		child_margin = MARGIN * 4
 	}
