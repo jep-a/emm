@@ -166,7 +166,9 @@ function InputSlider:InitOptions(default)
 	local first_option = tonumber(OptionValue(self.options[1]))
 
 	if default_v > first_option then
-		local mod = math.Round(default_v % math.Truncate(default_v, self.upper_range_round), option_padding)
+		local mod = math.Round(default_v % math.Truncate(default_v, self.upper_range_round), 2)
+
+		print(mod)
 
 		if mod == 0 then
 			self:GenerateOptions(-((default_v - first_option - self.upper_range_step)/self.upper_range_step))
@@ -214,7 +216,6 @@ function InputSlider:SetScrollPos()
 
 	self.scroll.current = math.Clamp(scroll, 1, #self.inner_container.children)
 	self.selected_option_index = self.scroll.current + self.offset - (option_padding + 1)
-	print(self.selected_option_index)
 end
 
 function InputSlider:LayoutScroll()
