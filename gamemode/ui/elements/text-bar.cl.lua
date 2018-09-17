@@ -11,6 +11,8 @@ function TextBar:Init(text, props)
 		text = text
 	})
 
+	self.d = true
+
 	if props then
 		self:SetAttributes(props)
 	end

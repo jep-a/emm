@@ -168,8 +168,6 @@ function InputSlider:InitOptions(default)
 	if default_v > first_option then
 		local mod = math.Round(default_v % math.Truncate(default_v, self.upper_range_round), 2)
 
-		print(mod)
-
 		if mod == 0 then
 			self:GenerateOptions(-((default_v - first_option - self.upper_range_step)/self.upper_range_step))
 		else

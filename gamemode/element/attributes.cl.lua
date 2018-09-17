@@ -36,6 +36,8 @@ local optional_attributes = {
 local layout_invalidators = {
 	"origin_x",
 	"origin_y",
+	"fit_x",
+	"fit_y",
 	"x",
 	"y",
 	"width",
@@ -131,7 +133,7 @@ function Element:SetText(text)
 	end
 end
 
-function Element:SetAttribute(k, v)
+function Element:SetAttribute(k, v, no_layout)
 	local static_attr = self.static_attributes
 	local attr = self.attributes
 	local layout_invalidator = self.layout_invalidators[k]
@@ -176,14 +178,20 @@ function Element:SetAttribute(k, v)
 		static_attr[k] = v
 	end
 
-	if layout_invalidator and old_v and not self.laying_out and isnumber(v) and math.Round(v, 3) ~= math.Round(old_v, 3) then
+	if not no_layout and layout_invalidator and (
+		(static_attr[k] ~= nil) or (old_v and not self.laying_out and isnumber(v) and math.Round(v, 3) ~= math.Round(old_v, 3))
+	) then
 		self.panel:InvalidateLayout(true)
 	end
 end
 
 function Element:SetAttributes(attr)
 	for k, v in pairs(attr) do
-		self:SetAttribute(k, v)
+		self:SetAttribute(k, v, true)
+	end
+
+	if not self.laying_out then
+		self.panel:InvalidateLayout(true)
 	end
 end
 
