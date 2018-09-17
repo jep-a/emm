@@ -9,7 +9,7 @@ function LobbyBar:Init(lobby)
 		crop_bottom = 1,
 		padding_left = MARGIN * 8,
 		padding_right = MARGIN * 6,
-		padding_top = MARGIN,
+		padding_top = MARGIN * 3,
 		inherit_color = false,
 		border = LINE_THICKNESS/2,
 		border_color = lobby.prototype.color,
@@ -52,7 +52,7 @@ function LobbyBar:Init(lobby)
 		layout_justification_y = JUSTIFY_CENTER,
 		fit_y = true,
 		width_percent = 0.5,
-		padding_bottom = MARGIN * 2,
+		padding_bottom = MARGIN * 3,
 		child_margin = MARGIN * 8,
 
 		Element.New {
@@ -77,7 +77,7 @@ function LobbyBar:Init(lobby)
 		fit_y = true,	
 		crop_bottom = 0.01,
 		width_percent = 0.5,
-		padding_bottom = MARGIN * 2,
+		padding_bottom = MARGIN * 3,
 		child_margin = MARGIN * 8
 	})
 

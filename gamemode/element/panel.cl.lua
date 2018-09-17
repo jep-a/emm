@@ -63,6 +63,14 @@ function ElementPanel:OnMousePressed(mouse)
 	end
 end
 
+function ElementPanel:OnMouseReleased(mouse)
+	self.element:OnMouseReleased(mouse)
+
+	if self:CanBubble() then
+		self.element.parent.panel:OnMouseReleased(mouse)
+	end
+end
+
 local hovered_panels = {}
 
 timer.Create("Element.HoveredPanels", 1/30, 0, function ()

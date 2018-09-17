@@ -23,6 +23,8 @@ local animatable_attributes = {
 local optional_attributes = {
 	"duration",
 	"overlay",
+	"origin_x",
+	"origin_y",
 	"width_percent",
 	"height_percent",
 	"angle",
@@ -32,6 +34,8 @@ local optional_attributes = {
 }
 
 local layout_invalidators = {
+	"origin_x",
+	"origin_y",
 	"x",
 	"y",
 	"width",

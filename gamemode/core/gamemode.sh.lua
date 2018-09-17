@@ -59,6 +59,7 @@ EMM.Include {
 	"ui/elements/player-bar",
 	"ui/elements/avatar-bar",
 	"ui/elements/checkbox",
+	"ui/elements/slider",
 	"ui/elements/text-input",
 	"ui/elements/time-input",
 

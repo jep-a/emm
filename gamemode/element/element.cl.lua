@@ -25,20 +25,38 @@ function Element:Init(props)
 	end
 end
 
-function Element:Add(element)
+function Element:Add(i_or_element, element)
+	local i
+
+	if isnumber(i_or_element) then
+		i = i_or_element
+	else
+		element = i_or_element
+	end
+
 	element.parent = self
 	element.last = true
 
 	self.panel:Add(element.panel)
 
-	local i = table.insert(self.children, element)
+	local layout = element:GetAttribute "layout"
+
+	if i then
+		table.insert(self.children, i, element)
+
+		if layout then
+			table.insert(self.layout_children, i, element)
+		end
+	else
+		i = table.insert(self.children, element)
+
+		if layout then
+			table.insert(self.layout_children, element)
+		end
+	end
 
 	if i > 1 then
 		self.children[i - 1].last = nil
-	end
-
-	if element:GetAttribute "layout" then
-		table.insert(self.layout_children, element)
 	end
 
 	if element:GetAttribute "inherit_cursor" then
@@ -65,6 +83,10 @@ function Element:Clear()
 end
 
 function Element:Finish()
+	if self.dragging then
+		self:StopDragging()
+	end
+
 	if self.parent then
 		local i = table.RemoveByValue(self.parent.children, self)
 
@@ -101,14 +123,18 @@ end
 function Element:Layout()
 	self.laying_out = true
 
-	if self.parent and self:GetAttribute "origin_position" then
+	if self:GetAttribute "origin_position" then
 		self:PositionFromOrigin()
 	end
 
 	if #self.layout_children > 0 then
 		self:StackChildren()
 	else
-		self:LayoutText()
+		if self:GetAttribute "font" then
+			self:LayoutText()
+		elseif #self.children > 0 then
+			self:Fit()
+		end
 	end
 
 	self:GenerateSize()
@@ -139,6 +165,10 @@ function Element:OnMousePressed(mouse)
 	end
 end
 
+function Element:OnMouseReleased(mouse)
+	-- 
+end
+
 function Element:OnMouseEntered()
 	if self.states.hover then
 		self:AnimateState "hover"
@@ -149,4 +179,58 @@ function Element:OnMouseExited()
 	if self.states.hover then
 		self:RevertState()
 	end
+end
+
+local drag_distance = 8
+
+local holding_element
+local holding_mouse
+local holding_x
+local holding_y
+local dragging
+
+hook.Add("Think", "Element.DragThink", function ()
+	if holding_element then
+		local mouse_down = input.IsMouseDown(holding_mouse)
+
+		if mouse_down and not holding_element.dragging then
+			local curr_x, curr_y = input.GetCursorPos()
+
+			if math.abs(curr_x - holding_x) > drag_distance or math.abs(curr_y - holding_y) > drag_distance then
+				holding_element:StartDragging()
+			end
+		end
+	
+		if holding_element.dragging then
+			holding_element:DragThink()
+			
+			if not mouse_down then
+				holding_element:StopDragging()
+			end
+		end
+	end
+end)
+
+hook.Add("VGUIMousePressed", "Element.StartDragging", function (panel, mouse)
+	if panel.element then
+		holding_element = panel.element
+		holding_mouse = mouse
+		holding_x, holding_y = input.GetCursorPos()
+	end
+end)
+
+function Element:StartDragging()
+	self.dragging = true
+end
+
+function Element:StopDragging()
+	if self == holding_element then
+		holding_element = nil
+	end
+
+	self.dragging = false
+end
+
+function Element:DragThink()
+	print "drag"
 end

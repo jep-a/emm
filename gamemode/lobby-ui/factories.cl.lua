@@ -42,7 +42,7 @@ function LobbyUIService.CreateLabels(left_labels, right_labels)
 		width_percent = 1,
 		padding_left = MARGIN * 8,
 		padding_right = MARGIN * 6,
-		padding_top = MARGIN * 2.75,
+		padding_top = MARGIN * 5,
 		inherit_color = false
 	}
 
@@ -51,7 +51,7 @@ function LobbyUIService.CreateLabels(left_labels, right_labels)
 		layout_justification_y = JUSTIFY_TOP,
 		fit_y = true,
 		width_percent = 0.5,
-		padding_bottom = MARGIN * 2,
+		padding_bottom = MARGIN * 4,
 		child_margin = MARGIN * 8
 	})
 
@@ -61,7 +61,7 @@ function LobbyUIService.CreateLabels(left_labels, right_labels)
 		layout_justification_y = JUSTIFY_TOP,
 		fit_y = true,
 		width_percent = 0.5,
-		padding_bottom = MARGIN * 2,
+		padding_bottom = MARGIN * 4,
 		child_margin = MARGIN * 8
 	})
 
@@ -143,13 +143,13 @@ function LobbyUIService.CreateLobbyList()
 		layout_direction = DIRECTION_COLUMN,
 		fit_y = true,
 		width_percent = 1,
-		padding_bottom = MARGIN * 3.5,
+		padding_bottom = MARGIN * 6.5,
 		background_color = COLOR_GRAY,
 		LobbyUIService.CreateLabels({"Type", "Host"}, {"Players"})
 	}
 
 	element:AddState("contains_children", {
-		padding_bottom = MARGIN * 1.8
+		padding_bottom = MARGIN * 4
 	})
 
 	return element

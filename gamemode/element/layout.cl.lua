@@ -31,22 +31,33 @@ function Element:GetFinalHeight()
 end
 
 function Element:PositionFromOrigin()
+	local origin_x = self:GetAttribute "origin_x"
+	local origin_y = self:GetAttribute "origin_y"
 	local x_origin_justify = self:GetAttribute "origin_justification_x"
 	local y_origin_justify = self:GetAttribute "origin_justification_y"
 	local x_pos_justify = self:GetAttribute "position_justification_x"
 	local y_pos_justify = self:GetAttribute "position_justification_y"
 
 	local parent = self.parent
-	local parent_w = parent:GetAttribute "width"
-	local parent_h = parent:GetAttribute "height"
+
+	local parent_w
+	local parent_h
+
+	if parent then
+		parent_w = parent:GetFinalWidth()
+		parent_h = parent:GetFinalHeight()
+	else
+		parent_w = ScrW()
+		parent_h = ScrH()
+	end
 
 	local w = self:GetFinalWidth()
 	local h = self:GetFinalHeight()
 
 	local start_x
 
-	if x_origin_justify == JUSTIFY_INHERIT then
-		start_x = self:GetAttribute "x"
+	if origin_x then
+		start_x = origin_x
 	elseif x_origin_justify == JUSTIFY_START then
 		start_x = 0
 	elseif x_origin_justify == JUSTIFY_CENTER then
@@ -57,8 +68,8 @@ function Element:PositionFromOrigin()
 
 	local start_y
 
-	if y_origin_justify == JUSTIFY_INHERIT then
-		start_y = self:GetAttribute "y"
+	if origin_y then
+		start_y = origin_y
 	elseif y_origin_justify == JUSTIFY_START then
 		start_y = 0
 	elseif y_origin_justify == JUSTIFY_CENTER then
@@ -254,11 +265,11 @@ function Element:StackChildren()
 	end
 
 	if fit then
-		self:SetAttribute(prop_keys.size, largest_line_size + padding_start + padding_end)
+		self:SetAttribute(prop_keys.size, largest_line_size)
 	end
 
 	if adj_fit then
-		self:SetAttribute(adj_prop_keys.size, total_adj_line_size + adj_padding_start + adj_padding_end)
+		self:SetAttribute(adj_prop_keys.size, total_adj_line_size)
 	end
 
 	line = 1
@@ -297,6 +308,52 @@ function Element:StackChildren()
 		end
 
 		child:SetAttribute(adj_prop_keys.position, adj_pos - adj_crop_offset)
+	end
+end
+
+function Element:Fit()
+	local fit_x = self:GetAttribute "fit_x"
+	local fit_y = self:GetAttribute "fit_y"
+
+	local padding_left = self:GetAttribute "padding_left"
+	local padding_right = self:GetAttribute "padding_right"
+	local padding_top = self:GetAttribute "padding_top"
+	local padding_bottom = self:GetAttribute "padding_bottom"
+
+	local children = self.children
+
+	local largest_w = 0
+	local largest_h = 0
+
+	for i = 1, #children do
+		local child = children[i]
+		local child_w = child:GetFinalWidth()
+		local child_h = child:GetFinalHeight()
+		local overlay = child:GetAttribute "overlay"
+
+		if fit_x and not child:GetAttribute "width_percent" and child_w > largest_w then
+			largest_w = child_w
+
+			if overlay then
+				largest_w = largest_w + padding_left + padding_right
+			end
+		end
+
+		if fit_y and not child:GetAttribute "height_percent" and child_h > largest_h then
+			largest_h = child_h
+
+			if overlay then
+				largest_h = largest_h + padding_top + padding_bottom
+			end
+		end
+	end
+
+	if fit_x then
+		self:SetAttribute("width", largest_w)
+	end
+	
+	if fit_y then
+		self:SetAttribute("height", largest_h)
 	end
 end
 

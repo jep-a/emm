@@ -8,20 +8,23 @@ local start_padding = 2
 local function ZeroString(len)
 	len = len or max_time_digits
 
-	local digits = ""
+	return string.format("%0"..len.."d", 0)
+end
 
-	for i = 1, len do
-		digits = digits.."0"
-	end
+local function Seconds(text)
+	local h, m, s = string.match(string.format("%06d", tonumber(text)), "(%d%d)(%d%d)(%d%d)")
 
-	return digits
+	return (tonumber(h) * 3600) + (tonumber(m) * 60) + tonumber(s)
 end
 
 function TimeInputPanel:Init()
 	self:SetMouseInputEnabled(false)
 	self:SetUpdateOnType(true)
 	
-	self.time = "0"
+	self.time = ""
+	self.colons = ""
+	self.time_with_colons = ""
+
 	self.old_caret_pos = max_time_digits
 	self.last_caret_pos_change = CurTime()
 	self.digit_width = 0
@@ -51,13 +54,16 @@ function TimeInputPanel:FormatDigits(digits)
 
 	local time
 	local colons
+	local time_with_colons
 
 	if tonumber(digits) == 0 then
 		time = ""
 		colons = ""
+		time_with_colons = ""
 	elseif 2 >= digits_len then
 		time = trimmed_digits
 		colons = ""
+		time_with_colons = trimmed_digits
 	else
 		self.formatted_lookup = {
 			[0] = lookup_start
@@ -66,13 +72,17 @@ function TimeInputPanel:FormatDigits(digits)
 		if (digits_len % 2) ~= 0 then
 			time = trimmed_digits[1]
 			colons = " "
+
 			table.insert(self.formatted_lookup, lookup_start + 1)
 		else
 			time = string.sub(trimmed_digits, 1, 2)
 			colons = "  "
+
 			table.insert(self.formatted_lookup, lookup_start + 1)
 			table.insert(self.formatted_lookup, lookup_start + 2)
 		end
+
+		time_with_colons = time
 		
 		for i = #time + 1, digits_len, 2 do
 			local next_i = i + 1
@@ -82,6 +92,7 @@ function TimeInputPanel:FormatDigits(digits)
 
 			time = time.." "..pair
 			colons = colons..":".."  "
+			time_with_colons = time_with_colons..":"..pair
 
 			table.insert(self.formatted_lookup, lookup_start + i - 1)
 			table.insert(self.formatted_lookup, lookup_start + i)
@@ -91,6 +102,7 @@ function TimeInputPanel:FormatDigits(digits)
 
 	self.time = time
 	self.colons = colons
+	self.time_with_colons = colons
 end
 
 function TimeInputPanel:OnValueChange(value)
@@ -108,13 +120,15 @@ function TimeInputPanel:OnValueChange(value)
 			caret_pos = caret_pos - 1
 		end
 	elseif max_time_digits > value_len then
-		text = ZeroString(max_time_digits - value_len)..text
+		text = string.format("%06d", text)
 		caret_pos = caret_pos + 1
 	end
 
 	self:SetText(text)
 	self:OffsetCaretPos(caret_pos)
 	self:FormatDigits(text)
+
+	self.seconds = Seconds(text)
 end
 
 function TimeInputPanel:ClampCaretPos(new_caret_pos)
@@ -162,6 +176,8 @@ function TimeInputPanel:PreventLetters()
 	if string.find(text, "[^%d]") then
 		self:SetText(ZeroString())
 		self.time = ""
+		self.colons = ""
+		self.time_with_colons = ""
 	end
 end
 
@@ -288,6 +304,10 @@ function TimeInput:OnMousePressed(mouse)
 	self:OnFocus(self)
 end
 
+function TimeInput:OnMouseReleased(mouse)
+	TimeInput.super.OnMouseReleased(self, mouse)
+end
+
 function TimeInput:OnFocus()
 	self.panel.text:SetMouseInputEnabled(false)
 	self.panel.text:RequestFocus()
@@ -300,4 +320,52 @@ end
 function TimeInput:OnUnFocus()
 	hook.Run("TextEntryUnFocus", self)
 	self.text_line:AnimateAttribute("alpha", 0)
+end
+
+function TimeInput:StartDragging()
+	print"start"
+	TimeInput.super.StartDragging(self)
+
+	self:OnUnFocus()
+
+	local seconds = self.panel.text.seconds
+
+	self.slider = InputSlider.New(self, {
+		default = seconds and {text = self.panel.text.time_with_colons, value = seconds} or 500,
+
+		text_generate = function (v)
+			return string.NiceTime(Seconds(v))
+		end,
+
+		upper_range_step = 10000,
+		upper_range_round = -4,
+
+		options = {
+			10000,
+			4500,
+			3000,
+			2000,
+			1500,
+			1000,
+			500,
+			{text = "4:20", value = 420},
+			200,
+			100,
+			45,
+			30,
+			15,
+			10,
+			5,
+			3
+		}
+	})
+
+	self.slider:AnimateAttribute("alpha", 255)
+	self.slider.panel:MakePopup()
+	self.slider.panel:SetKeyboardInputEnabled(false)
+end
+
+function TimeInput:StopDragging()
+	TimeInput.super.StopDragging(self)
+	self.slider:Finish()
 end
