@@ -64,6 +64,8 @@ function TimeInputPanel:FormatDigits(digits)
 		time = trimmed_digits
 		colons = ""
 		time_with_colons = trimmed_digits
+	
+		self.formatted_lookup = {[0] = lookup_start, lookup_start + 1, lookup_start + 2}
 	else
 		self.formatted_lookup = {
 			[0] = lookup_start
@@ -102,12 +104,12 @@ function TimeInputPanel:FormatDigits(digits)
 
 	self.time = time
 	self.colons = colons
-	self.time_with_colons = colons
+	self.time_with_colons = time_with_colons
 end
 
 function TimeInputPanel:OnValueChange(value)
-	local text = value
-	local value_len = #value
+	local text = tostring(value)
+	local value_len = #text
 	local caret_pos = self:GetCaretPos()
 
 	if value_len > max_time_digits then
@@ -323,18 +325,18 @@ function TimeInput:OnUnFocus()
 end
 
 function TimeInput:StartDragging()
-	print"start"
 	TimeInput.super.StartDragging(self)
 
 	self:OnUnFocus()
 
-	local seconds = self.panel.text.seconds
+	local time = tonumber(self.panel.text:GetText())
+	local has_value = tonumber(time) > 0
 
 	self.slider = InputSlider.New(self, {
-		default = seconds and {text = self.panel.text.time_with_colons, value = seconds} or 500,
+		default = has_value and {text = self.panel.text.time_with_colons, value = time} or 500,
 
 		text_generate = function (v)
-			return string.NiceTime(Seconds(v))
+			return NiceTime(Seconds(v))
 		end,
 
 		upper_range_step = 10000,
@@ -356,7 +358,8 @@ function TimeInput:StartDragging()
 			15,
 			10,
 			5,
-			3
+			3,
+			1
 		}
 	})
 
@@ -367,5 +370,8 @@ end
 
 function TimeInput:StopDragging()
 	TimeInput.super.StopDragging(self)
+
+	local v = self.slider.generated_options[self.slider.selected_option_index]
 	self.slider:Finish()
+	self.panel.text:SetValue(v)
 end

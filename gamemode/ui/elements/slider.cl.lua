@@ -1,6 +1,7 @@
 InputSlider = InputSlider or Class.New(Element)
 
 local scroll_step = 24
+local option_padding = 10
 
 local function OptionValue(option)
 	local v
@@ -32,12 +33,13 @@ function InputSlider:Init(input, props)
 		cursor = "hand"
 	})
 
+	self.start_time = CurTime()
+
 	self.inner_container = self:Add(Element.New {
 		layout = false,
 		layout_direction = DIRECTION_COLUMN,
 		fit = true,
 		padding_x = MARGIN * 3.5,
-		padding_y = MARGIN * 3,
 		child_margin = MARGIN
 	})
 
@@ -54,59 +56,23 @@ function InputSlider:Init(input, props)
 		border = 2
 	})
 
-	local default = props.default
-	local upper_range_round = props.upper_range_round
-	local upper_range_step = props.upper_range_step
-	local options = props.options
-
 	self.text_generate = props.text_generate
-	self.upper_range_round = upper_range_round
-	self.upper_range_step = upper_range_step
-	self.options = options
-
-	if options then
-		if default then
-			local default_v = OptionValue(default)
-			local first_option = tonumber(OptionValue(options[1]))
-
-			if default_v > first_option then
-				local mod = math.Round(default_v % math.Truncate(default_v, upper_range_round), 4)
-
-				if mod == 0 then
-					self:GenerateOptions(-((default_v - first_option)/upper_range_step))
-				else
-					self:GenerateOptions(nil, -((default_v - mod - first_option)/upper_range_step), default)
-				end
-			else
-				for i, v in pairs(options) do
-					if OptionValue(v) == default_v then
-						self:GenerateOptions(i)
-
-						break
-					elseif default_v > OptionValue(v) then
-						self:GenerateOptions(nil, i, default)
-
-						break
-					end
-				end
-			end
-		end
-	end
+	self.upper_range_round = props.upper_range_round
+	self.upper_range_step = props.upper_range_step
+	self.options = props.options
+	self.generated_options = {}
 
 	self.offset = 0
-	self.scroll = AnimatableValue.New(5, {
-		smooth = true,
-		smooth_multiplier = 2,
+	self.selected_option_index = 0
 
-		generate = function ()
-			local option_count = #self.inner_container.children
-			local _, y = self.panel:LocalCursorPos()
-			local relative_y = y - (self:GetFinalHeight()/2)
-			local scroll = math.floor(option_count/2) + math.Round(relative_y/scroll_step) + 1
-		
-			return scroll
-		end
+	self.scroll = AnimatableValue.New(option_padding + 1, {
+		smooth = true,
+		smooth_multiplier = 2
 	})
+
+	if self.options then
+		self:InitOptions(props.default)
+	end
 
 	self:AnimateAttribute("alpha", 255)
 end
@@ -121,12 +87,14 @@ function InputSlider:GenerateOptions(default_i, insert_i, insert_option)
 
 	local start_i = insert_i or default_i
 
-	for i = start_i - 4, start_i + 4 do
+	self.offset = start_i
+
+	for i = start_i - option_padding, start_i + option_padding do
 		self:GenerateOption(i)
 	end
 end
 
-function InputSlider:GenerateOption(i)
+function InputSlider:GenerateOption(i, option_i)
 	local is_insert
 	local v
 
@@ -169,19 +137,54 @@ function InputSlider:GenerateOption(i)
 	end
 
 	if v then
-		local text
+		self.generated_options[i] = OptionValue(v)
 
+		local text
+		
 		if istable(v) and v.text then
 			text = v.text
 		elseif self.text_generate then
 			text = self.text_generate(v)
 		end
 
-		self.inner_container:Add(Element.New {
+		local element_props = {
 			fit = true,
 			font = "Info",
 			text = text
-		})
+		}
+
+		if option_i then
+			self.inner_container:Add(option_i, Element.New(element_props))
+		else
+			self.inner_container:Add(Element.New(element_props))
+		end
+	end
+end
+
+function InputSlider:InitOptions(default)
+	local default_v = OptionValue(default)
+	local first_option = tonumber(OptionValue(self.options[1]))
+
+	if default_v > first_option then
+		local mod = math.Round(default_v % math.Truncate(default_v, self.upper_range_round), option_padding)
+
+		if mod == 0 then
+			self:GenerateOptions(-((default_v - first_option - self.upper_range_step)/self.upper_range_step))
+		else
+			self:GenerateOptions(nil, -((default_v - mod - first_option)/self.upper_range_step), default)
+		end
+	else
+		for i, v in pairs(self.options) do
+			if OptionValue(v) == default_v then
+				self:GenerateOptions(i)
+
+				break
+			elseif default_v > OptionValue(v) then
+				self:GenerateOptions(nil, i, default)
+
+				break
+			end
+		end
 	end
 end
 
@@ -198,13 +201,36 @@ function InputSlider:Finish()
 	self:AnimateFinish()
 end
 
+function InputSlider:SetScrollPos()
+	local _, y = self.panel:LocalCursorPos()
+	
+	local scroll
+	
+	if math.Round(CurTime() - self.start_time, 2) > (1/30) then
+		scroll = option_padding + math.Round((y - (self:GetFinalHeight()/2))/scroll_step) + 1
+	else
+		scroll = option_padding + 1
+	end
+
+	self.scroll.current = math.Clamp(scroll, 1, #self.inner_container.children)
+	self.selected_option_index = self.scroll.current + self.offset - (option_padding + 1)
+	print(self.selected_option_index)
+end
+
+function InputSlider:LayoutScroll()
+	local h = self:GetFinalHeight()
+	local child_margin = self.inner_container:GetAttribute "child_margin"
+	local option_h = self.inner_container.children[1]:GetFinalHeight() + child_margin
+	local inner_h = (option_h * ((option_padding * 2) + 1)) - child_margin
+
+	self.inner_container:SetAttribute("y", (h/2) - ((option_h - child_margin)/2) - ((self.scroll.smooth - 1) * option_h))
+end
+
 function InputSlider:Think()
 	InputSlider.super.Think(self)
 
-	local h = self:GetFinalHeight()
-	local inner_h = self.inner_container:GetFinalHeight()
-	local child_margin = self.inner_container:GetAttribute "child_margin"
-	local option_h = self.inner_container.children[1]:GetFinalHeight() + child_margin
-
-	self.inner_container:SetAttribute("y", (h/2) - option_h + child_margin - ((self.offset + self.scroll.smooth - 1) * option_h))
+	if #self.inner_container.children > 0 then
+		self:SetScrollPos()
+		self:LayoutScroll()
+	end
 end

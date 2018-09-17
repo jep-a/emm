@@ -232,5 +232,5 @@ function Element:StopDragging()
 end
 
 function Element:DragThink()
-	print "drag"
+	--
 end
