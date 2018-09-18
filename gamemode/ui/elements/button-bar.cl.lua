@@ -4,7 +4,6 @@ function ButtonBar:Init(props)
 	props = props or {}
 
 	ButtonBar.super.Init(self, {
-		layout_direction = DIRECTION_ROW,
 		layout_justification_y = JUSTIFY_CENTER,
 		fit_y = true,
 		width = BAR_WIDTH,

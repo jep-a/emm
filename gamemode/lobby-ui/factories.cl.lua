@@ -36,7 +36,6 @@ end
 
 function LobbyUIService.CreateLabels(left_labels, right_labels)
 	local element = Element.New {
-		layout_direction = DIRECTION_ROW,
 		layout_justification_y = JUSTIFY_END,
 		fit_y = true,
 		width_percent = 1,
@@ -47,7 +46,6 @@ function LobbyUIService.CreateLabels(left_labels, right_labels)
 	}
 
 	element.left_section = element:Add(Element.New {
-		layout_direction = DIRECTION_ROW,
 		layout_justification_y = JUSTIFY_TOP,
 		fit_y = true,
 		width_percent = 0.5,
@@ -56,7 +54,6 @@ function LobbyUIService.CreateLabels(left_labels, right_labels)
 	})
 
 	element.right_section = element:Add(Element.New {
-		layout_direction = DIRECTION_ROW,
 		layout_justification_x = JUSTIFY_END,
 		layout_justification_y = JUSTIFY_TOP,
 		fit_y = true,

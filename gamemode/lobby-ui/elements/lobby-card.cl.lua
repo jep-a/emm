@@ -16,7 +16,6 @@ function LobbyCard:Init(lobby)
 	lobby.card_element = self
 
 	self.prototype = self:Add(Element.New {
-		layout_direction = DIRECTION_ROW,
 		layout_justification_y = JUSTIFY_CENTER,
 		fit_y = true,
 		width_percent = 1,

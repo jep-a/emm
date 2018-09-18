@@ -2,7 +2,6 @@ LobbyBar = LobbyBar or Class.New(Element)
 
 function LobbyBar:Init(lobby)
 	LobbyBar.super.Init(self, {
-		layout_direction = DIRECTION_ROW,
 		layout_justification_y = JUSTIFY_END,
 		fit_y = true,
 		width_percent = 1,
@@ -48,7 +47,6 @@ function LobbyBar:Init(lobby)
 	lobby.bar_element = self
 
 	local left_section = self:Add(Element.New {
-		layout_direction = DIRECTION_ROW,
 		layout_justification_y = JUSTIFY_CENTER,
 		fit_y = true,
 		width_percent = 0.5,
@@ -71,7 +69,6 @@ function LobbyBar:Init(lobby)
 	})
 
 	local right_section = self:Add(Element.New {
-		layout_direction = DIRECTION_ROW,
 		layout_justification_x = JUSTIFY_END,
 		layout_justification_y = JUSTIFY_CENTER,
 		fit_y = true,	

@@ -209,6 +209,7 @@ function LobbyUIService.SelectLobby(lobby)
 
 		LobbyUIService.selected_lobby = lobby
 		LobbyUIService.lobby_card_section:Add(LobbyCard.New(lobby))
+		LobbyUIService.settings = LobbyUIService.container:Add(LobbySettings.New(lobby))
 	end
 end
 
@@ -221,6 +222,11 @@ function LobbyUIService.UnSelectLobby()
 
 	if lobby.card_element then
 		lobby.card_element:Finish()
+	end
+
+	if LobbyUIService.settings then
+		LobbyUIService.settings:Finish()
+		LobbyUIService.settings = nil
 	end
 
 	LobbyUIService.selected_lobby = nil

@@ -18,23 +18,43 @@ function MinigamePrototype:Init()
 	self.default_state = "Waiting"
 	self.required_players = 2
 
-	self:SetModifiableVars {
-		["states.Playing.time"] = {
-			prereq = {
+	self:SetAdjustableSettings {
+		{
+			key = "states.Playing.time",
+
+			prerequisite = {
 				label = "unlimited round time",
-				opposite = true,
-				override = 0
+				opposite_value = true,
+				override_value = 0
 			},
+
 			label = "round time",
-			type = "time",
-			default = 500,
-			min = 5
+			type = "time"
 		},
-		["player_classes.*"] = {
-			mods = {
-				can_walljump = {label = "can walljump"},
-				can_wallslide = {label = "can wallslide"},
-				can_airaccel = {label = "can air accelerate"}
+
+		{
+			key = "player_classes.*",
+
+			settings = {
+				{
+					key = "can_walljump",
+					label = "can walljump"
+				},
+
+				{
+					key = "can_wallslide",
+					label = "can wallslide"
+				},
+
+				{
+					key = "can_airaccel",
+					label = "can air accelerate"
+				},
+
+				{
+					key = "can_auto_bunnyhop",
+					label = "can auto-bunnyhop"
+				}
 			}
 		}
 	}
