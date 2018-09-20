@@ -208,3 +208,22 @@ end
 function Element:DragThink()
 	--
 end
+
+function Element:HasParent(element)
+	local has_parent
+	local curr_element = self
+
+	while curr_element.parent do
+		if curr_element.parent == element then
+			has_parent = true
+
+			break
+		else
+			has_parent = false
+		end
+
+		curr_element = curr_element.parent
+	end
+
+	return has_parent
+end

@@ -245,14 +245,14 @@ function LobbyUIService.UnFocus()
 end
 
 function LobbyUIService.FocusTextEntry(element)
-	if element.panel:HasParent(LobbyUIService.container.panel) then
+	if element:HasParent(LobbyUIService.container) then
 		LobbyUIService.Focus()
 	end
 end
 hook.Add("TextEntryFocus", "LobbyUIService.FocusTextEntry", LobbyUIService.FocusTextEntry)
 
 function LobbyUIService.UnFocusTextEntry(element)
-	if element.panel:HasParent(LobbyUIService.container.panel) then
+	if LobbyUIService.focused then
 		LobbyUIService.UnFocus()
 	end
 end

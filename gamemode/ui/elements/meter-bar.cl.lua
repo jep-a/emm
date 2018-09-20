@@ -8,11 +8,13 @@ function MeterBar:Init(props)
 		background_color = COLOR_BACKGROUND,
 
 		bar = Element.New {
-			width_percent = AnimatableValue.New(0, {smooth = true}),
+			width_percent = 0,
 			height_percent = 1,
 			fill_color = true
 		}
 	})
+
+	self.animatable_percent = AnimatableValue.New(0, {smooth = true})
 
 	if props then
 		self:SetAttributes(props)
@@ -20,5 +22,18 @@ function MeterBar:Init(props)
 end
 
 function MeterBar:SetPercent(percent)
-	self.bar:SetAttribute("width_percent", math.Clamp(percent, 0, 1))
+	self.animatable_percent.current = math.Clamp(percent, 0, 1)
+end
+
+function MeterBar:Think()
+	MeterBar.super.Think(self)
+
+	local w_percent = self.bar.attributes.width_percent
+	local old_w_percent = w_percent.current
+
+	w_percent.current = self.animatable_percent.smooth
+
+	if math.Round(old_w_percent, 4) ~= math.Round(w_percent.current, 4) then
+		self.bar:Layout()
+	end
 end

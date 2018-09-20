@@ -280,22 +280,33 @@ function TimeInput:Init(props)
 		}
 	})
 
-	self.value = 0
-
+	
 	self.panel.text = self.panel:Add(vgui.Create "TimeInputPanel")
 	self.panel.text.element = self
 	self.panel.text:SetFont(self:GetAttribute "font")
-
-	local text = self:GetAttribute "text" or 500
-
+	
+	local text = string.format("%06d", tonumber(self:GetAttribute "text" or 500))
+	
 	self.panel.text:SetText(text)
+	self.panel.text:OffsetCaretPos(max_time_digits)
 	self.panel.text:FormatDigits(text)
+	self.value = Seconds(text)
 
 	if props then
 		self:SetAttributes(props)
 		self.on_change = props.on_change
 		self.on_click = props.on_click
 	end
+end
+
+function TimeInput:Finish()
+	if self.slider then
+		self.slider:Finish()
+	end
+
+	self:OnUnFocus()
+
+	TimeInput.super.Finish(self)
 end
 
 function TimeInput:OnValueChanged(v)
@@ -331,7 +342,10 @@ function TimeInput:OnFocus()
 end
 
 function TimeInput:OnUnFocus()
+	self.panel.text:SetKeyboardInputEnabled(false)
+	
 	hook.Run("TextEntryUnFocus", self)
+
 	self.text_line:AnimateAttribute("alpha", 0)
 end
 
@@ -341,7 +355,7 @@ function TimeInput:StartDragging()
 	self:OnUnFocus()
 
 	self.slider = InputSlider.New(self, {
-		default = self.value > 0 and {text = self.panel.text.time_with_colons, value = self.value} or 500,
+		default = self.value > 0 and {text = self.panel.text.time_with_colons, value = tonumber(self.panel.text:GetText())} or 500,
 
 		text_generate = function (v)
 			return NiceTime(Seconds(v))
@@ -383,4 +397,5 @@ function TimeInput:StopDragging()
 	self.panel.text:SetValue(self.slider.generated_options[self.slider.selected_option_index])
 	self.panel.text:OffsetCaretPos(max_time_digits)
 	self.slider:Finish()
+	self.slider = nil
 end
