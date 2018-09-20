@@ -44,8 +44,8 @@ function PlayerBar:Layout()
 	PlayerBar.super.Layout(self)
 
 	if self.avatar then
-		local w = self:GetAttribute "width"
-		local h = self:GetAttribute "height"
+		local w = self.attributes.width.current
+		local h = self.attributes.height.current
 
 		self.avatar:SetSize(w, w)
 		self.avatar:SetPos(0, (h/2) - (w/2))

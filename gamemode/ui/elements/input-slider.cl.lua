@@ -18,16 +18,17 @@ end
 function InputSlider:Init(input, props)
 	local input_w = input:GetFinalWidth()
 	local input_h = input:GetFinalHeight()
-	local screen_x, screen_y = input.panel:LocalToScreen(input_w, input_h/2)
+	local screen_x, screen_y = input.panel:LocalToScreen(input_w/2, input_h/2)
 
 	InputSlider.super.Init(self, {
 		origin_position = true,
 		origin_x = screen_x,
 		origin_y = screen_y,
-		position_justification_x = JUSTIFY_END,
+		position_justification_x = JUSTIFY_CENTER,
 		position_justification_y = JUSTIFY_CENTER,
 		fit_x = true,
-		height = BAR_HEIGHT * 2,
+		height = INPUT_SLIDER_HEIGHT,
+		background_color = COLOR_GRAY,
 		alpha = 0,
 		border = 2,
 		cursor = "hand"
@@ -218,7 +219,7 @@ end
 
 function InputSlider:LayoutScroll()
 	local h = self:GetFinalHeight()
-	local child_margin = self.inner_container:GetAttribute "child_margin"
+	local child_margin = self.inner_container.attributes.child_margin.current
 	local option_h = self.inner_container.children[1]:GetFinalHeight() + child_margin
 	local inner_h = (option_h * ((option_padding * 2) + 1)) - child_margin
 

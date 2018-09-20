@@ -45,7 +45,7 @@ hook.Add("Think", "IndicatorService.Sort", IndicatorService.Sort)
 function IndicatorService.DrawWorldPositions(ply, eye_pos)
 	local eye_pos = LocalPlayer():EyePos()
 	local indicators = IndicatorService.container.children
-	local container_alpha = IndicatorService.container:GetAttribute "alpha"
+	local container_alpha = IndicatorService.container.attributes.alpha.current
 
 	for i = 1, #indicators do
 		local indicator = indicators[i]
@@ -71,17 +71,8 @@ function IndicatorService.DrawWorldPositions(ply, eye_pos)
 			indicator.x = x
 			indicator.y = y
 		
-			surface.SetAlphaMultiplier(CombineAlphas(container_alpha, indicator:GetAttribute "alpha", indicator.world_alpha.current))
-
-			Element.PaintTexture(nil, indicator_material, {
-				x = x,
-				y = y,
-				angle = 0,
-				width = size,
-				height = size,
-				color = indicator:GetAttribute "color"
-			})
-
+			surface.SetAlphaMultiplier(CombineAlphas(container_alpha, indicator.attributes.alpha.current, indicator.world_alpha.current))
+			Element.PaintTexture(nil, indicator_material, x, y, 0, size, size, indicator:GetColor())
 			surface.SetAlphaMultiplier(1)
 		end
 	end
@@ -103,7 +94,7 @@ function IndicatorService.RenderCoasters()
 				mask = MASK_NPCWORLDSTATIC
 			}
 
-			local alpha = CombineAlphas(indicator:GetAttribute "alpha", Lerp(trace.Fraction * 8, 255, 50))
+			local alpha = CombineAlphas(indicator.attributes.alpha.current, Lerp(trace.Fraction * 8, 255, 50))
 
 			if alpha > 0 then
 				cam.Start3D2D(trace.HitPos + (trace.HitNormal * Vector(0.5, 0.5, 0.5)), trace.HitNormal:Angle() + Angle(90, 0, 0), 0.25)

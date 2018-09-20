@@ -11,7 +11,7 @@ function NotificationService.CreateFlash(duration)
 		fill_color = true
 	}
 
-	element:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION})
+	element:AnimateAttribute("alpha", 0)
 
 	return element
 end

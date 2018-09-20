@@ -59,9 +59,10 @@ EMM.Include {
 	"ui/elements/player-bar",
 	"ui/elements/avatar-bar",
 	"ui/elements/checkbox",
-	"ui/elements/slider",
+	"ui/elements/input-slider",
 	"ui/elements/text-input",
 	"ui/elements/time-input",
+	"ui/elements/input-bar",
 
 	"lobby-ui/variables",
 	"lobby-ui/lobby-ui",
@@ -69,6 +70,7 @@ EMM.Include {
 	"lobby-ui/factories",
 	"lobby-ui/elements/lobby-bar",
 	"lobby-ui/elements/lobby-card",
+	"lobby-ui/elements/lobby-settings",
 
 	"hud/variables",
 	"hud/hud",

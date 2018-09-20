@@ -11,10 +11,12 @@ INDICATOR_WORLD_SIZE = 24
 INDICATOR_PERIPHERAL_SIZE = 40
 INDICATOR_COASTER_SIZE = 150
 
-INPUT_HEIGHT = 34
-
 BAR_WIDTH = 256
 BAR_HEIGHT = 64
+
+CHECKBOX_SIZE = 27
+
+INPUT_SLIDER_HEIGHT = 128 + (MARGIN * 4)
 
 surface.CreateFont("TextBar", {
 	font = "Roboto",
@@ -48,4 +50,14 @@ surface.CreateFont("Label", {
 	font = "Roboto Mono",
 	size = 16,
 	italic = true
+})
+
+surface.CreateFont("InputLabel", {
+	font = "Roboto",
+	size = 16
+})
+
+surface.CreateFont("InputText", {
+	font = "Roboto",
+	size = 16
 })

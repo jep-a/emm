@@ -3,40 +3,52 @@ local function RoundClamp(x)
 end
 
 function Element:GetXCropOffset()
-	return self:GetAttribute "width" * self:GetAttribute "crop_left"
+	local attr = self.attributes
+
+	return attr.width.current * attr.crop_left.current
 end
 
 function Element:GetYCropOffset()
-	return self:GetAttribute "height" * self:GetAttribute "crop_top"
+	local attr = self.attributes
+
+	return attr.height.current * attr.crop_top.current
 end
 
 function Element:GetInnerWidth()
-	return RoundClamp(self:GetAttribute "width" - self:GetAttribute "padding_left" - self:GetAttribute "padding_right")
+	local attr = self.attributes
+
+	return RoundClamp(attr.width.current - attr.padding_left.current - attr.padding_right.current)
 end
 
 function Element:GetInnerHeight()
-	return RoundClamp(self:GetAttribute "height" - self:GetAttribute "padding_top" - self:GetAttribute "padding_bottom")
+	local attr = self.attributes
+
+	return RoundClamp(attr.height.current - attr.padding_top.current - attr.padding_bottom.current)
 end
 
 function Element:GetFinalWidth()
-	local w = self:GetAttribute "width"
+	local attr = self.attributes
+	local w = attr.width.current
 
-	return RoundClamp(w - (self:GetXCropOffset() + (w * self:GetAttribute "crop_right")))
+	return RoundClamp(w - (self:GetXCropOffset() + (w * attr.crop_right.current)))
 end
 
 function Element:GetFinalHeight()
-	local h = self:GetAttribute "height"
+	local attr = self.attributes
+	local h = attr.height.current
 
-	return RoundClamp(h - (self:GetYCropOffset() + (h * self:GetAttribute "crop_bottom")))
+	return RoundClamp(h - (self:GetYCropOffset() + (h * attr.crop_bottom.current)))
 end
 
 function Element:PositionFromOrigin()
-	local origin_x = self:GetAttribute "origin_x"
-	local origin_y = self:GetAttribute "origin_y"
-	local x_origin_justify = self:GetAttribute "origin_justification_x"
-	local y_origin_justify = self:GetAttribute "origin_justification_y"
-	local x_pos_justify = self:GetAttribute "position_justification_x"
-	local y_pos_justify = self:GetAttribute "position_justification_y"
+	local attr = self.attributes
+	local static_attr = self.static_attributes
+	local origin_x = attr.origin_x and attr.origin_x.current
+	local origin_y = attr.origin_y and attr.origin_y.current
+	local x_origin_justify = static_attr.origin_justification_x
+	local y_origin_justify = static_attr.origin_justification_y
+	local x_pos_justify = static_attr.position_justification_x
+	local y_pos_justify = static_attr.position_justification_y
 
 	local parent = self.parent
 
@@ -98,10 +110,8 @@ function Element:PositionFromOrigin()
 		offset_y = -h
 	end
 
-	self:SetAttributes {
-		x = math.floor(start_x + offset_x),
-		y = math.floor(start_y + offset_y)
-	}
+	attr.x.current = math.floor(start_x + offset_x)
+	attr.y.current = math.floor(start_y + offset_y)
 end
 
 local axis_property_keys = {
@@ -114,6 +124,7 @@ local axis_property_keys = {
 		crop_start = "crop_left",
 		crop_end = "crop_right"
 	},
+
 	[DIRECTION_COLUMN] = {
 		position = "y",
 		size = "height",
@@ -126,8 +137,10 @@ local axis_property_keys = {
 }
 
 function Element:StackChildren()
+	local attr = self.attributes
 	local static_attr = self.static_attributes
 	local prop_keys = axis_property_keys[static_attr.layout_direction]
+
 	local adj_prop_keys
 	local main_justify
 	local adj_justify
@@ -149,14 +162,14 @@ function Element:StackChildren()
 	end
 
 	local fit = static_attr[prop_keys.fit]
-	local size = self:GetAttribute(prop_keys.size)
-	local padding_start = self:GetAttribute(prop_keys.padding_start)
-	local padding_end = self:GetAttribute(prop_keys.padding_end)
-	local child_margin = self:GetAttribute "child_margin"
+	local size = attr[prop_keys.size].current
+	local padding_start = attr[prop_keys.padding_start].current
+	local padding_end = attr[prop_keys.padding_end].current
+	local child_margin = attr.child_margin.current
 	local adj_fit = static_attr[adj_prop_keys.fit]
-	local adj_size = self:GetAttribute(adj_prop_keys.size)
-	local adj_padding_start = self:GetAttribute(adj_prop_keys.padding_start)
-	local adj_padding_end = self:GetAttribute(adj_prop_keys.padding_end)
+	local adj_size = attr[adj_prop_keys.size].current
+	local adj_padding_start = attr[adj_prop_keys.padding_start].current
+	local adj_padding_end = attr[adj_prop_keys.padding_end].current
 
 	local children = self.layout_children
 
@@ -196,7 +209,7 @@ function Element:StackChildren()
 				local prev_child = children[i - 1]
 				local cropped_prev_child_margin = (
 					child_margin * (
-						1 - math.Clamp(prev_child:GetAttribute(prop_keys.crop_start) + prev_child:GetAttribute(prop_keys.crop_end), 0, 1)
+						1 - math.Clamp(prev_child.attributes[prop_keys.crop_start].current + prev_child.attributes[prop_keys.crop_end].current, 0, 1)
 					)
 				)
 
@@ -265,11 +278,11 @@ function Element:StackChildren()
 	end
 
 	if fit then
-		self:SetAttribute(prop_keys.size, largest_line_size)
+		attr[prop_keys.size].current = largest_line_size
 	end
 
 	if adj_fit then
-		self:SetAttribute(adj_prop_keys.size, total_adj_line_size)
+		attr[adj_prop_keys.size].current = total_adj_line_size
 	end
 
 	line = 1
@@ -280,8 +293,13 @@ function Element:StackChildren()
 		end
 
 		local child = children[i]
+		local child_attr = child.attributes
+		local child_static_attr = child.static_attributes
 
-		child:SetAttribute(prop_keys.position, line_start_positions[line] + child_positions[i] - crop_offset)
+		local old_w = child_attr.width.current
+		local old_h = child_attr.height.current
+
+		child_attr[prop_keys.position].current = line_start_positions[line] + child_positions[i] - crop_offset
 
 		if static_attr.layout_direction == DIRECTION_ROW then
 			adj_child_size = child:GetFinalHeight()
@@ -289,7 +307,7 @@ function Element:StackChildren()
 			adj_child_size = child:GetFinalWidth()
 		end
 
-		local child_adj_justify = child:GetAttribute "self_adjacent_justification"
+		local child_adj_justify = child_static_attr.self_adjacent_justification
 
 		local inherit_adj_justify
 
@@ -307,18 +325,21 @@ function Element:StackChildren()
 			adj_pos = adj_pos + adj_line_sizes[line] - adj_child_size
 		end
 
-		child:SetAttribute(adj_prop_keys.position, adj_pos - adj_crop_offset)
+		child_attr[adj_prop_keys.position].current = adj_pos - adj_crop_offset
 	end
 end
 
 function Element:Fit()
-	local fit_x = self:GetAttribute "fit_x"
-	local fit_y = self:GetAttribute "fit_y"
+	local attr = self.attributes
+	local static_attr = self.static_attributes
 
-	local padding_left = self:GetAttribute "padding_left"
-	local padding_right = self:GetAttribute "padding_right"
-	local padding_top = self:GetAttribute "padding_top"
-	local padding_bottom = self:GetAttribute "padding_bottom"
+	local fit_x = static_attr.fit_x
+	local fit_y = static_attr.fit_y
+
+	local padding_left = attr.padding_left.current
+	local padding_right = attr.padding_right.current
+	local padding_top = attr.padding_top.current
+	local padding_bottom = attr.padding_bottom.current
 
 	local children = self.children
 
@@ -327,11 +348,14 @@ function Element:Fit()
 
 	for i = 1, #children do
 		local child = children[i]
+		local child_attr = child.attributes
+		local child_static_attr = child.static_attributes
+	
 		local child_w = child:GetFinalWidth()
 		local child_h = child:GetFinalHeight()
-		local overlay = child:GetAttribute "overlay"
+		local overlay = child_static_attr.overlay
 
-		if fit_x and not child:GetAttribute "width_percent" and child_w > largest_w then
+		if fit_x and not (attr.width_percent and attr.width_percent.current) and not child_attr.width_percent and child_w > largest_w then
 			largest_w = child_w
 
 			if overlay then
@@ -339,7 +363,7 @@ function Element:Fit()
 			end
 		end
 
-		if fit_y and not child:GetAttribute "height_percent" and child_h > largest_h then
+		if fit_y and not (attr.height_percent and attr.height_percent.current) and not child_attr.height_percent and child_h > largest_h then
 			largest_h = child_h
 
 			if overlay then
@@ -349,19 +373,21 @@ function Element:Fit()
 	end
 
 	if fit_x then
-		self:SetAttribute("width", largest_w)
+		attr.width.current = largest_w
 	end
 	
 	if fit_y then
-		self:SetAttribute("height", largest_h)
+		attr.height.current = largest_h
 	end
 end
 
 function Element:LayoutText(new_text)
+	local attr = self.attributes
+	local static_attr = self.static_attributes
 	local text = self.panel.text
 
-	local padding_left = self:GetAttribute "padding_left"
-	local padding_top = self:GetAttribute "padding_top"
+	local padding_left = attr.padding_left.current
+	local padding_top = attr.padding_top.current
 
 	text.x = padding_left - self:GetXCropOffset()
 	text.y = padding_top - self:GetYCropOffset()
@@ -369,15 +395,15 @@ function Element:LayoutText(new_text)
 	surface.SetFont(text:GetFont())
 	local text_w, text_h = surface.GetTextSize(new_text or text:GetText())
 
-	if self:GetAttribute "fit_x" then
-		self:SetAttribute("width", text_w + padding_left + self:GetAttribute "padding_right")
+	if static_attr.fit_x then
+		attr.width.current = text_w + padding_left + attr.padding_right.current
 		text:SizeToContentsX()
 	else
 		text:SetWide(self:GetInnerWidth())
 	end
 
-	if self:GetAttribute "fit_y" then
-		self:SetAttribute("height", text_h + padding_top + self:GetAttribute "padding_bottom")
+	if static_attr.fit_y then
+		attr.height.current = text_h + padding_top + attr.padding_bottom.current
 		text:SizeToContentsY()
 	else
 		text:SetTall(self:GetInnerHeight())
@@ -385,22 +411,28 @@ function Element:LayoutText(new_text)
 end
 
 function Element:GenerateSize()
+	local attr = self.attributes
+	local static_attr = self.static_attributes
 	local parent = self.parent
-	local overlay = self:GetAttribute "overlay"
-	local width_percent = self:GetAttribute "width_percent"
-	local height_percent = self:GetAttribute "height_percent"
 
+	local overlay = static_attr.overlay
+	local width_percent = attr.width_percent and attr.width_percent.current
+	local height_percent = attr.height_percent and attr.height_percent.current
+
+	local parent_attr
 	if parent then
+		parent_attr = parent.attributes
+
 		if width_percent then
 			local padding
 
 			if overlay then
 				padding = 0
 			else
-				padding = self.parent:GetAttribute "padding_left" + self.parent:GetAttribute "padding_right"
+				padding = parent_attr.padding_left.current + parent_attr.padding_right.current
 			end
 
-			self:SetAttribute("width", math.floor((self.parent:GetAttribute "width" - padding) * width_percent))
+			attr.width.current = math.floor((parent_attr.width.current - padding) * width_percent)
 		end
 
 		if height_percent then
@@ -409,18 +441,66 @@ function Element:GenerateSize()
 			if overlay then
 				padding = 0
 			else
-				padding = self.parent:GetAttribute "padding_top" + self.parent:GetAttribute "padding_bottom"
+				padding = parent_attr.padding_top.current + parent_attr.padding_bottom.current
 			end
 
-			self:SetAttribute("height", math.floor((self.parent:GetAttribute "height" - padding) * height_percent))
+			attr.height.current = math.floor((parent_attr.height.current - padding) * height_percent)
 		end
 	else
 		if width_percent then
-			self:SetAttribute("width", math.floor(ScrW() * width_percent))
+			attr.width.current = math.floor(ScrW() * width_percent)
 		end
 
 		if height_percent then
-			self:SetAttribute("height", math.floor(ScrH() * height_percent))
+			attr.height.current = math.floor(ScrH() * height_percent)
 		end
 	end
+end
+
+function Element:Layout()
+	self.laying_out = true
+
+	local attr = self.attributes
+	local static_attr = self.static_attributes
+
+	local old_w = self:GetFinalWidth()
+	local old_h = self:GetFinalHeight()
+
+	if static_attr.origin_position then
+		self:PositionFromOrigin()
+	end
+
+	if #self.layout_children > 0 then
+		self:StackChildren()
+	else
+		if static_attr.font then
+			self:LayoutText()
+		elseif #self.children > 0 then
+			self:Fit()
+		end
+	end
+
+	self:GenerateSize()
+
+	local new_w = self:GetFinalWidth()
+	local new_h = self:GetFinalHeight()
+
+	if old_w ~= new_w or old_h ~= new_h then
+		for _, child in pairs(self.children) do
+			if not child.laying_out then
+				child:Layout()
+			end
+		end
+
+		local parent = self.parent
+
+		if parent and not parent.laying_out then
+			parent:Layout()
+		end
+	end
+
+	self.panel:SetSize(new_w, new_h)
+	self.panel:SetPos(math.Round(attr.x.current), math.Round(attr.y.current))
+
+	self.laying_out = false
 end

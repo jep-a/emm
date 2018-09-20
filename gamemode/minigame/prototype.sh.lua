@@ -23,12 +23,12 @@ function MinigamePrototype:Init()
 			key = "states.Playing.time",
 
 			prerequisite = {
-				label = "unlimited round time",
+				label = "Unlimited round time",
 				opposite_value = true,
 				override_value = 0
 			},
 
-			label = "round time",
+			label = "Round time",
 			type = "time"
 		},
 
@@ -38,22 +38,22 @@ function MinigamePrototype:Init()
 			settings = {
 				{
 					key = "can_walljump",
-					label = "can walljump"
+					label = "Can walljump"
 				},
 
 				{
 					key = "can_wallslide",
-					label = "can wallslide"
+					label = "Can wallslide"
 				},
 
 				{
 					key = "can_airaccel",
-					label = "can air accelerate"
+					label = "Can air-accelerate"
 				},
 
 				{
 					key = "can_auto_bunnyhop",
-					label = "can auto-bunnyhop"
+					label = "Can auto bunny-hop"
 				}
 			}
 		}

@@ -4,7 +4,7 @@ end
 
 local function SanitizeSettings(tab)
 	local new_tab = {}
-t5
+
 	for k, v in pairs(tab) do
 		if istable(v) and v.settings then
 			table.insert(new_tab, {k, SanitizeSettings(v.settings)})
@@ -31,6 +31,6 @@ local function MapSettings(tab)
 end
 
 function MinigamePrototype:SetAdjustableSettings(vars)
-	self.adjustable_settings = SanitizeSettings(vars)
+	self.adjustable_settings = vars
 	self.adjustable_settings_map = MapSettings(vars)
 end

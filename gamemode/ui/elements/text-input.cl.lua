@@ -3,9 +3,14 @@ TextInput = TextInput or Class.New(Element)
 local TextInputPanel = {}
 
 function TextInputPanel:Paint(w, h)
-	local color = self.element:GetAttribute "text_color" or self.element:GetAttribute "color"
+	local attr = self.element.attributes
+	local color = attr.text_color and attr.text_color.current or self.element:GetColor()
 
 	self:DrawTextEntryText(color, COLOR_GRAY_LIGHTER, color)
+end
+
+function TextInputPanel:OnValueChange(v)
+	self.element:OnValueChanged(v)
 end
 
 function TextInputPanel:OnCursorEntered()
@@ -29,12 +34,13 @@ vgui.Register("TextInputPanel", TextInputPanel, "DTextEntry")
 function TextInput:Init(props)
 	TextInput.super.Init(self, {
 		fit_y = true,
-		width = BAR_WIDTH,
-		padding_left = MARGIN * 2,
-		padding_y = MARGIN * 2,
-		background_color = COLOR_GRAY,
+		width_percent = 1,
+		padding_left = MARGIN,
+		padding_top = MARGIN/2,
+		padding_bottom = MARGIN * 2,
+		background_color = COLOR_GRAY_DARK,
 		cursor = "beam",
-		font = "Info",
+		font = "InputText",
 		border = 2,
 		border_alpha = 0,
 		
@@ -57,6 +63,8 @@ function TextInput:Init(props)
 		}
 	})
 
+	self.value = ""
+
 	self.panel.text = self.panel:Add(vgui.Create "TextInputPanel")
 	self.panel.text.element = self
 	self.panel.text:SetFont(self:GetAttribute "font")
@@ -64,7 +72,16 @@ function TextInput:Init(props)
 
 	if props then
 		self:SetAttributes(props)
+		self.on_change = props.on_change
 		self.on_click = props.on_click
+	end
+end
+
+function TextInput:OnValueChanged(v)
+	self.value = v
+
+	if self.on_change then
+		self.on_change(self, v)
 	end
 end
 

@@ -112,48 +112,22 @@ function Element:Finish()
 end
 
 function Element:DetectEnd()
-	local duration = self:GetAttribute "duration"
+	local static_attr = self.static_attributes
+	local duration = static_attr.duration
 
-	if duration and CurTime() > (self:GetAttribute "start_time" + duration) then
-		self:SetAttribute("duration", nil)
+	if duration and CurTime() > (static_attr.start_time + duration) then
+		static_attr.duration = nil
 		self:Finish()
 	end
-end
-
-function Element:Layout()
-	self.laying_out = true
-
-	if self:GetAttribute "origin_position" then
-		self:PositionFromOrigin()
-	end
-
-	if #self.layout_children > 0 then
-		self:StackChildren()
-	else
-		if self:GetAttribute "font" then
-			self:LayoutText()
-		elseif #self.children > 0 then
-			self:Fit()
-		end
-	end
-
-	self:GenerateSize()
-
-	self.panel:SetSize(self:GetFinalWidth(), self:GetFinalHeight())
-	self.panel:SetPos(math.Round(self:GetAttribute "x"), math.Round(self:GetAttribute "y"))
-
-	if self:GetAttribute "layout" and self.parent then
-		self.parent.panel:InvalidateLayout(true)
-	end
-
-	self.laying_out = false
 end
 
 function Element:Think()
 	self:DetectEnd()
 
-	self.panel:SetAlpha(math.Round(self:GetAttribute "alpha"))
-	self.panel.text:SetTextColor(self:GetAttribute "text_color" or self:GetAttribute "color")
+	local attr = self.attributes
+
+	self.panel:SetAlpha(math.Round(attr.alpha.current))
+	self.panel.text:SetTextColor(attr.text_color and attr.text_color.current or self:GetColor())
 end
 
 function Element:OnMousePressed(mouse)

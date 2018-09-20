@@ -82,9 +82,11 @@ function Indicator:Think()
 		local periph_x = (math.cos(rad_ang) * periph_radius) + half_scr_w
 		local periph_y = (math.sin(rad_ang) * periph_radius) + half_scr_h
 
-		self.peripheral:SetAttribute("x", periph_x - (self.peripheral:GetAttribute "width"/2))
-		self.peripheral:SetAttribute("y", periph_y - (self.peripheral:GetAttribute "height"/2))
-		self.peripheral:SetAttribute("angle", -math.deg(rad_ang) + 90)
+		local attr = self.peripheral.attributes
+
+		attr.x.current = periph_x - (attr.width.current/2)
+		attr.y.current = periph_y - (attr.height.current/2)
+		attr.angle.current = -math.deg(rad_ang) + 90
 	end
 end
 

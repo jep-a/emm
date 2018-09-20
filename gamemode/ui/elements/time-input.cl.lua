@@ -130,7 +130,10 @@ function TimeInputPanel:OnValueChange(value)
 	self:OffsetCaretPos(caret_pos)
 	self:FormatDigits(text)
 
-	self.seconds = Seconds(text)
+	local sec = Seconds(text)
+
+	self.seconds = sec
+	self.element:OnValueChanged(sec)
 end
 
 function TimeInputPanel:ClampCaretPos(new_caret_pos)
@@ -198,7 +201,8 @@ function TimeInputPanel:Think()
 end
 
 function TimeInputPanel:Paint(w, h)
-	local color = self.element:GetAttribute "text_color" or self.element:GetAttribute "color"
+	local attr = self.element.attributes
+	local color = attr.text_color and attr.text_color.current or self.element:GetColor()
 
 	surface.SetFont(self:GetFont())
 
@@ -248,10 +252,10 @@ vgui.Register("TimeInputPanel", TimeInputPanel, "DTextEntry")
 function TimeInput:Init(props)
 	TimeInput.super.Init(self, {
 		fit_y = true,
-		width = BAR_WIDTH,
-		padding_left = MARGIN * 2,
-		padding_y = MARGIN * 2,
-		background_color = COLOR_GRAY,
+		width_percent = 0.8,
+		padding_left = MARGIN,
+		padding_y = MARGIN,
+		background_color = COLOR_GRAY_DARK,
 		cursor = "beam",
 		font = "NumberInfo",
 		border = 2,
@@ -276,22 +280,29 @@ function TimeInput:Init(props)
 		}
 	})
 
+	self.value = 0
+
 	self.panel.text = self.panel:Add(vgui.Create "TimeInputPanel")
 	self.panel.text.element = self
 	self.panel.text:SetFont(self:GetAttribute "font")
 
-	local text = self:GetAttribute "text"
-
-	if not text then
-		text = ZeroString()
-	end
+	local text = self:GetAttribute "text" or 500
 
 	self.panel.text:SetText(text)
 	self.panel.text:FormatDigits(text)
 
 	if props then
 		self:SetAttributes(props)
+		self.on_change = props.on_change
 		self.on_click = props.on_click
+	end
+end
+
+function TimeInput:OnValueChanged(v)
+	self.value = v
+
+	if self.on_change then
+		self.on_change(self, v)
 	end
 end
 
@@ -329,11 +340,8 @@ function TimeInput:StartDragging()
 
 	self:OnUnFocus()
 
-	local time = tonumber(self.panel.text:GetText())
-	local has_value = tonumber(time) > 0
-
 	self.slider = InputSlider.New(self, {
-		default = has_value and {text = self.panel.text.time_with_colons, value = time} or 500,
+		default = self.value > 0 and {text = self.panel.text.time_with_colons, value = self.value} or 500,
 
 		text_generate = function (v)
 			return NiceTime(Seconds(v))

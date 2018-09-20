@@ -22,7 +22,6 @@ local animatable_attributes = {
 
 local optional_attributes = {
 	"duration",
-	"overlay",
 	"origin_x",
 	"origin_y",
 	"width_percent",
@@ -58,6 +57,7 @@ local layout_invalidators = {
 function Element:InitAttributes()
 	self.static_attributes = {
 		paint = true,
+		overlay = false,
 		layout = true,
 		origin_position = false,
 		origin_justification_x = JUSTIFY_START,
@@ -96,9 +96,7 @@ function Element:InitAttributes()
 
 		if self.layout_invalidators[v] then
 			props = {
-				debounce = 1/60,
-	
-				callback = function ()
+				animate_callback = function ()
 					if IsValid(self.panel) then
 						self.panel:InvalidateLayout(true)
 					end
@@ -129,7 +127,7 @@ function Element:SetText(text)
 
 	if text ~= old_text then
 		self.panel.text:SetText(text)
-		self:LayoutText(text)
+		self:Layout()
 	end
 end
 
@@ -154,7 +152,12 @@ function Element:SetAttribute(k, v, no_layout)
 			attr[k]:Finish()
 			attr[k] = v
 		elseif isfunction(v) then
-			attr[k].generate = v
+			local old_v = attr[k].current
+
+			attr[k]:Finish()
+			attr[k] = AnimatableValue.New(old_v, {
+				generate = v
+			})
 		else
 			attr[k].current = v
 		end
@@ -195,12 +198,24 @@ function Element:SetAttributes(attr)
 	end
 end
 
+function Element:GetColor()
+	local color
+	
+	local parent = self.parent
+
+	if self.static_attributes.inherit_color and parent then
+		color = parent:GetColor()
+	else
+		color = self.attributes.color.current
+	end
+
+	return color
+end
+
 function Element:GetAttribute(k)
 	local attr
 
-	if k == "color" and self.static_attributes.inherit_color and self.parent then
-		attr = self.parent:GetAttribute "color"
-	elseif self.attributes[k] then
+	if self.attributes[k] then
 		attr = self.attributes[k].smooth or self.attributes[k].current
 	elseif self.static_attributes[k] then
 		attr = self.static_attributes[k]

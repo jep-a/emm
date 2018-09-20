@@ -77,7 +77,7 @@ function HUDService.CreateCrosshairLine(props)
 	})
 
 	local function Length()
-		return (HUDService.crosshair_lines_container:GetAttribute "width"/2) - (CROSSHAIR_LINES_GAP/2)
+		return (HUDService.crosshair_lines_container.attributes.width.current/2) - (CROSSHAIR_LINES_GAP/2)
 	end
 
 	if props.orientation == DIRECTION_ROW then

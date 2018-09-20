@@ -2,8 +2,8 @@
 
 function LobbyUIService.CreateHeader(text, fit)
 	local element = Element.New {
-		width_percent = 1,
 		fit_y = true,
+		width = COLUMN_WIDTH,
 		padding_y = MARGIN * 4,
 		font = "Header",
 		text_justification = 5,
@@ -13,7 +13,6 @@ function LobbyUIService.CreateHeader(text, fit)
 
 	if fit then
 		element:SetAttributes {
-			width_percent = false,
 			fit_x = true,
 			padding_left = MARGIN * 8,
 			padding_right = MARGIN * 7
@@ -39,10 +38,8 @@ function LobbyUIService.CreateLabels(left_labels, right_labels)
 		layout_justification_y = JUSTIFY_END,
 		fit_y = true,
 		width_percent = 1,
-		padding_left = MARGIN * 8,
-		padding_right = MARGIN * 6,
-		padding_top = MARGIN * 5,
-		inherit_color = false
+		padding_x = MARGIN * 8,
+		padding_top = MARGIN * 5
 	}
 
 	element.left_section = element:Add(Element.New {
