@@ -42,12 +42,13 @@ function Element:PaintBorder(w, h, color, thickness)
 	local cropped_w = w - ((w * attr.crop_left.current) + (w * attr.crop_right.current))
 	local cropped_h = h - ((h * attr.crop_top.current) + (h * attr.crop_bottom.current))
 	local color_with_alpha = ColorAlpha(color, CombineAlphas(color.a, attr.border_alpha.current) * 255)
+	local double_thickness = (thickness * 2)
 
 	surface.SetDrawColor(color_with_alpha)
 	surface.DrawRect(0, 0, cropped_w, thickness)
-	surface.DrawRect(cropped_w - thickness, 0, thickness, cropped_h)
+	surface.DrawRect(cropped_w - thickness, thickness, thickness, cropped_h - double_thickness)
 	surface.DrawRect(0, cropped_h - thickness, cropped_w, thickness)
-	surface.DrawRect(0, 0, thickness, cropped_h)
+	surface.DrawRect(0, thickness, thickness, cropped_h - double_thickness)
 end
 
 function Element:Paint()
