@@ -472,18 +472,20 @@ function Element:LayoutFamily()
 	local parent = self.parent
 
 	if parent and not parent.laying_out then
-		parent:Layout()
+		parent:Layout(true)
 	end
 end
 
-function Element:Layout()
+function Element:Layout(force_family_layout)
 	self.laying_out = true
 
 	local attr = self.attributes
 	local static_attr = self.static_attributes
 
-	local old_w = self:GetFinalWidth()
-	local old_h = self:GetFinalHeight()
+	local old_x = attr.x.current
+	local old_y = attr.y.current
+	local old_w = attr.width.current
+	local old_h = attr.height.current
 
 	if static_attr.origin_position then
 		self:PositionFromOrigin()
@@ -501,13 +503,16 @@ function Element:Layout()
 
 	self:GenerateSize()
 
-	local new_w = self:GetFinalWidth()
-	local new_h = self:GetFinalHeight()
+	local new_x = attr.x.current
+	local new_y = attr.y.current
+	local new_w = attr.width.current
+	local new_h = attr.height.current
 
-	if old_w ~= new_w or old_h ~= new_h then
+	if force_family_layout or old_x ~= new_x or old_y ~= new_y or old_w ~= new_w or old_h ~= new_h then
 		self:LayoutFamily()
 	end
 
-	self:SetPanelBounds(nil, nil, new_w, new_h)
+	self:SetPanelBounds()
+
 	self.laying_out = false
 end

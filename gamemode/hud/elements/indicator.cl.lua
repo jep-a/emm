@@ -7,7 +7,7 @@ function Indicator:Init(ent_or_vec)
 		layout = false,
 		width_percent = 1,
 		height_percent = 1,
-		inherit_color = false
+		inherit_color = false,
 	})
 
 	self.x = 0
@@ -61,6 +61,7 @@ function Indicator:Init(ent_or_vec)
 		width = INDICATOR_PERIPHERAL_SIZE,
 		height = INDICATOR_PERIPHERAL_SIZE,
 		material = indicator_material,
+		angle = 0,
 		alpha = 0
 	})
 end
@@ -87,6 +88,8 @@ function Indicator:Think()
 		attr.x.current = periph_x - (attr.width.current/2)
 		attr.y.current = periph_y - (attr.height.current/2)
 		attr.angle.current = -math.deg(rad_ang) + 90
+
+		self.peripheral:Layout()
 	end
 end
 

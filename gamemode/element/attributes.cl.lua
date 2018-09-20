@@ -98,7 +98,7 @@ function Element:InitAttributes()
 			props = {
 				animate_callback = function ()
 					if IsValid(self.panel) then
-						self.panel:InvalidateLayout(true)
+						self:Layout(true)
 					end
 				end
 			}
@@ -184,7 +184,7 @@ function Element:SetAttribute(k, v, no_layout)
 	if not no_layout and layout_invalidator and (
 		(static_attr[k] ~= nil) or (old_v and not self.laying_out and isnumber(v) and math.Round(v, 3) ~= math.Round(old_v, 3))
 	) then
-		self.panel:InvalidateLayout(true)
+		self:Layout()
 	end
 end
 
@@ -194,7 +194,7 @@ function Element:SetAttributes(attr)
 	end
 
 	if not self.laying_out then
-		self.panel:InvalidateLayout(true)
+		self:Layout()
 	end
 end
 

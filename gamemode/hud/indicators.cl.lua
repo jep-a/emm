@@ -72,7 +72,7 @@ function IndicatorService.DrawWorldPositions(ply, eye_pos)
 			indicator.y = y
 		
 			surface.SetAlphaMultiplier(CombineAlphas(container_alpha, indicator.attributes.alpha.current, indicator.world_alpha.current))
-			Element.PaintTexture(nil, indicator_material, x, y, 0, size, size, indicator:GetColor())
+			Element.PaintTexture(indicator, indicator_material, x, y, size, size, 0, indicator:GetColor())
 			surface.SetAlphaMultiplier(1)
 		end
 	end

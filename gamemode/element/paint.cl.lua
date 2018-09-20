@@ -5,7 +5,7 @@ function Element:PaintTexture(mat, x, y, w, h, ang, color)
 	y = y + attr.padding_top.current - self:GetYCropOffset()
 	w = w or attr.width.current
 	h = h or attr.height.current
-	ang = ang or (attr.angle and attr.angle.current)
+	ang = ang or (attr.angle and attr.angle.current) or 0
 	color = color or self:GetColor()
 
 	surface.SetDrawColor(color)
