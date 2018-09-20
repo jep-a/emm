@@ -71,6 +71,7 @@ function LobbyUIService.Open()
 	LobbyUIService.container.panel:SetMouseInputEnabled(true)
 	LobbyUIService.container.panel:MoveToFront()
 	LobbyUIService.container:AnimateAttribute("alpha", 255)
+	hook.Run "OnLobbyUIOpen"
 end
 
 function LobbyUIService.Close()
@@ -83,6 +84,7 @@ function LobbyUIService.Close()
 		LobbyUIService.container.panel:SetMouseInputEnabled(false)
 		LobbyUIService.container.panel:MoveToBack()
 		LobbyUIService.container:AnimateAttribute("alpha", 0)
+		hook.Run "OnLobbyUIClose"
 	end
 end
 

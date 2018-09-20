@@ -36,3 +36,16 @@ function HUDService.CreateQuadrant(section, props)
 
 	return element
 end
+
+function HUDService.CreateCrosshairContainer()
+	return Element.New {
+		layout = false,
+		origin_position = true,
+		origin_justification_x = JUSTIFY_CENTER,
+		origin_justification_y = JUSTIFY_CENTER,
+		position_justification_x = JUSTIFY_CENTER,
+		position_justification_y = JUSTIFY_CENTER,
+		width = CROSSHAIR_CONTAINER_SIZE,
+		height = CROSSHAIR_CONTAINER_SIZE
+	}
+end

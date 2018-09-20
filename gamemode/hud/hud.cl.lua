@@ -98,22 +98,22 @@ function HUDService.InitMeters()
 		value_func = Airaccel
 	})
 
-	HUDService.CreateCrosshairMeter {
+	HUDService.crosshair_container:Add(CrosshairMeter.New {
 		angle = CROSSHAIR_METER_ARC_ANGLE,
 		value_func = Health
-	}
+	})
 
-	HUDService.CreateCrosshairMeter {
+	HUDService.crosshair_container:Add(CrosshairMeter.New {
 		show_value = true,
 		hide_value_on_empty = true,
 		value_func = Speed,
 		value_divider = HUD_SPEED_METER_DIVIDER
-	}
+	})
 
-	HUDService.CreateCrosshairMeter {
+	HUDService.crosshair_container:Add(CrosshairMeter.New {
 		angle = -CROSSHAIR_METER_ARC_ANGLE,
 		value_func = Airaccel
-	}
+	})
 end
 
 function HUDService.InitCrosshairLines()
@@ -165,7 +165,7 @@ hook.Add("LocalPlayerSpawn", "HUDService.Show", function ()
 	end
 end)
 
-hook.Add("OnSpawnMenuClose", "HUDService.Show", HUDService.Show)
+hook.Add("OnLobbyUIClose", "HUDService.Show", HUDService.Show)
 
 function HUDService.Hide()
 	HUDService.crosshair_container:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION})
@@ -180,21 +180,21 @@ hook.Add("PrePlayerDeath", "HUDService.Hide", function (ply)
 	end
 end)
 
-hook.Add("OnSpawnMenuOpen", "HUDService.Hide", HUDService.Hide)
+hook.Add("OnLobbyUIOpen", "HUDService.Hide", HUDService.Hide)
 
 function HUDService.ShowNotifications()
 	HUDService.quadrant_a:AnimateAttribute("alpha", 255)
 	HUDService.quadrant_b:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
 	HUDService.quadrant_c:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION * 2})
 end
-hook.Add("OnSpawnMenuClose", "HUDService.ShowNotifications", HUDService.ShowNotifications)
+hook.Add("OnLobbyUIClose", "HUDService.ShowNotifications", HUDService.ShowNotifications)
 
 function HUDService.HideNotifications()
 	HUDService.quadrant_a:AnimateAttribute("alpha", 0)
 	HUDService.quadrant_b:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION})
 	HUDService.quadrant_c:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION * 2})
 end
-hook.Add("OnSpawnMenuOpen", "HUDService.HideNotifications", HUDService.HideNotifications)
+hook.Add("OnLobbyUIOpen", "HUDService.HideNotifications", HUDService.HideNotifications)
 
 function HUDService.RenderHooks()
 	hook.Run "DrawIndicators"
