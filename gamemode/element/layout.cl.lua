@@ -457,6 +457,25 @@ function Element:GenerateSize()
 	end
 end
 
+function Element:SetPanelBounds(x, y, w, h)
+	self.panel:SetSize(w or self:GetFinalWidth(), h or self:GetFinalHeight())
+	self.panel:SetPos(math.Round(x or self.attributes.x.current), math.Round(x or self.attributes.y.current))
+end
+
+function Element:LayoutFamily()
+	for _, child in pairs(self.children) do
+		if not child.laying_out then
+			child:Layout()
+		end
+	end
+
+	local parent = self.parent
+
+	if parent and not parent.laying_out then
+		parent:Layout()
+	end
+end
+
 function Element:Layout()
 	self.laying_out = true
 
@@ -486,21 +505,9 @@ function Element:Layout()
 	local new_h = self:GetFinalHeight()
 
 	if old_w ~= new_w or old_h ~= new_h then
-		for _, child in pairs(self.children) do
-			if not child.laying_out then
-				child:Layout()
-			end
-		end
-
-		local parent = self.parent
-
-		if parent and not parent.laying_out then
-			parent:Layout()
-		end
+		self:LayoutFamily()
 	end
 
-	self.panel:SetSize(new_w, new_h)
-	self.panel:SetPos(math.Round(attr.x.current), math.Round(attr.y.current))
-
+	self:SetPanelBounds(nil, nil, new_w, new_h)
 	self.laying_out = false
 end

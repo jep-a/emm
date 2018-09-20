@@ -47,7 +47,7 @@ function HUDService.InitContainers()
 	})
 
 	HUDService.crosshair_container = HUDService.container:Add(HUDService.CreateCrosshairContainer())
-	HUDService.crosshair_lines_container = HUDService.crosshair_container:Add(HUDService.CreateCrosshairLinesContainer())
+	HUDService.crosshair_lines_container = HUDService.crosshair_container:Add(CrosshairLines.New())
 end
 
 function HUDService.InitMeters()
@@ -155,7 +155,7 @@ function HUDService.Init()
 
 	HUDService.InitContainers()
 	HUDService.InitMeters()
-	HUDService.InitCrosshair()
+	-- HUDService.InitCrosshair()
 
 	hook.Run("InitHUDElements")
 end

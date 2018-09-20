@@ -80,17 +80,20 @@ function HUDService.CreateCrosshairLine(props)
 		return (HUDService.crosshair_lines_container.attributes.width.current/2) - (CROSSHAIR_LINES_GAP/2)
 	end
 
-	if props.orientation == DIRECTION_ROW then
-		element:SetAttributes {
-			width = Length,
-			height = CROSSHAIR_LINE_THICKNESS
-		}
-	else
-		element:SetAttributes {
-			width = CROSSHAIR_LINE_THICKNESS,
-			height = Length
-		}
-	end
+	-- if props.orientation == DIRECTION_ROW then
+	-- 	element:SetAttributes {
+	-- 		width = AnimatableValue.New(0, {
+	-- 			generate = Length,
+	-- 			callback = 
+	-- 		}),
+	-- 		height = CROSSHAIR_LINE_THICKNESS
+	-- 	}
+	-- else
+	-- 	element:SetAttributes {
+	-- 		width = CROSSHAIR_LINE_THICKNESS,
+	-- 		height = Length
+	-- 	}
+	-- end
 
 	element:SetAttributes(props)
 

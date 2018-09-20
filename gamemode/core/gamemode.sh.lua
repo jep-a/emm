@@ -79,6 +79,7 @@ EMM.Include {
 	"hud/indicators",
 	"hud/notifications",
 	"hud/elements/meters",
+	"hud/elements/crosshair-lines",
 	"hud/elements/indicator",
 	"hud/elements/notifications",
 }
