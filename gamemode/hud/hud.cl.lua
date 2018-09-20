@@ -47,7 +47,6 @@ function HUDService.InitContainers()
 	})
 
 	HUDService.crosshair_container = HUDService.container:Add(HUDService.CreateCrosshairContainer())
-	HUDService.crosshair_lines_container = HUDService.crosshair_container:Add(CrosshairLines.New())
 end
 
 function HUDService.InitMeters()
@@ -117,32 +116,8 @@ function HUDService.InitMeters()
 	}
 end
 
-function HUDService.InitCrosshair()
-	HUDService.CreateCrosshairLine {
-		origin_justification_x = JUSTIFY_CENTER,
-		position_justification_x = JUSTIFY_CENTER
-	}
-
-	HUDService.CreateCrosshairLine {
-		orientation = DIRECTION_ROW,
-		origin_justification_x = JUSTIFY_END,
-		origin_justification_y = JUSTIFY_CENTER,
-		position_justification_x = JUSTIFY_END,
-		position_justification_y = JUSTIFY_CENTER
-	}
-
-	HUDService.CreateCrosshairLine {
-		origin_justification_x = JUSTIFY_CENTER,
-		origin_justification_y = JUSTIFY_END,
-		position_justification_x = JUSTIFY_CENTER,
-		position_justification_y = JUSTIFY_END,
-	}
-
-	HUDService.CreateCrosshairLine {
-		orientation = DIRECTION_ROW,
-		origin_justification_y = JUSTIFY_CENTER,
-		position_justification_y = JUSTIFY_CENTER
-	}
+function HUDService.InitCrosshairLines()
+	HUDService.crosshair_lines = HUDService.crosshair_container:Add(CrosshairLines.New())
 end
 
 function HUDService.Init()
@@ -155,7 +130,7 @@ function HUDService.Init()
 
 	HUDService.InitContainers()
 	HUDService.InitMeters()
-	-- HUDService.InitCrosshair()
+	HUDService.InitCrosshairLines()
 
 	hook.Run("InitHUDElements")
 end
