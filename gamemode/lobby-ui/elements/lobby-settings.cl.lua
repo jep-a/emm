@@ -4,6 +4,7 @@ function LobbySettings:Init(lobby)
 	LobbySettings.super.Init(self, {
 		layout_direction = DIRECTION_COLUMN,
 		fit = true,
+		crop_right = 1,
 		child_margin = MARGIN * 4,
 		alpha = 0,
 		LobbyUIService.CreateHeader "Settings"
@@ -21,7 +22,25 @@ function LobbySettings:Init(lobby)
 	self.inputs = {}
 
 	self:InitSettings()
-	self:AnimateAttribute("alpha", 255)
+	self:AnimateAttribute("crop_right", 0, ANIMATION_DURATION * 3)
+	self:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
+end
+
+function LobbySettings:AnimateFinish()
+	self:AnimateAttribute("crop_right", 1, {
+		duration = ANIMATION_DURATION * 3,
+		delay = ANIMATION_DURATION,
+		
+		callback = function ()
+			LobbySettings.super.Finish(self)
+		end
+	})
+
+	self:AnimateAttribute("alpha", 0)
+end
+
+function LobbySettings:Finish()
+	self:AnimateFinish()
 end
 
 function LobbySettings:AddCategory(label, color)

@@ -12,14 +12,14 @@ function LobbyUIService.SetLobbyListHeaderText(count)
 		text = "No open lobbies"
 	end
 
-	LobbyUIService.lobby_section.header:SetText(string.upper(text))
+	LobbyUIService.lobby_section.header:SetText(text)
 end
 
 function LobbyUIService.LobbyHostText(ply)
 	local text
 
 	if IsLocalPlayer(ply) then
-		text = "your lobby"
+		text = "Your lobby"
 	else
 		text = ply:GetName().."'s lobby"
 	end
@@ -128,8 +128,8 @@ function LobbyUIService.FinishLobby(lobby)
 			lobby.bar_element:Finish()
 		end
 
-		if lobby.card_element then
-			lobby.card_element:Finish()
+		if lobby == LobbyUIService.selected_lobby then
+			LobbyUIService.UnSelectLobby()
 		end
 
 		local lobby_count = table.Count(MinigameService.lobbies)
@@ -170,7 +170,7 @@ function LobbyUIService.AddLobbyPlayer(lobby, ply)
 		ply.lobby_card_element:AnimateStart()
 
 		if is_local_ply then
-			lobby.card_element.actions:AnimateState "leave"
+			lobby.card_element.actions:AnimateState("leave", ANIMATION_DURATION * 2)
 		end
 	end
 end
@@ -193,7 +193,7 @@ function LobbyUIService.RemoveLobbyPlayer(lobby, ply)
 		end
 
 		if is_local_ply then
-			lobby.card_element.actions:RevertState()
+			lobby.card_element.actions:RevertState(ANIMATION_DURATION * 2)
 		end
 	end
 end
@@ -203,6 +203,8 @@ function LobbyUIService.SelectLobby(lobby)
 	if lobby ~= LobbyUIService.selected_lobby then
 		if LobbyUIService.selected_lobby then
 			LobbyUIService.UnSelectLobby()
+		else
+			LobbyUIService.lobby_card_section:SetAttribute("alpha", 0)
 		end
 
 		if lobby.bar_element then
@@ -212,6 +214,9 @@ function LobbyUIService.SelectLobby(lobby)
 		LobbyUIService.selected_lobby = lobby
 		LobbyUIService.lobby_card_section:Add(LobbyCard.New(lobby))
 		LobbyUIService.settings = LobbyUIService.container:Add(LobbySettings.New(lobby))
+
+		LobbyUIService.lobby_card_section:AnimateAttribute("crop_right", 0)
+		LobbyUIService.lobby_card_section:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
 	end
 end
 
@@ -224,6 +229,7 @@ function LobbyUIService.UnSelectLobby()
 
 	if lobby.card_element then
 		lobby.card_element:Finish()
+		LobbyUIService.lobby_card_section:AnimateAttribute("crop_right", 1, {delay = ANIMATION_DURATION})
 	end
 
 	if LobbyUIService.settings then

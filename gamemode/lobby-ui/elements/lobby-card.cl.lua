@@ -62,7 +62,7 @@ function LobbyCard:Init(lobby)
 	self.actions = self:Add(Element.New {
 		fit_y = true,
 		width_percent = 1,
-		crop_bottom = 0.5,
+		crop_bottom = 0.5
 	})
 
 	self.actions:AddState("leave", {

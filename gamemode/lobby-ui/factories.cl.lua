@@ -7,7 +7,7 @@ function LobbyUIService.CreateHeader(text, fit)
 		padding_y = MARGIN * 4,
 		font = "Header",
 		text_justification = 5,
-		text = string.upper(text),
+		text = text,
 		border = LINE_THICKNESS/2
 	}
 
@@ -83,6 +83,7 @@ end
 
 function LobbyUIService.CreateContainer()
 	return Element.New {
+		layout_justification_x = JUSTIFY_CENTER,
 		width_percent = 1,
 		height_percent = 1,
 		padding = 64,
@@ -154,6 +155,8 @@ function LobbyUIService.CreateLobbyCardSection()
 		layout_direction = DIRECTION_COLUMN,
 		width = COLUMN_WIDTH,
 		height_percent = 1,
-		child_margin = MARGIN * 4
+		crop_right = 1,
+		child_margin = MARGIN * 4,
+		alpha = 0
 	}
 end

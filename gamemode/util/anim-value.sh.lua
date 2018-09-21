@@ -1,6 +1,6 @@
 -- # Util
 
-local DefaultEase = CubicBezier(0, 0.5, 0.35, 1)
+local DefaultEase = CubicBezier(0, 0.66, 0.33, 1)
 
 local function FrameMultiplier()
 	return FrameTime() * 10

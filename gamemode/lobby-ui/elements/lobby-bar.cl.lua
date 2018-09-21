@@ -103,13 +103,15 @@ function LobbyBar:Init(lobby)
 end
 
 function LobbyBar:AnimateFinish()
-	self:AnimateAttribute("crop_bottom", 1)
+	self:AnimateAttribute("crop_bottom", 1, {
+		duration = ANIMATION_DURATION * 4,
 
-	self:AnimateAttribute("background_color", COLOR_BACKGROUND_LIGHT, {
 		callback = function ()
 			LobbyBar.super.Finish(self)
 		end
 	})
+
+	self:AnimateAttribute("background_color", COLOR_BACKGROUND_LIGHT)
 end
 
 function LobbyBar:Finish()
@@ -127,7 +129,7 @@ function LobbyBar:OnMousePressed(mouse)
 end
 
 function LobbyBar:OnMouseExited()
-	if not self.lobby.card_element then
+	if self.lobby and not self.lobby.card_element then
 		self:RevertState()
 	end
 end

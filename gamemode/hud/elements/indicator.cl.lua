@@ -96,6 +96,7 @@ end
 function Indicator:AnimateFinish()
 	self:AnimateAttribute("alpha", 0, {
 		duration = 1,
+
 		callback = function ()
 			local ent = self.entity
 

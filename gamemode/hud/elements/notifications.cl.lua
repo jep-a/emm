@@ -102,7 +102,7 @@ function CountdownNotification:Init(end_time, text)
 
 	self.time = self:Add(TextBar.New(nil, {
 		width = BAR_WIDTH,
-		padding_bottom = MARGIN * 2,
+		padding_y = MARGIN * 2,
 		fit_x = false,
 		fit_y = true,
 		fill_color = true,
