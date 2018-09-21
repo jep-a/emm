@@ -122,7 +122,8 @@ local axis_property_keys = {
 		padding_start = "padding_left",
 		padding_end = "padding_right",
 		crop_start = "crop_left",
-		crop_end = "crop_right"
+		crop_end = "crop_right",
+		layout_crop = "layout_crop_x"
 	},
 
 	[DIRECTION_COLUMN] = {
@@ -132,7 +133,8 @@ local axis_property_keys = {
 		padding_start = "padding_top",
 		padding_end = "padding_bottom",
 		crop_start = "crop_top",
-		crop_end = "crop_bottom"
+		crop_end = "crop_bottom",
+		layout_crop = "layout_crop_y"
 	}
 }
 
@@ -189,16 +191,22 @@ function Element:StackChildren()
 
 	for i = 1, #children do
 		local child = children[i]
+		local child_attr = child.attributes
 
 		local child_size
 		local adj_child_size
 
+		local layout_crop_x = child_attr.layout_crop_x.current
+		local layout_crop_y = child_attr.layout_crop_y.current
+		local final_w = child:GetFinalWidth()
+		local final_h = child:GetFinalHeight()
+
 		if static_attr.layout_direction == DIRECTION_ROW then
-			child_size = child:GetFinalWidth()
-			adj_child_size = child:GetFinalHeight()
+			child_size = final_w - (final_w * layout_crop_x)
+			adj_child_size = final_h - (final_h * layout_crop_y)
 		elseif static_attr.layout_direction == DIRECTION_COLUMN then
-			child_size = child:GetFinalHeight()
-			adj_child_size = child:GetFinalWidth()
+			child_size = final_h - (final_h * layout_crop_y)
+			adj_child_size = final_w - (final_w * layout_crop_x)
 		end
 
 		if fit or not static_attr.wrap or max_line_size >= (line_size + child_size) then
@@ -210,6 +218,8 @@ function Element:StackChildren()
 				local cropped_prev_child_margin = (
 					child_margin * (
 						1 - math.Clamp(prev_child.attributes[prop_keys.crop_start].current + prev_child.attributes[prop_keys.crop_end].current, 0, 1)
+					) * (
+						1 - math.Clamp(prev_child.attributes[prop_keys.layout_crop].current, 0, 1)
 					)
 				)
 
@@ -301,10 +311,15 @@ function Element:StackChildren()
 
 		child_attr[prop_keys.position].current = line_start_positions[line] + child_positions[i] - crop_offset
 
+		local layout_crop_x = child_attr.layout_crop_x.current
+		local layout_crop_y = child_attr.layout_crop_y.current
+		local final_w = child:GetFinalWidth()
+		local final_h = child:GetFinalHeight()
+
 		if static_attr.layout_direction == DIRECTION_ROW then
-			adj_child_size = child:GetFinalHeight()
+			adj_child_size = final_h - (final_h * layout_crop_y)
 		elseif static_attr.layout_direction == DIRECTION_COLUMN then
-			adj_child_size = child:GetFinalWidth()
+			adj_child_size = final_w - (final_w * layout_crop_x)
 		end
 
 		local child_adj_justify = child_static_attr.self_adjacent_justification

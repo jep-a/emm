@@ -36,7 +36,7 @@ function LobbyUIService.Init()
 	LobbyUIService.prototype_list = LobbyUIService.new_lobby_section:Add(LobbyUIService.CreatePrototypeList())
 	LobbyUIService.lobby_section = LobbyUIService.container:Add(LobbyUIService.CreateLobbySection())
 	LobbyUIService.lobby_list = LobbyUIService.lobby_section:Add(LobbyUIService.CreateLobbyList())
-	LobbyUIService.lobby_card_section = LobbyUIService.container:Add(LobbyUIService.CreateLobbyCardSection())
+	-- LobbyUIService.lobby_card_section = LobbyUIService.container:Add(LobbyUIService.CreateLobbyCardSection())
 
 	for _, proto in pairs(MinigameService.prototypes) do
 		LobbyUIService.prototype_list:Add(LobbyUIService.CreatePrototypeBar(proto))
@@ -148,8 +148,12 @@ function LobbyUIService.SetLobbyHost(lobby, ply)
 		lobby.bar_element.host:SetText(ProperPlayerName(ply))
 	end
 
-	if lobby.card_element then
+	if lobby == LobbyUIService.selected_lobby then
 		lobby.card_element.header:SetText(string.upper(LobbyUIService.LobbyHostText(ply)))
+
+		if IsLocalPlayer(ply) then
+			lobby = LobbyUIService.lobby_card_container:AddSettings()
+		end
 	end
 end
 hook.Add("LobbyHostChange", "LobbyUIService.SetLobbyHost", LobbyUIService.SetLobbyHost)
@@ -165,8 +169,8 @@ function LobbyUIService.AddLobbyPlayer(lobby, ply)
 		lobby.bar_element.players:SetText(#lobby.players)
 	end
 
-	if lobby.card_element then
-		ply.lobby_card_element = lobby.card_element.players:Add(PlayerBar.New(ply))
+	if lobby == LobbyUIService.selected_lobby then
+		ply.lobby_card_element = LobbyUIService.selected_lobby.players:Add(PlayerBar.New(ply))
 		ply.lobby_card_element:AnimateStart()
 
 		if is_local_ply then
@@ -187,7 +191,7 @@ function LobbyUIService.RemoveLobbyPlayer(lobby, ply)
 		lobby.bar_element.players:SetText(#lobby.players - 1)
 	end
 
-	if lobby.card_element then
+	if lobby == LobbyUIService.selected_lobby then
 		if ply.lobby_card_element then
 			ply.lobby_card_element:Finish()
 		end
@@ -203,20 +207,14 @@ function LobbyUIService.SelectLobby(lobby)
 	if lobby ~= LobbyUIService.selected_lobby then
 		if LobbyUIService.selected_lobby then
 			LobbyUIService.UnSelectLobby()
-		else
-			LobbyUIService.lobby_card_section:SetAttribute("alpha", 0)
 		end
-
+		
 		if lobby.bar_element then
 			lobby.bar_element:AnimateState "hover"
 		end
-
+		
 		LobbyUIService.selected_lobby = lobby
-		LobbyUIService.lobby_card_section:Add(LobbyCard.New(lobby))
-		LobbyUIService.settings = LobbyUIService.container:Add(LobbySettings.New(lobby))
-
-		LobbyUIService.lobby_card_section:AnimateAttribute("crop_right", 0)
-		LobbyUIService.lobby_card_section:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
+		LobbyUIService.lobby_card_container = LobbyUIService.container:Add(LobbyCardContainer.New(lobby))
 	end
 end
 
@@ -227,16 +225,11 @@ function LobbyUIService.UnSelectLobby()
 		lobby.bar_element:RevertState()
 	end
 
-	if lobby.card_element then
-		lobby.card_element:Finish()
-		LobbyUIService.lobby_card_section:AnimateAttribute("crop_right", 1, {delay = ANIMATION_DURATION})
+	if lobby == LobbyUIService.selected_lobby then
+		LobbyUIService.lobby_card_container:Finish()
+		LobbyUIService.lobby_card_container = nil
 	end
-
-	if LobbyUIService.settings then
-		LobbyUIService.settings:Finish()
-		LobbyUIService.settings = nil
-	end
-
+		
 	LobbyUIService.selected_lobby = nil
 end
 
@@ -266,10 +259,8 @@ hook.Add("TextEntryUnFocus", "LobbyUIService.UnFocusTextEntry", LobbyUIService.U
 
 function LobbyUIService.MousePressed(panel)
 	if 
-		panel == LobbyUIService.container.panel or
 		panel == LobbyUIService.new_lobby_section.panel or
-		panel == LobbyUIService.lobby_section.panel or
-		panel == LobbyUIService.lobby_card_section.panel
+		panel == LobbyUIService.lobby_section.panel
 	then
 		if LobbyUIService.selected_lobby then
 			LobbyUIService.UnSelectLobby()

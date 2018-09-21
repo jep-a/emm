@@ -83,10 +83,10 @@ end
 
 function LobbyUIService.CreateContainer()
 	return Element.New {
-		layout_justification_x = JUSTIFY_CENTER,
+		wrap = false,
 		width_percent = 1,
 		height_percent = 1,
-		padding = 64,
+		padding = MARGIN * 4,
 		child_margin = MARGIN * 4,
 		alpha = 0
 	}
@@ -95,8 +95,8 @@ end
 function LobbyUIService.CreateNewLobbySection()
 	return Element.New {
 		layout_direction = DIRECTION_COLUMN,
+		fit_y = true,
 		width = COLUMN_WIDTH,
-		height_percent = 1,
 		child_margin = MARGIN * 4,
 		LobbyUIService.CreateHeader "Make a new lobby"
 	}
@@ -152,11 +152,7 @@ end
 
 function LobbyUIService.CreateLobbyCardSection()
 	return Element.New {
-		layout_direction = DIRECTION_COLUMN,
-		width = COLUMN_WIDTH,
-		height_percent = 1,
-		crop_right = 1,
-		child_margin = MARGIN * 4,
-		alpha = 0
+		fit = true,
+		border = 1
 	}
 end

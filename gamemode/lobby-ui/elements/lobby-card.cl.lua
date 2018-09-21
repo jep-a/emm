@@ -1,14 +1,53 @@
+
+LobbyCardContainer = LobbyCardContainer or Class.New(Element)
+
+function LobbyCardContainer:Init(lobby)
+	LobbyCardContainer.super.Init(self, {
+		fit = true,
+		child_margin = MARGIN * 4,
+		alpha = 0
+	})
+
+	self.lobby = lobby
+	self.lobby_card = self:Add(LobbyCard.New(lobby))
+
+	if IsLocalPlayer(lobby.host) then
+		self.settings = self:Add(LobbySettings.New(lobby))
+	end
+
+	self:AnimateAttribute("alpha", 255, ANIMATION_DURATION * 2)
+end
+
+function LobbyCardContainer:AddSettings()
+	self.settings = self:Add(LobbySettings.New(self.lobby))
+end
+
+function LobbyCardContainer:AnimateFinish()
+	self:SetAttribute("layout_crop_x", 1)
+
+	self:AnimateAttribute("alpha", 0, {
+		duration = ANIMATION_DURATION * 2,
+
+		callback = function ()
+			LobbyCardContainer.super.Finish(self)
+		end
+	})
+	
+	self.lobby_card:FinishLobby()
+end
+
+function LobbyCardContainer:Finish()
+	self:AnimateFinish()
+end
+
 LobbyCard = LobbyCard or Class.New(Element)
 
 function LobbyCard:Init(lobby)
 	LobbyCard.super.Init(self, {
-		layout = false,
-		origin_position = true,
 		layout_direction = DIRECTION_COLUMN,
 		fit_y = true,
 		width = COLUMN_WIDTH,
 		child_margin = MARGIN * 4,
-		alpha = 0,
 		header = LobbyUIService.CreateHeader(LobbyUIService.LobbyHostText(lobby.host))
 	})
 
@@ -95,19 +134,9 @@ function LobbyCard:Init(lobby)
 			NetService.Send "RequestLobbyLeave"
 		end
 	})
-
-	self:AnimateAttribute("alpha", 255)
 end
 
-function LobbyCard:AnimateFinish()
-	self:AnimateAttribute("alpha", 0, {
-		callback = function ()
-			LobbyCard.super.Finish(self)
-		end
-	})
-end
-
-function LobbyCard:Finish()
+function LobbyCard:FinishLobby()
 	if self == self.lobby.card_element then
 		self.lobby.card_element = nil
 	end
@@ -117,5 +146,4 @@ function LobbyCard:Finish()
 	end
 
 	self.lobby = nil
-	self:AnimateFinish()
 end

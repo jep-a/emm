@@ -11,6 +11,8 @@ local animatable_attributes = {
 	"crop_top",
 	"crop_right",
 	"crop_bottom",
+	"layout_crop_x",
+	"layout_crop_y",
 	"child_margin",
 
 	color = COLOR_WHITE,
@@ -51,6 +53,8 @@ local layout_invalidators = {
 	"crop_top",
 	"crop_right",
 	"crop_bottom",
+	"layout_crop_x",
+	"layout_crop_y",
 	"child_margin"
 }
 
