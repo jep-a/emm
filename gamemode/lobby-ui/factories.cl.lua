@@ -114,7 +114,7 @@ end
 function LobbyUIService.CreatePrototypeBar(proto)
 	return ButtonBar.New {
 		color = proto.color,
-		material = Material("emm2/minigames/"..proto.key..".png", "nocull smooth"),
+		material = PNGMaterial("emm2/minigames/"..proto.key..".png"),
 		text = proto.name,
 		divider = true,
 

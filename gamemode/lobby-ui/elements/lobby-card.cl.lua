@@ -71,7 +71,7 @@ function LobbyCard:Init(lobby)
 			Element.New {
 				width_percent = 1,
 				height_percent = 1,
-				material = Material("emm2/minigames/"..lobby.prototype.key.."-2x.png", "nocull smooth")
+				material = PNGMaterial("emm2/minigames/"..lobby.prototype.key.."-2x.png")
 			}
 		},
 
@@ -116,7 +116,7 @@ function LobbyCard:Init(lobby)
 	self.join = self.actions:Add(ButtonBar.New {
 		background_color = lobby.prototype.color,
 		color = COLOR_WHITE,
-		material = Material("emm2/ui/join.png", "nocull smooth"),
+		material = PNGMaterial("emm2/ui/join.png"),
 		text = "Join",
 
 		on_click = function ()
@@ -127,7 +127,7 @@ function LobbyCard:Init(lobby)
 	self.leave = self.actions:Add(ButtonBar.New {
 		background_color = lobby.prototype.color,
 		color = COLOR_WHITE,
-		material = Material("emm2/ui/leave.png", "nocull smooth"),
+		material = PNGMaterial("emm2/ui/leave.png"),
 		text = "Leave",
 
 		on_click = function ()

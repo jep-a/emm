@@ -56,7 +56,7 @@ function LobbyBar:Init(lobby)
 			width = BUTTON_ICON_SIZE,
 			height = BUTTON_ICON_SIZE,
 			crop_y = 0.1,
-			material = Material("emm2/minigames/"..lobby.prototype.key..".png", "noclamp smooth")
+			material = PNGMaterial("emm2/minigames/"..lobby.prototype.key..".png")
 		}
 	})
 
