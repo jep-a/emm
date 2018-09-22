@@ -26,6 +26,8 @@ function MinigameLobby:Init(props)
 		self[k] = self[k] or {}
 	end
 
+	self:InitSettings()
+
 	hook.Run("LobbyInit", self)
 
 	if self:IsLocal() then

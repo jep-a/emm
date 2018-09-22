@@ -1,3 +1,16 @@
+function Nily(v)
+	return v == "nil" or v == nil
+end
+
+function Falsy(v)
+	return (
+		v == "" or
+		v == 0 or
+		v == false or
+		Nily(v)
+	)
+end
+
 function SequentialTableHasValue(tab, val)
 	for i = 1, #tab do
 		if val == tab[i] then

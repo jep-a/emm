@@ -29,6 +29,8 @@ function MinigameLobby:Init(props)
 		self[k] = {}
 	end
 
+	self:InitSettings()
+
 	NetService.Send("Lobby", self.id, self.prototype, self.host)
 	hook.Run("LobbyInit", self)
 

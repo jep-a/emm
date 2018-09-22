@@ -68,9 +68,17 @@ function MinigamePrototype:Init()
 end
 
 function MinigamePrototype:AddPlayerClass(ply_class)
+	ply_class = table.Merge({
+		can_walljump = true,
+		can_wallslide = true,
+		can_airaccel = true,
+		can_auto_bunnyhop = false
+	}, ply_class)
+
 	ply_class.id = table.Count(self.player_classes) + 1
 	ply_class.key = ply_class.key or ply_class.name
 	ply_class.color = ply_class.color or self.color
+
 	self.player_classes[ply_class.key] = ply_class
 end
 

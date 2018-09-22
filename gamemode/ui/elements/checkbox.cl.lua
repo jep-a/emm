@@ -58,3 +58,9 @@ function Checkbox:OnMousePressed(mouse)
 	Checkbox.super.OnMousePressed(self, mouse)
 	self:OnValueChanged(not self.value)
 end
+
+function Checkbox:SetValue(v)
+	if v ~= self.value then 
+		self:OnValueChanged(v)
+	end
+end

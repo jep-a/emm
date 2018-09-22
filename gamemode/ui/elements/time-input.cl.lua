@@ -11,6 +11,12 @@ local function ZeroString(len)
 	return string.format("%0"..len.."d", 0)
 end
 
+local function TimeString(seconds)
+	local time = string.FormattedTime(seconds)
+
+	return string.format("%02d%02d%02d", time.h, time.m, time.s)
+end
+
 local function Seconds(text)
 	local h, m, s = string.match(string.format("%06d", tonumber(text)), "(%d%d)(%d%d)(%d%d)")
 
@@ -18,7 +24,6 @@ local function Seconds(text)
 end
 
 function TimeInputPanel:Init()
-	self:SetMouseInputEnabled(false)
 	self:SetUpdateOnType(true)
 	
 	self.time = ""
@@ -107,21 +112,21 @@ function TimeInputPanel:FormatDigits(digits)
 	self.time_with_colons = time_with_colons
 end
 
-function TimeInputPanel:OnValueChange(value)
-	local text = tostring(value)
-	local value_len = #text
+function TimeInputPanel:OnValueChange(v)
+	local text = tostring(v)
+	local v_len = #text
 	local caret_pos = self:GetCaretPos()
-
-	if value_len > max_time_digits then
-		local trim = max_time_digits - (value_len + 1)
-
+	
+	if v_len > max_time_digits then
+		local trim = max_time_digits - (v_len + 1)
+		
 		if self.non_zero_i == 1 and (max_time_digits + 1) > caret_pos then
-			text = string.Left(value, trim)
+			text = string.Left(v, trim)
 		else
-			text = string.Right(value, trim)
+			text = string.Right(v, trim)
 			caret_pos = caret_pos - 1
 		end
-	elseif max_time_digits > value_len then
+	elseif max_time_digits > v_len then
 		text = string.format("%06d", text)
 		caret_pos = caret_pos + 1
 	end
@@ -197,6 +202,8 @@ function TimeInputPanel:Think()
 			self.old_caret_pos = caret_pos
 			self.last_caret_pos_change = CurTime()
 		end
+	else
+		self:SetMouseInputEnabled(false)
 	end
 end
 
@@ -205,7 +212,6 @@ function TimeInputPanel:Paint(w, h)
 	local color = attr.text_color and attr.text_color.current or self.element:GetColor()
 
 	surface.SetFont(self:GetFont())
-
 	surface.SetTextColor(color)
 	surface.SetTextPos(start_padding, 0)
 	surface.DrawText(self.time)
@@ -224,11 +230,11 @@ function TimeInputPanel:Paint(w, h)
 end
 
 function TimeInputPanel:ManuallySetCaretPos()
-	local x, y = self:LocalCursorPos()
-
+	local x, _ = self:LocalCursorPos()
 	local time_len = #self.time
+	local corrected_caret_pos = self.formatted_lookup[math.Round(math.Clamp((x - start_padding)/(time_len * self.digit_width), 0, 1) * time_len)]
 
-	self:OffsetCaretPos(self.formatted_lookup[math.Round(math.Clamp((x - start_padding)/(time_len * self.digit_width), 0, 1) * time_len)])
+	self:OffsetCaretPos(corrected_caret_pos)
 end
 
 function TimeInputPanel:OnCursorEntered()
@@ -285,12 +291,12 @@ function TimeInput:Init(time, props)
 	self.panel.text.element = self
 	self.panel.text:SetFont(self:GetAttribute "font")
 	
-	local text = string.format("%06d", tonumber(time or self:GetAttribute "text" or 500))
+	local text = time and TimeString(time) or ZeroString()
 	
 	self.panel.text:SetText(text)
 	self.panel.text:OffsetCaretPos(max_time_digits)
 	self.panel.text:FormatDigits(text)
-	self.value = Seconds(text)
+	self.value = time or 0
 
 	if props then
 		self:SetAttributes(props)
@@ -317,6 +323,11 @@ function TimeInput:OnValueChanged(v)
 	end
 end
 
+function TimeInput:SetValue(v)
+	self.panel.text:SetText(v)
+	self.panel.text:OnValueChange(v)
+end
+
 function TimeInput:OnMousePressed(mouse)
 	TimeInput.super.OnMousePressed(self, mouse)
 	self.panel.text:ManuallySetCaretPos()
@@ -324,7 +335,7 @@ function TimeInput:OnMousePressed(mouse)
 	if self.on_click then
 		self.on_click(self, mouse)
 	end
-
+	
 	self:OnFocus(self)
 end
 
@@ -333,7 +344,6 @@ function TimeInput:OnMouseReleased(mouse)
 end
 
 function TimeInput:OnFocus()
-	self.panel.text:SetMouseInputEnabled(false)
 	self.panel.text:RequestFocus()
 	
 	hook.Run("TextEntryFocus", self)
@@ -394,8 +404,14 @@ function TimeInput:StopDragging()
 	TimeInput.super.StopDragging(self)
 
 	self:OnFocus()
-	self.panel.text:SetValue(self.slider.generated_options[self.slider.selected_option_index])
-	self.panel.text:OffsetCaretPos(max_time_digits)
+
+	local v = self.slider.generated_options[self.slider.selected_option_index]
+
+	if v then
+		self.panel.text:SetValue(self.slider.generated_options[self.slider.selected_option_index])
+		self.panel.text:OffsetCaretPos(max_time_digits)
+	end
+
 	self.slider:Finish()
 	self.slider = nil
 end

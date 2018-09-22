@@ -23,7 +23,7 @@ function MinigameNetService.RequestLobbies()
 end
 hook.Add("InitPostEntity", "MinigameNetService.RequestLobbies", MinigameNetService.RequestLobbies)
 
-function MinigameNetService.ReceiveLobbies()
+function MinigameNetService.ReceiveLobbies(len)
 	local lobby_count = NetService.ReadID()
 
 	for i = 1, lobby_count do
@@ -34,22 +34,25 @@ function MinigameNetService.ReceiveLobbies()
 		local host = net.ReadEntity()
 		local ply_count = NetService.ReadID()
 
+		local plys = {}
+
+		for i = 1, ply_count do
+			plys[i] = net.ReadEntity()
+		end
+
+		local settings = net.ReadTable()
 		local proto = MinigameService.Prototype(proto_id)
 
-		local lobby = {
+		local lobby = MinigameService.CreateLobby({
 			id = lobby_id,
 			prototype = proto,
 			state = MinigameStateService.State(proto, state_id),
 			last_state_start = last_state_start,
 			host = host,
-			players = {}
-		}
+			players = plys
+		}, false)
 
-		for i = 1, ply_count do
-			lobby.players[i] = net.ReadEntity()
-		end
-
-		MinigameService.CreateLobby(lobby, false)
+		MinigameSettingsService.Adjust(lobby, settings)
 	end
 
 	hook.Run "ReceiveLobbies"

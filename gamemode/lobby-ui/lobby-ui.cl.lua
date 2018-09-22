@@ -158,6 +158,15 @@ function LobbyUIService.SetLobbyHost(lobby, ply)
 end
 hook.Add("LobbyHostChange", "LobbyUIService.SetLobbyHost", LobbyUIService.SetLobbyHost)
 
+function LobbyUIService.RefreshSettings(lobby, settings)
+	if lobby == LobbyUIService.selected_lobby then
+		if IsLocalPlayer(lobby.host) then
+			LobbyUIService.lobby_card_container.settings:RefreshOriginalValues(settings)
+		end
+	end
+end
+hook.Add("LobbySettingsChange", "LobbyUIService.RefreshSettings", LobbyUIService.RefreshSettings)
+
 function LobbyUIService.AddLobbyPlayer(lobby, ply)
 	local is_local_ply = IsLocalPlayer(ply)
 
@@ -170,7 +179,7 @@ function LobbyUIService.AddLobbyPlayer(lobby, ply)
 	end
 
 	if lobby == LobbyUIService.selected_lobby then
-		ply.lobby_card_element = LobbyUIService.selected_lobby.players:Add(PlayerBar.New(ply))
+		ply.lobby_card_element = lobby.card_element.players:Add(PlayerBar.New(ply))
 		ply.lobby_card_element:AnimateStart()
 
 		if is_local_ply then

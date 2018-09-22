@@ -1,6 +1,8 @@
 InputBar = InputBar or Class.New(Element)
 
 function InputBar:Init(label, type, v, input_props)
+	type = type or "boolean"
+
 	InputBar.super.Init(self, {
 		layout_justification_y = JUSTIFY_CENTER,
 		fit_y = true,
@@ -50,7 +52,9 @@ function InputBar:Init(label, type, v, input_props)
 
 	local input_element
 
-	if not type or type == "boolean" then
+	self.type = type
+
+	if type == "boolean" then
 		input_element = Checkbox
 	else
 		self.label:SetAttribute("width_percent", 0.5)
@@ -64,4 +68,12 @@ function InputBar:Init(label, type, v, input_props)
 	end
 
 	self.input = self.input_container:Add(input_element.New(v, input_props))
+end
+
+function InputBar:SetValue(v)
+	self.input:SetValue(v)
+end
+
+function InputBar:GetValue()
+	return self.input.value
 end

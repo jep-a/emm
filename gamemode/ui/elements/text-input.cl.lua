@@ -85,6 +85,11 @@ function TextInput:OnValueChanged(v)
 	end
 end
 
+function TextInput:SetValue(v)
+	self.panel.text:SetText(v)
+	self.panel.text:OnValueChange(v)
+end
+
 function TextInput:OnMousePressed(mouse)
 	TextInput.super.OnMousePressed(self, mouse)
 	

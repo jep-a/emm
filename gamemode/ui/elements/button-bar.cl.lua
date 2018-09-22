@@ -5,11 +5,9 @@ function ButtonBar:Init(props)
 
 	ButtonBar.super.Init(self, {
 		layout_justification_y = JUSTIFY_CENTER,
-		fit_y = true,
 		width = BAR_WIDTH,
+		height = BAR_HEIGHT,
 		padding_x = MARGIN * 8,
-		padding_top = MARGIN * 4,
-		padding_bottom = MARGIN * 5,
 		child_margin = MARGIN * 8,
 		background_color = props.background and COLOR_GRAY or props.background_color,
 		inherit_color = false,
