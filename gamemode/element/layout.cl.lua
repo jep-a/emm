@@ -215,16 +215,19 @@ function Element:StackChildren()
 
 			if i ~= 1 then
 				local prev_child = children[i - 1]
-				local cropped_prev_child_margin = (
-					child_margin * (
-						1 - math.Clamp(prev_child.attributes[prop_keys.crop_start].current + prev_child.attributes[prop_keys.crop_end].current, 0, 1)
-					) * (
-						1 - math.Clamp(prev_child.attributes[prop_keys.layout_crop].current, 0, 1)
-					)
-				)
+				local total_prev_crop = math.Clamp(prev_child.attributes[prop_keys.crop_start].current + prev_child.attributes[prop_keys.crop_end].current, 0, 1)
+				local cropped_prev_child_margin = child_margin * (1 - total_prev_crop) * (1 - math.Clamp(prev_child.attributes[prop_keys.layout_crop].current, 0, 1))
 
 				child_positions[i] = child_positions[i] + cropped_prev_child_margin
 				line_size = line_size + cropped_prev_child_margin
+
+				local total_crop = math.Clamp(child.attributes[prop_keys.crop_start].current + child.attributes[prop_keys.crop_end].current, 0, 1)
+
+				if total_crop == 1 then
+					prev_child.last = true
+				elseif prev_child.last then
+					prev_child.last = false
+				end
 			end
 
 			if adj_child_size > adj_line_size then
