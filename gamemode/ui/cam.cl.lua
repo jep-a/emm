@@ -34,7 +34,7 @@ end
 -- # Rendering
 
 function CamUIService.Render()
-	cam.Start3D(Vector(0, -ScrW()/2, -ScrH()/2), CamUIService.cam_angle.smooth, 90)
+	cam.Start3D(Vector(0, -ScrW()/2, -ScrH()/2), CamUIService.cam_angle.smooth/4, 90)
 	surface.DisableClipping(false)
 
 	render.PushFilterMag(TEXFILTER.ANISOTROPIC)

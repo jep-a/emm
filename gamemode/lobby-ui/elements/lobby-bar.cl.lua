@@ -47,8 +47,9 @@ function LobbyBar:Init(lobby)
 
 	local left_section = self:Add(Element.New {
 		layout_justification_y = JUSTIFY_CENTER,
+		wrap = false,
 		fit_y = true,
-		width_percent = 0.5,
+		width_percent = 0.75,
 		padding_bottom = MARGIN * 3,
 		child_margin = MARGIN * 8,
 
@@ -72,7 +73,7 @@ function LobbyBar:Init(lobby)
 		layout_justification_y = JUSTIFY_CENTER,
 		fit_y = true,	
 		crop_bottom = 0.01,
-		width_percent = 0.5,
+		width_percent = 0.25,
 		padding_bottom = MARGIN * 3,
 		child_margin = MARGIN * 8
 	})

@@ -3,7 +3,7 @@
 local DefaultEase = CubicBezier(0, 0.66, 0.33, 1)
 
 local function FrameMultiplier()
-	return FrameTime() * 10
+	return RealFrameTime() * 10
 end
 
 

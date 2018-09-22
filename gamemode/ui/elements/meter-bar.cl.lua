@@ -21,6 +21,11 @@ function MeterBar:Init(props)
 	end
 end
 
+function MeterBar:Finish()
+	MeterBar.super.Finish(self)
+	self.animatable_percent:Finish()
+end
+
 function MeterBar:SetPercent(percent)
 	self.animatable_percent.current = math.Clamp(percent, 0, 1)
 end
