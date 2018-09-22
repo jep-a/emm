@@ -249,7 +249,7 @@ end
 
 vgui.Register("TimeInputPanel", TimeInputPanel, "DTextEntry")
 
-function TimeInput:Init(props)
+function TimeInput:Init(time, props)
 	TimeInput.super.Init(self, {
 		fit_y = true,
 		width_percent = 0.8,
@@ -285,7 +285,7 @@ function TimeInput:Init(props)
 	self.panel.text.element = self
 	self.panel.text:SetFont(self:GetAttribute "font")
 	
-	local text = string.format("%06d", tonumber(self:GetAttribute "text" or 500))
+	local text = string.format("%06d", tonumber(time or self:GetAttribute "text" or 500))
 	
 	self.panel.text:SetText(text)
 	self.panel.text:OffsetCaretPos(max_time_digits)

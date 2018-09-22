@@ -31,7 +31,7 @@ end
 
 vgui.Register("TextInputPanel", TextInputPanel, "DTextEntry")
 
-function TextInput:Init(props)
+function TextInput:Init(text, props)
 	TextInput.super.Init(self, {
 		fit_y = true,
 		width_percent = 1,
@@ -68,7 +68,7 @@ function TextInput:Init(props)
 	self.panel.text = self.panel:Add(vgui.Create "TextInputPanel")
 	self.panel.text.element = self
 	self.panel.text:SetFont(self:GetAttribute "font")
-	self.panel.text:SetText(self:GetAttribute "text" or "")
+	self.panel.text:SetText(text or self:GetAttribute "text" or "")
 
 	if props then
 		self:SetAttributes(props)

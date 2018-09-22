@@ -18,6 +18,7 @@ function LobbySettings:Init(lobby)
 
 	self.game_category = self:AddCategory "Game"
 	self.player_class_categories = {}
+	self.settings = {}
 	self.inputs = {}
 
 	self:InitSettings()
@@ -39,15 +40,45 @@ end
 function LobbySettings:AddSetting(setting, ply_class_k)
 	local category = self.player_class_categories[ply_class_k] or self.game_category
 
-	local key
+	local k
 
 	if ply_class_k then
-		key = "player_classes."..ply_class_k.."."..setting.key
+		k = "player_classes."..ply_class_k.."."..setting.key
 	else
-		key = setting.key
+		k = setting.key
 	end
 
-	self.inputs[key] = category:Add(InputBar.New(setting.label, setting.type))
+	self.settings[k] = setting
+
+	local prereq = setting.prerequisite
+
+	if prereq then
+		self.inputs[k..".prerequisite"] = category:Add(InputBar.New(prereq.label, prereq.type, nil, {
+			on_change = function (input, v)
+				self:OnPrerequisiteValueChanged(k, v)
+			end
+		}))
+	end
+
+	self.inputs[k] = category:Add(InputBar.New(setting.label, setting.type, nil, {
+		on_change = function (input, v)
+			self:OnSettingValueChanged(k, v)
+		end
+	}))
+end
+
+function LobbySettings:OnPrerequisiteValueChanged(k, v)
+	local setting = self.settings[k]
+
+	if v ~= (setting.prerequisite and not setting.prerequisite.opposite) then
+		self.inputs[k]:RevertState()
+	else
+		self.inputs[k]:AnimateState "hidden"
+	end
+end
+
+function LobbySettings:OnSettingValueChanged(k, v)
+	print(k, v)
 end
 
 function LobbySettings:InitSettings()

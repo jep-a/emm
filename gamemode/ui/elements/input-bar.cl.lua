@@ -1,6 +1,6 @@
 InputBar = InputBar or Class.New(Element)
 
-function InputBar:Init(label, type)
+function InputBar:Init(label, type, v, input_props)
 	InputBar.super.Init(self, {
 		layout_justification_y = JUSTIFY_CENTER,
 		fit_y = true,
@@ -37,6 +37,10 @@ function InputBar:Init(label, type)
 		}
 	})
 
+	self:AddState("hidden", {
+		crop_bottom = 1
+	})
+
 	self.input_container = self:Add(Element.New {
 		layout_justification_x = JUSTIFY_END,
 		layout_justification_y = JUSTIFY_CENTER,
@@ -59,5 +63,5 @@ function InputBar:Init(label, type)
 		end
 	end
 
-	self.input = self.input_container:Add(input_element.New())
+	self.input = self.input_container:Add(input_element.New(v, input_props))
 end
