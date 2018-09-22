@@ -259,6 +259,7 @@ hook.Add("TextEntryUnFocus", "LobbyUIService.UnFocusTextEntry", LobbyUIService.U
 
 function LobbyUIService.MousePressed(panel)
 	if 
+		panel == LobbyUIService.container.panel or
 		panel == LobbyUIService.new_lobby_section.panel or
 		panel == LobbyUIService.lobby_section.panel
 	then
