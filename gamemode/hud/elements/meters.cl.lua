@@ -41,6 +41,24 @@ function HUDMeter:Init(quadrant, props)
 			crop_bottom = 0.125,
 			font = "HUDMeterValue"
 		})
+
+		if props.sub_value then
+			self.sub_value_text = self.value_text_container:Add(Element.New {
+				fit = true,
+				crop_y = 0.2,
+				font = "HUDMeterValueSmall"
+			})
+		end
+	
+		if props.units then
+			self.value_text_container:Add(Element.New {
+				self_adjacent_justification = JUSTIFY_END,
+				fit = true,
+				crop_y = 0.1,
+				text = props.units,
+				font = "HUDMeterValueSmall"
+			})
+		end
 	end
 
 	self.bar = self:Add(MeterBar.New {height = props.line_thickness or HUD_LINE_THICKNESS})
@@ -75,7 +93,14 @@ function HUDMeter:Think()
 	self.bar:SetPercent(width_percent)
 
 	if self.value_text then
-		self.value_text:SetText(self.debounced_value.debounce)
+		local v = tostring(self.debounced_value.debounce)
+
+		if self.sub_value_text then
+			self.value_text:SetText(string.sub(v, 1, -2))
+			self.sub_value_text:SetText(string.sub(v, -1))
+		else
+			self.value_text:SetText(v)
+		end
 	end
 end
 
@@ -137,22 +162,22 @@ function CrosshairMeter:Init(props)
 			position_justification_y = JUSTIFY_END,
 			fit = true,
 			wrap = false,
-			child_margin = MARGIN/4
+			child_margin = MARGIN/8
 		})
 
 		self.value_text = self.value_text_container:Add(Element.New {
 			fit = true,
 			crop_y = 0.125,
-			font = "CrosshairMeterValue",
-			text = "100"
+			font = "CrosshairMeterValue"
 		})
 
-		self.value_text_container:Add(Element.New {
-			fit = true,
-			crop_y = 0.125,
-			font = "CrosshairMeterValueSmall",
-			text = "0"
-		})
+		if props.sub_value then
+			self.sub_value_text = self.value_text_container:Add(Element.New {
+				fit = true,
+				crop_y = 0.125,
+				font = "CrosshairMeterValueSmall"
+			})
+		end
 	end
 end
 
@@ -167,7 +192,16 @@ function CrosshairMeter:Think()
 	self.percent.current = value/self.value_divider
 
 	if self.value_text then
-		self.value_text:SetText(self.debounced_value.debounce)
+		if self.value_text then
+			local v = tostring(self.debounced_value.debounce)
+	
+			if self.sub_value_text then
+				self.value_text:SetText(string.sub(v, 1, -2))
+				self.sub_value_text:SetText(string.sub(v, -1))
+			else
+				self.value_text:SetText(v)
+			end
+		end
 	end
 end
 

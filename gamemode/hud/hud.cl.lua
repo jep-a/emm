@@ -55,7 +55,7 @@ function HUDService.InitMeters()
 	end
 
 	local function Speed()
-		return math.Round(LocalPlayer():GetVelocity():Length2D()/10)
+		return math.Round(LocalPlayer():GetVelocity():Length2D())
 	end
 
 	local function Airaccel()
@@ -75,22 +75,9 @@ function HUDService.InitMeters()
 		hide_value_on_empty = true,
 		icon_material = speed_icon_material,
 		value_func = Speed,
-		value_divider = HUD_SPEED_METER_DIVIDER
-	})
-
-	HUDService.speed_meter.value_text_container:Add(Element.New {
-		fit = true,
-		crop_y = 0.18,
-		text = "0",
-		font = "HUDMeterValueSmall"
-	})
-
-	HUDService.speed_meter.value_text_container:Add(Element.New {
-		self_adjacent_justification = JUSTIFY_END,
-		fit = true,
-		crop_y = 0.1,
-		text = "u/s",
-		font = "HUDMeterValueSmall"
+		value_divider = HUD_SPEED_METER_DIVIDER,
+		sub_value = true,
+		units = "u/s",
 	})
 
 	HUDService.airaccel_meter = HUDMeter.New("i", {
@@ -107,7 +94,8 @@ function HUDService.InitMeters()
 		show_value = true,
 		hide_value_on_empty = true,
 		value_func = Speed,
-		value_divider = HUD_SPEED_METER_DIVIDER
+		value_divider = HUD_SPEED_METER_DIVIDER,
+		sub_value = true
 	})
 
 	HUDService.crosshair_container:Add(CrosshairMeter.New {
