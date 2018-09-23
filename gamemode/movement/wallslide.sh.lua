@@ -1,6 +1,7 @@
 WallslideService = WallslideService or {}
 
 local wallslide_effect_cooldown = 1/60
+local wallslide_transition_velocity = 400
 
 
 -- # Properties
@@ -68,7 +69,7 @@ function WallslideService.Velocity(trace, last_wallslide_time, wallslide_velocit
 
 	local new_move_vel =  (
 		((1 - frac) * Vector(wallslide_velocity.x, wallslide_velocity.y, 0)) +
-		(frac * Vector(trace.Normal.x, trace.Normal.y, trace.Normal.z * 0.1) * 400) -
+		(frac * Vector(trace.Normal.x, trace.Normal.y, trace.Normal.z * 0.1) * wallslide_transition_velocity) -
 		Vector(0, 0, 5)
 	)
 
