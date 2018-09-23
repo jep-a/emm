@@ -37,13 +37,13 @@ function HUDMeter:Init(quadrant, props)
 
 		self.value_text = self.value_text_container:Add(Element.New {
 			fit = true,
-			crop_top = 0.25,
+			crop_top = 0.24,
 			crop_bottom = 0.125,
 			font = "HUDMeterValue"
 		})
 	end
 
-	self.bar = self:Add(MeterBar.New())
+	self.bar = self:Add(MeterBar.New {height = props.line_thickness or HUD_LINE_THICKNESS})
 
 	self:Add(Element.New {
 		width = HUD_ICON_SIZE,
@@ -111,6 +111,7 @@ function CrosshairMeter:Init(props)
 		background_color = COLOR_BACKGROUND
 	})
 
+	self.line_thickness = AnimatableValue.New(props.line_thickness or HUD_LINE_THICKNESS)
 	self.angle = props.angle or 0
 	self.value_func = props.value_func
 	self.value_divider = props.value_divider or 100
@@ -196,7 +197,7 @@ function CrosshairMeter:Paint()
 	render.SetStencilZFailOperation(STENCILOPERATION_REPLACE)
 
 	surface.SetDrawColor(COLOR_WHITE)
-	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, radius - LINE_THICKNESS, CROSSHAIR_METER_ARC_LENGTH, ang, 720))
+	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, radius - self.line_thickness.current, CROSSHAIR_METER_ARC_LENGTH, ang, 720))
 
 	render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_NOTEQUAL)
 	render.SetStencilPassOperation(STENCILOPERATION_KEEP)
@@ -218,6 +219,7 @@ end
 
 function CrosshairMeter:Finish()
 	CrosshairMeter.super.Finish(self)
+	self.line_thickness:Finish()
 	self.debounced_value:Finish()
 	self.percent:Finish()
 end

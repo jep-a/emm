@@ -80,7 +80,7 @@ function HUDService.InitMeters()
 
 	HUDService.speed_meter.value_text_container:Add(Element.New {
 		fit = true,
-		crop_y = 0.2,
+		crop_y = 0.18,
 		text = "0",
 		font = "HUDMeterValueSmall"
 	})
