@@ -42,7 +42,7 @@ function AnimatableValue:Init(value, props)
 	local debounce = props.debounce
 
 	if props.callback then
-		debounce = debounce or 1/60
+		debounce = debounce or 0.1
 	end
 
 	if debounce then
@@ -52,7 +52,7 @@ function AnimatableValue:Init(value, props)
 		if isnumber(debounce) then
 			self.debounce_time = debounce
 		else
-			self.debounce_time = 1/60
+			self.debounce_time = 0.1
 		end
 
 		self.debounce = value
