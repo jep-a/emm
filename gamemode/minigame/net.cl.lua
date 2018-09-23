@@ -1,7 +1,7 @@
 function MinigameNetService.ReceiveLobby(lobby_id, proto, host)
 	MinigameService.CreateLobby {
 		id = lobby_id,
-		prototype = proto,
+		prototype = table.Copy(proto),
 		host = host,
 		players = {host}
 	}

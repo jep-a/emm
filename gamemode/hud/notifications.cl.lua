@@ -35,8 +35,16 @@ function NotificationService.PushCountdown(time, text, key)
 	return HUDService.quadrant_b:Add(NotificationContainer.New(CountdownNotification.New(time, text), time - CurTime(), key))
 end
 
-function NotificationService.PushMetaText(text, key)
-	return HUDService.quadrant_a:Add(NotificationContainer.New(TextBar.New(text), 0, key))
+function NotificationService.PushMetaText(text, key, i)
+	local notification = NotificationContainer.New(TextBar.New(text), 0, key)
+
+	if i then
+		HUDService.quadrant_a:Add(i, notification)
+	else
+		HUDService.quadrant_a:Add(notification)
+	end
+
+	return notification
 end
 
 local function FinishNotificationContainer(element)

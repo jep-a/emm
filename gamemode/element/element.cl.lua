@@ -41,7 +41,7 @@ function Element:Add(i_or_element, element)
 
 	local layout = element:GetAttribute "layout"
 
-	if i then
+	if i and #self.children >= (i - 1) then
 		table.insert(self.children, i, element)
 
 		if layout then

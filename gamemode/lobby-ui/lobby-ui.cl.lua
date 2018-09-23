@@ -36,7 +36,6 @@ function LobbyUIService.Init()
 	LobbyUIService.prototype_list = LobbyUIService.new_lobby_section:Add(LobbyUIService.CreatePrototypeList())
 	LobbyUIService.lobby_section = LobbyUIService.container:Add(LobbyUIService.CreateLobbySection())
 	LobbyUIService.lobby_list = LobbyUIService.lobby_section:Add(LobbyUIService.CreateLobbyList())
-	-- LobbyUIService.lobby_card_section = LobbyUIService.container:Add(LobbyUIService.CreateLobbyCardSection())
 
 	for _, proto in pairs(MinigameService.prototypes) do
 		LobbyUIService.prototype_list:Add(LobbyUIService.CreatePrototypeBar(proto))
@@ -159,10 +158,8 @@ end
 hook.Add("LobbyHostChange", "LobbyUIService.SetLobbyHost", LobbyUIService.SetLobbyHost)
 
 function LobbyUIService.RefreshSettings(lobby, settings)
-	if lobby == LobbyUIService.selected_lobby then
-		if IsLocalPlayer(lobby.host) then
-			LobbyUIService.lobby_card_container.settings:RefreshOriginalValues(settings)
-		end
+	if lobby == LobbyUIService.selected_lobby and IsLocalPlayer(lobby.host) then
+		LobbyUIService.lobby_card_container.settings:RefreshOriginalValues(settings)
 	end
 end
 hook.Add("LobbySettingsChange", "LobbyUIService.RefreshSettings", LobbyUIService.RefreshSettings)

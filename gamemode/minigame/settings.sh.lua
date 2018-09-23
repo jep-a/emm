@@ -49,6 +49,16 @@ function MinigameSettingsService.SortChanges(original_tab, changes_tab, new_tab)
 	end
 end
 
+function MinigameSettingsService.AdjustedSettings(lobby)
+	local settings = {}
+
+	for k, _ in pairs(lobby.changed_settings) do
+		settings[k] = MinigameSettingsService.Setting(lobby, k)
+	end
+
+	return settings
+end
+
 function MinigameSettingsService.Setting(lobby, k, use_nil)
 	local v
 

@@ -80,7 +80,7 @@ function MinigameLobby:RemovePlayer(ply, net, force)
 		end
 
 		if has_plys and self.host == ply then
-			self:SetHost(self.players[#self.players])
+			self:SetHost(self.players[1])
 		end
 
 		ply.leaving_lobby = nil

@@ -17,7 +17,7 @@ function MinigameNetService.SendLobbies(ply)
 			net.WriteEntity(ply)
 		end
 
-		MinigameSettingsService.WriteSettings(lobby)
+		net.WriteTable(MinigameSettingsService.AdjustedSettings(lobby))
 	end
 
 	net.Send(ply)
