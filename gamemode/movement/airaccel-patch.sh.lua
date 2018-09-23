@@ -1,9 +1,6 @@
-local AiraccelPatch = {}
+AiraccelPatchService = AiraccelPatchService or {}
 
-
--- # Air Acceleration Patch
-
-function AiraccelPatch.SetMoveType(ply, move)
+function AiraccelPatchService.SetMoveType(ply, move)
 	local z_vel = move:GetVelocity().z
 
 	if
@@ -14,9 +11,10 @@ function AiraccelPatch.SetMoveType(ply, move)
 		ply:SetMoveType(MOVETYPE_LADDER)
 	end
 end
-hook.Add("SetupMove", "AiraccelPatch.SetMoveType",AiraccelPatch.SetMoveType)
+hook.Add("SetupMove", "AiraccelPatchService.SetMoveType",AiraccelPatchService.SetMoveType)
 
-function AiraccelPatch.RemoveLadderSound(sound)
+
+function AiraccelPatchService.RemoveLadderSound(sound)
 	if IsValid(sound.Entity) then
 		local z_vel = sound.Entity:GetVelocity().z
 
@@ -29,4 +27,4 @@ function AiraccelPatch.RemoveLadderSound(sound)
 		end
 	end
 end
-hook.Add("EntityEmitSound", "AiraccelPatch.RemoveLadderSound", AiraccelPatch.RemoveLadderSound)
+hook.Add("EntityEmitSound", "AiraccelPatchService.RemoveLadderSound", AiraccelPatchService.RemoveLadderSound)

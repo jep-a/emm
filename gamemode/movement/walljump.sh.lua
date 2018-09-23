@@ -78,11 +78,6 @@ function WalljumpService.Walljump(ply, move, dir)
 	if trace.Hit and (ply.can_walljump_sky or not trace.HitSky) then
 		did_walljump = true
 
-		if ply:OnGround() then
-			ply:SetGroundEntity(NULL)
-			move:SetOrigin(move:GetOrigin() + Vector(0, 0, 1))
-		end
-
 		move:SetVelocity(move:GetVelocity() + WalljumpService.Velocity(ply, dir))
 	
 		if SERVER then
@@ -111,9 +106,11 @@ function WalljumpService.SetupWalljump(ply, move)
 		WalljumpService.CooledDown(ply)
 	then
 		local did_walljump
+
 		local fwd = move:GetAngles():Forward()
 		fwd.z = 0
 		fwd:Normalize()
+
 		local right = Vector(fwd.y, -fwd.x)
 
 		if move:KeyDown(IN_MOVERIGHT) then
