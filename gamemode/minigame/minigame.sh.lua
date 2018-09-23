@@ -76,10 +76,3 @@ function MinigameService.LoadPrototypes()
 end
 hook.Add("Initialize", "MinigameService.LoadPrototypes", MinigameService.LoadPrototypes)
 hook.Add("OnReloaded", "MinigameService.ReloadPrototypes", MinigameService.LoadPrototypes)
-
-function MinigameService.ReloadLobbies()
-	for _, lobby in pairs(MinigameService.lobbies) do
-		lobby.prototype = MinigameService.prototypes[lobby.prototype.key]
-	end
-end
-hook.Add("OnReloaded", "MinigameService.ReloadLobbies", MinigameService.ReloadLobbies)

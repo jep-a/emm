@@ -47,7 +47,6 @@ function HUDService.InitContainers()
 	})
 
 	HUDService.crosshair_container = HUDService.container:Add(HUDService.CreateCrosshairContainer())
-	HUDService.crosshair_lines_container = HUDService.crosshair_container:Add(HUDService.CreateCrosshairLinesContainer())
 end
 
 function HUDService.InitMeters()
@@ -99,50 +98,26 @@ function HUDService.InitMeters()
 		value_func = Airaccel
 	})
 
-	HUDService.CreateCrosshairMeter {
+	HUDService.crosshair_container:Add(CrosshairMeter.New {
 		angle = CROSSHAIR_METER_ARC_ANGLE,
 		value_func = Health
-	}
+	})
 
-	HUDService.CreateCrosshairMeter {
+	HUDService.crosshair_container:Add(CrosshairMeter.New {
 		show_value = true,
 		hide_value_on_empty = true,
 		value_func = Speed,
 		value_divider = HUD_SPEED_METER_DIVIDER
-	}
+	})
 
-	HUDService.CreateCrosshairMeter {
+	HUDService.crosshair_container:Add(CrosshairMeter.New {
 		angle = -CROSSHAIR_METER_ARC_ANGLE,
 		value_func = Airaccel
-	}
+	})
 end
 
-function HUDService.InitCrosshair()
-	HUDService.CreateCrosshairLine {
-		origin_justification_x = JUSTIFY_CENTER,
-		position_justification_x = JUSTIFY_CENTER
-	}
-
-	HUDService.CreateCrosshairLine {
-		orientation = DIRECTION_ROW,
-		origin_justification_x = JUSTIFY_END,
-		origin_justification_y = JUSTIFY_CENTER,
-		position_justification_x = JUSTIFY_END,
-		position_justification_y = JUSTIFY_CENTER
-	}
-
-	HUDService.CreateCrosshairLine {
-		origin_justification_x = JUSTIFY_CENTER,
-		origin_justification_y = JUSTIFY_END,
-		position_justification_x = JUSTIFY_CENTER,
-		position_justification_y = JUSTIFY_END,
-	}
-
-	HUDService.CreateCrosshairLine {
-		orientation = DIRECTION_ROW,
-		origin_justification_y = JUSTIFY_CENTER,
-		position_justification_y = JUSTIFY_CENTER
-	}
+function HUDService.InitCrosshairLines()
+	HUDService.crosshair_lines = HUDService.crosshair_container:Add(CrosshairLines.New())
 end
 
 function HUDService.Init()
@@ -155,7 +130,7 @@ function HUDService.Init()
 
 	HUDService.InitContainers()
 	HUDService.InitMeters()
-	HUDService.InitCrosshair()
+	HUDService.InitCrosshairLines()
 
 	hook.Run("InitHUDElements")
 end
@@ -178,24 +153,48 @@ end
 hook.Add("HUDShouldDraw", "HUDService.ShouldDraw", HUDService.ShouldDraw)
 
 function HUDService.Show()
-	HUDService.crosshair_container:AnimateAttribute("alpha", 255)
+	HUDService.crosshair_container:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
 	HUDService.quadrant_g:AnimateAttribute("alpha", 255)
 	HUDService.quadrant_h:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
 	HUDService.quadrant_i:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION * 2})
 end
-hook.Add("LocalPlayerSpawn", "HUDService.Show", HUDService.Show)
+
+hook.Add("LocalPlayerSpawn", "HUDService.Show", function ()
+	if not LobbyUIService.open then
+		HUDService.Show()
+	end
+end)
+
+hook.Add("OnLobbyUIClose", "HUDService.Show", HUDService.Show)
 
 function HUDService.Hide()
-	HUDService.crosshair_container:AnimateAttribute("alpha", 0)
+	HUDService.crosshair_container:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION})
 	HUDService.quadrant_g:AnimateAttribute("alpha", 0)
 	HUDService.quadrant_h:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION})
 	HUDService.quadrant_i:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION * 2})
 end
+
 hook.Add("PrePlayerDeath", "HUDService.Hide", function (ply)
 	if IsLocalPlayer(ply) then
 		HUDService.Hide()
 	end
 end)
+
+hook.Add("OnLobbyUIOpen", "HUDService.Hide", HUDService.Hide)
+
+function HUDService.ShowNotifications()
+	HUDService.quadrant_a:AnimateAttribute("alpha", 255)
+	HUDService.quadrant_b:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
+	HUDService.quadrant_c:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION * 2})
+end
+hook.Add("OnLobbyUIClose", "HUDService.ShowNotifications", HUDService.ShowNotifications)
+
+function HUDService.HideNotifications()
+	HUDService.quadrant_a:AnimateAttribute("alpha", 0)
+	HUDService.quadrant_b:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION})
+	HUDService.quadrant_c:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION * 2})
+end
+hook.Add("OnLobbyUIOpen", "HUDService.HideNotifications", HUDService.HideNotifications)
 
 function HUDService.RenderHooks()
 	hook.Run "DrawIndicators"

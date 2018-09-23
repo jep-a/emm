@@ -13,128 +13,58 @@ Element = Element or Class.New()
 function Element:Init(props)
 	self.children = {}
 	self.layout_children = {}
-
+	
 	self.panel = vgui.Create "ElementPanel"
 	self.panel.element = self
-
-	self.static_attributes = {
-		paint = true,
-		layout = true,
-		origin_position = false,
-		origin_justification_x = JUSTIFY_START,
-		origin_justification_y = JUSTIFY_START,
-		position_justification_x = JUSTIFY_START,
-		position_justification_y = JUSTIFY_START,
-		self_adjacent_justification = JUSTIFY_INHERIT,
-		layout_justification_x = JUSTIFY_START,
-		layout_justification_y = JUSTIFY_START,
-		layout_direction = DIRECTION_ROW,
-		wrap = true,
-		fit_x = false,
-		fit_y = false,
-		inherit_color = true,
-		fill_color = false
-	}
-
-	local anim_attr = {
-		"x",
-		"y",
-		"width",
-		"height",
-		"padding_left",
-		"padding_top",
-		"padding_right",
-		"padding_bottom",
-		"crop_left",
-		"crop_top",
-		"crop_right",
-		"crop_bottom",
-		"child_margin",
-
-		color = COLOR_WHITE,
-		background_color = COLOR_BLACK_CLEAR,
-		alpha = 255
-	}
-
-	self.attributes = {}
-
-	local opt_attr = {
-		"duration",
-		"overlay",
-		"width_percent",
-		"height_percent",
-		"angle",
-		"text_color",
-		"border",
-		"border_color"
-	}
-
-	self.optional_attributes = {}
-
-	for _, k in pairs(opt_attr) do
-		self.optional_attributes[k] = true
-	end
-
-	local layout_invalidators = {
-		"x",
-		"y",
-		"width",
-		"height",
-		"width_percent",
-		"height_percent",
-		"padding_left",
-		"padding_top",
-		"padding_right",
-		"padding_bottom",
-		"crop_left",
-		"crop_top",
-		"crop_right",
-		"crop_bottom",
-		"child_margin"
-	}
-
-	self.layout_invalidators = {}
-
-	for _, k in pairs(layout_invalidators) do
-		self.layout_invalidators[k] = true
-	end
-
-	for k, v in pairs(anim_attr) do
-		local props
-
-		if self.layout_invalidators[v] then
-			props = {
-				debounce = 1/60,
 	
-				callback = function ()
-					if IsValid(self.panel) then
-						self.panel:InvalidateLayout(true)
-					end
-				end
-			}
-		end
-
-		if isnumber(k) then
-			self.attributes[v] = AnimatableValue.New(0, props)
-		else
-			self.attributes[k] = AnimatableValue.New(v, props)
-		end
-	end
-
+	self:InitStates()
+	self:InitAttributes()
+	
 	if props then
 		self:SetAttributes(props)
 	end
 end
 
-function Element:Add(element)
+function Element:Add(i_or_element, element)
+	local i
+
+	if isnumber(i_or_element) then
+		i = i_or_element
+	else
+		element = i_or_element
+	end
+
 	element.parent = self
+	element.last = true
 
 	self.panel:Add(element.panel)
 
-	table.insert(self.children, element)
+	local layout = element:GetAttribute "layout"
 
-	if element:GetAttribute "layout" then
-		table.insert(self.layout_children, element)
+	if i and #self.children >= (i - 1) then
+		table.insert(self.children, i, element)
+
+		if layout then
+			table.insert(self.layout_children, i, element)
+		end
+	else
+		i = table.insert(self.children, element)
+
+		if layout then
+			table.insert(self.layout_children, element)
+		end
+	end
+
+	if i > 1 then
+		self.children[i - 1].last = nil
+	end
+
+	if element:GetAttribute "inherit_cursor" then
+		local cursor = self:GetAttribute "cursor"
+
+		if cursor then
+			element:SetAttribute("cursor", cursor)
+		end
 	end
 
 	return element
@@ -153,8 +83,16 @@ function Element:Clear()
 end
 
 function Element:Finish()
+	if self.dragging then
+		self:StopDragging()
+	end
+
 	if self.parent then
-		table.RemoveByValue(self.parent.children, self)
+		local i = table.RemoveByValue(self.parent.children, self)
+
+		if i > 1 and self.last then
+			self.parent.children[i - 1].last = true
+		end
 
 		if self:GetAttribute "layout" then
 			table.RemoveByValue(self.parent.layout_children, self)
@@ -174,42 +112,118 @@ function Element:Finish()
 end
 
 function Element:DetectEnd()
-	local duration = self:GetAttribute "duration"
+	local static_attr = self.static_attributes
+	local duration = static_attr.duration
 
-	if duration and CurTime() > (self:GetAttribute "start_time" + duration) then
-		self:SetAttribute("duration", nil)
+	if duration and CurTime() > (static_attr.start_time + duration) then
+		static_attr.duration = nil
 		self:Finish()
 	end
-end
-
-function Element:Layout()
-	self.laying_out = true
-
-	if self.parent and self:GetAttribute "origin_position" then
-		self:PositionFromOrigin()
-	end
-
-	if #self.layout_children > 0 then
-		self:StackChildren()
-	else
-		self:LayoutText()
-	end
-
-	self:GenerateSize()
-
-	self.panel:SetSize(self:GetFinalWidth(), self:GetFinalHeight())
-	self.panel:SetPos(math.Round(self:GetAttribute "x"), math.Round(self:GetAttribute "y"))
-
-	if self:GetAttribute "layout" and self.parent then
-		self.parent.panel:InvalidateLayout(true)
-	end
-
-	self.laying_out = false
 end
 
 function Element:Think()
 	self:DetectEnd()
 
-	self.panel:SetAlpha(math.Round(self:GetAttribute "alpha"))
-	self.panel.text:SetTextColor(self:GetAttribute "text_color" or self:GetAttribute "color")
+	local attr = self.attributes
+
+	self.panel:SetAlpha(math.Round(attr.alpha.current))
+	self.panel.text:SetTextColor(attr.text_color and attr.text_color.current or self:GetColor())
+end
+
+function Element:OnMousePressed(mouse)
+	if self.states.press then
+		local old_state = self.current_state
+
+		self:SetState "press"
+		self:AnimateState(old_state, ANIMATION_DURATION * 4)
+	end
+end
+
+function Element:OnMouseReleased(mouse)
+	-- 
+end
+
+function Element:OnMouseEntered()
+	if self.states.hover then
+		self:AnimateState "hover"
+	end
+end
+
+function Element:OnMouseExited()
+	if self.states.hover then
+		self:RevertState()
+	end
+end
+
+local drag_distance = 8
+
+local holding_element
+local holding_mouse
+local holding_x
+local holding_y
+local dragging
+
+hook.Add("Think", "Element.DragThink", function ()
+	if holding_element then
+		local mouse_down = input.IsMouseDown(holding_mouse)
+
+		if mouse_down and not holding_element.dragging then
+			local curr_x, curr_y = input.GetCursorPos()
+
+			if math.abs(curr_x - holding_x) > drag_distance or math.abs(curr_y - holding_y) > drag_distance then
+				holding_element:StartDragging()
+			end
+		end
+	
+		if holding_element.dragging then
+			holding_element:DragThink()
+			
+			if not mouse_down then
+				holding_element:StopDragging()
+			end
+		end
+	end
+end)
+
+hook.Add("VGUIMousePressed", "Element.StartDragging", function (panel, mouse)
+	if panel.element then
+		holding_element = panel.element
+		holding_mouse = mouse
+		holding_x, holding_y = input.GetCursorPos()
+	end
+end)
+
+function Element:StartDragging()
+	self.dragging = true
+end
+
+function Element:StopDragging()
+	if self == holding_element then
+		holding_element = nil
+	end
+
+	self.dragging = false
+end
+
+function Element:DragThink()
+	--
+end
+
+function Element:HasParent(element)
+	local has_parent
+	local curr_element = self
+
+	while curr_element.parent do
+		if curr_element.parent == element then
+			has_parent = true
+
+			break
+		else
+			has_parent = false
+		end
+
+		curr_element = curr_element.parent
+	end
+
+	return has_parent
 end

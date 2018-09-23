@@ -79,7 +79,7 @@ Minigame hooks work like Garry's Mod hooks. Additionally you can add hooks that 
 - `PostPlayerDeath(player)` (client-side only)
 
 ### Methods
-- `SetModifiableVars(table modifiable_variables)` sets what properties can be edited by lobby hosts.
+- `SetAdjustableSettings(table modifiable_variables)` sets what properties can be edited by lobby hosts.
 - `AddPlayerClass(table player_class)`
 - `AddHook(string hook_name, string identifier, function)/RemoveHook`
 - `AddStateHook(string state_name, string hook_name, string identifier, function)/RemoveStateHook`

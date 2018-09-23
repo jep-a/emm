@@ -58,7 +58,7 @@ function JSUI.SanitizedPrototypes()
 			sanitized_proto.key = string.lower(proto.key)
 			sanitized_proto.name = proto.name
 			sanitized_proto.color = string.format([[#%02x%02x%02x]], proto.color.r, proto.color.g, proto.color.b)
-			sanitized_proto.modifiables = proto.modifiable_vars
+			sanitized_proto.modifiables = proto.adjustable_settings
 
 			sanitized_proto.playerClasses = {}
 
@@ -234,10 +234,10 @@ function JSUI.Close()
 end
 -- hook.Add("OnSpawnMenuOpen", JSUI.Close)
 
-function GM:OnSpawnMenuOpen()
-	JSUI.Open()
-end
+-- function GM:OnSpawnMenuOpen()
+-- 	JSUI.Open()
+-- end
 
-function GM:OnSpawnMenuClose()
-	JSUI.Close()
-end
+-- function GM:OnSpawnMenuClose()
+-- 	JSUI.Close()
+-- end

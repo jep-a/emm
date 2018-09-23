@@ -36,6 +36,10 @@ NetService.type_readers = {
 
 	player_index = function ()
 		return net.ReadUInt(16)
+	end,
+
+	table = function ()
+		return net.ReadTable()
 	end
 }
 
@@ -61,6 +65,10 @@ NetService.type_writers = {
 
 	player_index = function (ply)
 		net.WriteUInt(ply and ply:EntIndex() or 0, 16)
+	end,
+
+	table = function (tab)
+		net.WriteTable(tab)
 	end
 }
 
