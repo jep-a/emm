@@ -1,15 +1,15 @@
-function Element:PaintTexture(material, props)
-	props = props or {}
+function Element:PaintTexture(mat, x, y, w, h, ang, color)
+	local attr = self.attributes
 
-	local x = props.x or self:GetAttribute "padding_left" - self:GetXCropOffset()
-	local y = props.y or self:GetAttribute "padding_top" - self:GetYCropOffset()
-	local w = props.width or self:GetAttribute "width"
-	local h = props.height or self:GetAttribute "height"
-	local ang = props.angle or self:GetAttribute "angle"
-	local color = props.color or self:GetAttribute "color"
+	x = x + attr.padding_left.current - self:GetXCropOffset()
+	y = y + attr.padding_top.current - self:GetYCropOffset()
+	w = w or attr.width.current
+	h = h or attr.height.current
+	ang = ang or (attr.angle and attr.angle.current) or 0
+	color = color or self:GetColor()
 
 	surface.SetDrawColor(color)
-	surface.SetMaterial(material)
+	surface.SetMaterial(mat)
 
 	if ang then
 		surface.DrawTexturedRectRotated(x + (w/2), y + (h/2), w, h, ang)
@@ -18,47 +18,65 @@ function Element:PaintTexture(material, props)
 	end
 end
 
-function Element:PaintRect(props)
-	props = props or {}
+function Element:PaintRect(x, y, w, h, color)
+	local attr = self.attributes
 
-	local x = props.x or 0
-	local y = props.y or 0
-	local w = props.width or self:GetAttribute "width"
-	local h = props.height or self:GetAttribute "height"
-	local color = props.color or self:GetAttribute "color"
+	x = x or 0
+	y = y or 0
+	w = w or attr.width.current
+	h = h or attr.height.current
+	color = color or self:GetColor()
 
 	surface.SetDrawColor(color)
 	surface.DrawRect(x, y, w, h)
 end
 
-function Element:PaintBorder(props)
-	props = props or {}
+function Element:PaintBorder(w, h, color, thickness)
+	local attr = self.attributes
 
-	local w = props.width or self:GetAttribute "width"
-	local h = props.height or self:GetAttribute "height"
-	w = w - ((w * self:GetAttribute "crop_left") + (w * self:GetAttribute "crop_right"))
-	h = h - ((h * self:GetAttribute "crop_top") + (h * self:GetAttribute "crop_bottom"))
-	local color = props.color or self:GetAttribute "border_color" or self:GetAttribute "color"
-	local thickness = props.thickness or self:GetAttribute "border"
+	w = w or attr.width.current
+	h = h or attr.height.current
+	color = color or (attr.border_color and attr.border_color.current) or self:GetColor()
+	thickness = thickness or attr.border.current
 
-	surface.SetDrawColor(color)
-	surface.DrawRect(0, 0, w, thickness)
-	surface.DrawRect(w - thickness, 0, thickness, h)
-	surface.DrawRect(0, h - thickness, w, thickness)
-	surface.DrawRect(0, 0, thickness, h)
+	local cropped_w = w - ((w * attr.crop_left.current) + (w * attr.crop_right.current))
+	local cropped_h = h - ((h * attr.crop_top.current) + (h * attr.crop_bottom.current))
+	local color_with_alpha = ColorAlpha(color, CombineAlphas(color.a, attr.border_alpha.current) * 255)
+	local double_thickness = (thickness * 2)
+
+	surface.SetDrawColor(color_with_alpha)
+	surface.DrawRect(0, 0, cropped_w, thickness)
+	surface.DrawRect(cropped_w - thickness, thickness, thickness, cropped_h - double_thickness)
+	surface.DrawRect(0, cropped_h - thickness, cropped_w, thickness)
+	surface.DrawRect(0, thickness, thickness, cropped_h - double_thickness)
 end
 
 function Element:Paint()
-	if self:GetAttribute "paint" then
-		self:PaintRect {color = not self:GetAttribute "fill_color" and self:GetAttribute "background_color"}
+	local static_attr = self.static_attributes
 
-		local mat = self:GetAttribute "material"
+	if static_attr.paint then
+		local attr = self.attributes
+		local x = 0
+		local y = 0
+		local w = attr.width.current
+		local h = attr.height.current
+		local color = self:GetColor()
+
+		self:PaintRect(x, y, w, h, not static_attr.fill_color and attr.background_color.current or color)
+
+		local mat = static_attr.material
 
 		if mat then
-			self:PaintTexture(mat)
+			self:PaintTexture(mat, x, y, w, h, attr.angle and attr.angle.current or 0, color)
 		end
+	end
+end
 
-		if self:GetAttribute "border" then
+function Element:PaintOver()
+	local static_attr = self.static_attributes
+
+	if static_attr.paint then
+		if self.attributes.border then
 			self:PaintBorder()
 		end
 	end

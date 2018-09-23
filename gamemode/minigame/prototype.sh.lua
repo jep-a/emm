@@ -18,23 +18,43 @@ function MinigamePrototype:Init()
 	self.default_state = "Waiting"
 	self.required_players = 2
 
-	self:SetModifiableVars {
-		["states.Playing.time"] = {
-			prereq = {
-				label = "unlimited round time",
-				opposite = true,
-				override = 0
+	self:SetAdjustableSettings {
+		{
+			key = "states.Playing.time",
+
+			prerequisite = {
+				label = "Unlimited round time",
+				opposite_value = true,
+				override_value = 0
 			},
-			label = "round time",
-			type = "time",
-			default = 500,
-			min = 5
+
+			label = "Round time",
+			type = "time"
 		},
-		["player_classes.*"] = {
-			mods = {
-				can_walljump = {label = "can walljump"},
-				can_wallslide = {label = "can wallslide"},
-				can_airaccel = {label = "can air accelerate"}
+
+		{
+			key = "player_classes.*",
+
+			settings = {
+				{
+					key = "can_walljump",
+					label = "Can walljump"
+				},
+
+				{
+					key = "can_wallslide",
+					label = "Can wallslide"
+				},
+
+				{
+					key = "can_airaccel",
+					label = "Can air-accelerate"
+				},
+
+				{
+					key = "can_auto_bunnyhop",
+					label = "Can auto bunny-hop"
+				}
 			}
 		}
 	}
@@ -48,9 +68,17 @@ function MinigamePrototype:Init()
 end
 
 function MinigamePrototype:AddPlayerClass(ply_class)
+	ply_class = table.Merge({
+		can_walljump = true,
+		can_wallslide = true,
+		can_airaccel = true,
+		can_auto_bunnyhop = false
+	}, ply_class)
+
 	ply_class.id = table.Count(self.player_classes) + 1
 	ply_class.key = ply_class.key or ply_class.name
 	ply_class.color = ply_class.color or self.color
+
 	self.player_classes[ply_class.key] = ply_class
 end
 

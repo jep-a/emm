@@ -1,7 +1,10 @@
 IndicatorService = IndicatorService or {}
 
+local indicator_material = Material("emm2/shapes/arrow.png", "noclamp smooth")
+local circle_material = Material("emm2/shapes/circle.png", "noclamp smooth")
 
--- # Elements
+
+-- # Init
 
 function IndicatorService.CreateContainer()
 	local element = Element.New {
@@ -13,124 +16,6 @@ function IndicatorService.CreateContainer()
 
 	return element
 end
-
-Indicator = Indicator or Class.New(Element)
-
-local indicator_material = Material("emm2/shapes/arrow.png", "noclamp smooth")
-local circle_material = Material("emm2/shapes/circle.png", "noclamp smooth")
-
-function Indicator:Init(ent_or_vec)
-	Indicator.super.Init(self, {
-		layout = false,
-		width_percent = 1,
-		height_percent = 1,
-		inherit_color = false
-	})
-
-	self.x = 0
-	self.y = 0
-	self.distance = 0
-	self.world_alpha = AnimatableValue.New()
-
-	self.animatable_color = AnimatableValue.New(COLOR_WHITE, {
-		smooth = true,
-		generate = function ()
-			local color
-
-			if IsValid(self.entity) then
-				color = self.entity.color
-			else
-				color = COLOR_WHITE
-			end
-
-			return color
-		end
-	})
-
-	self:SetAttribute("color", function ()
-		return self.animatable_color.smooth
-	end)
-
-	self.off_screen = AnimatableValue.New(false, {
-		generate = function ()
-			return 0 > self.x or self.x > ScrW() or 0 > self.y or self.y > ScrH()
-		end,
-
-		callback = function (anim_v)
-			if anim_v.current then
-				self.world_alpha:AnimateTo(0)
-				self.peripheral:AnimateAttribute("alpha", 255)
-			else
-				self.world_alpha:AnimateTo(255)
-				self.peripheral:AnimateAttribute("alpha", 0)
-			end
-		end
-	})
-
-	if isentity(ent_or_vec) then
-		self.entity = ent_or_vec
-	elseif isvector(ent_or_vec) then
-		self.position = ent_or_vec
-	end
-
-	self.peripheral = self:Add(Element.New {
-		layout = false,
-		width = INDICATOR_PERIPHERAL_SIZE,
-		height = INDICATOR_PERIPHERAL_SIZE,
-		material = indicator_material,
-		alpha = 0
-	})
-end
-
-function Indicator:Think()
-	Indicator.super.Think(self)
-
-	if self.off_screen.current then
-		local scr_w = ScrW()
-		local scr_h = ScrH()
-		local half_scr_w = scr_w/2
-		local half_scr_h = scr_h/2
-		local periph_radius = half_scr_h - HUD_PADDING_Y
-
-		local x = self.x
-		local y = self.y
-
-		local rad_ang = math.atan2(y - half_scr_h, x - half_scr_w)
-		local periph_x = (math.cos(rad_ang) * periph_radius) + half_scr_w
-		local periph_y = (math.sin(rad_ang) * periph_radius) + half_scr_h
-
-		self.peripheral:SetAttribute("x", periph_x - (self.peripheral:GetAttribute "width"/2))
-		self.peripheral:SetAttribute("y", periph_y - (self.peripheral:GetAttribute "height"/2))
-		self.peripheral:SetAttribute("angle", -math.deg(rad_ang) + 90)
-	end
-end
-
-function Indicator:AnimateFinish()
-	self:AnimateAttribute("alpha", 0, {
-		duration = 1,
-		callback = function ()
-			local ent = self.entity
-
-			if IsValid(ent) then
-				if self == ent.indicator then
-					ent.indicator = nil
-				end
-			end
-
-			Indicator.super.Finish(self)
-			self.world_alpha:Finish()
-			self.animatable_color:Finish()
-			self.off_screen:Finish()
-		end
-	})
-end
-
-function Indicator:Finish()
-	self:AnimateFinish()
-end
-
-
--- # Init
 
 function IndicatorService.Sort(ply, eye_pos)
 	local eye_pos = LocalPlayer():EyePos()
@@ -160,7 +45,7 @@ hook.Add("Think", "IndicatorService.Sort", IndicatorService.Sort)
 function IndicatorService.DrawWorldPositions(ply, eye_pos)
 	local eye_pos = LocalPlayer():EyePos()
 	local indicators = IndicatorService.container.children
-	local container_alpha = IndicatorService.container:GetAttribute "alpha"
+	local container_alpha = IndicatorService.container.attributes.alpha.current
 
 	for i = 1, #indicators do
 		local indicator = indicators[i]
@@ -186,17 +71,8 @@ function IndicatorService.DrawWorldPositions(ply, eye_pos)
 			indicator.x = x
 			indicator.y = y
 		
-			surface.SetAlphaMultiplier(CombineAlphas(container_alpha, indicator:GetAttribute "alpha", indicator.world_alpha.current))
-
-			Element.PaintTexture(nil, indicator_material, {
-				x = x,
-				y = y,
-				angle = 0,
-				width = size,
-				height = size,
-				color = indicator:GetAttribute "color"
-			})
-
+			surface.SetAlphaMultiplier(CombineAlphas(container_alpha, indicator.attributes.alpha.current, indicator.world_alpha.current))
+			Element.PaintTexture(indicator, indicator_material, x, y, size, size, 0, indicator:GetColor())
 			surface.SetAlphaMultiplier(1)
 		end
 	end
@@ -218,7 +94,7 @@ function IndicatorService.RenderCoasters()
 				mask = MASK_NPCWORLDSTATIC
 			}
 
-			local alpha = CombineAlphas(indicator:GetAttribute "alpha", Lerp(trace.Fraction * 8, 255, 50))
+			local alpha = CombineAlphas(indicator.attributes.alpha.current, Lerp(trace.Fraction * 8, 255, 50))
 
 			if alpha > 0 then
 				cam.Start3D2D(trace.HitPos + (trace.HitNormal * Vector(0.5, 0.5, 0.5)), trace.HitNormal:Angle() + Angle(90, 0, 0), 0.25)
@@ -292,12 +168,20 @@ hook.Add("OnReloaded", "IndicatorService.Reload", IndicatorService.Reload)
 function IndicatorService.Show()
 	IndicatorService.container:AnimateAttribute("alpha", 255)
 end
-hook.Add("LocalPlayerSpawn", "IndicatorService.Show", IndicatorService.Show)
+
+hook.Add("LocalPlayerSpawn", "IndicatorService.Show", function ()
+	if not LobbyUIService.open then
+		IndicatorService.Show()
+	end
+end)
+
+hook.Add("OnLobbyUIClose", "IndicatorService.Show", IndicatorService.Show)
 
 function IndicatorService.Hide()
 	IndicatorService.container:AnimateAttribute("alpha", 0)
 end
 hook.Add("LocalPlayerDeath", "IndicatorService.Hide", IndicatorService.Hide)
+hook.Add("OnLobbyUIOpen", "IndicatorService.Hide", IndicatorService.Hide)
 
 function IndicatorService.Draw()
 	IndicatorService.container.panel:PaintManual()

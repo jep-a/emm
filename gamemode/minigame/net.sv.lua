@@ -16,6 +16,8 @@ function MinigameNetService.SendLobbies(ply)
 		for _, ply in pairs(lobby.players) do
 			net.WriteEntity(ply)
 		end
+
+		net.WriteTable(MinigameSettingsService.AdjustedSettings(lobby))
 	end
 
 	net.Send(ply)

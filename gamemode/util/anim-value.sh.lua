@@ -1,15 +1,26 @@
 -- # Util
 
-local DefaultEase = CubicBezier(0, 0.5, 0.35, 1)
+local DefaultEase = CubicBezier(0, 0.66, 0.33, 1)
 
 local function FrameMultiplier()
-	return FrameTime() * 10
+	return RealFrameTime() * 10
 end
 
 
 -- # Class
 
 AnimatableValue = AnimatableValue or Class.New()
+
+function AnimatableValue.New(...)
+	local instance = Class.Instance(AnimatableValue, ...)
+
+	if instance.generate or instance.checking_changes or instance.smoothing then
+		table.insert(AnimatableValue.static.instances, instance)
+		instance.thinker = true
+	end
+
+	return instance
+end
 
 function AnimatableValue:Init(value, props)
 	value = value ~= nil and value or 0
@@ -48,6 +59,8 @@ function AnimatableValue:Init(value, props)
 		self.last_change = value
 		self.last_change_time = CurTime()
 	end
+
+	self.animate_callback = props.animate_callback
 end
 
 function AnimatableValue:GetAnimationEndTime()
@@ -61,6 +74,12 @@ function AnimatableValue:GetAnimationEndTime()
 end
 
 function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay, finish, callback)
+	local instances = AnimatableValue.static.instances
+
+	if not self.thinker and not table.HasValue(instances, self) then
+		table.insert(instances, self)
+	end
+
 	local duration
 
 	if istable(props_or_duration) then
@@ -101,7 +120,7 @@ function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay, finish
 	if stack then
 		table.insert(self.animations, anim)
 	else
-		self.animations[1] = anim
+		self.animations = {anim}
 	end
 
 	return self
@@ -118,7 +137,20 @@ function AnimatableValue:Animate()
 	if first_anim then
 		local time = math.TimeFraction(first_anim.start_time, first_anim.end_time, CurTime())
 		local eased_time = first_anim.ease(time)
-		local value = ((1 - eased_time) * first_anim.start_value) + (eased_time * first_anim.end_value)
+		local inverted_eased_time = 1 - eased_time
+
+		local value
+
+		if IsColor(self.current) then
+			value = Color(
+				(inverted_eased_time * first_anim.start_value.r) + (eased_time * first_anim.end_value.r),
+				(inverted_eased_time * first_anim.start_value.g) + (eased_time * first_anim.end_value.g),
+				(inverted_eased_time * first_anim.start_value.b) + (eased_time * first_anim.end_value.b),
+				(inverted_eased_time * first_anim.start_value.a) + (eased_time * first_anim.end_value.a)
+			)
+		else
+			value = (inverted_eased_time * first_anim.start_value) + (eased_time * first_anim.end_value)
+		end
 
 		self.current = value
 
@@ -126,7 +158,15 @@ function AnimatableValue:Animate()
 			self.smooth = value
 		end
 
+		if self.animate_callback then
+			self.animate_callback(self)
+		end
+
 		if time >= 1 then
+			if not self.thinker then
+				self:DisconnectFromHooks()
+			end
+
 			table.remove(self.animations, 1)
 
 			if first_anim.callback then
@@ -140,8 +180,14 @@ function AnimatableValue:Animate()
 	end
 end
 
+local cur_time = 0
+
+hook.Add("Think", "AnimatableValue.CurTime", function ()
+	cur_time = CurTime()
+end)
+
 function AnimatableValue:DetectChanges()
-	if CurTime() > (self.last_change_time + self.debounce_time) and self.last_change ~= self.current then
+	if cur_time > (self.last_change_time + self.debounce_time) and self.last_change ~= self.current then
 		self.debounce = self.current
 
 		if self.callback then

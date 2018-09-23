@@ -109,9 +109,13 @@ function Class.AddHook(class, name, func_k)
 		table.insert(class.static.hooks, {name = name, func_key = func_k})
 	end
 
+	local instances = class.static.instances
+
 	hook.Add(name, Class.TableID(class).."."..func_k, function (...)
-		for i = 1, #class.static.instances do
-			local instance = class.static.instances[i]
+		local len = #instances
+
+		for i = 1, len do
+			local instance = instances[i]
 
 			if instance then
 				class[func_k](instance, ...)

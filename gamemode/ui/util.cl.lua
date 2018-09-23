@@ -33,3 +33,15 @@ function GenerateSurfaceCircle(x, y, radius, arc, ang, quality)
 
 	return circle
 end
+
+function ProperPlayerName(ply)
+	local name
+
+	if IsLocalPlayer(ply) then
+		name = "you"
+	else
+		name = ply:GetName()
+	end
+
+	return name
+end

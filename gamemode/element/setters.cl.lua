@@ -68,15 +68,32 @@ Element.setters = {
 		attr.crop_bottom.current = v
 	end,
 
+	cursor = function (self, static_attr, attr, v)
+		static_attr.cursor = v
+
+		if v then
+			self.panel:SetCursor(v)
+
+			for _, child in pairs(self.children) do
+				if child:GetAttribute "inherit_cursor" then
+					child:SetAttribute("cursor", v)
+				end
+			end
+		end
+	end,
+
 	text_justification = function (self, static_attr, attr, v)
+		static_attr.text_justification = v
 		self:SetTextJustification(v)
 	end,
 
 	font = function (self, static_attr, attr, v)
+		static_attr.font = v
 		self:SetFont(v)
 	end,
 
 	text = function (self, static_attr, attr, v)
+		static_attr.text = v
 		self:SetText(v)
 	end
 }

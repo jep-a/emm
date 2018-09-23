@@ -175,8 +175,9 @@ function CrosshairMeter:OnValueChange(v)
 end
 
 function CrosshairMeter:Paint()
-	local half_w = self:GetAttribute "width"/2
-	local half_h = self:GetAttribute "height"/2
+	local attr = self.attributes
+	local half_w = attr.width.current/2
+	local half_h = attr.height.current/2
 	local radius = half_w - CROSSHAIR_METER_ARC_PADDING
 	local half_arc = CROSSHAIR_METER_ARC_LENGTH/2
 	local ang = self.angle + 90 - half_arc
@@ -202,12 +203,14 @@ function CrosshairMeter:Paint()
 	render.SetStencilFailOperation(STENCILOPERATION_KEEP)
 	render.SetStencilZFailOperation(STENCILOPERATION_KEEP)
 
-	surface.SetDrawColor(self:GetAttribute "background_color")
-	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, radius, CROSSHAIR_METER_ARC_LENGTH, ang, 720))
-
 	local percent = (self.percent.smooth * CROSSHAIR_METER_ARC_LENGTH) - 1
 
-	surface.SetDrawColor(self:GetAttribute "color")
+	if 1 > math.Round(self.percent.smooth, 4) then
+		surface.SetDrawColor(self.attributes.background_color.current)
+		surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, radius, CROSSHAIR_METER_ARC_LENGTH, ang, 720))
+	end
+
+	surface.SetDrawColor(self:GetColor())
 	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, radius, percent, ang + half_arc - (percent/2), 720))
 
 	render.SetStencilEnable(false)

@@ -29,6 +29,8 @@ function MinigameLobby:Init(props)
 		self[k] = {}
 	end
 
+	self:InitSettings()
+
 	NetService.Send("Lobby", self.id, self.prototype, self.host)
 	hook.Run("LobbyInit", self)
 
@@ -78,7 +80,7 @@ function MinigameLobby:RemovePlayer(ply, net, force)
 		end
 
 		if has_plys and self.host == ply then
-			self:SetHost(self.players[#self.players])
+			self:SetHost(self.players[1])
 		end
 
 		ply.leaving_lobby = nil
