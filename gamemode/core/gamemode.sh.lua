@@ -52,7 +52,6 @@ EMM.Include {
 	"ui/util",
 	"ui/cam",
 	"ui/vardebug",
-	"ui/js",
 	"ui/elements/text-bar",
 	"ui/elements/button-bar",
 	"ui/elements/meter-bar",
