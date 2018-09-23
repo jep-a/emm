@@ -1,12 +1,13 @@
 SlideService = SlideService or {}
 
+
 -- # Properties
 
 function SlideService.InitPlayerProperties(ply)
+	ply.can_slide = false
 	ply.slide_minimum = 0.71
 	ply.slide_hover_height = 2
-	ply.can_slide_ramp = false
-	ply.old_slide_velocity = Vector( )
+	ply.old_slide_velocity = Vector(0, 0, 0)
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
@@ -14,104 +15,122 @@ hook.Add(
 	SlideService.InitPlayerProperties
 )
 
--- # Utility
 
-function SlideService.Clip(velocity, plane)
-	return velocity - ( plane * velocity:Dot( plane ) )
+-- # Util
+
+function SlideService.Clip(vel, plane)
+	return vel - (plane * vel:Dot(plane))
 end
 
-function SlideService.GetGroundTrace(pos, endpos, ply)
-
-	return util.TraceHull(
-  {
+function SlideService.GetGroundTrace(pos, end_pos, ply)
+	return util.TraceHull {
 		start = pos,
-    endpos = endpos,
-    mins = ply:OBBMins( ),
-    maxs = ply:OBBMaxs( ),
+		endpos = end_pos,
+		mins = ply:OBBMins(),
+		maxs = ply:OBBMaxs(),
 		mask = MASK_PLAYERSOLID_BRUSHONLY
-	})
+	}
 end
 
-function SlideService.ShouldSlide(velocity, trace, surf_min, can_slide_ramp)
+function SlideService.ShouldSlide(vel, trace, surf_min, can_slide)
 	local should_slide
-	if trace.HitWorld and trace.HitNormal.z > surf_min and trace.HitNormal.z < 1 then // Trace hit world and is on a ramp
-    should_slide = velocity.z > 130 or (can_slide_ramp and -130 > velocity.z)
-	elseif trace.HitWorld and trace.HitNormal.z <= surf_min and trace.HitNormal.z > 0 then // Trace hit world and is on a surfable ramp
+
+	if
+		trace.HitWorld and
+		trace.HitNormal.z > surf_min and
+		1 > trace.HitNormal.z
+	then
+		should_slide = vel.z > 130 or (can_slide and (-130 > vel.z))
+	elseif
+		trace.HitWorld and
+		surf_min >= trace.HitNormal.z and
+		trace.HitNormal.z > 0
+	then
 		should_slide = true
-	else //Trace did not hit world or is on flat ground.
-    should_slide = false
+	else
+		should_slide = false
 	end
+
 	return should_slide
 end
 
-// Issue with sometimes hitting an exact spot between two surf ramps might cause the player to take damage
-function SlideService.HandleRampDamage(ply)
-  local vel = ply:GetVelocity( )
-	local pred_pos = ply:GetPos( ) + ( vel * FrameTime( ) ) // Fixes an issue with not taking damage when you should at the bottom of a surf
-	local trace = SlideService.GetGroundTrace( pred_pos, pred_pos - Vector( 0, 0, 10 ), ply )
-  if SlideService.ShouldSlide( SlideService.Clip( vel, trace.HitNormal ), trace, ply.slide_minimum, ply.can_slide_ramp ) then
-		ply:SetGroundEntity( NULL )
+function SlideService.HandleSlideDamage(ply)
+	local vel = ply:GetVelocity()
+	local pred_pos = ply:GetPos() + (vel * FrameTime())
+	local trace = SlideService.GetGroundTrace(pred_pos, pred_pos - Vector(0, 0, 10), ply)
+
+	if SlideService.ShouldSlide(SlideService.Clip(vel, trace.HitNormal), trace, ply.slide_minimum, ply.can_slide) then
+		ply:SetGroundEntity(NULL)
 	end
 end
-hook.Add("OnPlayerHitGround", "SlideService.HandleRampDamage", SlideService.HandleRampDamage)
+hook.Add("OnPlayerHitGround", "SlideService.HandleSlideDamage", SlideService.HandleSlideDamage)
+
 
 -- # Sliding
 
-function SlideService.SetupRamp( ply, move )
-	local trace, slide_velocity, predicted_trace, predicted_slide_velocity
-	local pos = move:GetOrigin( )
-	local frametime = FrameTime( )
-  local primal_velocity = move:GetVelocity( )
-  local next_velocity = primal_velocity * frametime
-	local secondPredict = false
-  local endpos = pos * 1
-	endpos.z = ( endpos.z - ply.slide_hover_height ) + math.min( next_velocity.z, 0 )  // Predicted the movement the next frame if going quickly downwards
-  trace = SlideService.GetGroundTrace( pos, endpos, ply )
-  slide_velocity = SlideService.Clip( primal_velocity, trace.HitNormal )
+function SlideService.SetupSlide(ply, move)
+	local frame_time = FrameTime()
+	local origin = move:GetOrigin()
+	local original_vel = move:GetVelocity()
+	local next_vel = original_vel * frame_time
 
-  endpos.x = endpos.x + next_velocity.x //Trace prediction
-  endpos.y = endpos.y + next_velocity.y
-  predicted_trace = SlideService.GetGroundTrace( pos, endpos, ply ) // Fixes a problem with taking fall damage when hitting the ramps at a certain angle.
-  predicted_slide_velocity = SlideService.Clip( primal_velocity, predicted_trace.HitNormal )
+	local trace_z = (origin.z - ply.slide_hover_height) + math.min(next_vel.z, 0)
 
-	// Had an issue with when going from a regular surf to a surf ramp that used to be walkable you would take damage and lose your speed.
-	// This fixes that issue.
-	if !predicted_trace.HitWorld && ply.old_slide_velocity then
-		endpos = pos * 1
-		endpos.z = ( endpos.z - ply.slide_hover_height ) + math.min( ply.old_slide_velocity.z * frametime, 0 )
-		endpos.x = endpos.x + ply.old_slide_velocity.x * frametime
-		endpos.y = endpos.y + ply.old_slide_velocity.y * frametime
+	local init_trace = SlideService.GetGroundTrace(origin, Vector(
+		origin.x,
+		origin.y,
+		trace_z
+	), ply)
 
-		predicted_trace = SlideService.GetGroundTrace( pos, endpos, ply )
-  	predicted_slide_velocity = SlideService.Clip( ply.old_slide_velocity, predicted_trace.HitNormal )
-		secondPredict = true
+	local slide_vel = SlideService.Clip(original_vel, init_trace.HitNormal)
+
+	local pred_trace = SlideService.GetGroundTrace(origin, Vector(origin.x + next_vel.x, origin.y + next_vel.y, trace_z), ply)
+	local pred_slide_vel = SlideService.Clip(original_vel, pred_trace.HitNormal)
+
+	local old_slide_vel = ply.old_slide_velocity
+
+	if old_slide_vel and not pred_trace.HitWorld then
+		pred_trace = SlideService.GetGroundTrace(origin, Vector(
+			origin.x + (old_slide_vel.x * frame_time),
+			origin.y + (old_slide_vel.y * frame_time),
+			(origin.z - ply.slide_hover_height) + math.min(old_slide_vel.z * frame_time, 0)
+		), ply)
+	
+		pred_slide_vel = SlideService.Clip(ply.old_slide_velocity, pred_trace.HitNormal)
 	end
 
-	if SlideService.ShouldSlide( predicted_slide_velocity, predicted_trace, ply.slide_minimum, ply.can_slide_ramp ) then
-		local velocity = predicted_slide_velocity
-	  if trace.HitWorld then // Fixes a problem which stop you from surfing down or stucks you.
-	    pos.z = trace.HitPos.z + ply.slide_hover_height
-	    if predicted_trace.HitNormal == trace.HitNormal then
-	      velocity = slide_velocity
-	    end
-	  else
-	    pos.z = predicted_trace.HitPos.z + ply.slide_hover_height
-	  end
-		ply.old_slide_velocity = velocity
-	  move:SetVelocity( velocity )
-	  move:SetOrigin( pos )
-		ply:SetGroundEntity( NULL )
-	elseif SlideService.ShouldSlide( slide_velocity, trace, ply.slide_minimum, ply.can_slide_ramp ) then
-		local velocity = slide_velocity
-		pos.z = trace.HitPos.z + ply.slide_hover_height
-		ply.old_slide_velocity = velocity
-		move:SetVelocity( velocity )
-	  move:SetOrigin( pos )
-		ply:SetGroundEntity( NULL )
+	if SlideService.ShouldSlide(pred_slide_vel, pred_trace, ply.slide_minimum, ply.can_slide) then
+		local vel
+	
+		if init_trace.HitWorld then
+			origin.z = init_trace.HitPos.z + ply.slide_hover_height
+
+			if init_trace.HitNormal == pred_trace.HitNormal then
+				vel = slide_vel
+			else
+				vel = pred_slide_vel
+			end
+		else
+			vel = pred_slide_vel
+			origin.z = pred_trace.HitPos.z + ply.slide_hover_height
+		end
+
+		ply.old_slide_velocity = vel
+
+		move:SetVelocity(vel)
+		move:SetOrigin(origin)
+		ply:SetGroundEntity(NULL)
+	elseif SlideService.ShouldSlide(slide_vel, init_trace, ply.slide_minimum, ply.can_slide) then
+		local vel = slide_vel
+
+		origin.z = init_trace.HitPos.z + ply.slide_hover_height
+		ply.old_slide_velocity = vel
+		
+		move:SetVelocity(vel)
+		move:SetOrigin(origin)
+		ply:SetGroundEntity(NULL)
 	else
-		// Resets incase secondPredict randomly activates upon switching from one surf ramp to another and doesn't send you in some random direction.
 		ply.old_slide_velocity = nil
 	end
-
 end
-hook.Add("SetupMove", "SlideService.SetupRamp", SlideService.SetupRamp)
+hook.Add("SetupMove", "SlideService.SetupSlide", SlideService.SetupSlide)
