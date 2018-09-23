@@ -52,8 +52,8 @@ function MinigamePrototype:Init()
 				},
 
 				{
-					key = "can_auto_bunnyhop",
-					label = "Can auto bunny-hop"
+					key = "can_autojump",
+					label = "Can auto-jump"
 				}
 			}
 		}

@@ -78,8 +78,17 @@ function WalljumpService.Walljump(ply, move, dir)
 	if trace.Hit and (ply.can_walljump_sky or not trace.HitSky) then
 		did_walljump = true
 
+		if ply:OnGround() then
+			ply:SetGroundEntity(NULL)
+			move:SetOrigin(move:GetOrigin() + Vector(0, 0, 1))
+		end
+
 		move:SetVelocity(move:GetVelocity() + WalljumpService.Velocity(ply, dir))
-		if SERVER then WalljumpService.Effect(ply, trace) end
+	
+		if SERVER then
+			WalljumpService.Effect(ply, trace)
+		end
+
 		ply.last_walljump_time = CurTime()
 
 		if not WalljumpService.PlayedSound(ply) then

@@ -36,9 +36,11 @@ hook.Add(
 	AiraccelService.PlayerProperties
 )
 
--- # Sound effects
+
+-- # Util
+
 function AiraccelService.KeyPress(ply, key)
-	if IsFirstTimePredicted() and key == IN_SPEED and not ply.airaccel_started then
+	if IsFirstTimePredicted() and ply.can_airaccel and key == IN_SPEED and not ply.airaccel_started then
 		ply.airaccel_started = true
 		PredictedSoundService.PlaySound(ply, ply.airaccel_sound)
 	end
@@ -76,7 +78,7 @@ function AiraccelService.SetupAiraccel(ply, move)
 		end
 	else
 		if IsFirstTimePredicted() and ply.airaccel_started then
-			if CLIENT then
+			if CLIENT and ply.can_airaccel then
 				PredictedSoundService.PlaySound(ply, ply.airaccel_sound, 100, 75, 0.2)
 			end
 

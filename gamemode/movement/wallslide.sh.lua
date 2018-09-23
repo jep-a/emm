@@ -1,5 +1,7 @@
 WallslideService = WallslideService or {}
 
+local wallslide_effect_cooldown = 1/60
+
 
 -- # Properties
 
@@ -31,7 +33,7 @@ function WallslideService.PlayerProperties(ply)
 	ply.wallsliding = false
 	ply.wallslide_velocity = Vector(0, 0, 0)
 	ply.last_wallslide_time = 0
-	ply.last_wallslide_spark_time = 0
+	ply.last_wallslide_effect_time = 0
 	WallslideService.SetupStamina(ply)
 end
 hook.Add(
@@ -64,7 +66,12 @@ end
 function WallslideService.Velocity(trace, last_wallslide_time, wallslide_velocity)
 	local frac = math.Clamp(math.TimeFraction(last_wallslide_time, last_wallslide_time + 2, CurTime()), 0, 1)
 
-	local new_move_vel = ((1 - frac) * (wallslide_velocity * Vector(1, 1, 0))) + (frac * (trace.Normal * Vector(1, 1, 0.1)) * 400) - Vector(0, 0, 5)
+	local new_move_vel =  (
+		((1 - frac) * Vector(wallslide_velocity.x, wallslide_velocity.y, 0)) +
+		(frac * Vector(trace.Normal.x, trace.Normal.y, trace.Normal.z * 0.1) * 400) -
+		Vector(0, 0, 5)
+	)
+
 	new_move_vel.z = math.min(new_move_vel.z, 1)
 
 	return new_move_vel
@@ -76,6 +83,7 @@ end
 
 function WallslideService.SetupWallslide(ply, move)
 	if ply:Alive() and ply.can_wallslide then
+		local cur_time = CurTime()
 		local aim = ply:GetAimVector()
 		local trace = WallslideService.Trace(ply, aim)
 
@@ -95,10 +103,12 @@ function WallslideService.SetupWallslide(ply, move)
 		then
 			if not WallslideService.Wallsliding(ply) and not WallslideService.StartedWallslide(ply) then
 				ply.wallslide_velocity = ply:GetVelocity()
-				ply.last_wallslide_time = CurTime()
 				ply.wallsliding = true
+				ply.last_wallslide_time = cur_time
+	
 				ply.stamina.wallslide:SetActive(true)
 				ply.stamina.wallslide:ReduceStamina(ply.wallslide_init_cost)
+	
 				PredictedSoundService.PlayWallslideSound(ply)
 
 				if CLIENT then
@@ -107,10 +117,15 @@ function WallslideService.SetupWallslide(ply, move)
 			end
 
 			move:SetVelocity(WallslideService.Velocity(trace, WallslideService.LastWallslideTime(ply), WallslideService.WallslideVelocity(ply)))
-			if SERVER then WallslideService.Effect(ply, trace) end
+
+			if SERVER and cur_time > (ply.last_wallslide_effect_time + wallslide_effect_cooldown) then 
+				WallslideService.Effect(ply, trace)
+				ply.last_wallslide_effect_time = cur_time
+			end
 		elseif WallslideService.Wallsliding(ply) and not WallslideService.FinishedWallslide(ply) then
 			ply.wallsliding = false
 			ply.stamina.wallslide:SetActive(false)
+
 			PredictedSoundService.StopWallslideSound(ply)
 
 			if CLIENT then
