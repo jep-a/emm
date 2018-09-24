@@ -4,6 +4,8 @@ GM.Email = "hello@jep.sh"
 GM.Website = "jep.sh"
 
 EMM.Include {
+	"settings/settings",
+
 	"util/util",
 	"util/palette",
 	"util/class",
@@ -77,8 +79,9 @@ EMM.Include {
 	"hud/factories",
 	"hud/indicators",
 	"hud/notifications",
-	"hud/elements/meters",
-	"hud/elements/crosshair-lines",
+	"hud/elements/hud-meter",
+	"hud/elements/crosshair-line",
+	"hud/elements/crosshair-meter",
 	"hud/elements/indicator",
-	"hud/elements/notifications",
+	"hud/elements/notifications"
 }

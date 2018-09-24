@@ -47,6 +47,7 @@ function HUDService.InitContainers()
 	})
 
 	HUDService.crosshair_container = HUDService.container:Add(HUDService.CreateCrosshairContainer())
+	HUDService.crosshair_meter_container = HUDService.container:Add(HUDService.CreateCrosshairContainer(true))
 end
 
 function HUDService.InitMeters()
@@ -85,12 +86,12 @@ function HUDService.InitMeters()
 		value_func = Airaccel
 	})
 
-	HUDService.crosshair_container:Add(CrosshairMeter.New {
-		angle = CROSSHAIR_METER_ARC_ANGLE,
-		value_func = Health
+	HUDService.crosshair_meter_container:Add(CrosshairMeter.New {
+		value_func = Health,
+		angle = CROSSHAIR_METER_ARC_ANGLE
 	})
 
-	HUDService.crosshair_container:Add(CrosshairMeter.New {
+	HUDService.crosshair_meter_container:Add(CrosshairMeter.New {
 		show_value = true,
 		hide_value_on_empty = true,
 		value_func = Speed,
@@ -98,9 +99,9 @@ function HUDService.InitMeters()
 		sub_value = true
 	})
 
-	HUDService.crosshair_container:Add(CrosshairMeter.New {
-		angle = -CROSSHAIR_METER_ARC_ANGLE,
-		value_func = Airaccel
+	HUDService.crosshair_meter_container:Add(CrosshairMeter.New {
+		value_func = Airaccel,
+		angle = -CROSSHAIR_METER_ARC_ANGLE
 	})
 end
 
@@ -142,6 +143,7 @@ hook.Add("HUDShouldDraw", "HUDService.ShouldDraw", HUDService.ShouldDraw)
 
 function HUDService.Show()
 	HUDService.crosshair_container:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
+	HUDService.crosshair_meter_container:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
 	HUDService.quadrant_g:AnimateAttribute("alpha", 255)
 	HUDService.quadrant_h:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION})
 	HUDService.quadrant_i:AnimateAttribute("alpha", 255, {delay = ANIMATION_DURATION * 2})
@@ -157,6 +159,7 @@ hook.Add("OnLobbyUIClose", "HUDService.Show", HUDService.Show)
 
 function HUDService.Hide()
 	HUDService.crosshair_container:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION})
+	HUDService.crosshair_meter_container:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION})
 	HUDService.quadrant_g:AnimateAttribute("alpha", 0)
 	HUDService.quadrant_h:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION})
 	HUDService.quadrant_i:AnimateAttribute("alpha", 0, {delay = ANIMATION_DURATION * 2})

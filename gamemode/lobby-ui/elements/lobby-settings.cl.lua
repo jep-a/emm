@@ -83,7 +83,6 @@ function LobbySettings:AddSetting(setting, ply_class_k)
 
 	local prereq = setting.prerequisite
 	local curr_v = MinigameSettingsService.Setting(self.lobby, k, true)
-	print(self.lobby.id, k, curr_v)
 
 	local prereq_v
 

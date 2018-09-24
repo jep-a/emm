@@ -49,8 +49,8 @@ function TextInput:Init(text, props)
 		},
 
 		text_line = Element.New {
-			layout = false,
 			overlay = true,
+			layout = false,
 			origin_position = true,
 			origin_justification_x = JUSTIFY_CENTER,
 			origin_justification_y = JUSTIFY_END,

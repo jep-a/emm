@@ -16,6 +16,8 @@ function Element:Init(props)
 	
 	self.panel = vgui.Create "ElementPanel"
 	self.panel.element = self
+
+	self.setting_hooks = {}
 	
 	self:InitStates()
 	self:InitAttributes()
@@ -83,6 +85,10 @@ function Element:Clear()
 end
 
 function Element:Finish()
+	for k, _ in pairs(self.setting_hooks) do
+		SettingsService.RemoveHook(k, Class.TableID(self))
+	end
+
 	if self.dragging then
 		self:StopDragging()
 	end
@@ -128,6 +134,16 @@ function Element:Think()
 
 	self.panel:SetAlpha(math.Round(attr.alpha.current))
 	self.panel.text:SetTextColor(attr.text_color and attr.text_color.current or self:GetColor())
+end
+
+function Element:AddConvarAnimator(name, attr, ...)
+	local anim_props = {...}
+
+	self.setting_hooks[name] = true
+
+	SettingsService.AddHook(name, Class.TableID(self), function (v)
+		self:AnimateAttribute(attr, v, unpack(anim_props))
+	end)
 end
 
 function Element:OnMousePressed(mouse)

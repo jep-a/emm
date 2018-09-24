@@ -24,50 +24,6 @@ Element.setters = {
 		end
 	end,
 
-	fit = function (self, static_attr, attr, v)
-		static_attr.fit_x = v
-		static_attr.fit_y = v
-	end,
-
-	size = function (self, static_attr, attr, v)
-		attr.width.current = v
-		attr.height.current = v
-	end,
-
-	padding = function (self, static_attr, attr, v)
-		attr.padding_left.current = v
-		attr.padding_top.current = v
-		attr.padding_right.current = v
-		attr.padding_bottom.current = v
-	end,
-
-	padding_x = function (self, static_attr, attr, v)
-		attr.padding_left.current = v
-		attr.padding_right.current = v
-	end,
-
-	padding_y = function (self, static_attr, attr, v)
-		attr.padding_top.current = v
-		attr.padding_bottom.current = v
-	end,
-
-	crop = function (self, static_attr, attr, v)
-		attr.crop_left.current = v
-		attr.crop_top.current = v
-		attr.crop_right.current = v
-		attr.crop_bottom.current = v
-	end,
-
-	crop_x = function (self, static_attr, attr, v)
-		attr.crop_left.current = v
-		attr.crop_right.current = v
-	end,
-
-	crop_y = function (self, static_attr, attr, v)
-		attr.crop_top.current = v
-		attr.crop_bottom.current = v
-	end,
-
 	cursor = function (self, static_attr, attr, v)
 		static_attr.cursor = v
 

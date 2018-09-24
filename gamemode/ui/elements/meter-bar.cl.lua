@@ -22,8 +22,8 @@ function MeterBar:Init(props)
 end
 
 function MeterBar:Finish()
-	MeterBar.super.Finish(self)
 	self.animatable_percent:Finish()
+	MeterBar.super.Finish(self)
 end
 
 function MeterBar:SetPercent(percent)

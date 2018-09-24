@@ -29,11 +29,15 @@ function ElementPanel:Think()
 end
 
 function ElementPanel:Paint()
-	self.element:Paint()
+	if self:GetAlpha() > 0 then
+		self.element:Paint()
+	end
 end
 
 function ElementPanel:PaintOver()
-	self.element:PaintOver()
+	if self:GetAlpha() > 0 then
+		self.element:PaintOver()
+	end
 end
 
 function ElementPanel:CanBubble()

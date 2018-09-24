@@ -22,7 +22,7 @@ function CrosshairLine:GenerateSize()
 	if self.parent then
 		local parent_attr = self.parent.attributes
 		local attr = self.attributes
-		local length = (parent_attr.width.current/2) - (CROSSHAIR_LINES_GAP/2)
+		local length = (parent_attr.width.current/2) - (parent_attr.child_margin.current/2)
 
 		if self.orientation == DIRECTION_ROW then
 			attr.width.current = length
@@ -46,9 +46,7 @@ end
 
 CrosshairLines = CrosshairLines or Class.New(Element)
 
-function CrosshairLines:Init(size)
-	size = size or CROSSHAIR_LINES_SIZE
-
+function CrosshairLines:Init(size, gap)
 	CrosshairLines.super.Init(self, {
 		layout = false,
 		origin_position = true,
@@ -56,8 +54,8 @@ function CrosshairLines:Init(size)
 		origin_justification_y = JUSTIFY_CENTER,
 		position_justification_x = JUSTIFY_CENTER,
 		position_justification_y = JUSTIFY_CENTER,
-		width = size,
-		height = size,
+		size = size or SettingsService.Setting "emm_crosshair_size",
+		child_margin = gap or SettingsService.Setting "emm_crosshair_gap",
 
 		CrosshairLine.New {
 			orientation = DIRECTION_COLUMN,
@@ -85,4 +83,12 @@ function CrosshairLines:Init(size)
 			position_justification_y = JUSTIFY_CENTER
 		}
 	})
+
+	if not size then
+		self:AddConvarAnimator("emm_crosshair_size", "size")
+	end
+
+	if not gap then
+		self:AddConvarAnimator("emm_crosshair_gap", "child_margin")
+	end
 end

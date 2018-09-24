@@ -58,6 +58,32 @@ local layout_invalidators = {
 	"child_margin"
 }
 
+local function HorizontalShorthandAttributes(attr, x, y)
+	return {attr.."_left", attr.."_right"}
+end
+
+local function VerticalShorthandAttributes(attr, x, y)
+	return {attr.."_top", attr.."_bottom"}
+end
+
+local function ShorthandAttributes(attr, x, y)
+	return table.Add(HorizontalShorthandAttributes(attr), VerticalShorthandAttributes(attr))
+end
+
+Element.static_shorthand_attributes = {
+	fit = {"fit_x", "fit_y"}
+}
+
+Element.shorthand_attributes = {
+	size = {"width", "height"},
+	padding = ShorthandAttributes "padding",
+	padding_x = HorizontalShorthandAttributes "padding",
+	padding_y = VerticalShorthandAttributes "padding",
+	crop = ShorthandAttributes "crop",
+	crop_x = HorizontalShorthandAttributes "crop",
+	crop_y = VerticalShorthandAttributes "crop"
+}
+
 function Element:InitAttributes()
 	self.static_attributes = {
 		paint = true,
@@ -165,6 +191,14 @@ function Element:SetAttribute(k, v, no_layout)
 		else
 			attr[k].current = v
 		end
+	elseif self.static_shorthand_attributes[k] then
+		for _, _k in pairs(self.static_shorthand_attributes[k]) do
+			static_attr[_k] = v
+		end
+	elseif self.shorthand_attributes[k] then
+		for _, _k in pairs(self.shorthand_attributes[k]) do
+			attr[_k].current = v
+		end
 	elseif self.setters[k] then
 		self.setters[k](self, static_attr, attr, v)
 	elseif self.optional_attributes[k] ~= nil then
@@ -229,5 +263,13 @@ function Element:GetAttribute(k)
 end
 
 function Element:AnimateAttribute(k, v, ...)
-	self.attributes[k]:AnimateTo(v, ...)
+	local attr = self.attributes
+
+	if attr[k] then
+		attr[k]:AnimateTo(v, ...)
+	elseif self.shorthand_attributes[k] then
+		for _, _k in pairs(self.shorthand_attributes[k]) do
+			attr[_k]:AnimateTo(v, ...)
+		end
+	end
 end

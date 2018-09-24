@@ -22,6 +22,13 @@ function AnimatableValue.New(...)
 	return instance
 end
 
+function AnimatableValue.NewFromSetting(name, ...)
+	local anim_v = AnimatableValue.New(SettingsService.Setting(name), ...)
+	anim_v:SetConvarAnimator(name)
+
+	return anim_v
+end
+
 function AnimatableValue:Init(value, props)
 	value = value ~= nil and value or 0
 	props = props or {}
@@ -127,8 +134,22 @@ function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay, finish
 end
 
 function AnimatableValue:Finish()
+	if self.setting_hook then
+		SettingsService.RemoveHook(self.setting_hook, Class.TableID(self))
+	end
+
 	self.animations = {}
 	self:DisconnectFromHooks()
+end
+
+function AnimatableValue:SetConvarAnimator(name, ...)
+	local anim_props = {...}
+
+	self.setting_hook = name
+
+	SettingsService.AddHook(name, Class.TableID(self), function (v)
+		self:AnimateTo(v, unpack(anim_props))
+	end)
 end
 
 function AnimatableValue:Animate()

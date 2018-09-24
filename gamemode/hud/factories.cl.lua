@@ -16,7 +16,10 @@ function HUDService.CreateSection(dist, ang)
 		height_percent = 1
 	})
 
-	CamUIService.AddPanel(element.panel, dist, ang)
+	CamUIService.AddPanel(element.panel, {
+		distance = dist,
+		angle = ang
+	})
 
 	return element
 end
@@ -37,15 +40,18 @@ function HUDService.CreateQuadrant(section, props)
 	return element
 end
 
-function HUDService.CreateCrosshairContainer()
-	return Element.New {
+function HUDService.CreateCrosshairContainer(camui)
+	local element = Element.New {
+		overlay = true,
 		layout = false,
 		origin_position = true,
-		origin_justification_x = JUSTIFY_CENTER,
-		origin_justification_y = JUSTIFY_CENTER,
-		position_justification_x = JUSTIFY_CENTER,
-		position_justification_y = JUSTIFY_CENTER,
-		width = CROSSHAIR_CONTAINER_SIZE,
-		height = CROSSHAIR_CONTAINER_SIZE
+		width_percent = 1,
+		height_percent = 1
 	}
+
+	if camui then
+		CamUIService.AddPanel(element.panel, {smooth_divider = 4})
+	end
+
+	return element
 end

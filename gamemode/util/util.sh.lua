@@ -11,6 +11,12 @@ function Falsy(v)
 	)
 end
 
+function Snap(n, snap)
+	local mod = n % snap
+	
+	return n - mod + (math.Round(mod/snap) * snap)
+end
+
 function SequentialTableHasValue(tab, val)
 	for i = 1, #tab do
 		if val == tab[i] then

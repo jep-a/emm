@@ -106,10 +106,10 @@ function Indicator:AnimateFinish()
 				end
 			end
 
-			Indicator.super.Finish(self)
 			self.world_alpha:Finish()
 			self.animatable_color:Finish()
 			self.off_screen:Finish()
+			Indicator.super.Finish(self)
 		end
 	})
 end
