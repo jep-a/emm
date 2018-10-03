@@ -22,6 +22,7 @@ function CrosshairMeter:Init(props)
 	self.value_divider = props.value_divider or 100
 	self.hide_value_on_empty = props.hide_value_on_empty
 	self.hide_value_on_full = props.hide_value_on_full
+	self.hid_value = true
 
 	local layout_props = {
 		animate_callback = function ()
@@ -31,17 +32,18 @@ function CrosshairMeter:Init(props)
 		end
 	}
 
-	self.debounced_value = AnimatableValue.New(0, {
+	local init_v = self.value_func()
+
+	self.debounced_value = AnimatableValue.New(init_v, {
 		callback = function (v)
 			self:OnValueChanged(v)
 		end
 	})
 
-	self.percent = AnimatableValue.New(0, {smooth = true})
-
+	self.percent = AnimatableValue.New(init_v/self.value_divider, {smooth = true})
 	self.angle = AnimatableValue.New(props.angle, layout_props)
 	self.radius = props.radius and AnimatableValue.New(props.radius, layout_props) or AnimatableValue.NewFromSetting("emm_crosshair_meter_radius", layout_props)
-	self.line_thickness = props.line_thickness and AnimatableValue.New(props.line_thickness) or AnimatableValue.NewFromSetting "emm_hud_line_thickness"
+	self.line_thickness = AnimatableValue.New(props.line_thickness or HUD_LINE_THICKNESS)
 	self.arc_length = props.arc_length and AnimatableValue.New(props.arc_length) or AnimatableValue.NewFromSetting "emm_crosshair_meter_arc_length"
 
 	if props.show_value then
@@ -59,7 +61,8 @@ function CrosshairMeter:Init(props)
 			position_justification_y = pos_justify_y,
 			fit = true,
 			wrap = false,
-			child_margin = MARGIN/8
+			child_margin = MARGIN/8,
+			alpha = not HUDMeter.ShouldHideValueText(self) and 255 or 0
 		})
 
 		self.value_text = self.value_text_container:Add(Element.New {
@@ -91,10 +94,10 @@ end
 function CrosshairMeter:Think()
 	CrosshairMeter.super.Think(self)
 
-	local value = self.value_func()
+	local v = self.value_func()
 
-	self.debounced_value.current = value
-	self.percent.current = value/self.value_divider
+	self.debounced_value.current = v
+	self.percent.current = v/self.value_divider
 
 	if self.value_text then
 		HUDMeter.SetValueText(self)

@@ -30,7 +30,7 @@ function AnimatableValue.NewFromSetting(name, ...)
 end
 
 function AnimatableValue:Init(value, props)
-	value = value ~= nil and value or 0
+	value = Default(value, 0)
 	props = props or {}
 
 	self.animations = {}

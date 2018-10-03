@@ -19,7 +19,9 @@ function HUDMeter:Init(quadrant, props)
 	self.hide_value_on_empty = props.hide_value_on_empty
 	self.hide_value_on_full = props.hide_value_on_full
 
-	self.debounced_value = AnimatableValue.New(0, {
+	local init_v = self.value_func()
+
+	self.debounced_value = AnimatableValue.New(init_v, {
 		callback = function (v)
 			self:OnValueChanged(v)
 		end
@@ -31,12 +33,13 @@ function HUDMeter:Init(quadrant, props)
 		self.value_text_container = self:Add(Element.New {
 			fit = true,
 			wrap = false,
-			child_margin = HUD_METER_VALUE_TEXT_MARGIN
+			child_margin = 2,
+			alpha = not self:ShouldHideValueText() and 255 or 0
 		})
 
 		self.value_text = self.value_text_container:Add(Element.New {
 			fit = true,
-			crop_top = 0.24,
+			crop_top = 0.225,
 			crop_bottom = 0.125,
 			font = "HUDMeterValue"
 		})
@@ -44,7 +47,8 @@ function HUDMeter:Init(quadrant, props)
 		if props.sub_value then
 			self.sub_value_text = self.value_text_container:Add(Element.New {
 				fit = true,
-				crop_y = 0.2,
+				crop_top = 0.225,
+				crop_bottom = 0.125,
 				font = "HUDMeterValueSmall"
 			})
 		end
@@ -53,19 +57,22 @@ function HUDMeter:Init(quadrant, props)
 			self.value_text_container:Add(Element.New {
 				self_adjacent_justification = JUSTIFY_END,
 				fit = true,
-				crop_y = 0.1,
+				crop_top = 0.225,
+				crop_bottom = 0.1,
 				text = props.units,
 				font = "HUDMeterValueSmall"
 			})
 		end
 	end
 
-	if props.line_thickness then
-		self.bar = self:Add(MeterBar.New {height = props.line_thickness})
-	else
-		self.bar = self:Add(MeterBar.New {height = SettingsService.Setting "emm_hud_line_thickness"})
-		self.bar:AddConvarAnimator("emm_hud_line_thickness", "height")
-	end
+	local init_percent = init_v/self.value_divider
+
+	self.bar = self:Add(MeterBar.New {
+		percent = init_percent,
+		height = props.line_thickness or HUD_LINE_THICKNESS
+	})
+
+	self:OnValueChanged(self.debounced_value)
 
 	self:Add(Element.New {
 		width = HUD_ICON_SIZE,
@@ -80,12 +87,15 @@ function HUDMeter:Finish()
 	HUDMeter.super.Finish(self)
 end
 
-function HUDMeter:SetValueText()
+function HUDMeter:SetValueText(round_sub_value)
 	local v = tostring(self.debounced_value.debounce)
 
 	if self.sub_value_text then
 		self.value_text:SetText(string.sub(v, 1, -2))
-		self.sub_value_text:SetText(string.sub(v, -1))
+
+		if not round_sub_value then
+			self.sub_value_text:SetText(string.sub(v, -1))
+		end
 	else
 		self.value_text:SetText(v)
 	end
@@ -112,9 +122,15 @@ function HUDMeter:Think()
 	end
 end
 
+function HUDMeter:ShouldHideValueText(v)
+	v = (v or self.debounced_value).current
+
+	return (self.hide_value_on_empty and v == 0) or (self.hide_value_on_full and v == self.value_divider)
+end
+
 function HUDMeter:OnValueChanged(v)
 	if self.value_text then
-		if not self.hid_value and ((self.hide_value_on_empty and v.current == 0) or (self.hide_value_on_full and v.current == self.value_divider)) then
+		if not self.hid_value and HUDMeter.ShouldHideValueText(self, v) then
 			self.value_text_container:AnimateAttribute("alpha", 0)
 			self.hid_value = true
 		elseif self.hid_value then

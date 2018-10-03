@@ -1,42 +1,88 @@
-HUD_PADDING_X = 256
-HUD_PADDING_Y = 16
-
-HUD_LINE_THICKNESS = 4
+HUD_LINE_THICKNESS = 2
 
 HUD_METER_SIZE = 3/4
 HUD_ICON_SIZE = 64
 
-HUD_MIDDLE_DISTANCE = 10.75
+HUD_MIDDLE_DISTANCE = 0
 
-HUD_SIDE_ANGLE = 10
-HUD_SIDE_DISTANCE = 15
-
-HUD_METER_VALUE_TEXT_SIZE = 36
-HUD_METER_VALUE_TEXT_MARGIN = HUD_METER_VALUE_TEXT_SIZE/18
-HUD_METER_VALUE_TEXT_SMALL_SIZE = 22
+HUD_SIDE_ANGLE = 35
+HUD_SIDE_DISTANCE = 0
 
 HUD_SPEED_METER_DIVIDER = 5000
 
-CROSSHAIR_METER_VALUE_TEXT_SIZE = 16
-CROSSHAIR_METER_VALUE_TEXT_SMALL_SIZE = 12
-
-CROSSHAIR_CONTAINER_SIZE = 200
-
-CROSSHAIR_METER_ARC_PADDING = CROSSHAIR_METER_VALUE_TEXT_SIZE + LINE_THICKNESS
-CROSSHAIR_METER_ARC_LENGTH = 32
 CROSSHAIR_METER_ARC_ANGLE = 90
-
-CROSSHAIR_LINES_SIZE = 300
-CROSSHAIR_LINES_GAP = 3
 CROSSHAIR_LINE_THICKNESS = 3
 
-SettingsService.New("emm_hud_line_thickness", {
+local function ReloadHUD()
+	HUDService.Reload()
+	IndicatorService.Reload(true)
+end
+
+SettingsService.New("emm_show_hud", {
+	default = true,
+	help = "Show HUD",
+	callback = ReloadHUD
+})
+
+SettingsService.New("emm_show_hud_meters", {
+	default = true,
+	help = "Show HUD meters",
+	callback = ReloadHUD
+})
+
+SettingsService.New("emm_show_crosshair", {
+	default = true,
+	help = "Show crosshair",
+	callback = ReloadHUD
+})
+
+SettingsService.New("emm_show_crosshair_meters", {
+	help = "Show crosshair meters",
+	callback = ReloadHUD
+})
+
+SettingsService.New("emm_show_indicators", {
+	default = true,
+	help = "Show indicators",
+
+	callback = function ()
+		IndicatorService.Reload(true)
+	end
+})
+
+SettingsService.New("emm_show_notifications", {
+	default = true,
+	help = "Show notifications",
+	callback = ReloadHUD
+})
+
+SettingsService.New("emm_hud_padding_x", {
 	type = "number",
-	default = 4,
+	default = 16,
 	round = true,
-	min = 1,
-	max = 8,
-	help = "HUD meter line thickness (pixels)"
+	snap = 8,
+	min = 0,
+	max = 256,
+	help = "HUD horizontal padding (pixels)"
+})
+
+SettingsService.New("emm_hud_padding_y", {
+	type = "number",
+	default = 16,
+	round = true,
+	snap = 8,
+	min = 0,
+	max = 256,
+	help = "HUD vertical padding (pixels)"
+})
+
+SettingsService.New("emm_hud_angle", {
+	type = "number",
+	default = 5,
+	min = 0,
+	max = 35,
+	help = "HUD side angles (degrees)",
+	callback = ReloadHUD
 })
 
 SettingsService.New("emm_crosshair_size", {
@@ -59,7 +105,7 @@ SettingsService.New("emm_crosshair_gap", {
 
 SettingsService.New("emm_crosshair_meter_radius", {
 	type = "number",
-	default = 150,
+	default = 40,
 	round = true,
 	min = 32,
 	max = 512,
@@ -68,7 +114,7 @@ SettingsService.New("emm_crosshair_meter_radius", {
 
 SettingsService.New("emm_crosshair_meter_arc_length", {
 	type = "number",
-	default = 32,
+	default = 40,
 	round = true,
 	min = 8,
 	max = 90,
@@ -77,23 +123,20 @@ SettingsService.New("emm_crosshair_meter_arc_length", {
 
 surface.CreateFont("HUDMeterValue", {
 	font = "Roboto Mono",
-	size = HUD_METER_VALUE_TEXT_SIZE,
-	weight = 700
+	size = 34
 })
 
 surface.CreateFont("HUDMeterValueSmall", {
 	font = "Roboto Mono",
-	size = HUD_METER_VALUE_TEXT_SMALL_SIZE,
-	weight = 700
+	size = 24
 })
 
 surface.CreateFont("CrosshairMeterValue", {
 	font = "Roboto Mono",
-	size = CROSSHAIR_METER_VALUE_TEXT_SIZE,
-	weight = 700
+	size = 16
 })
 
 surface.CreateFont("CrosshairMeterValueSmall", {
 	font = "Roboto Mono",
-	size = CROSSHAIR_METER_VALUE_TEXT_SMALL_SIZE
+	size = 12
 })

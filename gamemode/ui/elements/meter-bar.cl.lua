@@ -14,7 +14,7 @@ function MeterBar:Init(props)
 		}
 	})
 
-	self.animatable_percent = AnimatableValue.New(0, {smooth = true})
+	self.animatable_percent = AnimatableValue.New(props.percent, {smooth = true})
 
 	if props then
 		self:SetAttributes(props)

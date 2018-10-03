@@ -1,6 +1,6 @@
 IndicatorService = IndicatorService or {}
 
-local indicator_material = Material("emm2/shapes/arrow.png", "noclamp smooth")
+local indicator_material = Material("emm2/shapes/arrow-2x.png", "noclamp smooth")
 local circle_material = Material("emm2/shapes/circle.png", "noclamp smooth")
 
 
@@ -42,6 +42,29 @@ function IndicatorService.Sort(ply, eye_pos)
 end
 hook.Add("Think", "IndicatorService.Sort", IndicatorService.Sort)
 
+function IndicatorService.ScreenPosition(indicator)
+	local pos
+	
+	if IsValid(indicator.entity) then
+		pos = indicator.entity:WorldSpaceCenter()
+	elseif indicator.position then
+		pos = indicator.position
+	end
+
+	if pos then
+		cam.Start3D()
+
+		local screen_pos = (pos + Vector(0, 0, Lerp(indicator.distance/600, 40, 45))):ToScreen()
+
+		cam.End3D()
+
+		local size = Lerp(indicator.distance/800, INDICATOR_WORLD_SIZE * 2, INDICATOR_WORLD_SIZE)
+		local x, y = screen_pos.x - (size/2), screen_pos.y - 6 - (size/2)
+
+		return x, y, size
+	end
+end
+
 function IndicatorService.DrawWorldPositions(ply, eye_pos)
 	local eye_pos = LocalPlayer():EyePos()
 	local indicators = IndicatorService.container.children
@@ -49,25 +72,9 @@ function IndicatorService.DrawWorldPositions(ply, eye_pos)
 
 	for i = 1, #indicators do
 		local indicator = indicators[i]
+		local x, y, size = IndicatorService.ScreenPosition(indicator)
 
-		local pos
-	
-		if IsValid(indicator.entity) then
-			pos = indicator.entity:WorldSpaceCenter()
-		elseif indicator.position then
-			pos = indicator.position
-		end
-
-		if pos then
-			cam.Start3D()
-
-			local screen_pos = (pos + Vector(0, 0, Lerp(indicator.distance/600, 40, 45))):ToScreen()
-		
-			cam.End3D()
-
-			local size = Lerp(indicator.distance/800, INDICATOR_WORLD_SIZE * 2, INDICATOR_WORLD_SIZE)
-			local x, y = screen_pos.x - (size/2), screen_pos.y - 6 - (size/2)
-		
+		if x and y and size then
 			indicator.x = x
 			indicator.y = y
 		
@@ -110,47 +117,20 @@ function IndicatorService.RenderCoasters()
 end
 hook.Add("PreDrawOpaqueRenderables", "IndicatorService.RenderCoasters", IndicatorService.RenderCoasters)
 
-function IndicatorService.Add(lobby, ply)
-	if IsLocalPlayer(ply) then
-		for _, _ply in pairs(lobby.players) do
-			if ply ~= _ply then
-				_ply.indicator = Indicator.New(_ply)
-				IndicatorService.container:Add(_ply.indicator)
-			end
-		end
-	else
-		ply.indicator = Indicator.New(ply)
-		IndicatorService.container:Add(ply.indicator)
-	end
+function IndicatorService.Visible()
+	return SettingsService.Setting "emm_show_hud" and SettingsService.Setting "emm_show_indicators"
 end
-hook.Add("LocalLobbyPlayerJoin", "IndicatorService.Add", IndicatorService.Add)
-hook.Add("LocalLobbyPlayerSpawn", "IndicatorService.Add", function (lobby, ply)
-	if not IsLocalPlayer(ply) and not ply.indicator then
-		IndicatorService.Add(lobby, ply)
-	end
-end)
 
-hook.Add("LocalLobbyPlayerDeath", "IndicatorService.Remove", function (lobby, ply)
-	if not IsLocalPlayer(ply) and ply.indicator then
-		ply.indicator:Finish()
-	end
-end)
+function IndicatorService.PlayerShouldHaveIndicator(ply)
+	local should_have_indicator
 
-function IndicatorService.Clear(lobby, ply)
 	if IsLocalPlayer(ply) then
-		IndicatorService.container:Clear()
-	elseif ply.indicator then
-		ply.indicator:Finish()
+		should_have_indicator = false
+	elseif ply.player_class then
+		should_have_indicator = true
 	end
-end
-hook.Add("LocalLobbyPlayerLeave", "IndicatorService.Clear", IndicatorService.Clear)
 
-function IndicatorService.ReloadIndicators()
-	local ply = LocalPlayer()
-
-	if ply.lobby then
-		IndicatorService.Add(ply.lobby, ply)
-	end
+	return should_have_indicator
 end
 
 function IndicatorService.Init()
@@ -158,32 +138,108 @@ function IndicatorService.Init()
 end
 hook.Add("InitUI", "IndicatorService.Init", IndicatorService.Init)
 
-function IndicatorService.Reload()
-	IndicatorService.container:Finish()
-	IndicatorService.Init()
-	IndicatorService.ReloadIndicators()
+function IndicatorService.Reload(soft_reload)
+	if soft_reload then
+		IndicatorService.Clear()
+	else
+		IndicatorService.container:Finish()
+		IndicatorService.Init()
+	end
+
+	if IndicatorService.Visible() then
+		local lobby = LocalPlayer().lobby
+	
+		if lobby then
+			IndicatorService.InitLobby(lobby)
+		end
+	end
 end
 hook.Add("OnReloaded", "IndicatorService.Reload", IndicatorService.Reload)
 
-function IndicatorService.Show()
-	IndicatorService.container:AnimateAttribute("alpha", 255)
+function IndicatorService.InitLobby(lobby)
+	for _, ply in pairs(lobby.players) do
+		if IndicatorService.PlayerShouldHaveIndicator(ply) then
+			IndicatorService.AddPlayerIndicator(ply)
+		end
+	end
 end
 
-hook.Add("LocalPlayerSpawn", "IndicatorService.Show", function ()
-	if not LobbyUIService.open then
-		IndicatorService.Show()
-	end
-end)
+function IndicatorService.Clear()
+	IndicatorService.container:Clear()
+end
 
-hook.Add("OnLobbyUIClose", "IndicatorService.Show", IndicatorService.Show)
+function IndicatorService.AddPlayerIndicator(ply)
+	IndicatorService.container:Add(Indicator.New(ply))
+
+	if ply:Alive() then
+		ply.indicator:AnimateAttribute("alpha", 255)
+	end
+end
+
+function IndicatorService.LobbyPlayerJoin(lobby, ply)
+	if IndicatorService.Visible() then
+		if IsLocalPlayer(ply) then
+			IndicatorService.InitLobby(lobby)
+		elseif IndicatorService.PlayerShouldHaveIndicator(ply) then
+			IndicatorService.AddPlayerIndicator(ply)
+		end
+	end
+end
+hook.Add("LocalLobbyPlayerJoin", "IndicatorService.LobbyPlayerJoin", IndicatorService.LobbyPlayerJoin)
+
+function IndicatorService.LobbyPlayerLeave(lobby, ply)
+	if IndicatorService.Visible() then
+		if IsLocalPlayer(ply) then
+			IndicatorService.Clear()
+		elseif IndicatorService.PlayerShouldHaveIndicator(ply) then
+			ply.indicator:Finish()
+		end
+	end
+end
+hook.Add("LocalLobbyPlayerLeave", "IndicatorService.LobbyPlayerLeave", IndicatorService.LobbyPlayerLeave)
+
+function IndicatorService.LobbyPlayerSpawn(lobby, ply)
+	if IndicatorService.Visible() and IndicatorService.PlayerShouldHaveIndicator(ply) then
+		ply.indicator:AnimateAttribute("alpha", 255)
+	end
+end
+hook.Add("LocalLobbyPlayerSpawn", "IndicatorService.LobbyPlayerSpawn", IndicatorService.LobbyPlayerSpawn)
+
+function IndicatorService.LobbyPlayerDeath(lobby, ply)
+	if IndicatorService.Visible() and IndicatorService.PlayerShouldHaveIndicator(ply) then
+		ply.indicator:AnimateAttribute("alpha", 0)
+	end
+end
+hook.Add("LocalLobbyPlayerDeath", "IndicatorService.LobbyPlayerDeath", IndicatorService.LobbyPlayerDeath)
+
+function IndicatorService.LobbyPlayerClassChange(ply)
+	if IndicatorService.Visible() then
+		local should_have_indicator = IndicatorService.PlayerShouldHaveIndicator(ply)
+
+		if should_have_indicator and not ply.indicator then
+			IndicatorService.AddPlayerIndicator(ply)
+		elseif not should_have_indicator and ply.indicator then
+			ply.indicator:Finish()
+		end
+	end
+end
+hook.Add("LocalLobbyPlayerClassChange", "IndicatorService.LobbyPlayerClassChange", IndicatorService.LobbyPlayerClassChange)
+
+function IndicatorService.Show()
+	if IndicatorService.Visible() then
+		IndicatorService.container:AnimateAttribute("alpha", 255)
+	end
+end
 
 function IndicatorService.Hide()
-	IndicatorService.container:AnimateAttribute("alpha", 0)
+	if IndicatorService.Visible() then
+		IndicatorService.container:AnimateAttribute("alpha", 0)
+	end
 end
-hook.Add("LocalPlayerDeath", "IndicatorService.Hide", IndicatorService.Hide)
-hook.Add("OnLobbyUIOpen", "IndicatorService.Hide", IndicatorService.Hide)
 
 function IndicatorService.Draw()
-	IndicatorService.container.panel:PaintManual()
+	if IndicatorService.Visible() then
+		IndicatorService.container.panel:PaintManual()
+	end
 end
 hook.Add("DrawIndicators", "IndicatorService.Draw", IndicatorService.Draw)

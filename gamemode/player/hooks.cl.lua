@@ -70,11 +70,11 @@ hook.Add("InitPostEntity", "EMM.InitPostEntity", function ()
 
 	local local_ply = LocalPlayer()
 
-	hook.Run("InitUI")
 	hook.Run("LocalPlayerInitialSpawn", local_ply)
 	hook.Run("LocalPlayerSpawn", local_ply)
 	hook.Run("InitLocalPlayerProperties", local_ply)
 	hook.Run("LocalPlayerProperties", local_ply)
+	hook.Run("InitUI")
 
 	for _, ply in pairs(player.GetAll()) do
 		hook.Run("PlayerInitialSpawn", ply)

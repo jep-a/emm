@@ -110,16 +110,31 @@ function Class.AddHook(class, name, func_k)
 	end
 
 	local instances = class.static.instances
+	local queued_for_finish = {}
 
 	hook.Add(name, Class.TableID(class).."."..func_k, function (...)
+		local arguments = {...}
 		local len = #instances
 
 		for i = 1, len do
 			local instance = instances[i]
 
 			if instance then
-				class[func_k](instance, ...)
+				local success, error = pcall(function ()
+					class[func_k](instance, unpack(arguments))
+				end)
+		
+				if not success then
+					Error(error.."\n")
+					table.insert(queued_for_finish, instance)
+				end
 			end
+		end
+
+		local finish_len = #queued_for_finish
+
+		for i = 1, finish_len do
+			queued_for_finish[i]:DisconnectFromHooks()
 		end
 	end)
 end

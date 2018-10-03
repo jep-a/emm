@@ -1,20 +1,21 @@
 SettingsService = SettingsService or {}
 
-SettingsService.convar_properties = {}
+SettingsService.convar_properties = SettingsService.convar_properties or {}
 SettingsService.hooks = SettingsService.hooks or {}
 
 function SettingsService.New(name, props)
-	local default
-
 	if isbool(props.default) then
 		default = props.default and 1 or 0
 	else
-		default = props.default
+		default = Default(props.default, 0)
+	end
+	
+	if not SettingsService.convar_properties[name] then
+		CreateClientConVar(name, default, true, false, props.help)
+		cvars.AddChangeCallback(name, SettingsService.OnConvarChanged)
 	end
 
 	SettingsService.convar_properties[name] = props
-	CreateClientConVar(name, default, true, false, props.help)
-	cvars.AddChangeCallback(name, SettingsService.OnConvarChanged)
 end
 
 function SettingsService.AddHook(name, id, callback)
@@ -28,43 +29,49 @@ function SettingsService.RemoveHook(name, id)
 	end
 end
 
-function SettingsService.Setting(name, v)
+function SettingsService.Setting(name)
 	local v
 
-	local convar_prop = SettingsService.convar_properties[name]
+	local convar_props = SettingsService.convar_properties[name]
 	local convar = GetConVar(name)
 
-	if convar_prop.type == "string" then
+	if convar_props.type == "string" then
 		v = convar:GetString() or props.default or ""
-	elseif convar_prop.type == "number" then
-		local number = convar:GetFloat() or props.default or 0
+	elseif convar_props.type == "number" then
+		v = convar:GetFloat() or props.default or 0
 
-		if convar_prop.round then
-			v = math.Round(number, isnumber(convar_prop.round) and convar_prop.round)
+		if convar_props.round then
+			v = math.Round(v, isnumber(convar_props.round) and convar_props.round)
 		end
 
-		if convar_prop.snap then
-			v = Snap(v, convar_prop.snap)
+		if convar_props.snap then
+			v = Snap(v, convar_props.snap)
 		end
 
-		if convar_prop.min then
-			v = math.max(v, convar_prop.min)
+		if convar_props.min then
+			v = math.max(v, convar_props.min)
 		end
 
-		if convar_prop.max then
-			v = math.min(v, convar_prop.max)
+		if convar_props.max then
+			v = math.min(v, convar_props.max)
 		end
 	else
-		v = convar:GetBool() or props.default or false
+		v = Default(convar:GetBool(), convar_props.default, false)
 	end
 
 	return v
 end
 
 function SettingsService.OnConvarChanged(name)
-	if SettingsService.hooks[name] then
-		local v = SettingsService.Setting(name)
+	local v = SettingsService.Setting(name)
 
+	local callback = SettingsService.convar_properties[name].callback
+
+	if callback then
+		callback(v)
+	end
+
+	if SettingsService.hooks[name] then
 		for _, hk in pairs(SettingsService.hooks[name]) do
 			hk(v)
 		end

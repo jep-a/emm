@@ -11,6 +11,20 @@ function Falsy(v)
 	)
 end
 
+function Default(...)
+	local final_v
+
+	for _, v in pairs({...}) do
+		if v ~= "nil" then
+			final_v = v
+
+			break
+		end
+	end
+
+	return final_v
+end
+
 function Snap(n, snap)
 	local mod = n % snap
 	

@@ -16,35 +16,49 @@ function NotificationService.CreateFlash(duration)
 	return element
 end
 
+function NotificationService.Visible()
+	return SettingsService.Setting "emm_show_hud" and SettingsService.Setting "emm_show_notifications"
+end
+
 function NotificationService.PushSideText(text)
-	return HUDService.quadrant_c:Add(NotificationContainer.New(TextBar.New(text, {
-		padding = 0,
-		fill_color = false
-	})))
+	if NotificationService.Visible() then
+		return HUDService.quadrant_c:Add(NotificationContainer.New(TextBar.New(text, {
+			padding = 0,
+			fill_color = false
+		})))
+	end
 end
 
 function NotificationService.PushText(text)
-	return HUDService.quadrant_b:Add(NotificationContainer.New(TextBar.New(text)))
+	if NotificationService.Visible() then
+		return HUDService.quadrant_b:Add(NotificationContainer.New(TextBar.New(text)))
+	end
 end
 
 function NotificationService.PushAvatarText(ply, text)
-	return HUDService.quadrant_b:Add(NotificationContainer.New(AvatarNotification.New(ply, text)))
+	if NotificationService.Visible() then
+		return HUDService.quadrant_b:Add(NotificationContainer.New(AvatarNotification.New(ply, text)))
+	end
 end
 
 function NotificationService.PushCountdown(time, text, key)
-	return HUDService.quadrant_b:Add(NotificationContainer.New(CountdownNotification.New(time, text), time - CurTime(), key))
+	if NotificationService.Visible() then
+		return HUDService.quadrant_b:Add(NotificationContainer.New(CountdownNotification.New(time, text), time - CurTime(), key))
+	end
 end
 
 function NotificationService.PushMetaText(text, key, i)
-	local notification = NotificationContainer.New(TextBar.New(text), 0, key)
+	if NotificationService.Visible() then
+		local notification = NotificationContainer.New(TextBar.New(text), 0, key)
 
-	if i then
-		HUDService.quadrant_a:Add(i, notification)
-	else
-		HUDService.quadrant_a:Add(notification)
+		if i then
+			HUDService.quadrant_a:Add(i, notification)
+		else
+			HUDService.quadrant_a:Add(notification)
+		end
+
+		return notification
 	end
-
-	return notification
 end
 
 local function FinishNotificationContainer(element)
@@ -58,7 +72,7 @@ function NotificationService.FinishSticky(key)
 end
 
 function NotificationService.Clear(lobby, ply)
-	if not lobby or IsLocalPlayer(ply) then
+	if NotificationService.Visible() and not lobby or IsLocalPlayer(ply) then
 		for _, element in pairs(HUDService.quadrant_b.children) do
 			FinishNotificationContainer(element)
 		end

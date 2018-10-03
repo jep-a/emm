@@ -72,7 +72,7 @@ function MinigamePrototype:AddPlayerClass(ply_class)
 		can_walljump = true,
 		can_wallslide = true,
 		can_airaccel = true,
-		can_auto_bunnyhop = false
+		can_autojump = false
 	}, ply_class)
 
 	ply_class.id = table.Count(self.player_classes) + 1
