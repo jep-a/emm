@@ -16,7 +16,7 @@ end
 function NumberInputPanel:AllowInput(string)
 	local allowed
 
-	local is_num = string.find(string, "%d")
+	local is_num = string.find(string, "[%d%.-]")
 
 	if is_num then
 		allowed = true

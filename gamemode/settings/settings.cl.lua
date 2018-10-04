@@ -79,11 +79,13 @@ function SettingsService.Set(name, v)
 	if convar_props.type == "string" then
 		convar:SetString(v or "")
 	elseif convar_props.type == "number" then
-		if v == "" or Nily(v) then
-			v = 0
+		local number_v = tonumber(v)
+
+		if number_v == "" or Nily(number_v) then
+			number_v = 0
 		end
 	
-		convar:SetFloat(SettingsService.ValidateNumber(name, v))
+		convar:SetFloat(SettingsService.ValidateNumber(name, number_v))
 	else
 		convar:SetBool(v)
 	end
