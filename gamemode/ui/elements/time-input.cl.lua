@@ -306,8 +306,8 @@ function TimeInput:Init(time, props)
 end
 
 function TimeInput:Finish()
-	if self.slider then
-		self.slider:Finish()
+	if self.dragger then
+		self.dragger:Finish()
 	end
 
 	self:OnUnFocus()
@@ -364,7 +364,7 @@ function TimeInput:StartDragging()
 
 	self:OnUnFocus()
 
-	self.slider = InputSlider.New(self, {
+	self.dragger = InputDragger.New(self, {
 		default = self.value > 0 and {text = self.panel.text.time_with_colons, value = tonumber(self.panel.text:GetText())} or 500,
 
 		text_generate = function (v)
@@ -395,9 +395,9 @@ function TimeInput:StartDragging()
 		}
 	})
 
-	self.slider:AnimateAttribute("alpha", 255)
-	self.slider.panel:MakePopup()
-	self.slider.panel:SetKeyboardInputEnabled(false)
+	self.dragger:AnimateAttribute("alpha", 255)
+	self.dragger.panel:MakePopup()
+	self.dragger.panel:SetKeyboardInputEnabled(false)
 end
 
 function TimeInput:StopDragging()
@@ -405,13 +405,13 @@ function TimeInput:StopDragging()
 
 	self:OnFocus()
 
-	local v = self.slider.generated_options[self.slider.selected_option_index]
+	local v = self.dragger.generated_options[self.dragger.selected_option_index]
 
 	if v then
-		self.panel.text:SetValue(self.slider.generated_options[self.slider.selected_option_index])
+		self.panel.text:SetValue(self.dragger.generated_options[self.dragger.selected_option_index])
 		self.panel.text:OffsetCaretPos(max_time_digits)
 	end
 
-	self.slider:Finish()
-	self.slider = nil
+	self.dragger:Finish()
+	self.dragger = nil
 end

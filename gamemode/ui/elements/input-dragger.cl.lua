@@ -1,4 +1,4 @@
-InputSlider = InputSlider or Class.New(Element)
+InputDragger = InputDragger or Class.New(Element)
 
 local scroll_step = 24
 local option_padding = 10
@@ -15,12 +15,12 @@ local function OptionValue(option)
 	return v
 end
 
-function InputSlider:Init(input, props)
+function InputDragger:Init(input, props)
 	local input_w = input:GetFinalWidth()
 	local input_h = input:GetFinalHeight()
 	local screen_x, screen_y = input.panel:LocalToScreen(input_w/2, input_h/2)
 
-	InputSlider.super.Init(self, {
+	InputDragger.super.Init(self, {
 		origin_position = true,
 		origin_x = screen_x,
 		origin_y = screen_y,
@@ -78,11 +78,11 @@ function InputSlider:Init(input, props)
 	self:AnimateAttribute("alpha", 255)
 end
 
-function InputSlider:GenerateUpperRangeValue(i)
+function InputDragger:GenerateUpperRangeValue(i)
 	return tonumber(OptionValue(self.options[1])) - ((i - 1) * self.upper_range_step)
 end
 
-function InputSlider:GenerateOptions(default_i, insert_i, insert_option)
+function InputDragger:GenerateOptions(default_i, insert_i, insert_option)
 	self.insert_i = insert_i
 	self.insert_option = insert_option
 
@@ -95,7 +95,7 @@ function InputSlider:GenerateOptions(default_i, insert_i, insert_option)
 	end
 end
 
-function InputSlider:GenerateOption(i, option_i)
+function InputDragger:GenerateOption(i, option_i)
 	local is_insert
 	local v
 
@@ -162,7 +162,7 @@ function InputSlider:GenerateOption(i, option_i)
 	end
 end
 
-function InputSlider:InitOptions(default)
+function InputDragger:InitOptions(default)
 	local default_v = OptionValue(default)
 	local first_option = tonumber(OptionValue(self.options[1]))
 
@@ -189,20 +189,20 @@ function InputSlider:InitOptions(default)
 	end
 end
 
-function InputSlider:AnimateFinish()
+function InputDragger:AnimateFinish()
 	self:AnimateAttribute("alpha", 0, {
 		callback = function ()
-			InputSlider.super.Finish(self)
+			InputDragger.super.Finish(self)
 		end
 	})
 end
 
-function InputSlider:Finish()
+function InputDragger:Finish()
 	self.scroll:Finish()
 	self:AnimateFinish()
 end
 
-function InputSlider:SetScrollPos()
+function InputDragger:SetScrollPos()
 	local _, y = self.panel:LocalCursorPos()
 	
 	local scroll
@@ -217,7 +217,7 @@ function InputSlider:SetScrollPos()
 	self.selected_option_index = self.scroll.current + self.offset - (option_padding + 1)
 end
 
-function InputSlider:LayoutScroll()
+function InputDragger:LayoutScroll()
 	local h = self:GetFinalHeight()
 	local child_margin = self.inner_container.attributes.child_margin.current
 	local option_h = self.inner_container.children[1]:GetFinalHeight() + child_margin
@@ -226,8 +226,8 @@ function InputSlider:LayoutScroll()
 	self.inner_container:SetAttribute("y", (h/2) - ((option_h - child_margin)/2) - ((self.scroll.smooth - 1) * option_h))
 end
 
-function InputSlider:Think()
-	InputSlider.super.Think(self)
+function InputDragger:Think()
+	InputDragger.super.Think(self)
 
 	if #self.inner_container.children > 0 then
 		self:SetScrollPos()

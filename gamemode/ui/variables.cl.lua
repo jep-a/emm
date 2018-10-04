@@ -28,7 +28,7 @@ SettingsService.New("cam_ui_smooth_multiplier", {
 	default = 1,
 	min = 0,
 	max = 4,
-	help = "Cam UI smoothing multiplier",
+	help = "3D UI smoothing multiplier",
 })
 
 surface.CreateFont("TextBar", {
