@@ -225,7 +225,7 @@ function TimeInputPanel:Paint(w, h)
 	surface.SetDrawColor(color)
 
 	if self:HasFocus() and math.Round((CurTime() - self.last_caret_pos_change) % 1) == 0 then
-		surface.DrawRect((self.digit_width * self.caret_pos_after_colon) + start_padding, 0, LINE_THICKNESS/2, h - MARGIN)
+		surface.DrawRect((self.digit_width * self.caret_pos_after_colon) + start_padding, 0, LINE_THICKNESS, h - MARGIN)
 	end
 end
 
@@ -280,7 +280,7 @@ function TimeInput:Init(time, props)
 			position_justification_x = JUSTIFY_CENTER,
 			position_justification_y = JUSTIFY_END,
 			width_percent = 1,
-			height = LINE_THICKNESS/2,
+			height = LINE_THICKNESS,
 			fill_color = true,
 			alpha = 0
 		}

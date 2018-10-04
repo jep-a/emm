@@ -476,8 +476,14 @@ function Element:GenerateSize()
 end
 
 function Element:SetPanelBounds(x, y, w, h)
+	local attr = self.attributes
+
 	self.panel:SetSize(w or self:GetFinalWidth(), h or self:GetFinalHeight())
-	self.panel:SetPos(math.Round(x or self.attributes.x.current), math.Round(x or self.attributes.y.current))
+
+	self.panel:SetPos(
+		math.Round(x or (attr.x.current + attr.offset_x.current)),
+		math.Round(x or (attr.y.current + attr.offset_y.current))
+	)
 end
 
 function Element:LayoutFamily()

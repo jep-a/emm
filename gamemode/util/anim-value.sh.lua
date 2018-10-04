@@ -68,6 +68,7 @@ function AnimatableValue:Init(value, props)
 	end
 
 	self.animate_callback = props.animate_callback
+	self.smooth_callback = props.smooth_callback
 end
 
 function AnimatableValue:GetAnimationEndTime()
@@ -80,7 +81,7 @@ function AnimatableValue:GetAnimationEndTime()
 	return end_time
 end
 
-function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay, finish, callback)
+function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay)
 	local instances = AnimatableValue.static.instances
 
 	if not self.thinker and not table.HasValue(instances, self) then
@@ -88,6 +89,10 @@ function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay, finish
 	end
 
 	local duration
+	local finish
+	local callback
+	local animate_callback
+	local stack
 
 	if istable(props_or_duration) then
 		duration = props_or_duration.duration or 0.2
@@ -95,6 +100,7 @@ function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay, finish
 		delay = props_or_duration.delay or 0
 		finish = props_or_duration.finish
 		callback = props_or_duration.callback
+		animate_callback = props_or_duration.animate_callback
 		stack = props_or_duration.stack
 	else
 		duration = props_or_duration or 0.2
@@ -121,6 +127,7 @@ function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay, finish
 		ease = ease,
 		delay = delay,
 		finish = finish,
+		animate_callback = animate_callback,
 		callback = callback
 	}
 
@@ -190,8 +197,12 @@ function AnimatableValue:Animate()
 
 			table.remove(self.animations, 1)
 
+			if first_anim.animate_callback then
+				first_anim.animate_callback(self)
+			end	
+
 			if first_anim.callback then
-				first_anim.callback(first_anim)
+				first_anim.callback(self)
 			end
 
 			if first_anim.finish then
@@ -252,6 +263,10 @@ function AnimatableValue:Smooth()
 		self.new = Color(Smooth(mult, curr.r, last.r), Smooth(mult, curr.g, last.g), Smooth(mult, curr.b, last.b), Smooth(mult, curr.a, last.a))
 	else
 		self.new = Smooth(mult, curr, last)
+	end
+
+	if self.smooth_callback and last ~= self.new then
+		self.smooth_callback(self)
 	end
 
 	self.last = self.new

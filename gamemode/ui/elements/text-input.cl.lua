@@ -57,7 +57,7 @@ function TextInput:Init(text, props)
 			position_justification_x = JUSTIFY_CENTER,
 			position_justification_y = JUSTIFY_END,
 			width_percent = 1,
-			height = LINE_THICKNESS/2,
+			height = LINE_THICKNESS,
 			fill_color = true,
 			alpha = 0
 		}

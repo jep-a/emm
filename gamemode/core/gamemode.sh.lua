@@ -54,6 +54,7 @@ EMM.Include {
 	"ui/util",
 	"ui/cam",
 	"ui/vardebug",
+	"ui/elements/scroll-container",
 	"ui/elements/text-bar",
 	"ui/elements/button-bar",
 	"ui/elements/meter-bar",
@@ -65,7 +66,6 @@ EMM.Include {
 	"ui/elements/time-input",
 	"ui/elements/input-bar",
 
-	"lobby-ui/variables",
 	"lobby-ui/lobby-ui",
 	"lobby-ui/elements",
 	"lobby-ui/factories",

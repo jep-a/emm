@@ -9,7 +9,7 @@ function LobbyBar:Init(lobby)
 		padding_x = MARGIN * 8,
 		padding_top = MARGIN * 3,
 		inherit_color = false,
-		border = LINE_THICKNESS/2,
+		border = LINE_THICKNESS,
 		border_color = lobby.prototype.color,
 		border_alpha = 0,
 		cursor = "hand",
@@ -86,12 +86,12 @@ function LobbyBar:Init(lobby)
 		font = "NumberInfo",
 		text_justification = 5,
 		text = #lobby.players,
-		border = LINE_THICKNESS/2
+		border = LINE_THICKNESS
 	})
 
 	self:Add(Element.New {
 		width_percent = 1,
-		height = LINE_THICKNESS/2,
+		height = LINE_THICKNESS,
 		fill_color = true,
 	
 		alpha = function ()

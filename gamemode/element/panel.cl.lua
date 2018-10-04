@@ -75,6 +75,10 @@ function ElementPanel:OnMouseReleased(mouse)
 	end
 end
 
+function ElementPanel:OnMouseWheeled(scroll)
+	self.element:OnMouseScrolled(scroll)
+end
+
 local hovered_panels = {}
 
 timer.Create("Element.HoveredPanels", 1/30, 0, function ()
