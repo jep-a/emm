@@ -79,10 +79,10 @@ function LobbySettings:AddSetting(setting, ply_class_k)
 	end
 
 	self.settings[k] = setting
-	self.original_values[k] = MinigameSettingsService.Setting(self.lobby, k)
+	self.original_values[k] = MinigameSettingsService.Get(self.lobby, k)
 
 	local prereq = setting.prerequisite
-	local curr_v = MinigameSettingsService.Setting(self.lobby, k, true)
+	local curr_v = MinigameSettingsService.Get(self.lobby, k, true)
 
 	local prereq_v
 

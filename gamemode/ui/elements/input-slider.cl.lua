@@ -27,7 +27,7 @@ function InputSlider:Init(input, props)
 		position_justification_x = JUSTIFY_CENTER,
 		position_justification_y = JUSTIFY_CENTER,
 		fit_x = true,
-		height = INPUT_SLIDER_HEIGHT,
+		height = INPUT_HEIGHT,
 		background_color = COLOR_GRAY,
 		alpha = 0,
 		border = 2,

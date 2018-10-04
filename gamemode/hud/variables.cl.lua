@@ -18,30 +18,30 @@ local function ReloadHUD()
 	IndicatorService.Reload(true)
 end
 
-SettingsService.New("emm_show_hud", {
+SettingsService.New("show_hud", {
 	default = true,
 	help = "Show HUD",
 	callback = ReloadHUD
 })
 
-SettingsService.New("emm_show_hud_meters", {
+SettingsService.New("show_hud_meters", {
 	default = true,
 	help = "Show HUD meters",
 	callback = ReloadHUD
 })
 
-SettingsService.New("emm_show_crosshair", {
+SettingsService.New("show_crosshair", {
 	default = true,
 	help = "Show crosshair",
 	callback = ReloadHUD
 })
 
-SettingsService.New("emm_show_crosshair_meters", {
+SettingsService.New("show_crosshair_meters", {
 	help = "Show crosshair meters",
 	callback = ReloadHUD
 })
 
-SettingsService.New("emm_show_indicators", {
+SettingsService.New("show_indicators", {
 	default = true,
 	help = "Show indicators",
 
@@ -50,13 +50,13 @@ SettingsService.New("emm_show_indicators", {
 	end
 })
 
-SettingsService.New("emm_show_notifications", {
+SettingsService.New("show_notifications", {
 	default = true,
 	help = "Show notifications",
 	callback = ReloadHUD
 })
 
-SettingsService.New("emm_hud_padding_x", {
+SettingsService.New("hud_padding_x", {
 	type = "number",
 	default = 16,
 	round = true,
@@ -66,7 +66,7 @@ SettingsService.New("emm_hud_padding_x", {
 	help = "HUD horizontal padding (pixels)"
 })
 
-SettingsService.New("emm_hud_padding_y", {
+SettingsService.New("hud_padding_y", {
 	type = "number",
 	default = 16,
 	round = true,
@@ -76,7 +76,7 @@ SettingsService.New("emm_hud_padding_y", {
 	help = "HUD vertical padding (pixels)"
 })
 
-SettingsService.New("emm_hud_angle", {
+SettingsService.New("hud_angle", {
 	type = "number",
 	default = 5,
 	min = 0,
@@ -85,7 +85,7 @@ SettingsService.New("emm_hud_angle", {
 	callback = ReloadHUD
 })
 
-SettingsService.New("emm_crosshair_size", {
+SettingsService.New("crosshair_size", {
 	type = "number",
 	default = 24,
 	round = true,
@@ -94,7 +94,7 @@ SettingsService.New("emm_crosshair_size", {
 	help = "Crosshair size (pixels)"
 })
 
-SettingsService.New("emm_crosshair_gap", {
+SettingsService.New("crosshair_gap", {
 	type = "number",
 	default = 3,
 	round = true,
@@ -103,7 +103,7 @@ SettingsService.New("emm_crosshair_gap", {
 	help = "Crosshair gap (pixels)"
 })
 
-SettingsService.New("emm_crosshair_meter_radius", {
+SettingsService.New("crosshair_meter_radius", {
 	type = "number",
 	default = 40,
 	round = true,
@@ -112,7 +112,7 @@ SettingsService.New("emm_crosshair_meter_radius", {
 	help = "Crosshair meter radius (pixels)"
 })
 
-SettingsService.New("emm_crosshair_meter_arc_length", {
+SettingsService.New("crosshair_meter_arc_length", {
 	type = "number",
 	default = 40,
 	round = true,

@@ -23,7 +23,7 @@ function AnimatableValue.New(...)
 end
 
 function AnimatableValue.NewFromSetting(name, ...)
-	local anim_v = AnimatableValue.New(SettingsService.Setting(name), ...)
+	local anim_v = AnimatableValue.New(SettingsService.Get(name), ...)
 	anim_v:SetConvarAnimator(name)
 
 	return anim_v

@@ -63,8 +63,12 @@ EMM.Include {
 	"ui/elements/checkbox",
 	"ui/elements/input-slider",
 	"ui/elements/text-input",
+	"ui/elements/number-input",
 	"ui/elements/time-input",
 	"ui/elements/input-bar",
+
+	"settings/ui",
+	"settings/factories",
 
 	"lobby-ui/lobby-ui",
 	"lobby-ui/elements",

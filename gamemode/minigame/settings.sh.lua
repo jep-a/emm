@@ -53,13 +53,13 @@ function MinigameSettingsService.AdjustedSettings(lobby)
 	local settings = {}
 
 	for k, _ in pairs(lobby.changed_settings) do
-		settings[k] = MinigameSettingsService.Setting(lobby, k)
+		settings[k] = MinigameSettingsService.Get(lobby, k)
 	end
 
 	return settings
 end
 
-function MinigameSettingsService.Setting(lobby, k, use_nil)
+function MinigameSettingsService.Get(lobby, k, use_nil)
 	local v
 
 	local tab = lobby
@@ -140,11 +140,11 @@ function MinigameLobby:InitSettings()
 				for _, ply_class_setting in pairs(setting.settings) do
 					local k = "player_classes."..ply_class_k.."."..ply_class_setting.key
 
-					self.original_settings[k] = MinigameSettingsService.Setting(self, k)
+					self.original_settings[k] = MinigameSettingsService.Get(self, k)
 				end
 			end
 		else
-			self.original_settings[setting.key] = MinigameSettingsService.Setting(self, setting.key)
+			self.original_settings[setting.key] = MinigameSettingsService.Get(self, setting.key)
 		end
 	end
 end

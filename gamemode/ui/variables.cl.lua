@@ -21,9 +21,9 @@ LARGE_BUTTON_ICON_SIZE = 64
 
 CHECKBOX_SIZE = 27
 
-INPUT_SLIDER_HEIGHT = 128 + (MARGIN * 4)
+INPUT_HEIGHT = 128 + (MARGIN * 4)
 
-SettingsService.New("emm_cam_ui_smooth_multiplier", {
+SettingsService.New("cam_ui_smooth_multiplier", {
 	type = "number",
 	default = 1,
 	min = 0,

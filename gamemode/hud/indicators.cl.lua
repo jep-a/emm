@@ -118,7 +118,7 @@ end
 hook.Add("PreDrawOpaqueRenderables", "IndicatorService.RenderCoasters", IndicatorService.RenderCoasters)
 
 function IndicatorService.Visible()
-	return SettingsService.Setting "emm_show_hud" and SettingsService.Setting "emm_show_indicators"
+	return SettingsService.Get "show_hud" and SettingsService.Get "show_indicators"
 end
 
 function IndicatorService.PlayerShouldHaveIndicator(ply)

@@ -1,7 +1,10 @@
 SettingsService = SettingsService or {}
 
-SettingsService.convar_properties = SettingsService.convar_properties or {}
+SettingsService.convars = SettingsService.convars or {}
+SettingsService.ordered_convars = {}
 SettingsService.hooks = SettingsService.hooks or {}
+
+local gamemode_prefix = engine.ActiveGamemode().."_"
 
 function SettingsService.New(name, props)
 	if isbool(props.default) then
@@ -10,12 +13,13 @@ function SettingsService.New(name, props)
 		default = Default(props.default, 0)
 	end
 	
-	if not SettingsService.convar_properties[name] then
-		CreateClientConVar(name, default, true, false, props.help)
-		cvars.AddChangeCallback(name, SettingsService.OnConvarChanged)
+	if not SettingsService.convars[name] then
+		CreateClientConVar(gamemode_prefix..name, default, true, false, props.help)
+		cvars.AddChangeCallback(gamemode_prefix..name, SettingsService.OnConvarChanged)
 	end
 
-	SettingsService.convar_properties[name] = props
+	SettingsService.convars[name] = props
+	table.insert(SettingsService.ordered_convars, name)
 end
 
 function SettingsService.AddHook(name, id, callback)
@@ -29,32 +33,38 @@ function SettingsService.RemoveHook(name, id)
 	end
 end
 
-function SettingsService.Setting(name)
+function SettingsService.ValidateNumber(name, v)
+	local convar_props = SettingsService.convars[name]
+
+	if convar_props.round then
+		v = math.Round(v, isnumber(convar_props.round) and convar_props.round)
+	end
+
+	if convar_props.snap then
+		v = Snap(v, convar_props.snap)
+	end
+
+	if convar_props.min then
+		v = math.max(v, convar_props.min)
+	end
+
+	if convar_props.max then
+		v = math.min(v, convar_props.max)
+	end
+
+	return v
+end
+
+function SettingsService.Get(name)
 	local v
 
-	local convar_props = SettingsService.convar_properties[name]
-	local convar = GetConVar(name)
+	local convar_props = SettingsService.convars[name]
+	local convar = GetConVar(gamemode_prefix..name)
 
 	if convar_props.type == "string" then
 		v = convar:GetString() or props.default or ""
 	elseif convar_props.type == "number" then
-		v = convar:GetFloat() or props.default or 0
-
-		if convar_props.round then
-			v = math.Round(v, isnumber(convar_props.round) and convar_props.round)
-		end
-
-		if convar_props.snap then
-			v = Snap(v, convar_props.snap)
-		end
-
-		if convar_props.min then
-			v = math.max(v, convar_props.min)
-		end
-
-		if convar_props.max then
-			v = math.min(v, convar_props.max)
-		end
+		v = SettingsService.ValidateNumber(name, convar:GetFloat() or props.default or 0)
 	else
 		v = Default(convar:GetBool(), convar_props.default, false)
 	end
@@ -62,17 +72,35 @@ function SettingsService.Setting(name)
 	return v
 end
 
-function SettingsService.OnConvarChanged(name)
-	local v = SettingsService.Setting(name)
+function SettingsService.Set(name, v)
+	local convar_props = SettingsService.convars[name]
+	local convar = GetConVar(gamemode_prefix..name)
 
-	local callback = SettingsService.convar_properties[name].callback
+	if convar_props.type == "string" then
+		convar:SetString(v or "")
+	elseif convar_props.type == "number" then
+		if v == "" or Nily(v) then
+			v = 0
+		end
+	
+		convar:SetFloat(SettingsService.ValidateNumber(name, v))
+	else
+		convar:SetBool(v)
+	end
+end
+
+function SettingsService.OnConvarChanged(name)
+	local unprefixed_name = string.sub(name, #gamemode_prefix + 1)
+	local v = SettingsService.Get(unprefixed_name)
+
+	local callback = SettingsService.convars[unprefixed_name].callback
 
 	if callback then
 		callback(v)
 	end
 
-	if SettingsService.hooks[name] then
-		for _, hk in pairs(SettingsService.hooks[name]) do
+	if SettingsService.hooks[unprefixed_name] then
+		for _, hk in pairs(SettingsService.hooks[unprefixed_name]) do
 			hk(v)
 		end
 	end

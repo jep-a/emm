@@ -2,6 +2,10 @@ TextInput = TextInput or Class.New(Element)
 
 local TextInputPanel = {}
 
+function TextInputPanel:Init()
+	self:SetUpdateOnType(true)
+end
+
 function TextInputPanel:Paint(w, h)
 	local attr = self.element.attributes
 	local color = attr.text_color and attr.text_color.current or self.element:GetColor()
@@ -48,33 +52,40 @@ function TextInput:Init(text, props)
 			border_alpha = 255
 		},
 
-		text_line = Element.New {
-			overlay = true,
-			layout = false,
-			origin_position = true,
-			origin_justification_x = JUSTIFY_CENTER,
-			origin_justification_y = JUSTIFY_END,
-			position_justification_x = JUSTIFY_CENTER,
-			position_justification_y = JUSTIFY_END,
-			width_percent = 1,
-			height = LINE_THICKNESS,
-			fill_color = true,
-			alpha = 0
-		}
+		text_line = self:CreateTextLine()
 	})
 
-	self.value = ""
-
+	self.value = tostring(text)
 	self.panel.text = self.panel:Add(vgui.Create "TextInputPanel")
-	self.panel.text.element = self
-	self.panel.text:SetFont(self:GetAttribute "font")
-	self.panel.text:SetText(text or self:GetAttribute "text" or "")
+	self:SetupPanel(text)
 
 	if props then
 		self:SetAttributes(props)
 		self.on_change = props.on_change
 		self.on_click = props.on_click
 	end
+end
+
+function TextInput:CreateTextLine()
+	return Element.New {
+		overlay = true,
+		layout = false,
+		origin_position = true,
+		origin_justification_x = JUSTIFY_CENTER,
+		origin_justification_y = JUSTIFY_END,
+		position_justification_x = JUSTIFY_CENTER,
+		position_justification_y = JUSTIFY_END,
+		width_percent = 1,
+		height = LINE_THICKNESS,
+		fill_color = true,
+		alpha = 0
+	}
+end
+
+function TextInput:SetupPanel(text)
+	self.panel.text.element = self
+	self.panel.text:SetFont(self:GetAttribute "font")
+	self.panel.text:SetText(text or self:GetAttribute "text" or "")
 end
 
 function TextInput:OnValueChanged(v)
