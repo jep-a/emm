@@ -5,6 +5,7 @@ function player_metatable:SetupCoreProperties()
 		self:SetMaxHealth(self.max_health)
 		self:SetArmor(0)
 		self:ShouldDropWeapon(false)
+		self:Strip()
 	end
 
 	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)

@@ -58,5 +58,5 @@ function player_metatable:SetupPlayerClass()
 end
 
 function player_metatable:EndPlayerClass()
-	--
+	self:SetupCoreProperties()
 end
