@@ -116,7 +116,7 @@ SettingsService.New("crosshair_meter_arc_length", {
 	type = "number",
 	default = 40,
 	round = true,
-	min = 8,
+	min = 0,
 	max = 90,
 	help = "Crosshair meter arc length (degrees)"
 })

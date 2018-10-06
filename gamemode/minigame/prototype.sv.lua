@@ -2,10 +2,14 @@ function MinigamePrototype:Respawn(ply)
 	ply:Spawn()
 end
 
-function MinigamePrototype:PickRandomPlayerClasses()
+function MinigamePrototype:PickPlayerClasses()
 	if self.random_player_classes then
 		local picked_plys = MinigameService.PickRandomPlayerClasses(self, self.random_player_classes)
 		MinigameService.CallNetHook(self, "RandomPlayerClassesPicked", picked_plys)
+	elseif self.default_player_class then
+		for _, ply in pairs(self.players) do
+			ply:SetPlayerClass(self.player_classes[self.default_player_class])
+		end
 	end
 end
 
@@ -13,7 +17,7 @@ function MinigamePrototype:ReplacePlayerClass(ply)
 	local ply_class = ply.player_class
 
 	if ply_class.minimum and ply_class.minimum > 0 and ply_class.minimum > (#self[ply_class.key] - 1) then
-		self:PickRandomPlayerClasses()
+		self:PickPlayerClasses()
 	end
 end
 
@@ -65,7 +69,7 @@ end
 
 function MinigamePrototype:AddDefaultHooks()
 	self:AddHook("StartStateWaiting", "ClearPlayerClasses", MinigameService.ClearPlayerClasses)
-	self:AddHook("StartStatePlaying", "PickRandomPlayerClasses", self.PickRandomPlayerClasses)
+	self:AddHook("StartStatePlaying", "PickPlayerClasses", self.PickPlayerClasses)
 	self:AddStateHook("Playing", "PlayerJoin", "Respawn", self.Respawn)
 	self:AddStateHook("Playing", "PlayerJoin", "SetDefaultPlayerClass", self.SetDefaultPlayerClass)
 	self:AddStateHook("Playing", "PlayerLeave", "ReplacePlayerClass", self.ReplacePlayerClass)

@@ -21,6 +21,7 @@ function LobbySettings:Init(lobby)
 
 	self.original_values = {}
 	self.changed_values = {}
+	self.values = {}
 
 	self.settings = {}
 	self.inputs = {}
@@ -79,7 +80,16 @@ function LobbySettings:AddSetting(setting, ply_class_k)
 	end
 
 	self.settings[k] = setting
-	self.original_values[k] = MinigameSettingsService.Get(self.lobby, k)
+
+	local v = MinigameSettingsService.Get(self.lobby, k)
+
+	if istable(v) then
+		for _k, _v in pairs(v) do
+			self.original_values[k..".".._k] = _v
+		end
+	else
+		self.original_values[k] = v
+	end
 
 	local prereq = setting.prerequisite
 	local curr_v = MinigameSettingsService.Get(self.lobby, k, true)
@@ -104,11 +114,30 @@ function LobbySettings:AddSetting(setting, ply_class_k)
 		}))
 	end
 
-	self.inputs[k] = category:Add(InputBar.New(setting.label, setting.type, curr_v, {
-		on_change = function (input, v)
+	local input_props = {
+		options = setting.options
+	}
+
+	local list = setting.type == "list"
+
+	if list then
+		input_props.on_change = function (input, list_k, v)
+			self:OnSettingValueChanged(k.."."..list_k, v)
+		end
+	else
+		input_props.on_change = function (input, v)
 			self:OnSettingValueChanged(k, v)
 		end
-	}))
+	end
+
+	self.inputs[k] = category:Add(InputBar.New(setting.label, setting.type, curr_v, input_props))
+
+	if list then
+		for list_k, list_v in pairs(self.inputs[k].input.inputs) do
+			print(list_k)
+			self.inputs[k.."."..list_k] = list_v
+		end
+	end
 
 	if prereq and prereq_v == prereq.opposite_value then
 		self.inputs[k]:SetState "hidden"
@@ -131,6 +160,7 @@ function LobbySettings:OnPrerequisiteValueChanged(k, v)
 
 		if override then
 			self.inputs[k]:SetValue(override)
+			self.values[k] = override
 		end
 
 		self.inputs[k]:AnimateState "hidden"
@@ -146,7 +176,10 @@ function LobbySettings:RefreshSaver()
 end
 
 function LobbySettings:OnSettingValueChanged(k, v)
+	self.values[k] = v
+
 	MinigameSettingsService.SortChange(self.original_values, self.changed_values, k, v)
+
 	self:RefreshSaver()
 end
 
@@ -174,7 +207,7 @@ function LobbySettings:Save()
 	local changed_v = {}
 
 	for k, _ in pairs(self.changed_values) do
-		local v = self.inputs[k]:GetValue()
+		local v = self.values[k]
 
 		if Falsy(v) and Nily(self.lobby.original_settings[k]) then
 			changed_v[k] = "nil"

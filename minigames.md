@@ -61,7 +61,7 @@ PlayerClasses are tables of properties like `color` and `can_walljump` that will
 PlayerClass {
 	name = "Hunted",
 	color = COLOR_ORANGE,
-	can_tag = {"Hunter"}
+	can_tag = {Hunter = true}
 }
 ```
 

@@ -19,7 +19,7 @@ function player_metatable:SetPlayerClass(class)
 
 	MinigameService.CallHook(self.lobby, "PlayerClassChange", self, old_class, class)
 
-	if IsLocalPlayer(self) then
+	if IsLocalPlayer(self) and class.display_name then
 		NotificationService.PushMetaText(class.name, "PlayerClass", 2)
 	end
 end
@@ -49,7 +49,7 @@ end
 function PlayerClassService.InitHUDElements()
 	local ply_class = LocalPlayer().player_class
 
-	if ply_class then
+	if ply_class and ply_class.display_name then
 		NotificationService.PushMetaText(ply_class.name, "PlayerClass", 2)
 	end
 end

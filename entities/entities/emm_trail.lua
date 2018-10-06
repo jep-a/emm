@@ -18,6 +18,7 @@ function ENT:Initialize()
 	else
 		self.animatable_color = AnimatableValue.New(COLOR_WHITE, {
 			smooth = true,
+
 			generate = function ()
 				return self:GetOwner().color
 			end

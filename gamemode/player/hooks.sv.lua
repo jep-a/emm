@@ -9,6 +9,7 @@ hook.Add("PlayerSpawn", "EMM.PlayerSpawn", function (ply)
 	hook.Run("PlayerProperties", ply)
 	ply:SetupCoreProperties()
 	ply:SetupModel()
+	ply:SetupLoadout()
 
 	if ply.lobby then
 		MinigameService.CallHook(ply.lobby, "PlayerSpawn", ply)
@@ -26,75 +27,55 @@ hook.Add("PlayerDisconnected", "NetworkPlayerDisconnected", function (ply)
 end)
 
 
--- # Properties
-
-hook.Add("InitPlayerProperties", "InitCorePlayerProperties", function (ply)
-	ply.max_health = 100
-	ply.can_health_regen = true
-	ply.health_regen_step = 1
-	ply.run_speed = 400
-	ply.jump_power = 220
-	ply.fall_damage_mult = 0.0563
-	ply.death_cooldown = 2
-	ply.last_death_time = 0
-end)
-
-
 -- # Death
 
-function GM:PlayerDeath(ply, infl, att)
-	local att_valid = IsValid(att)
-	local infl_valid = IsValid(infl)
+function GM:PlayerDeath(ply, inflictor, attacker)
+	local att_valid = IsValid(attacker)
+	local infl_valid = IsValid(inflictor)
 
-	if att_valid and att:GetClass() == "trigger_hurt" then
-		att = ply
+	if att_valid and attacker:GetClass() == "trigger_hurt" then
+		attacker = ply
 	end
 
-	if att_valid and att:IsVehicle() and IsValid(att:GetDriver()) then
-		att = att:GetDriver()
+	if att_valid and attacker:IsVehicle() and IsValid(attacker:GetDriver()) then
+		attacker = attacker:GetDriver()
 	end
 
 	if not infl_valid and att_valid then
-		infl = att
+		inflictor = attacker
 	end
 
-	if infl_valid and infl == att and (infl:IsPlayer() or infl:IsNPC()) then
-		infl = infl:GetActiveWeapon()
+	if infl_valid and inflictor == attacker and (inflictor:IsPlayer() or inflictor:IsNPC()) then
+		inflictor = inflictor:GetActiveWeapon()
 	
 		if not infl_valid then
-			infl = att
+			inflictor = attacker
 		end
 	end
 end
 
-function GM:DoPlayerDeath(ply, att, dmg)
+function GM:DoPlayerDeath(ply, attacker, dmg)
 	ply:CreateRagdoll()
 end
 
-hook.Add("DoPlayerDeath", "EMM.PrePlayerDeath", function (ply, att, dmg)
+hook.Add("DoPlayerDeath", "EMM.PrePlayerDeath", function (ply, attacker, dmg)
 	if ply.lobby then
-		MinigameService.CallHook(ply.lobby, "PrePlayerDeath", ply, att, dmg)
+		MinigameService.CallHook(ply.lobby, "PrePlayerDeath", ply, attacker, dmg)
 	end
 
-	hook.Run("PrePlayerDeath", ply, att, dmg)
-	NetService.Send("PrePlayerDeath", ply, att)
+	hook.Run("PrePlayerDeath", ply, attacker, dmg)
+	NetService.Send("PrePlayerDeath", ply, attacker)
 end)
 
-hook.Add("PlayerDeath", "EMM.PlayerDeath", function (ply, infl, att)
+hook.Add("PlayerDeath", "EMM.PlayerDeath", function (ply, inflictor, attacker)
 	ply:FreezeMovement()
 
 	if ply.lobby then
-		MinigameService.CallHook(ply.lobby, "PlayerDeath", ply, infl, att)
+		MinigameService.CallHook(ply.lobby, "PlayerDeath", ply, inflictor, attacker)
 	end
 
-	NetService.Send("PlayerDeath", ply, infl, att)
+	NetService.Send("PlayerDeath", ply, inflictor, attacker)
 end)
-
-local function SetDeathTime(ply)
-	ply.last_death_time = CurTime()
-end
-hook.Add("PlayerDeath", "DeathTime", SetDeathTime)
-hook.Add("PlayerSilentDeath", "DeathTime", SetDeathTime)
 
 hook.Add("PostPlayerDeath", "NetworkPostPlayerDeath", function (ply)
 	NetService.Send("PostPlayerDeath", ply)
@@ -127,21 +108,71 @@ hook.Add("PlayerDeathThink", "Respawn", function (ply)
 end)
 
 
--- # Misc
+-- # Damage
 
-hook.Add("GetFallDamage", "Fall", function (ply, speed)
-	local speed = (speed - 580) * ply.fall_damage_mult
-	local view_punch = speed/20
+local function ShouldTakeDamage(victim, attacker)
+	local should_damage
 
-	ply:ViewPunch(Angle(math.random(-view_punch, view_punch), math.random(-view_punch, view_punch), 0))
+	local victim_is_player = victim:IsPlayer()
 
-	return speed
+	if victim_is_player and victim.should_take_damage then
+		should_damage = victim.should_take_damage
+		victim.should_take_damage = nil
+	else
+		if attacker == game.GetWorld() then
+			should_damage = true
+		elseif
+			IsValid(attacker) and
+			MinigameService.IsSharingLobby(victim, attacker) and
+			victim_is_player and
+			attacker:IsPlayer() and
+			attacker.player_class and
+			victim.player_class
+		then
+			should_damage = attacker.player_class.can_damage_everyone or attacker.player_class.can_damage[victim.player_class.key]
+		else
+			should_damage = false
+		end
+
+		if victim_is_player then
+			victim.should_take_damage = should_damage
+		end
+	end
+
+	return should_damage
+end
+
+hook.Add("EntityTakeDamage", "EMM.EntityTakeDamage", function (victim, dmg)
+	return not ShouldTakeDamage(victim, dmg:GetAttacker())
 end)
 
-timer.Create("PlayerHealthRegeneration", 1, 0, function ()
+hook.Add("PlayerShouldTakeDamage", "EMM.PlayerShouldTakeDamage", function (victim, attacker)
+	return ShouldTakeDamage(victim, attacker)
+end)
+
+
+-- # Misc
+
+hook.Add("GetFallDamage", "EMM.FallDamage", function (ply, speed)
+	local fall_damage
+
+	if ply.can_take_fall_damage then
+		fall_damage = (speed - 580) * ply.fall_damage_multiplier
+	
+		local view_punch = fall_damage/20
+
+		ply:ViewPunch(Angle(math.random(-view_punch, view_punch), math.random(-view_punch, view_punch), 0))
+	else
+		fall_damage = 0
+	end
+
+	return fall_damage
+end)
+
+timer.Create("EMM.PlayerHealthRegeneration", 1, 0, function ()
 	for _, ply in pairs(player.GetAll()) do
-		if ply:Alive() and ply.can_health_regen then
-			ply:SetHealth(math.Clamp(ply:Health() + ply.health_regen_step, 0, ply.max_health))
+		if ply:Alive() and ply.can_regenerate_health then
+			ply:SetHealth(math.Clamp(ply:Health() + ply.health_regenerate_step, 0, ply.max_health))
 		end
 	end
 end)

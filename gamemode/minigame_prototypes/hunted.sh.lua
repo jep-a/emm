@@ -10,7 +10,7 @@ MINIGAME.random_player_classes = {
 MINIGAME:AddPlayerClass {
 	name = "Hunted",
 	color = COLOR_PEACH,
-	can_tag = {"Hunter"},
+	can_tag = {Hunter = true},
 	tag_victim = true,
 	swap_on_tag = true,
 	kill_on_tag = true,

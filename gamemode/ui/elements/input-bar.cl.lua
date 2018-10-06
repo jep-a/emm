@@ -68,6 +68,9 @@ function InputBar:Init(label, type, v, input_props)
 		elseif type == "time" then
 			input_element = TimeInput
 			input_w_percent = 0.5
+		elseif type == "list" then
+			input_element = ListSelector
+			input_w_percent = 0.25
 		end
 
 		self.label:SetAttribute("width_percent", 1 - input_w_percent)

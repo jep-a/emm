@@ -90,6 +90,7 @@ function Element:InitAttributes()
 	self.static_attributes = {
 		paint = true,
 		overlay = false,
+		clamp_to_screen = false,
 		layout = true,
 		origin_position = false,
 		origin_justification_x = JUSTIFY_START,

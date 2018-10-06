@@ -54,6 +54,23 @@ function MinigamePrototype:Init()
 				{
 					key = "can_autojump",
 					label = "Can auto-jump"
+				},
+
+				{
+					key = "can_regenerate_health",
+					label = "Can regenerate health"
+				},
+
+				{
+					key = "can_take_fall_damage",
+					label = "Can take fall damage"
+				},
+
+				{
+					key = "weapons",
+					label = "Weapons",
+					type = "list",
+					options = MINIGAME_WEAPONS
 				}
 			}
 		}
@@ -67,18 +84,10 @@ function MinigamePrototype:Init()
 	end
 end
 
-function MinigamePrototype:AddPlayerClass(ply_class)
-	ply_class = table.Merge({
-		can_walljump = true,
-		can_wallslide = true,
-		can_airaccel = true,
-		can_autojump = false
-	}, ply_class)
-
+function MinigamePrototype:AddPlayerClass(props)
+	ply_class = PlayerClassService.CreatePlayerClass(props)
 	ply_class.id = table.Count(self.player_classes) + 1
-	ply_class.key = ply_class.key or ply_class.name
-	ply_class.color = ply_class.color or self.color
-
+	ply_class.color = props.color or self.color
 	self.player_classes[ply_class.key] = ply_class
 end
 

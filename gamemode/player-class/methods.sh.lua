@@ -50,7 +50,11 @@ function player_metatable:HasPlayerClass()
 end
 
 function player_metatable:SetupPlayerClass()
-	--
+	self:SetupCoreProperties()
+
+	if SERVER then
+		self:SetupLoadout()
+	end
 end
 
 function player_metatable:EndPlayerClass()

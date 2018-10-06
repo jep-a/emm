@@ -67,8 +67,10 @@ local function FinishNotificationContainer(element)
 	end
 end
 
-function NotificationService.FinishSticky(key)
-	NotificationService.stickies[key]:Finish()
+function NotificationService.FinishSticky(k)
+	if NotificationService.stickies[k] then
+		NotificationService.stickies[k]:Finish()
+	end
 end
 
 function NotificationService.Clear(lobby, ply)

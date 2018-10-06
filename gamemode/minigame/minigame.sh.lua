@@ -2,6 +2,19 @@ MinigameService = MinigameService or {}
 MinigameService.prototypes = MinigameService.prototypes or {}
 MinigameService.lobbies = MinigameService.lobbies or {}
 
+MINIGAME_WEAPONS = {
+	"weapon_crowbar",
+	"weapon_physcannon",
+	"weapon_pistol",
+	"weapon_357",
+	"weapon_smg1",
+	"weapon_shotgun",
+	"weapon_ar2",
+	"weapon_crossbow",
+	"weapon_rpg",
+	"weapon_frag"
+}
+
 function MinigameService.Prototype(id)
 	for _, proto in pairs(MinigameService.prototypes) do
 		if id == proto.id then

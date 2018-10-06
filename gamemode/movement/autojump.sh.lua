@@ -4,7 +4,7 @@ AutoJumpService = AutoJumpService or {}
 -- # Properties
 
 function AutoJumpService.InitPlayerProperties(ply)
-	ply.can_autojump = true
+	ply.can_autojump = false
 	ply.force_autojump = false
 end
 hook.Add(

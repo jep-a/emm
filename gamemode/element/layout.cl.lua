@@ -486,6 +486,28 @@ function Element:SetPanelBounds(x, y, w, h)
 	)
 end
 
+function Element:ClampToScreen()
+	local attr = self.attributes
+	local x = attr.x.current
+	local y = attr.y.current
+	local w = self:GetFinalWidth()
+	local h = self:GetFinalHeight()
+	local scr_w = ScrW()
+	local scr_h = ScrH()
+
+	if 0 > x then
+		attr.x.current = 0
+	elseif (x + w) > scr_w then
+		attr.x.current = scr_w - w
+	end
+
+	if 0 > y then
+		attr.y.current = 0
+	elseif (y + h) > scr_h then
+		attr.y.current = scr_h - h
+	end
+end
+
 function Element:LayoutFamily()
 	for _, child in pairs(self.children) do
 		if not child.laying_out then
@@ -526,6 +548,10 @@ function Element:Layout(force_family_layout)
 	end
 
 	self:GenerateSize()
+
+	if static_attr.clamp_to_screen then
+		self:ClampToScreen()
+	end
 
 	local new_x = attr.x.current
 	local new_y = attr.y.current

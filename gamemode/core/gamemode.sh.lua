@@ -65,6 +65,7 @@ EMM.Include {
 	"ui/elements/text-input",
 	"ui/elements/number-input",
 	"ui/elements/time-input",
+	"ui/elements/list-selector",
 	"ui/elements/input-bar",
 
 	"settings/ui",
