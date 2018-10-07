@@ -87,6 +87,7 @@ function LobbyUIService.CreateContainer()
 		height_percent = 1,
 		alpha = 0
 	}, {
+		layout_justification_x = JUSTIFY_CENTER,
 		wrap = false,
 		width_percent = 1,
 		fit = true,

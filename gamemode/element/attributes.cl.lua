@@ -104,6 +104,7 @@ function Element:InitAttributes()
 		wrap = true,
 		fit_x = false,
 		fit_y = false,
+		crop_margin = true,
 		inherit_color = true,
 		fill_color = false,
 		inherit_cursor = true,
