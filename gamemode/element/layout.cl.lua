@@ -228,17 +228,17 @@ function Element:StackChildren()
 					cropped_prev_child_margin = 1
 				end
 
+				local total_crop
 				local cropped_child_margin
 
-				if child.static_attributes.crop_margin then
-					local total_crop = math.Clamp(child_attr[prop_keys.crop_start].current + child_attr[prop_keys.crop_end].current, 0, 1)
-					
+				if i == children_count and child.static_attributes.crop_margin then
+					total_crop = math.Clamp(child_attr[prop_keys.crop_start].current + child_attr[prop_keys.crop_end].current, 0, 1)
 					cropped_child_margin = (1 - total_crop) * (1 - child_attr[prop_keys.layout_crop].current)
 				else
 					cropped_child_margin = 1
 				end
 
-				local cropped_margin = child_margin * cropped_prev_child_margin * cropped_child_margin
+				local cropped_margin = math.Clamp(child_margin * cropped_prev_child_margin * cropped_child_margin, 0, child_margin)
 
 				child_positions[i] = child_positions[i] + cropped_margin
 				line_size = line_size + cropped_margin

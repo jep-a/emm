@@ -16,8 +16,8 @@ function LobbyCardContainer:Init(lobby)
 		self.settings = self:Add(LobbySettings.New(lobby))
 	end
 
-	self:AnimateAttribute("layout_crop_x", 0, ANIMATION_DURATION * 2)
-	self:AnimateAttribute("alpha", 255, ANIMATION_DURATION * 2)
+	self:AnimateAttribute("layout_crop_x", 0, ANIMATION_DURATION * 4)
+	self:AnimateAttribute("alpha", 255, ANIMATION_DURATION * 4)
 end
 
 function LobbyCardContainer:AddSettings()
@@ -25,10 +25,10 @@ function LobbyCardContainer:AddSettings()
 end
 
 function LobbyCardContainer:AnimateFinish()
-	self:AnimateAttribute("layout_crop_x", 1, ANIMATION_DURATION * 2)
+	self:AnimateAttribute("layout_crop_x", 1, ANIMATION_DURATION * 4)
 
 	self:AnimateAttribute("alpha", 0, {
-		duration = ANIMATION_DURATION * 2,
+		duration = ANIMATION_DURATION * 4,
 
 		callback = function ()
 			LobbyCardContainer.super.Finish(self)
