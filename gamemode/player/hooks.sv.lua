@@ -120,9 +120,6 @@ local function ShouldTakeDamage(victim, attacker, dmg)
 		should_damage = victim.should_take_damage
 		victim.should_take_damage = nil
 	else
-		if inflictor then
-			print(inflictor, victim.lobby, inflictor.lobby)
-		end
 		if attacker == game.GetWorld() then
 			should_damage = true
 		elseif

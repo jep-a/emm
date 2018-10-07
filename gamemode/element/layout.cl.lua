@@ -223,7 +223,7 @@ function Element:StackChildren()
 
 				local total_crop = math.Clamp(child.attributes[prop_keys.crop_start].current + child.attributes[prop_keys.crop_end].current, 0, 1)
 
-				if total_crop == 1 then
+				if i == #children and total_crop == 1 then
 					prev_child.last = true
 				elseif prev_child.last then
 					prev_child.last = false

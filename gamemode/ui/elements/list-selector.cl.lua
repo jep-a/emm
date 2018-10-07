@@ -87,6 +87,9 @@ function ListSelector:CreateList()
 		border = 2
 	}
 
+	self.list.panel:MakePopup()
+	self.list.panel:SetKeyboardInputEnabled(false)
+
 	ListSelector.focused = self
 
 	for _, list_option in pairs(self.options) do
