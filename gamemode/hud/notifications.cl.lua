@@ -17,7 +17,7 @@ function NotificationService.CreateFlash(duration)
 end
 
 function NotificationService.Visible()
-	return SettingsService.Setting "emm_show_hud" and SettingsService.Setting "emm_show_notifications"
+	return SettingsService.Get "show_hud" and SettingsService.Get "show_notifications"
 end
 
 function NotificationService.PushSideText(text)
@@ -67,8 +67,10 @@ local function FinishNotificationContainer(element)
 	end
 end
 
-function NotificationService.FinishSticky(key)
-	NotificationService.stickies[key]:Finish()
+function NotificationService.FinishSticky(k)
+	if NotificationService.stickies[k] then
+		NotificationService.stickies[k]:Finish()
+	end
 end
 
 function NotificationService.Clear(lobby, ply)

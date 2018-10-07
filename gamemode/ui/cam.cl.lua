@@ -6,7 +6,7 @@ local cam_angle_divider = 4
 
 -- # Setup
 
-CamUIService.cam_smooth_multiplier = CamUIService.cam_smooth_multiplier or AnimatableValue.NewFromSetting "emm_cam_ui_smooth_multiplier"
+CamUIService.cam_smooth_multiplier = CamUIService.cam_smooth_multiplier or AnimatableValue.NewFromSetting "cam_ui_smooth_multiplier"
 
 CamUIService.eye_angle = CamUIService.eye_angle or AnimatableValue.New(Angle(0, 0, 0), {
 	smooth = true,

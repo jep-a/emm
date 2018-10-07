@@ -54,8 +54,8 @@ function CrosshairLines:Init(size, gap)
 		origin_justification_y = JUSTIFY_CENTER,
 		position_justification_x = JUSTIFY_CENTER,
 		position_justification_y = JUSTIFY_CENTER,
-		size = size or SettingsService.Setting "emm_crosshair_size",
-		child_margin = gap or SettingsService.Setting "emm_crosshair_gap",
+		size = size or SettingsService.Get "crosshair_size",
+		child_margin = gap or SettingsService.Get "crosshair_gap",
 
 		CrosshairLine.New {
 			orientation = DIRECTION_COLUMN,
@@ -85,10 +85,10 @@ function CrosshairLines:Init(size, gap)
 	})
 
 	if not size then
-		self:AddConvarAnimator("emm_crosshair_size", "size")
+		self:AddConvarAnimator("crosshair_size", "size")
 	end
 
 	if not gap then
-		self:AddConvarAnimator("emm_crosshair_gap", "child_margin")
+		self:AddConvarAnimator("crosshair_gap", "child_margin")
 	end
 end

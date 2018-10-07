@@ -7,7 +7,7 @@ function Checkbox:Init(bool, props)
 		width = CHECKBOX_SIZE,
 		height = CHECKBOX_SIZE,
 		background_color = COLOR_GRAY_DARK,
-		border = LINE_THICKNESS/2,
+		border = LINE_THICKNESS,
 		border_color = COLOR_WHITE,
 		border_alpha = 0,
 		cursor = "hand",

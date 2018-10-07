@@ -2,10 +2,14 @@ function MinigamePrototype:Respawn(ply)
 	ply:Spawn()
 end
 
-function MinigamePrototype:PickRandomPlayerClasses()
+function MinigamePrototype:PickPlayerClasses()
 	if self.random_player_classes then
 		local picked_plys = MinigameService.PickRandomPlayerClasses(self, self.random_player_classes)
 		MinigameService.CallNetHook(self, "RandomPlayerClassesPicked", picked_plys)
+	elseif self.default_player_class then
+		for _, ply in pairs(self.players) do
+			ply:SetPlayerClass(self.player_classes[self.default_player_class])
+		end
 	end
 end
 
@@ -13,22 +17,31 @@ function MinigamePrototype:ReplacePlayerClass(ply)
 	local ply_class = ply.player_class
 
 	if ply_class.minimum and ply_class.minimum > 0 and ply_class.minimum > (#self[ply_class.key] - 1) then
-		self:PickRandomPlayerClasses()
+		self:PickPlayerClasses()
 	end
 end
 
-function MinigamePrototype:ForfeitPlayerClass(ply)
+function MinigamePrototype:ForfeitPlayerClassToClosest(ply, inflictor, attacker)
 	local ply_class = ply.player_class
 
-	if ply_class and ply_class.swap_closest_on_death then
+	if ply_class and ply_class.swap_closest_on_death and not (ply_class.swap_with_attacker and IsPlayer(attacker) and ply ~= attacker and ply_class ~= attacker.player_class) then
 		local closest_ply = MinigameService.PickClosestPlayerClass(self, ply, {
 			blacklist_class_key = ply_class.key,
 			swap_player_class = true
 		})
 
 		if closest_ply then
-			MinigameService.CallNetHook(self, "PlayerClassForfeit", ply, closest_ply)
+			MinigameService.CallNetHook(self, "PlayerClassForfeitToClosest", ply, closest_ply)
 		end
+	end
+end
+
+function MinigamePrototype:ForfeitPlayerClassToAttacker(ply, inflictor, attacker)
+	local ply_class = ply.player_class
+
+	if ply_class and IsPlayer(attacker) and ply_class.swap_with_attacker and ply_class ~= attacker.player_class then
+		MinigameService.SwapPlayerClass(ply, attacker)
+		MinigameService.CallNetHook(self, "PlayerClassForfeitToAttacker", ply, attacker)
 	end
 end
 
@@ -44,10 +57,10 @@ function MinigamePrototype:CheckIfNoPlayerClasses(ply, old_class)
 	end
 end
 
-function MinigamePrototype:SetPlayerClassOnDeath(ply)
+function MinigamePrototype:SetPlayerClassOnDeath(ply, inflictor, attacker)
 	if ply.player_class and ply.player_class.player_class_on_death then
 		ply:SetPlayerClass(self.player_classes[ply.player_class.player_class_on_death])
-		MinigameService.CallNetHook(self, "PlayerClassChangeFromDeath", ply)
+		MinigameService.CallNetHook(self, "PlayerClassChangeFromDeath", ply, attacker)
 	end
 end
 
@@ -65,12 +78,13 @@ end
 
 function MinigamePrototype:AddDefaultHooks()
 	self:AddHook("StartStateWaiting", "ClearPlayerClasses", MinigameService.ClearPlayerClasses)
-	self:AddHook("StartStatePlaying", "PickRandomPlayerClasses", self.PickRandomPlayerClasses)
+	self:AddHook("StartStatePlaying", "PickPlayerClasses", self.PickPlayerClasses)
 	self:AddStateHook("Playing", "PlayerJoin", "Respawn", self.Respawn)
 	self:AddStateHook("Playing", "PlayerJoin", "SetDefaultPlayerClass", self.SetDefaultPlayerClass)
 	self:AddStateHook("Playing", "PlayerLeave", "ReplacePlayerClass", self.ReplacePlayerClass)
-	self:AddStateHook("Playing", "PlayerLeave", "ForfeitPlayerClass", self.ForfeitPlayerClass)
-	self:AddStateHook("Playing", "PlayerDeath", "ForfeitPlayerClass", self.ForfeitPlayerClass)
+	self:AddStateHook("Playing", "PlayerLeave", "ForfeitPlayerClassToClosest", self.ForfeitPlayerClassToClosest)
+	self:AddStateHook("Playing", "PlayerDeath", "ForfeitPlayerClassToClosest", self.ForfeitPlayerClassToClosest)
+	self:AddStateHook("Playing", "PlayerDeath", "ForfeitPlayerClassToAttacker", self.ForfeitPlayerClassToAttacker)
 	self:AddStateHook("Playing", "PlayerDeath", "SetPlayerClassOnDeath", self.SetPlayerClassOnDeath)
 	self:AddStateHook("Playing", "PlayerClassChange", "EndIfNoPlayerClasses", self.CheckIfNoPlayerClasses)
 end

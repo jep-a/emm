@@ -63,8 +63,8 @@ function LobbyCard:Init(lobby)
 		Element.New {
 			layout_justification_x = JUSTIFY_CENTER,
 			layout_justification_y = JUSTIFY_CENTER,
-			width = LOBBY_CARD_PROTOTYPE_ICON_SIZE,
-			height = LOBBY_CARD_PROTOTYPE_ICON_SIZE,
+			width = LARGE_BUTTON_ICON_SIZE,
+			height = LARGE_BUTTON_ICON_SIZE,
 			padding = MARGIN/2,
 			background_color = lobby.prototype.color,
 

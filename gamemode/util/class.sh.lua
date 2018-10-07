@@ -125,7 +125,12 @@ function Class.AddHook(class, name, func_k)
 				end)
 		
 				if not success then
-					Error(error.."\n")
+					if instance.debug_trace then
+						Error(instance.debug_trace.."\n")
+					else
+						Error(error.."\n")
+					end
+
 					table.insert(queued_for_finish, instance)
 				end
 			end

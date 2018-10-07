@@ -2,7 +2,12 @@ EMM = EMM or {}
 
 EMM.client_includes = {}
 
-EMM_GAMEMODE_DIRECTORY = "emm/gamemode/"
+gamemode_name = string.match(debug.getinfo(1).source, "^@gamemodes/([^%/]+)/")
+gamemode_lua_directory = gamemode_name.."/gamemode/"
+
+function engine.ActiveGamemode()
+	return gamemode_name
+end
 
 function IsSharedFile(file)
 	return string.match(file, "sh.lua$")
@@ -20,7 +25,7 @@ function EMM.Include(inc, inc_func)
 			EMM.Include(_inc)
 		end
 	elseif isstring(inc) then
-		local inc_path = EMM_GAMEMODE_DIRECTORY..inc
+		local inc_path = gamemode_lua_directory..inc
 		local inc_file = file.Find(inc_path, "LUA")[1]
 		local sh_inc_file = file.Find(inc_path..".sh.lua", "LUA")[1]
 		local cl_inc_file = file.Find(inc_path..".cl.lua", "LUA")[1]
@@ -41,4 +46,4 @@ function EMM.Include(inc, inc_func)
 	end
 end
 
-include "emm.lua"
+include(gamemode_name..".lua")

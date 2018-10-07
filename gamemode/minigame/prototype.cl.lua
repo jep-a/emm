@@ -10,7 +10,7 @@ function MinigamePrototype:NotifyRandomPlayerClassesPicked(involves_local_ply, p
 	end
 end
 
-function MinigamePrototype:NotifyPlayerClassForfeit(involves_local_ply, forfeiter, closest_ply)
+function MinigamePrototype:NotifyPlayerClassForfeitToClosest(involves_local_ply, forfeiter, closest_ply)
 	local ply_class_name = closest_ply.player_class.name
 
 	if involves_local_ply then
@@ -22,13 +22,54 @@ function MinigamePrototype:NotifyPlayerClassForfeit(involves_local_ply, forfeite
 	end
 end
 
-function MinigamePrototype:NotifyPlayerClassChangeFromDeath(involves_local_ply, ply)
-	local ply_class_name = ply.player_class.name
+function MinigamePrototype:NotifyPlayerClassForfeitToAttacker(involves_local_ply, forfeiter, attacker)
+	local ply_class_name = attacker.player_class.name
 
 	if involves_local_ply then
-		NotificationService.PushText("you have turned into a "..ply_class_name)
+		local attacker_is_local_ply = IsLocalPlayer(attacker)
+
+		NotificationService.PushAvatarText(attacker_is_local_ply and forfeiter or attacker, (attacker_is_local_ply and "killed" or "killed by").." for "..ply_class_name)
 	else
-		NotificationService.PushSideText(ply:GetName().." has died and turned into a "..ply_class_name)
+		NotificationService.PushSideText(attacker:GetName().." has killed "..forfeiter:GetName().." for "..ply_class_name)
+	end
+
+	forfeiter.block_kill_notification = true
+end
+
+function MinigamePrototype:NotifyPlayerClassChangeFromDeath(involves_local_ply, ply, attacker)
+	local ply_class = ply.player_class
+	local ply_class_name = ply_class.name
+
+	if ply_class.notify_player_class_on_death then
+		if involves_local_ply then
+			NotificationService.PushText("you have turned into a "..ply_class_name)
+		else
+			NotificationService.PushSideText(ply:GetName().." has died and turned into a "..ply_class_name)
+		end
+	end
+end
+
+function MinigamePrototype:NotifyPlayerDeath(involves_local_ply, ply, inflictor, attacker)
+	if ply.block_kill_notification then
+		ply.block_kill_notification = nil
+	else
+		local ply_class = ply.player_class
+
+		if ply_class then
+			local ply_class_name = ply_class.name
+
+			if ply_class.notify_on_killed_by_player and IsPlayer(attacker) and ply ~= attacker then
+				if involves_local_ply then
+					local attacker_is_local_ply = IsLocalPlayer(attacker)
+			
+					NotificationService.PushAvatarText(attacker_is_local_ply and ply or attacker, attacker_is_local_ply and "killed" or "killed by")
+				else
+					NotificationService.PushSideText(attacker:GetName().." has killed "..ply:GetName())
+				end
+			elseif not involves_local_ply and ply_class.notify_on_killed_by_other then
+				NotificationService.PushSideText(ply:GetName().." has died")
+			end
+		end
 	end
 end
 
@@ -47,7 +88,7 @@ end
 function MinigamePrototype:NotifyStateCountdown(involves_local_ply, old_state, new_state)
 	new_state = new_state or self.state
 
-	if new_state.time and new_state.notify_countdown then
+	if new_state and new_state.time and new_state.notify_countdown then
 		if self.countdown_notification then
 			self.countdown_notification:Finish()
 			self.countdown_notification = nil
@@ -101,8 +142,10 @@ function MinigamePrototype:AddDefaultHooks()
 	self:AddHookNotification("StartState", self.NotifyStateCountdown)
 	self:AddHookNotification("StartStateWaiting", self.NotifyWaitingForPlayers)
 	self:AddHookNotification("RandomPlayerClassesPicked", self.NotifyRandomPlayerClassesPicked)
-	self:AddHookNotification("PlayerClassForfeit", self.NotifyPlayerClassForfeit)
+	self:AddHookNotification("PlayerClassForfeitToClosest", self.NotifyPlayerClassForfeitToClosest)
+	self:AddHookNotification("PlayerClassForfeitToAttacker", self.NotifyPlayerClassForfeitToAttacker)
 	self:AddHookNotification("PlayerClassChangeFromDeath", self.NotifyPlayerClassChangeFromDeath)
+	self:AddHookNotification("PlayerDeath", self.NotifyPlayerDeath)
 	self:AddStateHookNotification("Waiting", "PlayerJoin", self.NotifyWaitingForPlayers)
 
 	hook.Run("CreateMinigameHooks", self)

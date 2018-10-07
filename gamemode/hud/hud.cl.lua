@@ -7,14 +7,14 @@ local airaccel_icon_material = Material("emm2/hud/airaccel.png", "noclamp smooth
 function HUDService.InitContainers()
 	HUDService.container = HUDService.CreateContainer()
 
-	HUDService.container:AddConvarAnimator("emm_hud_padding_x", "padding_x")
-	HUDService.container:AddConvarAnimator("emm_hud_padding_y", "padding_y")
+	HUDService.container:AddConvarAnimator("hud_padding_x", "padding_x")
+	HUDService.container:AddConvarAnimator("hud_padding_y", "padding_y")
 
 	HUDService.container:SetAttribute("color", function ()
 		return HUDService.animatable_color.smooth
 	end)
 
-	local ang = SettingsService.Setting "emm_hud_angle"
+	local ang = SettingsService.Get "hud_angle"
 
 	HUDService.left_section = HUDService.CreateSection(Angle(0, -ang, 0))
 	HUDService.middle_section = HUDService.CreateSection(nil, math.Remap(ang, 0, 35, 0, 0.41))
@@ -72,7 +72,7 @@ function HUDService.InitMeters()
 		return LocalPlayer().stamina.airaccel.amount
 	end
 
-	if SettingsService.Setting "emm_show_hud_meters" then
+	if SettingsService.Get "show_hud_meters" then
 		HUDService.health_meter = HUDMeter.New("g", {
 			show_value = true,
 			hide_value_on_empty = true,
@@ -97,7 +97,7 @@ function HUDService.InitMeters()
 		})
 	end
 
-	if SettingsService.Setting "emm_show_crosshair_meters" then
+	if SettingsService.Get "show_crosshair_meters" then
 		HUDService.crosshair_meter_container:Add(CrosshairMeter.New {
 			value_func = Health,
 			angle = CROSSHAIR_METER_ARC_ANGLE
@@ -123,7 +123,7 @@ function HUDService.InitCrosshairLines()
 end
 
 function HUDService.Init()
-	if SettingsService.Setting "emm_show_hud" then
+	if SettingsService.Get "show_hud" then
 		HUDService.animatable_color = AnimatableValue.New(COLOR_WHITE, {
 			smooth = true,
 
@@ -135,7 +135,7 @@ function HUDService.Init()
 		HUDService.InitContainers()
 		HUDService.InitMeters()
 
-		if SettingsService.Setting "emm_show_crosshair" then
+		if SettingsService.Get "show_crosshair" then
 			HUDService.InitCrosshairLines()
 		end
 
@@ -169,7 +169,7 @@ function HUDService.Reload()
 		HUDService.container = nil
 	end
 
-	if SettingsService.Setting "emm_show_hud" then
+	if SettingsService.Get "show_hud" then
 		HUDService.Init()
 		HUDService.ShowAll()
 	end
@@ -238,7 +238,7 @@ function HUDService.HideAll()
 end
 
 function HUDService.SpawnShow()
-	if SettingsService.Setting "emm_show_hud" and not LobbyUIService.open then
+	if SettingsService.Get "show_hud" and not LobbyUIService.open then
 		if HUDService.container then
 			HUDService.ShowMeters()
 			HUDService.ShowCrosshair()
@@ -252,7 +252,7 @@ end
 hook.Add("LocalPlayerSpawn", "HUDService.SpawnShow", HUDService.SpawnShow)
 
 function HUDService.DeathHide()
-	if SettingsService.Setting "emm_show_hud" and not LobbyUIService.open then
+	if SettingsService.Get "show_hud" and not LobbyUIService.open then
 		HUDService.HideMeters()
 		HUDService.HideCrosshair()
 
@@ -264,7 +264,7 @@ end
 hook.Add("LocalPlayerDeath", "HUDService.DeathHide", HUDService.DeathHide)
 
 function HUDService.LobbyUIShow()
-	if SettingsService.Setting "emm_show_hud" then
+	if SettingsService.Get "show_hud" then
 		if LocalPlayer():Alive() then
 			HUDService.ShowAll()
 
@@ -279,7 +279,7 @@ end
 hook.Add("OnLobbyUIClose", "HUDService.LobbyUIShow", HUDService.LobbyUIShow)
 
 function HUDService.LobbyUIHide()
-	if SettingsService.Setting "emm_show_hud" then
+	if SettingsService.Get "show_hud" then
 		HUDService.HideAll()
 
 		if IndicatorService.Visible() then

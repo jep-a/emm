@@ -1,25 +1,26 @@
 -- # Spawning
 
 local init_post_ent = false
-local queued_ent_created_hooks = {}
+local queued_player_init_spawn_hooks = {}
+local queued_player_spawn_hooks = {}
 
 hook.Add("OnReloaded", "ReloadInitPostEntity", function ()
 	init_post_ent = true
 end)
 
-local function CallPlayerSpawnHook(ply_index, func)
+local function CallPlayerSpawnHook(queue, ply_index, func)
 	if IsValid(Entity(ply_index)) then
 		func()
 	else
-		table.insert(queued_ent_created_hooks, {player_index = ply_index, func = func})
+		queue[ply_index] = func
 	end
 end
 
 local function CallPlayerInitialSpawnHooks(ply_index)
 	if init_post_ent then
-		CallPlayerSpawnHook(ply_index, function ()
+		CallPlayerSpawnHook(queued_player_init_spawn_hooks, ply_index, function ()
 			local ply = Entity(ply_index)
-
+		
 			hook.Run("PlayerInitialSpawn", ply)
 			hook.Run("InitPlayerProperties", ply)
 		end)
@@ -29,9 +30,11 @@ NetService.Receive("PlayerInitialSpawn", CallPlayerInitialSpawnHooks)
 
 local function CallPlayerSpawnHooks(ply_index)
 	if init_post_ent then
-		CallPlayerSpawnHook(ply_index, function ()
+		CallPlayerSpawnHook(queued_player_spawn_hooks, ply_index, function ()
 			local ply = Entity(ply_index)
 			local is_local_ply = IsLocalPlayer(ply)
+
+			ply.just_spawned = true
 
 			if is_local_ply then
 				hook.Run("LocalPlayerSpawn", ply)
@@ -48,6 +51,7 @@ local function CallPlayerSpawnHooks(ply_index)
 			end
 
 			hook.Run("PlayerProperties", ply)
+			ply:SetupCoreProperties()
 
 			if is_local_ply then
 				hook.Run("LocalPlayerProperties", ply)
@@ -60,6 +64,10 @@ local function CallPlayerSpawnHooks(ply_index)
 
 				MinigameService.CallHook(ply.lobby, "PlayerProperties", ply)
 			end
+
+			timer.Simple(1/60, function ()
+				ply.just_spawned = nil
+			end)
 		end)
 	end
 end
@@ -74,28 +82,30 @@ hook.Add("InitPostEntity", "EMM.InitPostEntity", function ()
 	hook.Run("LocalPlayerSpawn", local_ply)
 	hook.Run("InitLocalPlayerProperties", local_ply)
 	hook.Run("LocalPlayerProperties", local_ply)
-	hook.Run("InitUI")
+	hook.Run "InitUI"
 
 	for _, ply in pairs(player.GetAll()) do
 		hook.Run("PlayerInitialSpawn", ply)
 		hook.Run("PlayerSpawn", ply)
 		hook.Run("InitPlayerProperties", ply)
 		hook.Run("PlayerProperties", ply)
+		ply:SetupCoreProperties()
 	end
 end)
 
 hook.Add("OnEntityCreated", "CallDelayedPlayerSpawnHooks", function (ent)
-	local done_hks = {}
-
-	for i, hk in pairs(queued_ent_created_hooks) do
-		if ent:EntIndex() == hk.player_index then
-			hk.func()
-			table.insert(done_hks, i)
+	for i, hk in pairs(queued_player_init_spawn_hooks) do
+		if ent:EntIndex() == i then
+			hk()
+			queued_player_init_spawn_hooks[i] = nil
 		end
 	end
 
-	for _, i in pairs(done_hks) do
-		table.remove(queued_ent_created_hooks, i)
+	for i, hk in pairs(queued_player_spawn_hooks) do
+		if ent:EntIndex() == i then
+			hk()
+			queued_player_spawn_hooks[i] = nil
+		end
 	end
 end)
 
@@ -109,11 +119,11 @@ end)
 
 -- # Death
 
-NetService.Receive("PrePlayerDeath", function (ply, att)
-	hook.Run("PrePlayerDeath", ply, att)
+NetService.Receive("PrePlayerDeath", function (ply, attacker)
+	hook.Run("PrePlayerDeath", ply, attacker)
 
 	if IsLocalPlayer(ply) then
-		hook.Run("LocalPrePlayerDeath", ply, att)
+		hook.Run("LocalPrePlayerDeath", ply, attacker)
 	end
 
 	if ply.lobby then
@@ -121,23 +131,23 @@ NetService.Receive("PrePlayerDeath", function (ply, att)
 			hook.Run("LocalLobbyPrePlayerDeath", ply.lobby, ply)
 		end
 
-		MinigameService.CallHook(ply.lobby, "PrePlayerDeath", ply, att)
+		MinigameService.CallHook(ply.lobby, "PrePlayerDeath", ply, attacker)
 	end
 end)
 
-NetService.Receive("PlayerDeath", function (ply, infl, att)
-	hook.Run("PlayerDeath", ply, infl, att)
+NetService.Receive("PlayerDeath", function (ply, inflictor, attacker)
+	hook.Run("PlayerDeath", ply, inflictor, attacker)
 
 	if IsLocalPlayer(ply) then
-		hook.Run("LocalPlayerDeath", ply, infl, att)
+		hook.Run("LocalPlayerDeath", ply, inflictor, attacker)
 	end
 
 	if ply.lobby then
 		if MinigameService.IsLocalLobby(ply) then
-			hook.Run("LocalLobbyPlayerDeath", ply.lobby, ply, infl, att)
+			hook.Run("LocalLobbyPlayerDeath", ply.lobby, ply, inflictor, attacker)
 		end
 
-		MinigameService.CallHook(ply.lobby, "PlayerDeath", ply, infl, att)
+		MinigameService.CallHook(ply.lobby, "PlayerDeath", ply, inflictor, attacker)
 	end
 end)
 

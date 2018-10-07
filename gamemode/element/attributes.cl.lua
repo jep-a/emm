@@ -1,6 +1,8 @@
 local animatable_attributes = {
 	"x",
 	"y",
+	"offset_x",
+	"offset_y",
 	"width",
 	"height",
 	"padding_left",
@@ -88,6 +90,7 @@ function Element:InitAttributes()
 	self.static_attributes = {
 		paint = true,
 		overlay = false,
+		clamp_to_screen = false,
 		layout = true,
 		origin_position = false,
 		origin_justification_x = JUSTIFY_START,

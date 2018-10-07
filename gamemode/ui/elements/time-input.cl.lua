@@ -225,7 +225,7 @@ function TimeInputPanel:Paint(w, h)
 	surface.SetDrawColor(color)
 
 	if self:HasFocus() and math.Round((CurTime() - self.last_caret_pos_change) % 1) == 0 then
-		surface.DrawRect((self.digit_width * self.caret_pos_after_colon) + start_padding, 0, LINE_THICKNESS/2, h - MARGIN)
+		surface.DrawRect((self.digit_width * self.caret_pos_after_colon) + start_padding, 0, LINE_THICKNESS, h - MARGIN)
 	end
 end
 
@@ -280,7 +280,7 @@ function TimeInput:Init(time, props)
 			position_justification_x = JUSTIFY_CENTER,
 			position_justification_y = JUSTIFY_END,
 			width_percent = 1,
-			height = LINE_THICKNESS/2,
+			height = LINE_THICKNESS,
 			fill_color = true,
 			alpha = 0
 		}
@@ -306,8 +306,8 @@ function TimeInput:Init(time, props)
 end
 
 function TimeInput:Finish()
-	if self.slider then
-		self.slider:Finish()
+	if self.dragger then
+		self.dragger:Finish()
 	end
 
 	self:OnUnFocus()
@@ -364,7 +364,7 @@ function TimeInput:StartDragging()
 
 	self:OnUnFocus()
 
-	self.slider = InputSlider.New(self, {
+	self.dragger = InputDragger.New(self, {
 		default = self.value > 0 and {text = self.panel.text.time_with_colons, value = tonumber(self.panel.text:GetText())} or 500,
 
 		text_generate = function (v)
@@ -395,9 +395,9 @@ function TimeInput:StartDragging()
 		}
 	})
 
-	self.slider:AnimateAttribute("alpha", 255)
-	self.slider.panel:MakePopup()
-	self.slider.panel:SetKeyboardInputEnabled(false)
+	self.dragger:AnimateAttribute("alpha", 255)
+	self.dragger.panel:MakePopup()
+	self.dragger.panel:SetKeyboardInputEnabled(false)
 end
 
 function TimeInput:StopDragging()
@@ -405,13 +405,13 @@ function TimeInput:StopDragging()
 
 	self:OnFocus()
 
-	local v = self.slider.generated_options[self.slider.selected_option_index]
+	local v = self.dragger.generated_options[self.dragger.selected_option_index]
 
 	if v then
-		self.panel.text:SetValue(self.slider.generated_options[self.slider.selected_option_index])
+		self.panel.text:SetValue(self.dragger.generated_options[self.dragger.selected_option_index])
 		self.panel.text:OffsetCaretPos(max_time_digits)
 	end
 
-	self.slider:Finish()
-	self.slider = nil
+	self.dragger:Finish()
+	self.dragger = nil
 end

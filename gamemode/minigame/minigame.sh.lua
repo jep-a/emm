@@ -2,6 +2,19 @@ MinigameService = MinigameService or {}
 MinigameService.prototypes = MinigameService.prototypes or {}
 MinigameService.lobbies = MinigameService.lobbies or {}
 
+MINIGAME_WEAPONS = {
+	"weapon_crowbar",
+	"weapon_physcannon",
+	"weapon_pistol",
+	"weapon_357",
+	"weapon_smg1",
+	"weapon_shotgun",
+	"weapon_ar2",
+	"weapon_crossbow",
+	"weapon_rpg",
+	"weapon_frag"
+}
+
 function MinigameService.Prototype(id)
 	for _, proto in pairs(MinigameService.prototypes) do
 		if id == proto.id then
@@ -47,7 +60,7 @@ end
 -- # Init
 
 local MINIGAME_PROTOTYPES_DIRECTORY = "minigame_prototypes/"
-local minigame_prototype_files, minigame_prototype_dirs = file.Find(EMM_GAMEMODE_DIRECTORY..MINIGAME_PROTOTYPES_DIRECTORY.."*", "LUA")
+local minigame_prototype_files, minigame_prototype_dirs = file.Find(gamemode_lua_directory..MINIGAME_PROTOTYPES_DIRECTORY.."*", "LUA")
 local minigame_fenv_metatable = {__index = _G}
 
 function MinigameService.LoadPrototype(path)

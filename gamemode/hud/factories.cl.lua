@@ -4,8 +4,8 @@ function HUDService.CreateContainer()
 	return Element.New {
 		width_percent = 1,
 		height_percent = 1,
-		padding_x = SettingsService.Setting "emm_hud_padding_x",
-		padding_y = SettingsService.Setting "emm_hud_padding_y"
+		padding_x = SettingsService.Get "hud_padding_x",
+		padding_y = SettingsService.Get "hud_padding_y"
 	}
 end
 

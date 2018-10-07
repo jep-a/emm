@@ -24,11 +24,10 @@ function TaggingService.Think()
 		for _i = 1, #TaggingService.taggable_groups[i] do
 			local taggable = TaggingService.taggable_groups[i][_i]
 
-			if taggable.player_class and taggable.player_class.can_tag then
+			if IsValid(taggable) then
 				local ents = ents.FindInSphere(taggable:WorldSpaceCenter(), taggable.taggable_radius)
 
 				if
-					taggable:IsPlayer() and
 					taggable:Alive() and
 					CurTime() > (taggable.last_tag_time + taggable.taggable_cooldown)
 				then
@@ -41,7 +40,7 @@ function TaggingService.Think()
 							ent:Alive() and
 							MinigameService.IsSharingLobby(taggable, ent) and
 							ent.player_class and
-							SequentialTableHasValue(taggable.player_class.can_tag, ent.player_class.key)
+							taggable.player_class.can_tag[ent.player_class.key]
 						then
 							TaggingService.Tag(taggable.lobby, taggable, ent)
 						end

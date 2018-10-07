@@ -4,6 +4,7 @@ SpectateService = SpectateService or {}
 -- # Properties
 
 function SpectateService.InitPlayerProperties(ply)
+	ply.can_spectate = false
 	ply.spectate_obs_mode = OBS_MODE_CHASE
 	ply.spectate_timeout = 0
 	ply.spectators = ply.spectators or {}
@@ -39,7 +40,7 @@ end
 function SpectateService.Spectate(ply, cmd, args)
 	local target = SpectateService.FindPlayerByName(args[1])
 
-	if CurTime() > ply.spectate_timeout then
+	if ply.can_spectate and CurTime() > ply.spectate_timeout then
 		if target then
 			if ply:GetObserverMode() == OBS_MODE_NONE then
 				if not ply:IsOnGround() then

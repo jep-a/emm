@@ -159,6 +159,10 @@ function Element:OnMouseReleased(mouse)
 	-- 
 end
 
+function Element:OnMouseScrolled(scroll)
+	-- 
+end
+
 function Element:OnMouseEntered()
 	if self.states.hover then
 		self:AnimateState "hover"

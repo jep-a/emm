@@ -8,15 +8,23 @@ function MinigameNetService.ReceiveLobby(lobby_id, proto, host)
 end
 NetService.Receive("Lobby", MinigameNetService.ReceiveLobby)
 
+local function CallIfReceivedLobbies(func)
+	return function (...)
+		if MinigameNetService.received_lobbies then
+			func(...)
+		end
+	end
+end
+
 function MinigameNetService.ReceiveLobbyState(lobby, state_id, last_state_start)
 	lobby:SetState(MinigameStateService.State(lobby, state_id), last_state_start)
 end
-NetService.Receive("LobbyState", MinigameNetService.ReceiveLobbyState)
+NetService.Receive("LobbyState", CallIfReceivedLobbies(MinigameNetService.ReceiveLobbyState))
 
-NetService.Receive("LobbyFinish", MinigameService.FinishLobby)
-NetService.Receive("LobbyHost", MinigameLobby.SetHost)
-NetService.Receive("LobbyPlayer", MinigameLobby.AddPlayer)
-NetService.Receive("LobbyPlayerLeave", MinigameLobby.RemovePlayer)
+NetService.Receive("LobbyFinish", CallIfReceivedLobbies(MinigameService.FinishLobby))
+NetService.Receive("LobbyHost", CallIfReceivedLobbies(MinigameLobby.SetHost))
+NetService.Receive("LobbyPlayer", CallIfReceivedLobbies(MinigameLobby.AddPlayer))
+NetService.Receive("LobbyPlayerLeave", CallIfReceivedLobbies(MinigameLobby.RemovePlayer))
 
 function MinigameNetService.RequestLobbies()
 	NetService.Send "RequestLobbies"
@@ -55,6 +63,7 @@ function MinigameNetService.ReceiveLobbies(len)
 		MinigameSettingsService.Adjust(lobby, settings)
 	end
 
+	MinigameNetService.received_lobbies = true
 	hook.Run "ReceiveLobbies"
 end
 net.Receive("Lobbies", MinigameNetService.ReceiveLobbies)

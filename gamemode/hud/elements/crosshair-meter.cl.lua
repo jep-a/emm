@@ -42,9 +42,9 @@ function CrosshairMeter:Init(props)
 
 	self.percent = AnimatableValue.New(init_v/self.value_divider, {smooth = true})
 	self.angle = AnimatableValue.New(props.angle, layout_props)
-	self.radius = props.radius and AnimatableValue.New(props.radius, layout_props) or AnimatableValue.NewFromSetting("emm_crosshair_meter_radius", layout_props)
+	self.radius = props.radius and AnimatableValue.New(props.radius, layout_props) or AnimatableValue.NewFromSetting("crosshair_meter_radius", layout_props)
 	self.line_thickness = AnimatableValue.New(props.line_thickness or HUD_LINE_THICKNESS)
-	self.arc_length = props.arc_length and AnimatableValue.New(props.arc_length) or AnimatableValue.NewFromSetting "emm_crosshair_meter_arc_length"
+	self.arc_length = props.arc_length and AnimatableValue.New(props.arc_length) or AnimatableValue.NewFromSetting "crosshair_meter_arc_length"
 
 	if props.show_value then
 		local origin_x, origin_y = self:CalculateValueTextPosition()

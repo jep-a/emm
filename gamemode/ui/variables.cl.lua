@@ -2,7 +2,7 @@ HALF_ALPHA = 255/2
 QUARTER_ALPHA = 255/4
 ANIMATION_DURATION = 0.2
 
-LINE_THICKNESS = 4
+LINE_THICKNESS = 2
 MARGIN = 4
 
 CAMUI_SMOOTH_MULTIPLIER = 16
@@ -11,19 +11,24 @@ INDICATOR_WORLD_SIZE = 24
 INDICATOR_PERIPHERAL_SIZE = 40
 INDICATOR_COASTER_SIZE = 150
 
+COLUMN_WIDTH = 256
+
 BAR_WIDTH = 256
 BAR_HEIGHT = 64
 
+BUTTON_ICON_SIZE = 32
+LARGE_BUTTON_ICON_SIZE = 64
+
 CHECKBOX_SIZE = 27
 
-INPUT_SLIDER_HEIGHT = 128 + (MARGIN * 4)
+INPUT_HEIGHT = 128 + (MARGIN * 4)
 
-SettingsService.New("emm_cam_ui_smooth_multiplier", {
+SettingsService.New("cam_ui_smooth_multiplier", {
 	type = "number",
 	default = 1,
 	min = 0,
 	max = 4,
-	help = "Cam UI smoothing multiplier",
+	help = "3D UI smoothing multiplier",
 })
 
 surface.CreateFont("TextBar", {

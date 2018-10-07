@@ -36,7 +36,15 @@ NetService.CreateSchema("LobbySettings", {"minigame_lobby", "table"})
 NetService.CreateUpstreamSchema("LobbySettings", {"minigame_lobby", "table"})
 
 function MinigameSettingsService.SortChange(original_tab, changes_tab, k, v)
-	if v ~= original_tab[k] and not (Falsy(v) and Nily(original_tab[k])) then
+	if istable(v) and istable(original_tab[k]) then
+		for _k, _v in pairs(v) do
+			if _v ~= original_tab[k][_k] and not (Falsy(_v) and Nily(original_tab[k][_k])) then
+				changes_tab[k..".".._k] = true
+			else
+				changes_tab[k..".".._k] = nil
+			end
+		end
+	elseif v ~= original_tab[k] and not (Falsy(v) and Nily(original_tab[k])) then
 		changes_tab[k] = true
 	elseif changes_tab[k] then
 		changes_tab[k] = nil
@@ -53,13 +61,13 @@ function MinigameSettingsService.AdjustedSettings(lobby)
 	local settings = {}
 
 	for k, _ in pairs(lobby.changed_settings) do
-		settings[k] = MinigameSettingsService.Setting(lobby, k)
+		settings[k] = MinigameSettingsService.Get(lobby, k)
 	end
 
 	return settings
 end
 
-function MinigameSettingsService.Setting(lobby, k, use_nil)
+function MinigameSettingsService.Get(lobby, k, use_nil)
 	local v
 
 	local tab = lobby
@@ -114,6 +122,10 @@ function MinigameSettingsService.Adjust(lobby, settings)
 				if #exploded_k == i then
 					if setting == "nil" then
 						tab[lobby_k] = nil
+					elseif istable(setting) then
+						for _k, v in pairs(setting) do
+							tab[lobby_k][_k] = v
+						end
 					else
 						tab[lobby_k] = setting
 					end
@@ -130,6 +142,23 @@ function MinigamePrototype:SetAdjustableSettings(vars)
 	self.adjustable_settings_map = MapSettings(vars)
 end
 
+function MinigamePrototype:AddAdjustableSettings(vars)
+	self.adjustable_settings = table.Add(self.adjustable_settings, vars)
+	self.adjustable_settings_map = MapSettings(self.adjustable_settings)
+end
+
+function MinigameLobby:SaveOriginalSetting(k)
+	local setting_v = MinigameSettingsService.Get(self, k)
+
+	if istable(setting_v) then
+		for _k, v in pairs(setting_v) do
+			self.original_settings[k..".".._k] = v
+		end
+	else
+		self.original_settings[k] = setting_v
+	end
+end
+
 function MinigameLobby:InitSettings()
 	self.original_settings = {}
 	self.changed_settings = {}
@@ -138,13 +167,11 @@ function MinigameLobby:InitSettings()
 		if string.match(setting.key, "player_classes%.%*") then
 			for ply_class_k, ply_class in pairs(self.prototype.player_classes) do
 				for _, ply_class_setting in pairs(setting.settings) do
-					local k = "player_classes."..ply_class_k.."."..ply_class_setting.key
-
-					self.original_settings[k] = MinigameSettingsService.Setting(self, k)
+					self:SaveOriginalSetting("player_classes."..ply_class_k.."."..ply_class_setting.key)
 				end
 			end
 		else
-			self.original_settings[setting.key] = MinigameSettingsService.Setting(self, setting.key)
+			self:SaveOriginalSetting(setting.key)
 		end
 	end
 end

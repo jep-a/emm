@@ -118,7 +118,7 @@ end
 hook.Add("PreDrawOpaqueRenderables", "IndicatorService.RenderCoasters", IndicatorService.RenderCoasters)
 
 function IndicatorService.Visible()
-	return SettingsService.Setting "emm_show_hud" and SettingsService.Setting "emm_show_indicators"
+	return SettingsService.Get "show_hud" and SettingsService.Get "show_indicators"
 end
 
 function IndicatorService.PlayerShouldHaveIndicator(ply)
@@ -128,6 +128,8 @@ function IndicatorService.PlayerShouldHaveIndicator(ply)
 		should_have_indicator = false
 	elseif ply.player_class then
 		should_have_indicator = true
+	else
+		should_have_indicator = false
 	end
 
 	return should_have_indicator
@@ -171,7 +173,7 @@ end
 function IndicatorService.AddPlayerIndicator(ply)
 	IndicatorService.container:Add(Indicator.New(ply))
 
-	if ply:Alive() then
+	if ply.just_spawned or ply:Alive() then
 		ply.indicator:AnimateAttribute("alpha", 255)
 	end
 end
@@ -216,8 +218,12 @@ function IndicatorService.LobbyPlayerClassChange(ply)
 	if IndicatorService.Visible() then
 		local should_have_indicator = IndicatorService.PlayerShouldHaveIndicator(ply)
 
-		if should_have_indicator and not ply.indicator then
-			IndicatorService.AddPlayerIndicator(ply)
+		if should_have_indicator then
+			if ply.indicator and ply:Alive() then
+				ply.indicator:AnimateAttribute("alpha", 255)
+			else
+				IndicatorService.AddPlayerIndicator(ply)
+			end
 		elseif not should_have_indicator and ply.indicator then
 			ply.indicator:Finish()
 		end

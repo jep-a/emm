@@ -11,7 +11,7 @@ function ButtonBar:Init(props)
 		child_margin = MARGIN * 8,
 		background_color = props.background and COLOR_GRAY or props.background_color,
 		inherit_color = false,
-		border = LINE_THICKNESS/2,
+		border = LINE_THICKNESS,
 		border_color = props.color,
 		border_alpha = 0,
 		cursor = "hand",

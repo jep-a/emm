@@ -8,7 +8,7 @@ function LobbyUIService.CreateHeader(text, fit)
 		font = "Header",
 		text_justification = 5,
 		text = text,
-		border = LINE_THICKNESS/2
+		border = LINE_THICKNESS
 	}
 
 	if fit then
@@ -61,7 +61,7 @@ function LobbyUIService.CreateLabels(left_labels, right_labels)
 
 	element:Add(Element.New {
 		width_percent = 1,
-		height = LINE_THICKNESS/2,
+		height = LINE_THICKNESS,
 		fill_color = true
 	})
 
@@ -82,14 +82,17 @@ end
 -- # Main elements
 
 function LobbyUIService.CreateContainer()
-	return Element.New {
-		wrap = false,
+	return ScrollContainer.New({
 		width_percent = 1,
 		height_percent = 1,
-		padding = MARGIN * 4,
-		child_margin = MARGIN * 4,
 		alpha = 0
-	}
+	}, {
+		wrap = false,
+		width_percent = 1,
+		fit = true,
+		padding = MARGIN * 4,
+		child_margin = MARGIN * 4
+	})
 end
 
 function LobbyUIService.CreateNewLobbySection()
@@ -126,8 +129,8 @@ end
 
 function LobbyUIService.CreateLobbySection()
 	return Element.New {
+		fit_y = true,
 		width_percent = 0.25,
-		height_percent = 1,
 		child_margin = MARGIN * 4,
 		header = LobbyUIService.CreateHeader("No open lobbies", true)
 	}
