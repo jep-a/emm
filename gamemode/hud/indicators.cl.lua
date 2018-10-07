@@ -218,12 +218,8 @@ function IndicatorService.LobbyPlayerClassChange(ply)
 	if IndicatorService.Visible() then
 		local should_have_indicator = IndicatorService.PlayerShouldHaveIndicator(ply)
 
-		if should_have_indicator then
-			if ply.indicator and ply:Alive() then
-				ply.indicator:AnimateAttribute("alpha", 255)
-			else
-				IndicatorService.AddPlayerIndicator(ply)
-			end
+		if should_have_indicator and not ply.indicator then
+			IndicatorService.AddPlayerIndicator(ply)
 		elseif not should_have_indicator and ply.indicator then
 			ply.indicator:Finish()
 		end
