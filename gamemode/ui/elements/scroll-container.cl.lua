@@ -16,8 +16,8 @@ function ScrollContainer:Init(props, inner_container_props)
 	})
 end
 
-function ScrollContainer:AddInner(child)
-	return self.inner_container:Add(child)
+function ScrollContainer:AddInner(...)
+	return self.inner_container:Add(...)
 end
 
 function ScrollContainer:OnMouseScrolled(scroll)

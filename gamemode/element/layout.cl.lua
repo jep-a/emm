@@ -188,8 +188,9 @@ function Element:StackChildren()
 	local line_size = 0
 	local adj_line_size = 0
 	local largest_line_size = 0
+	local children_count = #children
 
-	for i = 1, #children do
+	for i = 1, children_count do
 		local child = children[i]
 		local child_attr = child.attributes
 
@@ -215,15 +216,34 @@ function Element:StackChildren()
 
 			if i ~= 1 then
 				local prev_child = children[i - 1]
-				local total_prev_crop = math.Clamp(prev_child.attributes[prop_keys.crop_start].current + prev_child.attributes[prop_keys.crop_end].current, 0, 1)
-				local cropped_prev_child_margin = child_margin * (1 - total_prev_crop) * (1 - math.Clamp(prev_child.attributes[prop_keys.layout_crop].current, 0, 1))
+				local prev_child_attr = prev_child.attributes
 
-				child_positions[i] = child_positions[i] + cropped_prev_child_margin
-				line_size = line_size + cropped_prev_child_margin
+				local cropped_prev_child_margin
 
-				local total_crop = math.Clamp(child.attributes[prop_keys.crop_start].current + child.attributes[prop_keys.crop_end].current, 0, 1)
+				if prev_child.static_attributes.crop_margin then
+					local total_prev_crop = math.Clamp(prev_child_attr[prop_keys.crop_start].current + prev_child_attr[prop_keys.crop_end].current, 0, 1)
 
-				if i == #children and total_crop == 1 then
+					cropped_prev_child_margin = (1 - total_prev_crop) * (1 - prev_child_attr[prop_keys.layout_crop].current)
+				else
+					cropped_prev_child_margin = 1
+				end
+
+				local total_crop
+				local cropped_child_margin
+
+				if i == children_count and child.static_attributes.crop_margin then
+					total_crop = math.Clamp(child_attr[prop_keys.crop_start].current + child_attr[prop_keys.crop_end].current, 0, 1)
+					cropped_child_margin = (1 - total_crop) * (1 - child_attr[prop_keys.layout_crop].current)
+				else
+					cropped_child_margin = 1
+				end
+
+				local cropped_margin = math.Clamp(child_margin * cropped_prev_child_margin * cropped_child_margin, 0, child_margin)
+
+				child_positions[i] = child_positions[i] + cropped_margin
+				line_size = line_size + cropped_margin
+
+				if i == children_count and total_crop == 1 then
 					prev_child.last = true
 				elseif prev_child.last then
 					prev_child.last = false
@@ -244,7 +264,7 @@ function Element:StackChildren()
 			adj_line_size = adj_child_size
 		end
 
-		if i == #children then
+		if i == children_count then
 			line_sizes[line] = line_size
 			adj_line_sizes[line] = adj_line_size
 		end
@@ -300,7 +320,7 @@ function Element:StackChildren()
 
 	line = 1
 
-	for i = 1, #children do
+	for i = 1, children_count do
 		if new_lines[i] then
 			line = line + 1
 		end

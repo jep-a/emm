@@ -2,6 +2,7 @@ function MinigameSettingsService.Save(lobby, settings)
 	MinigameSettingsService.SortChanges(lobby.original_settings, lobby.changed_settings, settings)
 	MinigameSettingsService.Adjust(lobby, settings)
 	hook.Run("LobbySettingsChange", lobby, settings)
+	MinigameService.CallHook(lobby, "SettingsChange", settings)
 
 	if lobby:IsLocal() then
 		hook.Run("LocalLobbySettingsChange", lobby, settings)

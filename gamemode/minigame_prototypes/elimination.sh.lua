@@ -23,3 +23,10 @@ MINIGAME:AddPlayerClass {
 	end_on_none = true,
 	player_class_on_death = "Hunter"
 }
+
+MINIGAME:AddAdjustableSettings {
+	{
+		key = "player_classes.Hunted.can_tag.Hunter",
+		label = "Hunted can be tagged"
+	}
+}

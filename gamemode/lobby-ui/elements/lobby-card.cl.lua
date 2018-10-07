@@ -3,6 +3,7 @@ LobbyCardContainer = LobbyCardContainer or Class.New(Element)
 
 function LobbyCardContainer:Init(lobby)
 	LobbyCardContainer.super.Init(self, {
+		layout_crop_x = 1,
 		fit = true,
 		child_margin = MARGIN * 4,
 		alpha = 0
@@ -15,7 +16,8 @@ function LobbyCardContainer:Init(lobby)
 		self.settings = self:Add(LobbySettings.New(lobby))
 	end
 
-	self:AnimateAttribute("alpha", 255, ANIMATION_DURATION * 2)
+	self:AnimateAttribute("layout_crop_x", 0, ANIMATION_DURATION * 4)
+	self:AnimateAttribute("alpha", 255, ANIMATION_DURATION * 4)
 end
 
 function LobbyCardContainer:AddSettings()
@@ -23,10 +25,10 @@ function LobbyCardContainer:AddSettings()
 end
 
 function LobbyCardContainer:AnimateFinish()
-	self:SetAttribute("layout_crop_x", 1)
+	self:AnimateAttribute("layout_crop_x", 1, ANIMATION_DURATION * 4)
 
 	self:AnimateAttribute("alpha", 0, {
-		duration = ANIMATION_DURATION * 2,
+		duration = ANIMATION_DURATION * 4,
 
 		callback = function ()
 			LobbyCardContainer.super.Finish(self)
@@ -101,7 +103,8 @@ function LobbyCard:Init(lobby)
 	self.actions = self:Add(Element.New {
 		fit_y = true,
 		width_percent = 1,
-		crop_bottom = 0.5
+		crop_bottom = 0.5,
+		crop_margin = false
 	})
 
 	self.actions:AddState("leave", {
