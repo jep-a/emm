@@ -1,7 +1,5 @@
-GM.Name = "Extended Movement Mod"
-GM.Author = "Jep Alaba"
-GM.Email = "hello@jep.sh"
-GM.Website = "jep.sh"
+GM.Name = "Extended Movement Mod (Parkour)"
+GM.Author = "arkade"
 
 EMM.Include {
 	"settings/settings",
