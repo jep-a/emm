@@ -142,6 +142,11 @@ function MinigamePrototype:SetAdjustableSettings(vars)
 	self.adjustable_settings_map = MapSettings(vars)
 end
 
+function MinigamePrototype:AddAdjustableSettings(vars)
+	self.adjustable_settings = table.Add(self.adjustable_settings, vars)
+	self.adjustable_settings_map = MapSettings(self.adjustable_settings)
+end
+
 function MinigameLobby:SaveOriginalSetting(k)
 	local setting_v = MinigameSettingsService.Get(self, k)
 

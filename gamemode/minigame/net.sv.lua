@@ -21,6 +21,8 @@ function MinigameNetService.SendLobbies(ply)
 	end
 
 	net.Send(ply)
+
+	ply.received_lobbies = true
 end
 NetService.Receive("RequestLobbies", MinigameNetService.SendLobbies)
 
@@ -47,12 +49,16 @@ function MinigameNetService.RequestLobbyJoin(ply, lobby)
 		ply.lobby:RemovePlayer(ply)
 	end
 
-	lobby:AddPlayer(ply)
+	if lobby then
+		lobby:AddPlayer(ply)
+	end
 end
 NetService.Receive("RequestLobbyJoin", MinigameNetService.RequestLobbyJoin)
 
 function MinigameNetService.RequestLobbyLeave(ply)
-	ply.lobby:RemovePlayer(ply)
+	if ply.lobby then
+		ply.lobby:RemovePlayer(ply)
+	end
 end
 NetService.Receive("RequestLobbyLeave", MinigameNetService.RequestLobbyLeave)
 

@@ -21,18 +21,27 @@ function MinigamePrototype:ReplacePlayerClass(ply)
 	end
 end
 
-function MinigamePrototype:ForfeitPlayerClass(ply)
+function MinigamePrototype:ForfeitPlayerClassToClosest(ply, inflictor, attacker)
 	local ply_class = ply.player_class
 
-	if ply_class and ply_class.swap_closest_on_death then
+	if ply_class and ply_class.swap_closest_on_death and not (ply_class.swap_with_attacker and IsPlayer(attacker) and ply ~= attacker and ply_class ~= attacker.player_class) then
 		local closest_ply = MinigameService.PickClosestPlayerClass(self, ply, {
 			blacklist_class_key = ply_class.key,
 			swap_player_class = true
 		})
 
 		if closest_ply then
-			MinigameService.CallNetHook(self, "PlayerClassForfeit", ply, closest_ply)
+			MinigameService.CallNetHook(self, "PlayerClassForfeitToClosest", ply, closest_ply)
 		end
+	end
+end
+
+function MinigamePrototype:ForfeitPlayerClassToAttacker(ply, inflictor, attacker)
+	local ply_class = ply.player_class
+
+	if ply_class and IsPlayer(attacker) and ply_class.swap_with_attacker and ply_class ~= attacker.player_class then
+		MinigameService.SwapPlayerClass(ply, attacker)
+		MinigameService.CallNetHook(self, "PlayerClassForfeitToAttacker", ply, attacker)
 	end
 end
 
@@ -48,10 +57,10 @@ function MinigamePrototype:CheckIfNoPlayerClasses(ply, old_class)
 	end
 end
 
-function MinigamePrototype:SetPlayerClassOnDeath(ply)
+function MinigamePrototype:SetPlayerClassOnDeath(ply, inflictor, attacker)
 	if ply.player_class and ply.player_class.player_class_on_death then
 		ply:SetPlayerClass(self.player_classes[ply.player_class.player_class_on_death])
-		MinigameService.CallNetHook(self, "PlayerClassChangeFromDeath", ply)
+		MinigameService.CallNetHook(self, "PlayerClassChangeFromDeath", ply, attacker)
 	end
 end
 
@@ -73,8 +82,9 @@ function MinigamePrototype:AddDefaultHooks()
 	self:AddStateHook("Playing", "PlayerJoin", "Respawn", self.Respawn)
 	self:AddStateHook("Playing", "PlayerJoin", "SetDefaultPlayerClass", self.SetDefaultPlayerClass)
 	self:AddStateHook("Playing", "PlayerLeave", "ReplacePlayerClass", self.ReplacePlayerClass)
-	self:AddStateHook("Playing", "PlayerLeave", "ForfeitPlayerClass", self.ForfeitPlayerClass)
-	self:AddStateHook("Playing", "PlayerDeath", "ForfeitPlayerClass", self.ForfeitPlayerClass)
+	self:AddStateHook("Playing", "PlayerLeave", "ForfeitPlayerClassToClosest", self.ForfeitPlayerClassToClosest)
+	self:AddStateHook("Playing", "PlayerDeath", "ForfeitPlayerClassToClosest", self.ForfeitPlayerClassToClosest)
+	self:AddStateHook("Playing", "PlayerDeath", "ForfeitPlayerClassToAttacker", self.ForfeitPlayerClassToAttacker)
 	self:AddStateHook("Playing", "PlayerDeath", "SetPlayerClassOnDeath", self.SetPlayerClassOnDeath)
 	self:AddStateHook("Playing", "PlayerClassChange", "EndIfNoPlayerClasses", self.CheckIfNoPlayerClasses)
 end

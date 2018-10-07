@@ -110,15 +110,19 @@ end)
 
 -- # Damage
 
-local function ShouldTakeDamage(victim, attacker)
+local function ShouldTakeDamage(victim, attacker, dmg)
 	local should_damage
 
+	local inflictor = dmg and dmg:GetInflictor()
 	local victim_is_player = victim:IsPlayer()
 
 	if victim_is_player and victim.should_take_damage then
 		should_damage = victim.should_take_damage
 		victim.should_take_damage = nil
 	else
+		if inflictor then
+			print(inflictor, victim.lobby, inflictor.lobby)
+		end
 		if attacker == game.GetWorld() then
 			should_damage = true
 		elseif
@@ -127,7 +131,8 @@ local function ShouldTakeDamage(victim, attacker)
 			victim_is_player and
 			attacker:IsPlayer() and
 			attacker.player_class and
-			victim.player_class
+			victim.player_class and
+			(inflictor and victim.lobby == inflictor.lobby)
 		then
 			should_damage = attacker.player_class.can_damage_everyone or attacker.player_class.can_damage[victim.player_class.key]
 		else
@@ -143,7 +148,7 @@ local function ShouldTakeDamage(victim, attacker)
 end
 
 hook.Add("EntityTakeDamage", "EMM.EntityTakeDamage", function (victim, dmg)
-	return not ShouldTakeDamage(victim, dmg:GetAttacker())
+	return not ShouldTakeDamage(victim, dmg:GetAttacker(), dmg)
 end)
 
 hook.Add("PlayerShouldTakeDamage", "EMM.PlayerShouldTakeDamage", function (victim, attacker)

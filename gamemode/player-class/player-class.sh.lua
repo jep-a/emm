@@ -13,10 +13,10 @@ function PlayerClassService.CreatePlayerClass(props)
 		can_take_fall_damage = true,
 		can_damage_everyone = true,
 		can_damage = {},
-
-		weapons = {
-			weapon_crowbar = true
-		}
+		weapons = {},
+		notify_player_class_on_death = true,
+		notify_on_killed_by_player = true,
+		notify_on_killed_by_other = false
 	}, props)
 
 	return ply_class

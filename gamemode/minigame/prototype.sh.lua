@@ -113,6 +113,7 @@ end
 hook.Add("CreateMinigameHookSchemas", "Default", function ()
 	MinigameNetService.CreateHookSchema "StateExpired"
 	MinigameNetService.CreateHookSchema("RandomPlayerClassesPicked", {"entities"})
-	MinigameNetService.CreateHookSchema("PlayerClassForfeit", {"entity", "entity"})
+	MinigameNetService.CreateHookSchema("PlayerClassForfeitToClosest", {"entity", "entity"})
+	MinigameNetService.CreateHookSchema("PlayerClassForfeitToAttacker", {"entity", "entity"})
 	MinigameNetService.CreateHookSchema("PlayerClassChangeFromDeath", {"entity"})
 end)

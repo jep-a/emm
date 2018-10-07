@@ -103,13 +103,15 @@ end
 function ListSelector:FinishList()
 	local old_list = self.list
 
-	old_list:AnimateAttribute("alpha", 0, {
-		callback = function ()
-			old_list:Finish()
-		end
-	})
-	
-	self.list = nil
+	if old_list then
+		old_list:AnimateAttribute("alpha", 0, {
+			callback = function ()
+				old_list:Finish()
+			end
+		})
+		
+		self.list = nil
+	end
 end
 
 function ListSelector:OnListValueChanged(k, v)
@@ -133,7 +135,7 @@ function ListSelector:OnListValueChanged(k, v)
 end
 
 function ListSelector.MousePressed(panel)
-	if ListSelector.focused and ListSelector.focused.list.panel:IsCursorOutBounds()  then
+	if ListSelector.focused and ListSelector.focused.list and ListSelector.focused.list.panel:IsCursorOutBounds() then
 		ListSelector.focused:FinishList()
 		ListSelector.focused = nil
 	end
@@ -154,7 +156,10 @@ end
 
 function ListSelector:OnMousePressed(mouse)
 	ListSelector.super.OnMousePressed(self, mouse)
-	self:CreateList()
+
+	if not self.list then
+		self:CreateList()
+	end
 end
 
 function ListSelector:SetValue(k, v)

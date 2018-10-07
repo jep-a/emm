@@ -1,8 +1,10 @@
 function PlayerClassService.ReceivePlayerClass(ply, id)
-	if id ~= 0 then
-		ply:SetPlayerClass(PlayerClassService.MinigamePlayerClass(ply, id))
-	else
-		ply:ClearPlayerClass()
+	if MinigameNetService.received_lobbies then
+		if id ~= 0 then
+			ply:SetPlayerClass(PlayerClassService.MinigamePlayerClass(ply, id))
+		else
+			ply:ClearPlayerClass()
+		end
 	end
 end
 NetService.Receive("PlayerClass", PlayerClassService.ReceivePlayerClass)

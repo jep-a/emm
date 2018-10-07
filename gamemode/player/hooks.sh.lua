@@ -48,3 +48,11 @@ hook.Add("PlayerDeath", "DeathTime", SetDeathTime)
 if SERVER then
 	hook.Add("PlayerSilentDeath", "DeathTime", SetDeathTime)
 end
+
+hook.Add("OnEntityCreated", "AssignLobby", function (ent)
+	local owner = ent:GetOwner()
+
+	if IsValid(owner) and owner.lobby then
+		ent.lobby = owner.lobby
+	end
+end)

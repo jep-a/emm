@@ -14,9 +14,17 @@ MINIGAME:AddPlayerClass {
 	tag_victim = true,
 	swap_on_tag = true,
 	kill_on_tag = true,
-	swap_closest_on_death = true
+	swap_closest_on_death = true,
+	swap_with_attacker = true
 }
 
 MINIGAME:AddPlayerClass {
 	name = "Hunter"
+}
+
+MINIGAME:AddAdjustableSettings {
+	{
+		key = "player_classes.Hunted.can_tag.Hunter",
+		label = "Hunted can be tagged"
+	}
 }

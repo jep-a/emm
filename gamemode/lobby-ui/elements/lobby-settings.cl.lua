@@ -134,7 +134,6 @@ function LobbySettings:AddSetting(setting, ply_class_k)
 
 	if list then
 		for list_k, list_v in pairs(self.inputs[k].input.inputs) do
-			print(list_k)
 			self.inputs[k.."."..list_k] = list_v
 		end
 	end

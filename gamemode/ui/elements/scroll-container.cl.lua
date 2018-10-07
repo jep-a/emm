@@ -23,11 +23,11 @@ end
 function ScrollContainer:OnMouseScrolled(scroll)
 	local curr_scroll = self.scroll.current
 	local new_scroll = curr_scroll + (scroll * 50)
-	local min = -(self.inner_container:GetFinalHeight() - self:GetFinalHeight())
+	local min = math.min(-(self.inner_container:GetFinalHeight() - self:GetFinalHeight()), 0)
 
-	if 0 > min and 0 > new_scroll or new_scroll > min then
+	-- if 0 > min and 0 > new_scroll or new_scroll > min then
 		self.scroll.current = math.Clamp(new_scroll, min, 0)
-	end
+	-- end
 end
 
 function ScrollContainer:Finish()

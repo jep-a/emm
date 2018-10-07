@@ -83,6 +83,11 @@ function LobbyUIService.Close()
 		LobbyUIService.container.panel:SetMouseInputEnabled(false)
 		LobbyUIService.container.panel:MoveToBack()
 		LobbyUIService.container:AnimateAttribute("alpha", 0)
+
+		if ListSelector.focused and ListSelector.focused:HasParent(LobbyUIService.container) then
+			ListSelector.focused:FinishList()
+		end
+	
 		hook.Run "OnLobbyUIClose"
 	end
 end
@@ -210,7 +215,7 @@ end
 hook.Add("LobbyPlayerLeave", "LobbyUIService.RemoveLobbyPlayer", LobbyUIService.RemoveLobbyPlayer)
 
 function LobbyUIService.SelectLobby(lobby)
-	if lobby ~= LobbyUIService.selected_lobby then
+	if lobby and lobby ~= LobbyUIService.selected_lobby then
 		if LobbyUIService.selected_lobby then
 			LobbyUIService.UnSelectLobby()
 		end
@@ -227,16 +232,18 @@ end
 function LobbyUIService.UnSelectLobby()
 	local lobby = LobbyUIService.selected_lobby
 
-	if lobby.bar_element then
-		lobby.bar_element:RevertState()
-	end
+	if lobby then
+		if lobby.bar_element then
+			lobby.bar_element:RevertState()
+		end
 
-	if lobby == LobbyUIService.selected_lobby then
-		LobbyUIService.lobby_card_container:Finish()
-		LobbyUIService.lobby_card_container = nil
+		if lobby == LobbyUIService.selected_lobby then
+			LobbyUIService.lobby_card_container:Finish()
+			LobbyUIService.lobby_card_container = nil
+		end
+			
+		LobbyUIService.selected_lobby = nil
 	end
-		
-	LobbyUIService.selected_lobby = nil
 end
 
 function LobbyUIService.Focus()

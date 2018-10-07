@@ -30,6 +30,10 @@ function AnimatableValue.NewFromSetting(name, ...)
 end
 
 function AnimatableValue:Init(value, props)
+	if EMM.debug then
+		self.debug_trace = debug.traceback()
+	end
+
 	value = Default(value, 0)
 	props = props or {}
 
