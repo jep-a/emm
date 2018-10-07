@@ -95,6 +95,7 @@ end
 function MinigameSettingsService.Adjust(lobby, settings)
 	for k, setting in pairs(settings) do
 		local adjustable
+		local adjusted
 
 		for _k, _setting in pairs(lobby.prototype.adjustable_settings_map) do
 			if string.find(k, _k) then
@@ -122,16 +123,25 @@ function MinigameSettingsService.Adjust(lobby, settings)
 				if #exploded_k == i then
 					if setting == "nil" then
 						tab[lobby_k] = nil
+						adjusted = true
 					elseif istable(setting) then
 						for _k, v in pairs(setting) do
 							tab[lobby_k][_k] = v
+							adjusted = true
 						end
 					else
 						tab[lobby_k] = setting
+						adjusted = true
 					end
 				else
 					tab = tab[lobby_k]
+					adjusted = true
 				end
+			end
+
+			if adjusted then
+				hook.Run("LobbySettingChange", lobby, k, setting)
+				MinigameService.CallHook(lobby, "SettingChange", k, setting)
 			end
 		end
 	end

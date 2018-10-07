@@ -7,6 +7,7 @@ function MinigameSettingsService.Save(ply, lobby, settings)
 	end
 
 	hook.Run("LobbySettingsChange", lobby, settings)
+	MinigameService.CallHook(lobby, "SettingsChange", settings)
 end
 
 NetService.Receive("LobbySettings", MinigameSettingsService.Save)

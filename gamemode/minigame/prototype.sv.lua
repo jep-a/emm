@@ -51,16 +51,37 @@ function MinigamePrototype:SetDefaultPlayerClass(ply)
 	end
 end
 
+function MinigamePrototype:SetPlayerClassOnDeath(ply, inflictor, attacker)
+	if ply.player_class and ply.player_class.player_class_on_death then
+		ply:SetPlayerClass(self.player_classes[ply.player_class.player_class_on_death])
+		MinigameService.CallNetHook(self, "PlayerClassChangeFromDeath", ply, attacker)
+	end
+end
+
 function MinigamePrototype:CheckIfNoPlayerClasses(ply, old_class)
 	if old_class and old_class.end_on_none and 1 > #self[old_class.key] then
 		self:NextState()
 	end
 end
 
-function MinigamePrototype:SetPlayerClassOnDeath(ply, inflictor, attacker)
-	if ply.player_class and ply.player_class.player_class_on_death then
-		ply:SetPlayerClass(self.player_classes[ply.player_class.player_class_on_death])
-		MinigameService.CallNetHook(self, "PlayerClassChangeFromDeath", ply, attacker)
+function MinigamePrototype:ReloadLoadouts(settings)
+	local ply_classes_adjusted = {}
+
+	for k, setting in pairs(settings) do
+		local match = string.match(k, "player_classes%.(.*)%.weapons")
+
+		if match then
+			ply_classes_adjusted[match] = true
+		end
+	end
+
+	if ply_classes_adjusted then
+		for ply_class, _ in pairs(ply_classes_adjusted) do
+			for _, ply in pairs(self[ply_class]) do
+				ply:Strip()
+				ply:SetupLoadout()
+			end
+		end
 	end
 end
 
@@ -87,6 +108,7 @@ function MinigamePrototype:AddDefaultHooks()
 	self:AddStateHook("Playing", "PlayerDeath", "ForfeitPlayerClassToAttacker", self.ForfeitPlayerClassToAttacker)
 	self:AddStateHook("Playing", "PlayerDeath", "SetPlayerClassOnDeath", self.SetPlayerClassOnDeath)
 	self:AddStateHook("Playing", "PlayerClassChange", "EndIfNoPlayerClasses", self.CheckIfNoPlayerClasses)
+	self:AddStateHook("Playing", "SettingsChange", "ReloadLoadouts", self.ReloadLoadouts)
 end
 
 function MinigamePrototype:AddRequirePlayersHooks()
