@@ -120,7 +120,7 @@ local function ShouldTakeDamage(victim, attacker, dmg)
 		should_damage = victim.should_take_damage
 		victim.should_take_damage = nil
 	else
-		if attacker == game.GetWorld() then
+		if attacker == game.GetWorld() or attacker:GetClass() == "trigger_hurt" then
 			should_damage = true
 		elseif
 			IsValid(attacker) and
