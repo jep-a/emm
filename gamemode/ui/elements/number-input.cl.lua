@@ -53,11 +53,9 @@ local offset = 2
 
 function NumberInput:Init(text, props)
 	NumberInput.super.Init(self, {
-		fit_y = true,
 		width_percent = 1,
-		padding_left = MARGIN,
-		padding_top = (MARGIN/2) + offset,
-		padding_bottom = (MARGIN * 2) - offset,
+		height_percent = 1,
+		padding_left = 2,
 		background_color = COLOR_GRAY_DARK,
 		cursor = "beam",
 		font = "NumberInfo",

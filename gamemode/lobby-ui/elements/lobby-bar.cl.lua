@@ -2,12 +2,11 @@ LobbyBar = LobbyBar or Class.New(Element)
 
 function LobbyBar:Init(lobby)
 	LobbyBar.super.Init(self, {
-		layout_justification_y = JUSTIFY_END,
-		fit_y = true,
+		layout_justification_y = JUSTIFY_CENTER,
 		width_percent = 1,
+		height = 52,
 		crop_bottom = 1,
-		padding_x = MARGIN * 8,
-		padding_top = MARGIN * 3,
+		padding_x = 32,
 		inherit_color = false,
 		border = LINE_THICKNESS,
 		border_color = lobby.prototype.color,
@@ -44,41 +43,29 @@ function LobbyBar:Init(lobby)
 
 	self.lobby = lobby
 	lobby.bar_element = self
-
-	local left_section = self:Add(Element.New {
+	
+	self.type_container = self:Add(Element.New {
 		layout_justification_y = JUSTIFY_CENTER,
-		wrap = false,
-		fit_y = true,
-		width_percent = 0.75,
-		padding_bottom = MARGIN * 3,
-		child_margin = MARGIN * 8,
-
-		Element.New {
-			width = BUTTON_ICON_SIZE,
-			height = BUTTON_ICON_SIZE,
-			crop_y = 0.1,
-			material = PNGMaterial("emm2/minigames/"..lobby.prototype.key..".png")
-		}
+		width = 64,
+		height_percent = 1
 	})
 
-	self.host = left_section:Add(Element.New {
+	self.type_container:Add(Element.New {
+		width = BUTTON_ICON_SIZE,
+		height = BUTTON_ICON_SIZE,
+		crop = 0.1,
+		material = PNGMaterial("emm2/minigames/"..lobby.prototype.key..".png")
+	})
+
+	self.host = self:Add(Element.New {
 		fit = true,
 		font = "Info",
 		text_justification = 4,
 		text = ProperPlayerName(lobby.host)
 	})
 
-	local right_section = self:Add(Element.New {
-		layout_justification_x = JUSTIFY_END,
-		layout_justification_y = JUSTIFY_CENTER,
-		fit_y = true,	
-		crop_bottom = 0.01,
-		width_percent = 0.25,
-		padding_bottom = MARGIN * 3,
-		child_margin = MARGIN * 8
-	})
-
-	self.players = right_section:Add(Element.New {
+	self.players = self:Add(Element.New {
+		self_justification = JUSTIFY_END,
 		width = 25,
 		height = 24,
 		crop_right = 0.01,
@@ -90,10 +77,16 @@ function LobbyBar:Init(lobby)
 	})
 
 	self:Add(Element.New {
+		layout = false,
+		origin_position = true,
+		origin_justification_x = JUSTIFY_CENTER,
+		origin_justification_y = JUSTIFY_END,
+		position_justification_x = JUSTIFY_CENTER,
+		position_justification_y = JUSTIFY_END,
 		width_percent = 1,
 		height = LINE_THICKNESS,
 		fill_color = true,
-	
+
 		alpha = function ()
 			return self.last and 0 or 255
 		end

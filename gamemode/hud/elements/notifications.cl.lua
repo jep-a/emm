@@ -37,15 +37,18 @@ function NotificationContainer:Init(children, duration, key)
 end
 
 function NotificationContainer:AnimateStart()
-	self:SetAttribute("crop_bottom", 1)
-	self:AnimateAttribute("crop_bottom", 0)
+	self:SetAttributes {
+		crop_bottom = 1,
+		layout_crop_y = 1
+	}
+
+	self:AnimateAttribute("crop_bottom", 0, 1/60)
+	self:AnimateAttribute("layout_crop_y", 0)
 end
 
 function NotificationContainer:AnimateFinish()
-	self:AnimateAttribute("alpha", 0, 1)
-
 	self:AnimateAttribute("crop_bottom", 1, {
-		duration = 1,
+		duration = ANIMATION_DURATION * 10,
 
 		callback = function ()
 			if self.key then
@@ -59,6 +62,8 @@ function NotificationContainer:AnimateFinish()
 			NotificationContainer.super.Finish(self)
 		end
 	})
+
+	self:AnimateAttribute("alpha", 0, ANIMATION_DURATION * 10)
 end
 
 function NotificationContainer:Finish()

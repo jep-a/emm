@@ -3,7 +3,8 @@ TimeInput = TimeInput or Class.New(Element)
 local TimeInputPanel = {}
 
 local max_time_digits = 6
-local start_padding = 2
+local padding_x = 4
+local padding_y = 3
 
 local function ZeroString(len)
 	len = len or max_time_digits
@@ -213,11 +214,11 @@ function TimeInputPanel:Paint(w, h)
 
 	surface.SetFont(self:GetFont())
 	surface.SetTextColor(color)
-	surface.SetTextPos(start_padding, 0)
+	surface.SetTextPos(padding_x, padding_y)
 	surface.DrawText(self.time)
 	
 	surface.SetTextColor(ColorAlpha(color, CombineAlphas(color.a, QUARTER_ALPHA) * 255))
-	surface.SetTextPos(start_padding - 1, 0)
+	surface.SetTextPos(padding_x - 1, padding_y)
 	surface.DrawText(self.colons)
 
 	self.digit_width = surface.GetTextSize "0"
@@ -225,14 +226,14 @@ function TimeInputPanel:Paint(w, h)
 	surface.SetDrawColor(color)
 
 	if self:HasFocus() and math.Round((CurTime() - self.last_caret_pos_change) % 1) == 0 then
-		surface.DrawRect((self.digit_width * self.caret_pos_after_colon) + start_padding, 0, LINE_THICKNESS, h - MARGIN)
+		surface.DrawRect((self.digit_width * self.caret_pos_after_colon) + padding_x, 0, LINE_THICKNESS, h - padding_y)
 	end
 end
 
 function TimeInputPanel:ManuallySetCaretPos()
 	local x, _ = self:LocalCursorPos()
 	local time_len = #self.time
-	local corrected_caret_pos = self.formatted_lookup[math.Round(math.Clamp((x - start_padding)/(time_len * self.digit_width), 0, 1) * time_len)]
+	local corrected_caret_pos = self.formatted_lookup[math.Round(math.Clamp((x - padding_x)/(time_len * self.digit_width), 0, 1) * time_len)]
 
 	self:OffsetCaretPos(corrected_caret_pos)
 end
@@ -257,10 +258,8 @@ vgui.Register("TimeInputPanel", TimeInputPanel, "DTextEntry")
 
 function TimeInput:Init(time, props)
 	TimeInput.super.Init(self, {
-		fit_y = true,
-		width_percent = 0.8,
-		padding_left = MARGIN,
-		padding_y = MARGIN,
+		width_percent = 1,
+		height_percent = 1,
 		background_color = COLOR_GRAY_DARK,
 		cursor = "beam",
 		font = "NumberInfo",

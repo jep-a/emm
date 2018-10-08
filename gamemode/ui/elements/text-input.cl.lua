@@ -37,11 +37,9 @@ vgui.Register("TextInputPanel", TextInputPanel, "DTextEntry")
 
 function TextInput:Init(text, props)
 	TextInput.super.Init(self, {
-		fit_y = true,
 		width_percent = 1,
-		padding_left = MARGIN,
-		padding_top = MARGIN/2,
-		padding_bottom = MARGIN * 2,
+		height_percent = 1,
+		padding_left = 2,
 		background_color = COLOR_GRAY_DARK,
 		cursor = "beam",
 		font = "InputText",

@@ -1,24 +1,39 @@
 InputBar = InputBar or Class.New(Element)
 
-function InputBar:Init(label, type, v, input_props)
+function InputBar.Type(type)
+	local type = type or "boolean"
+
 	type = type or "boolean"
 
-	InputBar.super.Init(self, {
-		layout_justification_y = JUSTIFY_CENTER,
-		fit_y = true,
-		width_percent = 1,
-		padding_x = MARGIN * 8,
-		padding_y = MARGIN * 4,
-		inherit_color = false,
-		color = COLOR_WHITE,
+	local input_element
 
-		label = Element.New {
-			fit_y = true,
-			width_percent = 0.75,
-			crop_top = 0.15,
-			font = "InputLabel",
-			text = label,
-		},
+	if type == "boolean" then
+		input_element = Checkbox
+	elseif type == "text" then
+		input_element = TextInput
+	elseif type == "number" then
+		input_element = NumberInput
+	elseif type == "time" then
+		input_element = TimeInput
+	elseif type == "list" then
+		input_element = ListSelector
+	end
+
+	return input_element
+end
+
+function InputBar:Init(label, type, v, input_props)
+	InputBar.super.Init(self, {
+		layout_justification_x = JUSTIFY_END,
+		layout_justification_y = JUSTIFY_CENTER,
+		width_percent = 1,
+		height = 52,
+		padding_x = 32,
+		padding_y = 14,
+		inherit_color = false,
+		font = "InputLabel",
+		text_justification = 4,
+		text = label,
 
 		Element.New {
 			layout = false,
@@ -43,41 +58,16 @@ function InputBar:Init(label, type, v, input_props)
 		crop_bottom = 1
 	})
 
-	self.input_container = self:Add(Element.New {
-		layout_justification_x = JUSTIFY_END,
-		layout_justification_y = JUSTIFY_CENTER,
-		fit_y = true,
-		width_percent = 0.25
-	})
+	if type or v or input_props then
+		self.input = InputBar.Type(type).New(v, input_props)
 
-	local input_element
-
-	self.type = type
-
-	if type == "boolean" then
-		input_element = Checkbox
-	else
-		local input_w_percent
-
-		if type == "text" then
-			input_element = TextInput
-			input_w_percent = 0.5
-		elseif type == "number" then
-			input_element = NumberInput
-			input_w_percent = 0.25
-		elseif type == "time" then
-			input_element = TimeInput
-			input_w_percent = 0.5
-		elseif type == "list" then
-			input_element = ListSelector
-			input_w_percent = 0.25
-		end
-
-		self.label:SetAttribute("width_percent", 1 - input_w_percent)
-		self.input_container:SetAttribute("width_percent", input_w_percent)
+		self:Add(Element.New {
+			layout_justification_x = JUSTIFY_END,
+			width_percent = 0.25,
+			height_percent = 1,
+			self.input
+		})
 	end
-
-	self.input = self.input_container:Add(input_element.New(v, input_props))
 end
 
 function InputBar:SetValue(v)

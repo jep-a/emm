@@ -44,6 +44,7 @@ EMM.Include {
 	"element/attributes",
 	"element/setters",
 	"element/layout",
+	"element/stack",
 	"element/paint",
 	"element/states",
 

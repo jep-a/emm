@@ -22,59 +22,79 @@ function LobbyUIService.CreateHeader(text, fit)
 	return element
 end
 
-function LobbyUIService.CreateLabel(text)
-	return Element.New {
+function LobbyUIService.CreateLabel(props)
+	local element = Element.New {
+		layout_justification_x = props.justification,
+		self_justification = props.justification or JUSTIFY_INHERIT,
+		fit_x = not props.width,
+		width_percent = props.width_percent,
+		height_percent = 1,
+		width = props.width,
+		inherit_color = not props.color,
+		color = props.color
+	}
+
+	element:Add(Element.New {
 		fit = true,
 		crop_top = 0.125,
 		crop_bottom = 0.01,
 		font = "Label",
-		text_justification = 4,
-		text = string.upper(text)
-	}
+		text = string.upper(props.text),
+	})
+
+	element:Add(Element.New {
+		layout = false,
+		origin_position = true,
+		origin_justification_y = JUSTIFY_END,
+		position_justification_y = JUSTIFY_END,
+		width_percent = 1,
+		height = LINE_THICKNESS,
+		fill_color = props.color,
+		inherit_color = not props.color,
+		color = props.color
+	})
+
+	return element
 end
 
 function LobbyUIService.CreateLabels(left_labels, right_labels)
 	local element = Element.New {
-		layout_justification_y = JUSTIFY_END,
-		fit_y = true,
 		width_percent = 1,
-		padding_x = MARGIN * 8,
-		padding_top = MARGIN * 5
+		height = 52,
+		padding_x = 32,
+		padding_top = 20
 	}
 
-	element.left_section = element:Add(Element.New {
-		layout_justification_y = JUSTIFY_TOP,
-		fit_y = true,
-		width_percent = 0.5,
-		padding_bottom = MARGIN * 4,
-		child_margin = MARGIN * 8
-	})
-
-	element.right_section = element:Add(Element.New {
-		layout_justification_x = JUSTIFY_END,
-		layout_justification_y = JUSTIFY_TOP,
-		fit_y = true,
-		width_percent = 0.5,
-		padding_bottom = MARGIN * 4,
-		child_margin = MARGIN * 8
-	})
-
 	element:Add(Element.New {
+		layout = false,
+		origin_position = true,
+		origin_justification_x = JUSTIFY_CENTER,
+		origin_justification_y = JUSTIFY_END,
+		position_justification_x = JUSTIFY_CENTER,
+		position_justification_y = JUSTIFY_END,
 		width_percent = 1,
 		height = LINE_THICKNESS,
 		fill_color = true
 	})
 
 	for _, label in pairs(left_labels) do
-		element.left_section:Add(LobbyUIService.CreateLabel(label))
+		if istable(label) then
+			element:Add(LobbyUIService.CreateLabel(label))
+		else
+			element:Add(LobbyUIService.CreateLabel {text = label})
+		end
 	end
 
 	if right_labels then
 		for _, label in pairs(right_labels) do
-			element.right_section:Add(LobbyUIService.CreateLabel(label))
+			if istable(label) then
+				label.justification = label.justification or JUSTIFY_END
+				element:Add(LobbyUIService.CreateLabel(label))
+			else
+				element:Add(LobbyUIService.CreateLabel {text = label, justification = JUSTIFY_END})
+			end
 		end
 	end
-
 	return element
 end
 
@@ -88,9 +108,8 @@ function LobbyUIService.CreateContainer()
 		alpha = 0
 	}, {
 		layout_justification_x = JUSTIFY_CENTER,
-		wrap = false,
 		width_percent = 1,
-		fit = true,
+		fit_y = true,
 		padding = MARGIN * 4,
 		child_margin = MARGIN * 4
 	})
@@ -131,9 +150,9 @@ end
 function LobbyUIService.CreateLobbySection()
 	return Element.New {
 		fit_y = true,
-		width_percent = 0.25,
+		width = COLUMN_WIDTH * 2,
 		child_margin = MARGIN * 4,
-		header = LobbyUIService.CreateHeader("No open lobbies", true)
+		header = LobbyUIService.CreateHeader "No open lobbies"
 	}
 end
 
@@ -144,7 +163,14 @@ function LobbyUIService.CreateLobbyList()
 		width_percent = 1,
 		padding_bottom = MARGIN * 6.5,
 		background_color = COLOR_GRAY,
-		LobbyUIService.CreateLabels({"Type", "Host"}, {"Players"})
+		LobbyUIService.CreateLabels({
+			{
+				text = "Type",
+				width = 64
+			},
+
+			"Host"
+		}, {"Players"})
 	}
 
 	element:AddState("contains_children", {

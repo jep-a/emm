@@ -60,6 +60,7 @@ function LobbyCard:Init(lobby)
 		layout_justification_y = JUSTIFY_CENTER,
 		fit_y = true,
 		width_percent = 1,
+		height = 64,
 		background_color = COLOR_GRAY,
 
 		Element.New {
@@ -67,7 +68,7 @@ function LobbyCard:Init(lobby)
 			layout_justification_y = JUSTIFY_CENTER,
 			width = LARGE_BUTTON_ICON_SIZE,
 			height = LARGE_BUTTON_ICON_SIZE,
-			padding = MARGIN/2,
+			padding = 2,
 			background_color = lobby.prototype.color,
 
 			Element.New {
@@ -81,8 +82,7 @@ function LobbyCard:Init(lobby)
 			fit = true,
 			crop_top = 0.2,
 			crop_bottom = 0.15,
-			padding_left = MARGIN * 8,
-			padding_bottom = MARGIN - 1,
+			padding_left = 32,
 			font = "ButtonBar",
 			text_justification = 4,
 			text = string.upper(lobby.prototype.name)

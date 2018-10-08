@@ -97,6 +97,7 @@ function Element:InitAttributes()
 		origin_justification_y = JUSTIFY_START,
 		position_justification_x = JUSTIFY_START,
 		position_justification_y = JUSTIFY_START,
+		self_justification = JUSTIFY_INHERIT,
 		self_adjacent_justification = JUSTIFY_INHERIT,
 		layout_justification_x = JUSTIFY_START,
 		layout_justification_y = JUSTIFY_START,

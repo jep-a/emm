@@ -3,8 +3,8 @@ TextBar = TextBar or Class.New(Element)
 function TextBar:Init(text, props)
 	TextBar.super.Init(self, {
 		fit = true,
-		padding_x = MARGIN * 2,
-		padding_y = MARGIN,
+		padding_x = 8,
+		padding_y = 4,
 		fill_color = true,
 		font = "TextBar",
 		text_justification = 5,

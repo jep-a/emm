@@ -37,7 +37,7 @@ function HUDService.CreateQuadrant(section, props)
 		wrap = false,
 		width_percent = 1,
 		height_percent = 1/3,
-		child_margin = MARGIN
+		child_margin = 4
 	})
 
 	if props then
