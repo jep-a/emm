@@ -61,6 +61,13 @@ function NumberInput:Init(text, props)
 		font = "NumberInfo",
 		border = 2,
 		border_alpha = 0,
+
+		disabled = {
+			background_color = COLOR_BLACK_CLEAR,
+			border = 1,
+			border_color = COLOR_GRAY_DARK,
+			border_alpha = 255
+		},
 		
 		hover = {
 			border_alpha = 255
@@ -75,9 +82,22 @@ function NumberInput:Init(text, props)
 
 	if props then
 		self:SetAttributes(props)
+		self.read_only = props.read_only
 		self.on_change = props.on_change
 		self.on_click = props.on_click
+
+		if props.read_only then
+			self:Disable()
+		end
 	end
+end
+
+function NumberInput:Disable()
+	TextInput.Disable(self)
+end
+
+function NumberInput:Enable()
+	TextInput.Enable(self)
 end
 
 function NumberInput:OnValueChanged(v)
@@ -101,6 +121,14 @@ function NumberInput:OnMousePressed(mouse)
 	end
 
 	self:OnFocus(self)
+end
+
+function NumberInput:OnMouseEntered()
+	TextInput.OnMouseEntered(self)
+end
+
+function NumberInput:OnMouseExited()
+	TextInput.OnMouseExited(self)
 end
 
 function NumberInput:OnFocus()

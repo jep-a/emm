@@ -126,7 +126,7 @@ function Class.AddHook(class, name, func_k)
 		
 				if not success then
 					if instance.debug_trace then
-						Error(instance.debug_trace.."\n")
+						Error(error.."\n"..instance.debug_trace.."\n")
 					else
 						Error(error.."\n")
 					end

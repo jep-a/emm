@@ -86,6 +86,10 @@ function AnimatableValue:GetAnimationEndTime()
 end
 
 function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay)
+	if EMM.debug then
+		self.debug_trace = debug.traceback()
+	end
+
 	local instances = AnimatableValue.static.instances
 
 	if not self.thinker and not table.HasValue(instances, self) then
@@ -173,15 +177,21 @@ function AnimatableValue:Animate()
 
 		local value
 
-		if IsColor(self.current) then
-			value = Color(
-				(inverted_eased_time * first_anim.start_value.r) + (eased_time * first_anim.end_value.r),
-				(inverted_eased_time * first_anim.start_value.g) + (eased_time * first_anim.end_value.g),
-				(inverted_eased_time * first_anim.start_value.b) + (eased_time * first_anim.end_value.b),
-				(inverted_eased_time * first_anim.start_value.a) + (eased_time * first_anim.end_value.a)
-			)
-		else
-			value = (inverted_eased_time * first_anim.start_value) + (eased_time * first_anim.end_value)
+		if first_anim.start_value == nil then
+			first_anim.start_value = first_anim.end_value
+		end
+
+		if first_anim.end_value ~= nil then
+			if IsColor(self.current) then
+				value = Color(
+					(inverted_eased_time * first_anim.start_value.r) + (eased_time * first_anim.end_value.r),
+					(inverted_eased_time * first_anim.start_value.g) + (eased_time * first_anim.end_value.g),
+					(inverted_eased_time * first_anim.start_value.b) + (eased_time * first_anim.end_value.b),
+					(inverted_eased_time * first_anim.start_value.a) + (eased_time * first_anim.end_value.a)
+				)
+			else
+				value = (inverted_eased_time * first_anim.start_value) + (eased_time * first_anim.end_value)
+			end
 		end
 
 		self.current = value

@@ -265,6 +265,13 @@ function TimeInput:Init(time, props)
 		font = "NumberInfo",
 		border = 2,
 		border_alpha = 0,
+
+		disabled = {
+			background_color = COLOR_BLACK_CLEAR,
+			border = 1,
+			border_color = COLOR_GRAY_DARK,
+			border_alpha = 255
+		},
 		
 		hover = {
 			border_alpha = 255
@@ -299,9 +306,22 @@ function TimeInput:Init(time, props)
 
 	if props then
 		self:SetAttributes(props)
+		self.read_only = props.read_only
 		self.on_change = props.on_change
 		self.on_click = props.on_click
+
+		if props.read_only then
+			self:Disable()
+		end
 	end
+end
+
+function TimeInput:Disable()
+	TextInput.Disable(self)
+end
+
+function TimeInput:Enable()
+	TextInput.Enable(self)
 end
 
 function TimeInput:Finish()
@@ -340,6 +360,14 @@ end
 
 function TimeInput:OnMouseReleased(mouse)
 	TimeInput.super.OnMouseReleased(self, mouse)
+end
+
+function TimeInput:OnMouseEntered()
+	TextInput.OnMouseEntered(self)
+end
+
+function TimeInput:OnMouseExited()
+	TextInput.OnMouseExited(self)
 end
 
 function TimeInput:OnFocus()

@@ -5,7 +5,8 @@ function LobbySettings:Init(lobby)
 		layout_direction = DIRECTION_COLUMN,
 		fit = true,
 		child_margin = MARGIN * 4,
-		LobbyUIService.CreateHeader "Lobby settings"
+		inherit_color = false,
+		LobbyUIService.CreateHeader "Lobby settings",
 	})
 
 	self.lobby = lobby
@@ -24,16 +25,50 @@ function LobbySettings:Init(lobby)
 		self.player_class_category = self:AddCategory "Player"
 	end
 
-	self.player_class_categories = {}
+	self.disabled = not IsLocalPlayer(lobby.host)
 
 	self.original_values = {}
 	self.changed_values = {}
 	self.values = {}
+
 	self.settings = {}
+	
 	self.inputs = {}
+	self.input_containers = {}
+	self.list_inputs = {}
 
 	self:InitSettings()
 	self:CreateSaver()
+end
+
+function LobbySettings:Finish()
+	self.original_values = {}
+	self.changed_values = {}
+	self.values = {}
+
+	self.settings = {}
+	
+	self.inputs = {}
+	self.input_containers = {}
+	self.list_inputs = {}
+
+	LobbySettings.super.Finish(self)
+end
+
+function LobbySettings:Disable()
+	self.disabled = true
+
+	for _, input_container in pairs(self.input_containers) do
+		input_container.input:Disable()
+	end
+end
+
+function LobbySettings:Enable()
+	self.disabled = false
+
+	for _, input_container in pairs(self.input_containers) do
+		input_container.input:Enable()
+	end
 end
 
 function LobbySettings:CreateSaver()
@@ -61,14 +96,12 @@ function LobbySettings:HideSaver()
 	self.saver:AnimateAttribute("alpha", 0, ANIMATION_DURATION * 2)
 end
 
-function LobbySettings:AddCategory(label, color)
+function LobbySettings:AddCategory(label)
 	return self.body:Add(Element.New {
 		layout_direction = DIRECTION_COLUMN,
 		fit_y = true,
 		width = COLUMN_WIDTH * 2,
 		padding_bottom = MARGIN * 2,
-		inherit_color = false,
-		color = color,
 		background_color = COLOR_GRAY,
 		label = LobbyUIService.CreateLabels {label}
 	})
@@ -95,7 +128,9 @@ function LobbySettings:AddPrerequisiteSetting(k, prereq, setting_v, category)
 		end
 	end
 
-	self.inputs[k..".prerequisite"] = category:Add(InputBar.New(prereq.label, prereq.type, prereq_v, {
+	self.input_containers[k..".prerequisite"] = category:Add(InputBar.New(prereq.label, prereq.type, prereq_v, {
+		read_only = self.disabled,
+
 		on_change = function (input, v)
 			self:OnPrerequisiteValueChanged(k, v)
 		end
@@ -115,7 +150,7 @@ function LobbySettings:AddSetting(setting, ply_class_k, setting_row)
 
 	self.settings[k] = setting
 
-	local category = self.player_class_categories[ply_class_k] or self.game_category
+	local category = self.game_category
 	local safe_v = MinigameSettingsService.Get(self.lobby, k)
 	local actual_v = MinigameSettingsService.Get(self.lobby, k, true)
 	local prereq_v
@@ -134,40 +169,62 @@ function LobbySettings:AddSetting(setting, ply_class_k, setting_row)
 		prereq_v = self:AddPrerequisiteSetting(k, prereq, actual_v, category)
 	end
 
-	local input_props = {options = setting.options}
+	local input_props = {
+		read_only = self.disabled,
+		options = setting.options
+	}
+
 	local list = setting.type == "list"
 
 	if list then
-		input_props.on_change = function (input, list_k, safe_v)
-			self:OnSettingValueChanged(k.."."..list_k, safe_v)
+		input_props.on_change = function (input, list_k, v)
+			self:OnSettingValueChanged(k.."."..list_k, v)
 		end
 	else
-		input_props.on_change = function (input, safe_v)
-			self:OnSettingValueChanged(k, safe_v)
+		input_props.on_change = function (input, v)
+			self:OnSettingValueChanged(k, v)
 		end
 	end
 
 	if setting_row then
-		self.inputs[k] = setting_row:Add(Element.New {
+		self.inputs[k] = InputBar.Type(setting.type).New(actual_v, input_props)
+
+		self.input_containers[k] = setting_row:Add(Element.New {
 			layout_justification_x = JUSTIFY_END,
 			height_percent = 1,
 			width = 100,
 			padding_left = 4,
 			hidden = {alpha = 0},
-			input = InputBar.Type(setting.type).New(actual_v, input_props)
+			input = self.inputs[k]
 		})
 	else
-		self.inputs[k] = category:Add(InputBar.New(setting.label, setting.type, actual_v, input_props))
+		self.input_containers[k] = category:Add(InputBar.New(setting.label, setting.type, actual_v, input_props))
+		self.inputs[k] = self.input_containers[k].input
+	end
+	
+	if list then
+		for _, option in pairs(setting.options) do
+			self.list_inputs[k.."."..option] = self.inputs[k]
+		end
 	end
 
 	if prereq and prereq_v == prereq.opposite_value then
-		self.inputs[k]:SetState "hidden"
+		self.input_containers[k]:SetState "hidden"
 	end
 end
 
-function LobbySettings:RefreshOriginalValues(settings)
+function LobbySettings:Refresh(settings)
+	for k, v in pairs(settings) do
+		if self.inputs[k] then
+			self.inputs[k]:SetValue(v)
+		elseif self.list_inputs[k] then
+			self.list_inputs[k]:SetValue(k, v)
+		end
+	end
+
 	table.Merge(self.original_values, settings)
 	MinigameSettingsService.SortChanges(self.original_values, self.changed_values, settings)
+
 	self:RefreshSaver()
 end
 
@@ -175,16 +232,16 @@ function LobbySettings:OnPrerequisiteValueChanged(k, v)
 	local setting = self.settings[k]
 
 	if v ~= setting.prerequisite.opposite_value then
-		self.inputs[k]:RevertState()
+		self.input_containers[k]:RevertState()
 	else
 		local override = setting.prerequisite.override_value
 
 		if override then
-			self.inputs[k]:SetValue(override)
+			self.input_containers[k]:SetValue(override)
 			self.values[k] = override
 		end
 
-		self.inputs[k]:AnimateState "hidden"
+		self.input_containers[k]:AnimateState "hidden"
 	end
 end
 

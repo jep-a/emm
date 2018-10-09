@@ -30,7 +30,6 @@ function InputBar:Init(label, type, v, input_props)
 		height = 52,
 		padding_x = 32,
 		padding_y = 14,
-		inherit_color = false,
 		font = "InputLabel",
 		text_justification = 4,
 		text = label,

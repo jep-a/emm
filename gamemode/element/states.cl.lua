@@ -1,4 +1,5 @@
 local reserved_states = {
+	"disabled",
 	"hover",
 	"press"
 }
@@ -34,7 +35,7 @@ function Element:SetState(key, ...)
 	self:SetAttributes(self.states[key])
 end
 
-function Element:AnimateState(key, ...)
+function Element:AnimateState(state_k, ...)
 	local original_state = self.current_state == "original"
 
 	if original_state and not self.states.original then
@@ -45,19 +46,19 @@ function Element:AnimateState(key, ...)
 
 	if not original_state then
 		for k, _ in pairs(self.states[self.current_state]) do
-			if not self.states[key][k] then
+			if not self.states[state_k][k] then
 				modified_attr[k] = true
 			end
 		end
 	end
 
-	self.current_state = key
+	self.current_state = state_k
 
 	for k, _ in pairs(modified_attr) do
 		self:AnimateAttribute(k, self.states.original[k], ...)
 	end
 
-	for k, v in pairs(self.states[key]) do
+	for k, v in pairs(self.states[state_k]) do
 		self:AnimateAttribute(k, v, ...)
 	end
 end

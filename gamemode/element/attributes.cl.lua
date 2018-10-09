@@ -276,5 +276,7 @@ function Element:AnimateAttribute(k, v, ...)
 		for _, _k in pairs(self.shorthand_attributes[k]) do
 			attr[_k]:AnimateTo(v, ...)
 		end
+	elseif self.optional_attributes[k] then
+		self:SetAttribute(k, v)
 	end
 end

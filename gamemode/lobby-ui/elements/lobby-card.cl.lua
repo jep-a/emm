@@ -11,17 +11,10 @@ function LobbyCardContainer:Init(lobby)
 
 	self.lobby = lobby
 	self.lobby_card = self:Add(LobbyCard.New(lobby))
-
-	if IsLocalPlayer(lobby.host) then
-		self.settings = self:Add(LobbySettings.New(lobby))
-	end
+	self.settings = self:Add(LobbySettings.New(lobby))
 
 	self:AnimateAttribute("layout_crop_x", 0, ANIMATION_DURATION * 4)
 	self:AnimateAttribute("alpha", 255, ANIMATION_DURATION * 4)
-end
-
-function LobbyCardContainer:AddSettings()
-	self.settings = self:Add(LobbySettings.New(self.lobby))
 end
 
 function LobbyCardContainer:AnimateFinish()

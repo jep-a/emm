@@ -155,16 +155,20 @@ function LobbyUIService.SetLobbyHost(lobby, ply)
 	if lobby == LobbyUIService.selected_lobby then
 		lobby.card_element.header:SetText(string.upper(LobbyUIService.LobbyHostText(ply)))
 
+		local settings = LobbyUIService.lobby_card_container.settings
+
 		if IsLocalPlayer(ply) then
-			lobby = LobbyUIService.lobby_card_container:AddSettings()
+			settings:Enable()
+		else
+			settings:Disable()
 		end
 	end
 end
 hook.Add("LobbyHostChange", "LobbyUIService.SetLobbyHost", LobbyUIService.SetLobbyHost)
 
 function LobbyUIService.RefreshSettings(lobby, settings)
-	if lobby == LobbyUIService.selected_lobby and IsLocalPlayer(lobby.host) then
-		LobbyUIService.lobby_card_container.settings:RefreshOriginalValues(settings)
+	if lobby == LobbyUIService.selected_lobby then
+		LobbyUIService.lobby_card_container.settings:Refresh(settings)
 	end
 end
 hook.Add("LobbySettingsChange", "LobbyUIService.RefreshSettings", LobbyUIService.RefreshSettings)

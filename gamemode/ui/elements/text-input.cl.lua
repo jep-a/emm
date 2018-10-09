@@ -46,6 +46,13 @@ function TextInput:Init(text, props)
 		border = 2,
 		border_alpha = 0,
 		
+		disabled = {
+			background_color = COLOR_BLACK_CLEAR,
+			border = 1,
+			border_color = COLOR_GRAY_DARK,
+			border_alpha = 255
+		},
+
 		hover = {
 			border_alpha = 255
 		},
@@ -59,9 +66,27 @@ function TextInput:Init(text, props)
 
 	if props then
 		self:SetAttributes(props)
+		self.read_only = props.read_only
 		self.on_change = props.on_change
 		self.on_click = props.on_click
+
+		if props.read_only then
+			self:Disable()
+		end
 	end
+end
+
+function TextInput:Disable()
+	self.disabled = true
+	self.panel:SetMouseInputEnabled(false)
+	self:OnUnFocus()
+	self:AnimateState "disabled"
+end
+
+function TextInput:Enable()
+	self.disabled = false
+	self.panel:SetMouseInputEnabled(true)
+	self:RevertState()
 end
 
 function TextInput:CreateTextLine()
@@ -107,6 +132,20 @@ function TextInput:OnMousePressed(mouse)
 	end
 
 	self:OnFocus(self)
+end
+
+function TextInput:OnMouseEntered()
+	if self.disabled then
+		self.panel:SetMouseInputEnabled(false)
+	else
+		TextInput.super.OnMouseEntered(self)
+	end
+end
+
+function TextInput:OnMouseExited()
+	if not self.disabled then
+		TextInput.super.OnMouseExited(self)
+	end
 end
 
 function TextInput:OnFocus()

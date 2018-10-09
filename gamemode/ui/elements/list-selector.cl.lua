@@ -8,7 +8,6 @@ function ListSelector:Init(v, props)
 		height = CHECKBOX_SIZE,
 		background_color = COLOR_GRAY_DARK,
 		border = LINE_THICKNESS,
-		border_color = COLOR_WHITE,
 		border_alpha = 0,
 		cursor = "hand",
 		bubble_mouse = false,
@@ -18,8 +17,7 @@ function ListSelector:Init(v, props)
 		},
 
 		press = {
-			background_color = COLOR_GRAY_DARK,
-			border_color = COLOR_BACKGROUND
+			border_alpha = 0
 		},
 
 		check = Element.New {
@@ -31,7 +29,6 @@ function ListSelector:Init(v, props)
 			position_justification_y = JUSTIFY_CENTER,
 			width = BUTTON_ICON_SIZE,
 			height = BUTTON_ICON_SIZE,
-			inherit_color = false,
 			material = hamburger_material,
 		},
 	})
@@ -51,7 +48,28 @@ function ListSelector:Init(v, props)
 
 	if props then
 		self:SetAttributes(props)
+		self.read_only = props.read_only
 		self.on_change = props.on_change
+
+		if props.read_only then
+			self:Disable()
+		end
+	end
+end
+
+function ListSelector:Disable()
+	self.disabled = true
+
+	for _, input in pairs(self.inputs) do
+		input:Disable()
+	end
+end
+
+function ListSelector:Enable()
+	self.disabled = false
+
+	for _, input in pairs(self.inputs) do
+		input:Enable()
 	end
 end
 
@@ -94,6 +112,8 @@ function ListSelector:CreateList()
 
 	for _, list_option in pairs(self.options) do
 		self.inputs[list_option] = self.list:Add(InputBar.New(list_option, nil, self.value[list_option], {
+			read_only = self.disabled,
+
 			on_change = function (input, v)
 				self:OnListValueChanged(list_option, v)
 			end
@@ -114,27 +134,12 @@ function ListSelector:FinishList()
 		})
 		
 		self.list = nil
+		self.inputs = {}
 	end
 end
 
 function ListSelector:OnListValueChanged(k, v)
-	-- MinigameSettingsService.SortChange(self.original_values, self.changed_values, k, v)
-
-	-- if table.Count(self.changed_values) > 0 then
-		-- local new_v = {}
-
-		-- for k, _ in pairs(self.changed_values) do
-		-- 	local input_v = self.inputs[k]:GetValue()
-
-		-- 	if input_v or self.original_values[k] ~= nil then
-		-- 		new_v[k] = input_v
-		-- 	end
-		-- end
-
-		self:OnValueChanged(k, v)
-	-- else
-	-- 	self:OnValueChanged(k, self.original_value)
-	-- end
+	self:OnValueChanged(k, v)
 end
 
 function ListSelector.MousePressed(panel)
@@ -145,14 +150,14 @@ function ListSelector.MousePressed(panel)
 end
 hook.Add("VGUIMousePressed", "ListSelector.MousePressed", ListSelector.MousePressed)
 
-function ListSelector:OnValueChanged(k, v)
+function ListSelector:OnValueChanged(k, v, no_callback)
 	if k then
 		self.value[k] = v
 	else
 		self.value = v
 	end
 
-	if self.on_change then
+	if not no_callback and self.on_change then
 		self.on_change(self, k, v)
 	end
 end
@@ -166,7 +171,10 @@ function ListSelector:OnMousePressed(mouse)
 end
 
 function ListSelector:SetValue(k, v)
-	if v ~= self.inputs[k]:GetValue() then
-		self:OnValueChanged(k, v)
+	if self.inputs[k] and v ~= self.inputs[k].value then
+		self.inputs[k]:SetValue(v)
+		self:OnValueChanged(k, v, true)
+	elseif v ~= self.value[k] then
+		self:OnValueChanged(k, v, true)
 	end
 end
