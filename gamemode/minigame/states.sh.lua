@@ -1,11 +1,15 @@
 MinigameStateService = MinigameStateService or {}
 
-function MinigameStateService.State(lobby, id)
+function MinigameStateService.State(lobby, k_or_id)
 	for _, state in pairs(lobby.states) do
-		if id == state.id then
+		if k_or_id == state.key or k_or_id == state.id then
 			return state
 		end
 	end
+end
+
+function MinigamePrototype:CanRestart()
+	return self.state == self.states.Playing or self.state == self.states.Starting
 end
 
 function MinigamePrototype:AddState(state)

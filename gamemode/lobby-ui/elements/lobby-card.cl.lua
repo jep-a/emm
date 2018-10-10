@@ -92,21 +92,26 @@ function LobbyCard:Init(lobby)
 
 	self.actions = self:Add(Element.New {
 		fit_y = true,
+		width_percent = 1
+	})
+
+	self.switch = self.actions:Add(Element.New {
+		fit_y = true,
 		width_percent = 1,
 		crop_bottom = 0.5,
 		crop_margin = false
 	})
 
-	self.actions:AddState("leave", {
+	self.switch:AddState("leave", {
 		crop_top = 0.5,
 		crop_bottom = 0
 	})
 
 	if lobby:IsLocal() then
-		self.actions:SetState "leave"
+		self.switch:SetState "leave"
 	end
 
-	self.join = self.actions:Add(ButtonBar.New {
+	self.join = self.switch:Add(ButtonBar.New {
 		background_color = lobby.prototype.color,
 		color = COLOR_WHITE,
 		material = PNGMaterial("emm2/ui/join.png"),
@@ -117,7 +122,7 @@ function LobbyCard:Init(lobby)
 		end
 	})
 
-	self.leave = self.actions:Add(ButtonBar.New {
+	self.leave = self.switch:Add(ButtonBar.New {
 		background_color = lobby.prototype.color,
 		color = COLOR_WHITE,
 		material = PNGMaterial("emm2/ui/leave.png"),
@@ -127,7 +132,74 @@ function LobbyCard:Init(lobby)
 			NetService.Send "RequestLobbyLeave"
 		end
 	})
+
+	if IsLocalPlayer(lobby.host) then
+		self:AddHostActions()
+	end
 end
+
+function LobbyCard:AddRestartAction()
+	self.restart = self.actions:Add(ButtonBar.New {
+		crop_bottom = 1,
+		background_color = COLOR_GRAY,
+		color = self.lobby.prototype.color,
+		material = PNGMaterial("emm2/ui/restart.png"),
+		text = "Restart",
+
+		on_click = function ()
+			NetService.Send "RequestLobbyRestart"
+		end
+	})
+
+	self.restart:SetAttributes {
+		crop_bottom = 1,
+		alpha = 0
+	}
+	
+	self.restart:AnimateAttribute("crop_bottom", 0, ANIMATION_DURATION * 2)
+	self.restart:AnimateAttribute("alpha", 255, ANIMATION_DURATION * 2)
+end
+
+function LobbyCard:FinishRestartAction()
+	local old_restart = self.restart
+
+	old_restart:AnimateAttribute("crop_bottom", 1, {
+		duration = ANIMATION_DURATION * 2,
+
+		callback = function ()
+			old_restart:Finish()
+		end
+	})
+
+	old_restart:AnimateAttribute("alpha", 0, ANIMATION_DURATION * 2)
+
+	self.restart = nil
+end
+
+function LobbyCard:AddHostActions()
+	if self.lobby:CanRestart() then
+		self:AddRestartAction()
+	end
+end
+
+function LobbyCard:FinishHostActions()
+	if self.restart then
+		self:FinishRestartAction()
+	end
+end
+
+function LobbyCard.AdjustStateHostActions(lobby, old_state, state)
+	if IsLocalPlayer(lobby.host) and lobby == LobbyUIService.selected_lobby then
+		local can_restart = lobby:CanRestart()
+
+		if lobby.card_element.restart and not can_restart then
+			lobby.card_element:FinishRestartAction()
+		elseif not lobby.card_element.restart and can_restart then
+			lobby.card_element:AddRestartAction()
+		end
+	end
+end
+hook.Add("LocalLobbySetState", "LobbyCard.AdjustStateHostActions", LobbyCard.AdjustStateHostActions)
 
 function LobbyCard:FinishLobby()
 	if self == self.lobby.card_element then

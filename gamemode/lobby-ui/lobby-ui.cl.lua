@@ -168,8 +168,10 @@ function LobbyUIService.SetLobbyHost(lobby, ply)
 		local settings = LobbyUIService.lobby_card_container.settings
 
 		if IsLocalPlayer(ply) then
+			lobby.card_element:AddHostActions()
 			settings:Enable()
 		else
+			lobby.card_element:FinishHostActions()
 			settings:Disable()
 		end
 	end
@@ -199,7 +201,7 @@ function LobbyUIService.AddLobbyPlayer(lobby, ply)
 		ply.lobby_card_element:AnimateStart()
 
 		if is_local_ply then
-			lobby.card_element.actions:AnimateState("leave", ANIMATION_DURATION * 2)
+			lobby.card_element.switch:AnimateState("leave", ANIMATION_DURATION * 2)
 		end
 	end
 end
@@ -222,7 +224,7 @@ function LobbyUIService.RemoveLobbyPlayer(lobby, ply)
 		end
 
 		if is_local_ply then
-			lobby.card_element.actions:RevertState(ANIMATION_DURATION * 2)
+			lobby.card_element.switch:RevertState(ANIMATION_DURATION * 2)
 		end
 	end
 end

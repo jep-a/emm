@@ -39,6 +39,15 @@ function MinigameNetService.RequestLobby(ply, proto)
 end
 NetService.Receive("RequestLobby", MinigameNetService.RequestLobby)
 
+function MinigameNetService.RequestLobbyRestart(ply)
+	local lobby = ply.lobby
+
+	if lobby and lobby:CanRestart() then
+		lobby:SetState(lobby.states.Ending)
+	end
+end
+NetService.Receive("RequestLobbyRestart", MinigameNetService.RequestLobbyRestart)
+
 function MinigameNetService.RequestLobbyFinish(ply)
 	MinigameService.FinishLobby(ply.lobby)
 end

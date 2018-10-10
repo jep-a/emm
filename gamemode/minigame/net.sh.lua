@@ -25,6 +25,7 @@ NetService.CreateSchema("LobbyPlayerLeave", {"minigame_lobby", "entity"})
 NetService.CreateSchema("LobbyHost", {"minigame_lobby", "entity"})
 NetService.CreateUpstreamSchema "RequestLobbies"
 NetService.CreateUpstreamSchema("RequestLobby", {"minigame_prototype"})
+NetService.CreateUpstreamSchema "RequestLobbyRestart"
 NetService.CreateUpstreamSchema "RequestLobbyFinish"
 NetService.CreateUpstreamSchema("RequestLobbyJoin", {"minigame_lobby"})
 NetService.CreateUpstreamSchema "RequestLobbyLeave"
