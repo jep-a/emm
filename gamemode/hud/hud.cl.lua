@@ -60,16 +60,18 @@ function HUDService.InitContainers()
 end
 
 function HUDService.InitMeters()
+	local local_ply = LocalPlayer()
+
 	local function Health()
-		return LocalPlayer():Health()
+		return local_ply:Health()
 	end
 
 	local function Speed()
-		return math.Round(LocalPlayer():GetVelocity():Length2D())
+		return math.Round(local_ply:GetVelocity():Length2D())
 	end
 
 	local function Airaccel()
-		return LocalPlayer().stamina.airaccel.amount
+		return local_ply.can_airaccel and local_ply.stamina.airaccel:GetStamina() or 0
 	end
 
 	if SettingsService.Get "show_hud_meters" then

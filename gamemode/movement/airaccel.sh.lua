@@ -5,6 +5,7 @@ AiraccelService = AiraccelService or {}
 
 function AiraccelService.InitPlayerProperties(ply)
 	ply.can_airaccel = true
+	ply.has_infinite_airaccel = false
 	ply.airaccel_regen_step = 0.1
 	ply.airaccel_decay_step = 0.1
 	ply.airaccel_cooldown = 2
@@ -24,6 +25,7 @@ function AiraccelService.SetupStamina(ply)
 	ply.stamina.airaccel.regen_step = ply.airaccel_regen_step
 	ply.stamina.airaccel.decay_step = ply.airaccel_decay_step
 	ply.stamina.airaccel.cooldown = ply.airaccel_cooldown
+	ply.stamina.airaccel.infinite = ply.has_infinite_airaccel
 	ply.stamina.airaccel.amount = 100
 end
 

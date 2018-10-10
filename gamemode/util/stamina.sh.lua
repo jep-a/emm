@@ -35,11 +35,11 @@ function StaminaType:Init()
 end
 
 function StaminaType:GetStamina()
-	return self.amount
+	return self.infinite and 100 or self.amount
 end
 
 function StaminaType:HasStamina()
-	return self.amount > 0
+	return self.infinite or (self.amount > 0)
 end
 
 function StaminaType:SetStamina(value)
@@ -69,19 +69,61 @@ end
 
 -- # Updating
 
+function StaminaService.UpdatePlayer(ply, cur_time)
+	for _, stamina_type in pairs(ply.stamina) do
+		if stamina_type.active then
+			stamina_type:ReduceStamina(stamina_type.decay_step)
+		elseif cur_time > (stamina_type.last_active + stamina_type.cooldown) then
+			stamina_type:AddStamina(stamina_type.regen_step)
+		end
+	end
+end
+
 function StaminaService.Update()
 	if IsFirstTimePredicted() then
 		local cur_time = CurTime()
 
-		for _, ply in pairs(SERVER and player.GetAll() or {LocalPlayer()}) do
-			for _, stamina_type in pairs(ply.stamina) do
-				if stamina_type.active then
-					stamina_type:ReduceStamina(stamina_type.decay_step)
-				elseif cur_time > (stamina_type.last_active + stamina_type.cooldown) then
-					stamina_type:AddStamina(stamina_type.regen_step)
-				end
+		if SERVER then
+			for _, ply in pairs(player.GetAll()) do
+				StaminaService.UpdatePlayer(ply, cur_time)
 			end
+		else
+			StaminaService.UpdatePlayer(LocalPlayer(), cur_time)
 		end
 	end
 end
 hook.Add("SetupMove", "StaminaService.Update", StaminaService.Update)
+
+
+-- # Minigame settings reloading
+
+function StaminaService.Reload(lobby, settings)
+	local ply_classes_adjusted = {}
+	local staminas = {}
+
+	for k, v in pairs(settings) do
+		local ply_class, stamina = string.match(k, "player_classes%.(.*)%.has_infinite_(.*)")
+
+		if SERVER then
+			if ply_class then
+				ply_classes_adjusted[ply_class] = stamina
+				staminas[stamina] = v
+			end
+		else
+			local local_ply = LocalPlayer()
+	
+			if ply_class == local_ply.player_class.key then
+				local_ply.stamina[stamina].infinite = v
+			end
+		end
+	end
+
+	if SERVER and ply_classes_adjusted then
+		for ply_class, stamina in pairs(ply_classes_adjusted) do
+			for _, ply in pairs(lobby[ply_class]) do
+				ply.stamina[stamina].infinite = staminas[stamina]
+			end
+		end
+	end
+end
+hook.Add(SERVER and "LobbySettingsChange" or "LocalLobbySettingsChange", "StaminaService.Reload", StaminaService.Reload)

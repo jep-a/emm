@@ -67,6 +67,16 @@ function MinigamePrototype:Init()
 				},
 
 				{
+					key = "has_infinite_wallslide",
+					label = "Has infinite wallslide stamina"
+				},
+			
+				{
+					key = "has_infinite_airaccel",
+					label = "Has infinite air-accelerate stamina"
+				},
+
+				{
 					key = "weapons",
 					label = "Weapons",
 					type = "list",

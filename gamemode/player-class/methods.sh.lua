@@ -52,6 +52,12 @@ end
 function player_metatable:SetupPlayerClass()
 	self:SetupCoreProperties()
 
+	if CLIENT and IsLocalPlayer(self) then
+		hook.Run("LocalPlayerProperties", self)
+	end
+
+	hook.Run("PlayerProperties", self)
+
 	if SERVER then
 		self:SetupLoadout()
 	end
