@@ -5,7 +5,7 @@ function MeterBar:Init(props)
 		layout_justification_x = JUSTIFY_CENTER,
 		width_percent = 1,
 		height = LINE_THICKNESS,
-		background_color = COLOR_BACKGROUND,
+		background_color = COLOR_BLACK,
 
 		bar = Element.New {
 			width_percent = 0,

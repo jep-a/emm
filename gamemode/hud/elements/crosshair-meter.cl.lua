@@ -15,7 +15,7 @@ function CrosshairMeter:Init(props)
 		width_percent = 1,
 		height_percent = 1,
 		child_margin = MARGIN * 4,
-		background_color = COLOR_BACKGROUND
+		background_color = COLOR_BLACK
 	})
 
 	self.value_func = props.value_func

@@ -1,5 +1,5 @@
 MINIGAME.name = "Miscellaneous"
-MINIGAME.color = COLOR_PURPLE
+MINIGAME.color = COLOR_ROYAL
 MINIGAME.default_state = "Playing"
 MINIGAME.default_player_class = "Miscellaneous"
 MINIGAME.required_players = 0
