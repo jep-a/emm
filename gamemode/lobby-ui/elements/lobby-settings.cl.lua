@@ -22,7 +22,7 @@ function LobbySettings:Init(lobby)
 	if table.Count(lobby.prototype.player_classes) > 1 then
 		self.player_class_category = self:AddCategory "Player classes"
 	else
-		self.player_class_category = self:AddCategory "Player"
+		self.player_class_category = self:AddCategory "Players"
 	end
 
 	self.disabled = not IsLocalPlayer(lobby.host)
@@ -31,6 +31,7 @@ function LobbySettings:Init(lobby)
 	self.changed_values = {}
 	self.values = {}
 
+	self.game_settings = {}
 	self.settings = {}
 	
 	self.inputs = {}
@@ -39,6 +40,10 @@ function LobbySettings:Init(lobby)
 
 	self:InitSettings()
 	self:CreateSaver()
+
+	if table.Count(self.game_settings) == 0 then
+		self.game_category:Finish()
+	end
 end
 
 function LobbySettings:Finish()
@@ -211,6 +216,7 @@ function LobbySettings:AddSetting(setting, ply_class_k, setting_row)
 			input = self.inputs[k]
 		})
 	else
+		self.game_settings[k] = setting
 		self.input_containers[k] = category:Add(InputBar.New(setting.label, setting.type, actual_v, input_props))
 		self.inputs[k] = self.input_containers[k].input
 	end

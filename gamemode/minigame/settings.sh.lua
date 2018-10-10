@@ -147,14 +147,55 @@ function MinigameSettingsService.Adjust(lobby, settings)
 	end
 end
 
-function MinigamePrototype:SetAdjustableSettings(vars)
-	self.adjustable_settings = vars
-	self.adjustable_settings_map = MapSettings(vars)
+function MinigamePrototype:MapSettings()
+	self.adjustable_settings_map = MapSettings(self.adjustable_settings)
 end
 
-function MinigamePrototype:AddAdjustableSettings(vars)
-	self.adjustable_settings = table.Add(self.adjustable_settings, vars)
-	self.adjustable_settings_map = MapSettings(self.adjustable_settings)
+function MinigamePrototype:SetAdjustableSettings(settings)
+	self.adjustable_settings = settings
+	self:MapSettings()
+end
+
+function MinigamePrototype:AddAdjustableSetting(setting)
+	table.insert(self.adjustable_settings, setting)
+	self:MapSettings()
+end
+
+function MinigamePrototype:AddAdjustableSettings(settings)
+	table.Add(self.adjustable_settings, settings)
+	self:MapSettings()
+end
+
+function MinigamePrototype:RemoveAdjustableSetting(k)
+	for i, setting in pairs(self.adjustable_settings) do
+		if k == setting.key then
+			table.remove(self.adjustable_settings, i)
+
+			break
+		end
+	end
+
+	self.adjustable_settings_map[EscapeSettingsKey(k)] = nil
+end
+
+function MinigamePrototype:RemoveAdjustableSettings(settings)
+	local removing = {}
+
+	for _, k in pairs(settings) do
+		for i, setting in pairs(self.adjustable_settings) do
+			if k == setting.key then
+				table.insert(removing, i)
+
+				break
+			end
+		end
+
+		self.adjustable_settings_map[EscapeSettingsKey(k)] = nil
+	end
+
+	for _, i in pairs(removing) do
+		table.remove(self.adjustable_settings, i)
+	end
 end
 
 function MinigameLobby:SaveOriginalSetting(k)

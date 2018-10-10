@@ -150,7 +150,7 @@ function LobbyUIService.FinishLobby(lobby)
 
 		LobbyUIService.SetLobbyListHeaderText(lobby_count)
 
-		if 1 > lobby_count then
+		if lobby_count == 0 then
 			LobbyUIService.lobby_list:RevertState()
 		end
 	end

@@ -24,9 +24,7 @@ MINIGAME:AddPlayerClass {
 	player_class_on_death = "Hunter"
 }
 
-MINIGAME:AddAdjustableSettings {
-	{
-		key = "player_classes.Hunted.can_tag.Hunter",
-		label = "Hunted can be tagged"
-	}
+MINIGAME:AddAdjustableSetting {
+	key = "player_classes.Hunter.can_tag.Hunted",
+	label = "Hunted can be tagged"
 }

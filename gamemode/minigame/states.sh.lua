@@ -9,7 +9,7 @@ function MinigameStateService.State(lobby, k_or_id)
 end
 
 function MinigamePrototype:CanRestart()
-	return self.state == self.states.Playing or self.state == self.states.Starting
+	return self.prototype.key ~= "Miscellaneous" and self.state == self.states.Playing or self.state == self.states.Starting
 end
 
 function MinigamePrototype:AddState(state)

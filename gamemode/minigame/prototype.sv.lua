@@ -59,7 +59,7 @@ function MinigamePrototype:SetPlayerClassOnDeath(ply, inflictor, attacker)
 end
 
 function MinigamePrototype:CheckIfNoPlayerClasses(ply, old_class)
-	if old_class and old_class.end_on_none and 1 > #self[old_class.key] then
+	if old_class and old_class.end_on_none and #self[old_class.key] == 0 then
 		self:NextState()
 	end
 end

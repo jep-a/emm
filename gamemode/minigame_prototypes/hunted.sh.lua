@@ -22,9 +22,7 @@ MINIGAME:AddPlayerClass {
 	name = "Hunter"
 }
 
-MINIGAME:AddAdjustableSettings {
-	{
-		key = "player_classes.Hunted.can_tag.Hunter",
-		label = "Hunted can be tagged"
-	}
+MINIGAME:AddAdjustableSetting {
+	key = "player_classes.Hunted.can_tag.Hunter",
+	label = "Hunted can be tagged"
 }
