@@ -54,7 +54,8 @@ function InputBar:Init(label, type, v, input_props)
 	})
 
 	self:AddState("hidden", {
-		crop_bottom = 1
+		crop_bottom = 1,
+		background_color = COLOR_BACKGROUND_LIGHT
 	})
 
 	if type or v or input_props then

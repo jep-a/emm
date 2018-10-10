@@ -4,7 +4,7 @@ function LobbyUIService.CreateHeader(text, fit)
 	local element = Element.New {
 		fit_y = true,
 		width = COLUMN_WIDTH,
-		padding_y = MARGIN * 4,
+		padding_y = 16,
 		font = "Header",
 		text_justification = 5,
 		text = text,
@@ -14,8 +14,7 @@ function LobbyUIService.CreateHeader(text, fit)
 	if fit then
 		element:SetAttributes {
 			fit_x = true,
-			padding_left = MARGIN * 8,
-			padding_right = MARGIN * 7
+			padding_y = 32
 		}
 	end
 
@@ -103,15 +102,19 @@ end
 
 function LobbyUIService.CreateContainer()
 	return ScrollContainer.New({
-		width_percent = 1,
+		origin_position = true,
+		origin_justification_x = JUSTIFY_CENTER,
+		position_justification_x = JUSTIFY_CENTER,
+		width_percent = 2,
 		height_percent = 1,
 		alpha = 0
 	}, {
 		layout_justification_x = JUSTIFY_CENTER,
+		wrap = false,
 		width_percent = 1,
 		fit_y = true,
-		padding = MARGIN * 4,
-		child_margin = MARGIN * 4
+		padding_y = 16,
+		child_margin = 16
 	})
 end
 
@@ -120,7 +123,7 @@ function LobbyUIService.CreateNewLobbySection()
 		layout_direction = DIRECTION_COLUMN,
 		fit_y = true,
 		width = COLUMN_WIDTH,
-		child_margin = MARGIN * 4,
+		child_margin = 16,
 		LobbyUIService.CreateHeader "Make a new lobby"
 	}
 end
@@ -150,8 +153,8 @@ end
 function LobbyUIService.CreateLobbySection()
 	return Element.New {
 		fit_y = true,
-		width = COLUMN_WIDTH * 2,
-		child_margin = MARGIN * 4,
+		width = COLUMN_WIDTH * (LobbyUIService.HellaSmallScreen() and 1 or 2),
+		child_margin = 16,
 		header = LobbyUIService.CreateHeader "No open lobbies"
 	}
 end
@@ -161,7 +164,7 @@ function LobbyUIService.CreateLobbyList()
 		layout_direction = DIRECTION_COLUMN,
 		fit_y = true,
 		width_percent = 1,
-		padding_bottom = MARGIN * 6.5,
+		padding_bottom = 26,
 		background_color = COLOR_GRAY,
 		LobbyUIService.CreateLabels({
 			{
@@ -174,7 +177,7 @@ function LobbyUIService.CreateLobbyList()
 	}
 
 	element:AddState("contains_children", {
-		padding_bottom = MARGIN * 4
+		padding_bottom = 16
 	})
 
 	return element
@@ -182,7 +185,8 @@ end
 
 function LobbyUIService.CreateLobbyCardSection()
 	return Element.New {
-		fit = true,
-		border = 1
+		fit_y = true,
+		width = (COLUMN_WIDTH * 3) + 16,
+		layout_crop_x = 1
 	}
 end

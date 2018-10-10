@@ -27,13 +27,11 @@ Element.setters = {
 	cursor = function (self, static_attr, attr, v)
 		static_attr.cursor = v
 
-		if v then
-			self.panel:SetCursor(v)
+		self.panel:SetCursor(v or "none")
 
-			for _, child in pairs(self.children) do
-				if child:GetAttribute "inherit_cursor" then
-					child:SetAttribute("cursor", v)
-				end
+		for _, child in pairs(self.children) do
+			if child.static_attributes.inherit_cursor and not child.static_attributes.cursor then
+				child:SetAttribute("cursor", v)
 			end
 		end
 	end,

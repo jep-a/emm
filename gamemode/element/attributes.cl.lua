@@ -43,6 +43,8 @@ local layout_invalidators = {
 	"fit_y",
 	"x",
 	"y",
+	"offset_x",
+	"offset_y",
 	"width",
 	"height",
 	"width_percent",
@@ -178,7 +180,11 @@ function Element:SetAttribute(k, v, no_layout)
 	end
 
 	if static_attr[k] ~= nil then
-		static_attr[k] = v
+		if self.setters[k] then
+			self.setters[k](self, static_attr, attr, v)
+		else
+			static_attr[k] = v
+		end
 	elseif attr[k] ~= nil then
 		if self.optional_attributes[k] ~= nil and v == false then
 			attr[k]:Finish()

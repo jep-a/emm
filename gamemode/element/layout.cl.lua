@@ -313,7 +313,7 @@ function Element:Layout(force_family_layout)
 	else
 		if static_attr.font then
 			self:LayoutText()
-		elseif #self.children > 0 then
+		else
 			self:Fit()
 		end
 	end

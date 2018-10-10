@@ -90,6 +90,8 @@ function Element:StackChildren()
 	end
 end
 
+local CropMarginEase = CubicBezier(0.05, 1.05, 0, 1)
+
 function Element:Stack(prop_keys, adj_prop_keys, main_justify, adj_justify, crop_offset, adj_crop_offset, children)
 	children = children or self.layout_children
 
@@ -170,7 +172,7 @@ function Element:Stack(prop_keys, adj_prop_keys, main_justify, adj_justify, crop
 					cropped_child_margin = 1
 				end
 
-				local cropped_margin = math.Clamp(child_margin * cropped_prev_child_margin * cropped_child_margin, 0, child_margin)
+				local cropped_margin = math.Clamp(child_margin * CropMarginEase(cropped_prev_child_margin * cropped_child_margin), 0, child_margin)
 
 				child_positions[i] = child_positions[i] + cropped_margin
 				line_size = line_size + cropped_margin

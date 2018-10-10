@@ -44,19 +44,38 @@ function ElementPanel:CanBubble()
 	return self.element.parent and self:GetAttribute "bubble_mouse"
 end
 
-function ElementPanel:IsCursorOutBounds()
+function ElementPanel:IsCursorOutBoundsX()
 	local out_bounds
 
-	local x, y = self:LocalCursorPos()
-	local w, h = self:GetSize()
+	local x, _ = self:LocalCursorPos()
+	local w = self:GetWide()
 
-	if 0 > x or x > w or 0 > y or y > h then
+	if 0 > x or x > w then
 		out_bounds = true
 	else
 		out_bounds = false
 	end
 
 	return out_bounds
+end
+
+function ElementPanel:IsCursorOutBoundsY()
+	local out_bounds
+
+	local _, y = self:LocalCursorPos()
+	local h = self:GetTall()
+
+	if 0 > y or y > h then
+		out_bounds = true
+	else
+		out_bounds = false
+	end
+
+	return out_bounds
+end
+
+function ElementPanel:IsCursorOutBounds()
+	return self:IsCursorOutBoundsX() or self:IsCursorOutBoundsY()
 end
 
 function ElementPanel:OnMousePressed(mouse)

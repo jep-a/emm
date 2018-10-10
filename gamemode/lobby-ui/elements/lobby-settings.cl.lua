@@ -100,8 +100,8 @@ function LobbySettings:AddCategory(label)
 	return self.body:Add(Element.New {
 		layout_direction = DIRECTION_COLUMN,
 		fit_y = true,
-		width = COLUMN_WIDTH * 2,
-		padding_bottom = MARGIN * 2,
+		width = COLUMN_WIDTH * (LobbyUIService.HellaSmallScreen() and 1.5 or 2),
+		padding_bottom = 8,
 		background_color = COLOR_GRAY,
 		label = LobbyUIService.CreateLabels {label}
 	})

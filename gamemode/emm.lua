@@ -1,4 +1,4 @@
-EMM.debug = true
+EMM.debug = false
 
 EMM.Include {
 	"core/env",

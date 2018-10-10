@@ -3,6 +3,14 @@ LobbyUIService = LobbyUIService or {}
 
 -- # Util
 
+function LobbyUIService.SmallScreen()
+	return 1600 > ScrW()
+end
+
+function LobbyUIService.HellaSmallScreen()
+	return 800 > ScrW()
+end
+
 function LobbyUIService.SetLobbyListHeaderText(count)
 	local text
 
@@ -36,6 +44,8 @@ function LobbyUIService.Init()
 	LobbyUIService.prototype_list = LobbyUIService.new_lobby_section:Add(LobbyUIService.CreatePrototypeList())
 	LobbyUIService.lobby_section = LobbyUIService.container:AddInner(LobbyUIService.CreateLobbySection())
 	LobbyUIService.lobby_list = LobbyUIService.lobby_section:Add(LobbyUIService.CreateLobbyList())
+	LobbyUIService.lobby_card_section = LobbyUIService.container:AddInner(LobbyUIService.CreateLobbyCardSection())
+	LobbyUIService.viewing_settings = false
 
 	for _, proto in pairs(MinigameService.prototypes) do
 		LobbyUIService.prototype_list:Add(LobbyUIService.CreatePrototypeBar(proto))
@@ -220,16 +230,28 @@ hook.Add("LobbyPlayerLeave", "LobbyUIService.RemoveLobbyPlayer", LobbyUIService.
 
 function LobbyUIService.SelectLobby(lobby)
 	if lobby and lobby ~= LobbyUIService.selected_lobby then
+		local small_screen = LobbyUIService.SmallScreen()
+
 		if LobbyUIService.selected_lobby then
 			LobbyUIService.UnSelectLobby()
 		end
+
+		if small_screen then
+			LobbyUIService.container.inner_container:AnimateAttribute("offset_x", 168, ANIMATION_DURATION * 4)
+		end
+
+		LobbyUIService.lobby_card_section:AnimateAttribute("layout_crop_x", 0, ANIMATION_DURATION * 4)
 		
 		if lobby.bar_element then
 			lobby.bar_element:AnimateState "hover"
 		end
 		
 		LobbyUIService.selected_lobby = lobby
-		LobbyUIService.lobby_card_container = LobbyUIService.container:AddInner(LobbyCardContainer.New(lobby))
+		LobbyUIService.lobby_card_container = LobbyUIService.lobby_card_section:Add(LobbyCardContainer.New(lobby))
+
+		if small_screen then
+			LobbyUIService.lobby_card_container.settings:AnimateAttribute("alpha", HALF_ALPHA)
+		end
 	end
 end
 
@@ -237,17 +259,41 @@ function LobbyUIService.UnSelectLobby()
 	local lobby = LobbyUIService.selected_lobby
 
 	if lobby then
+		local small_screen = LobbyUIService.SmallScreen()
+	
 		if lobby.bar_element then
 			lobby.bar_element:RevertState()
 		end
+
+		if small_screen then
+			LobbyUIService.container.inner_container:AnimateAttribute("offset_x", 0, ANIMATION_DURATION * 4)
+		end
+	
+		LobbyUIService.lobby_card_section:AnimateAttribute("layout_crop_x", 1, ANIMATION_DURATION * 4)
 
 		if lobby == LobbyUIService.selected_lobby then
 			LobbyUIService.lobby_card_container:Finish()
 			LobbyUIService.lobby_card_container = nil
 		end
-			
+	
 		LobbyUIService.selected_lobby = nil
 	end
+end
+
+function LobbyUIService.ViewSettings()
+	LobbyUIService.viewing_settings = true
+	LobbyUIService.container.inner_container:AnimateAttribute("offset_x", -168, ANIMATION_DURATION * 4)
+	LobbyUIService.new_lobby_section:AnimateAttribute("alpha", QUARTER_ALPHA)
+	LobbyUIService.lobby_section:AnimateAttribute("alpha", QUARTER_ALPHA)
+	LobbyUIService.lobby_card_container.settings:AnimateAttribute("alpha", 255)
+end
+
+function LobbyUIService.HideSettings()
+	LobbyUIService.viewing_settings = false
+	LobbyUIService.container.inner_container:AnimateAttribute("offset_x", 168, ANIMATION_DURATION * 4)
+	LobbyUIService.new_lobby_section:AnimateAttribute("alpha", 255)
+	LobbyUIService.lobby_section:AnimateAttribute("alpha", 255)
+	LobbyUIService.lobby_card_container.settings:AnimateAttribute("alpha", QUARTER_ALPHA)
 end
 
 function LobbyUIService.Focus()
@@ -276,15 +322,30 @@ hook.Add("TextEntryUnFocus", "LobbyUIService.UnFocusTextEntry", LobbyUIService.U
 
 function LobbyUIService.MousePressed(panel)
 	if 
+		not (LobbyUIService.SmallScreen() and LobbyUIService.viewing_settings) and
 		not ListSelector.focused and (
 			panel == LobbyUIService.container.panel or
 			panel == LobbyUIService.container.inner_container.panel or
 			panel == LobbyUIService.new_lobby_section.panel or
 			panel == LobbyUIService.lobby_section.panel
-		)
+		) and
+		LobbyUIService.selected_lobby
 	then
-		if LobbyUIService.selected_lobby then
-			LobbyUIService.UnSelectLobby()
+		if LobbyUIService.SmallScreen() then
+			LobbyUIService.HideSettings()
+		end
+
+		LobbyUIService.UnSelectLobby()
+	end
+	
+	if LobbyUIService.SmallScreen() and LobbyUIService.lobby_card_container then
+		if not LobbyUIService.lobby_card_container.settings.panel:IsCursorOutBoundsX() then
+			LobbyUIService.ViewSettings()
+		elseif
+			not LobbyUIService.new_lobby_section.panel:IsCursorOutBoundsX() or
+			not LobbyUIService.lobby_section.panel:IsCursorOutBoundsX()
+		then
+			LobbyUIService.HideSettings()
 		end
 	end
 end

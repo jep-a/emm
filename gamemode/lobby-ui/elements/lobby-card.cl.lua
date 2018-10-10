@@ -3,7 +3,7 @@ LobbyCardContainer = LobbyCardContainer or Class.New(Element)
 
 function LobbyCardContainer:Init(lobby)
 	LobbyCardContainer.super.Init(self, {
-		layout_crop_x = 1,
+		layout = false,
 		fit = true,
 		child_margin = MARGIN * 4,
 		alpha = 0
@@ -13,15 +13,12 @@ function LobbyCardContainer:Init(lobby)
 	self.lobby_card = self:Add(LobbyCard.New(lobby))
 	self.settings = self:Add(LobbySettings.New(lobby))
 
-	self:AnimateAttribute("layout_crop_x", 0, ANIMATION_DURATION * 4)
-	self:AnimateAttribute("alpha", 255, ANIMATION_DURATION * 4)
+	self:AnimateAttribute("alpha", 255, ANIMATION_DURATION * 2)
 end
 
 function LobbyCardContainer:AnimateFinish()
-	self:AnimateAttribute("layout_crop_x", 1, ANIMATION_DURATION * 4)
-
 	self:AnimateAttribute("alpha", 0, {
-		duration = ANIMATION_DURATION * 4,
+		duration = ANIMATION_DURATION * 2,
 
 		callback = function ()
 			LobbyCardContainer.super.Finish(self)
