@@ -13,7 +13,7 @@ local function ZeroString(len)
 end
 
 local function TimeString(seconds)
-	local time = string.FormattedTime(seconds)
+	local time = string.FormattedTime(tonumber(seconds))
 
 	return string.format("%02d%02d%02d", time.h, time.m, time.s)
 end
@@ -343,6 +343,8 @@ function TimeInput:OnValueChanged(v, no_callback)
 end
 
 function TimeInput:SetValue(v, no_callback)
+	v = TimeString(v)
+
 	self.panel.text:SetText(v)
 	self.panel.text:OnValueChange(v, no_callback)
 end
