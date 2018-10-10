@@ -100,17 +100,17 @@ function NumberInput:Enable()
 	TextInput.Enable(self)
 end
 
-function NumberInput:OnValueChanged(v)
+function NumberInput:OnValueChanged(v, no_callback)
 	self.value = v
 
-	if self.on_change then
+	if not no_callback and self.on_change then
 		self.on_change(self, v)
 	end
 end
 
-function NumberInput:SetValue(v)
+function NumberInput:SetValue(v, no_callback)
 	self.panel.text:SetText(v)
-	self.panel.text:OnValueChange(v)
+	self.panel.text:OnValueChange(v, no_callback)
 end
 
 function NumberInput:OnMousePressed(mouse)

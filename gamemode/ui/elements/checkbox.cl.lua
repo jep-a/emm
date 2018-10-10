@@ -67,11 +67,11 @@ function Checkbox:Enable()
 	self:RevertState()
 end
 
-function Checkbox:OnValueChanged(v)
+function Checkbox:OnValueChanged(v, no_callback)
 	self.value = v
 	self.check:AnimateAttribute("alpha", v and 255 or 0)
 
-	if self.on_change then
+	if not no_callback and self.on_change then
 		self.on_change(self, v)
 	end
 end
@@ -95,8 +95,8 @@ function Checkbox:OnMouseExited()
 	end
 end
 
-function Checkbox:SetValue(v)
+function Checkbox:SetValue(v, no_callback)
 	if v ~= self.value then 
-		self:OnValueChanged(v)
+		self:OnValueChanged(v, no_callback)
 	end
 end

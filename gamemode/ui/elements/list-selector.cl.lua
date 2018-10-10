@@ -170,11 +170,11 @@ function ListSelector:OnMousePressed(mouse)
 	end
 end
 
-function ListSelector:SetValue(k, v)
+function ListSelector:SetValue(k, v, no_callback)
 	if self.inputs[k] and v ~= self.inputs[k].value then
-		self.inputs[k]:SetValue(v)
-		self:OnValueChanged(k, v, true)
+		self.inputs[k]:SetValue(v, no_callback)
+		self:OnValueChanged(k, v, no_callback)
 	elseif v ~= self.value[k] then
-		self:OnValueChanged(k, v, true)
+		self:OnValueChanged(k, v, no_callback)
 	end
 end

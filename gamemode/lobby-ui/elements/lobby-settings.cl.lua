@@ -115,8 +115,12 @@ function LobbySettings:AddPlayerClassSetting(setting)
 	end
 end
 
-function LobbySettings:AddPrerequisiteSetting(k, prereq, setting_v, category)
+function LobbySettings:GetPrerequisiteValue(k, setting_v)
+	setting_v = setting_v or MinigameSettingsService.Get(self.lobby, k, true)
+
 	local prereq_v
+
+	local prereq = self.settings[k].prerequisite
 
 	if prereq.default then
 		prereq_v = prereq.default
@@ -128,13 +132,22 @@ function LobbySettings:AddPrerequisiteSetting(k, prereq, setting_v, category)
 		end
 	end
 
-	self.input_containers[k..".prerequisite"] = category:Add(InputBar.New(prereq.label, prereq.type, prereq_v, {
+	return prereq_v
+end
+
+function LobbySettings:AddPrerequisiteSetting(k, prereq, setting_v, category)
+	local prereq_v = self:GetPrerequisiteValue(k, setting_v)
+	local input_k = k..".prerequisite"
+
+	self.input_containers[input_k] = category:Add(InputBar.New(prereq.label, prereq.type, prereq_v, {
 		read_only = self.disabled,
 
 		on_change = function (input, v)
 			self:OnPrerequisiteValueChanged(k, v)
 		end
 	}))
+
+	self.inputs[input_k] = self.input_containers[input_k].input
 
 	return prereq_v
 end
@@ -215,10 +228,18 @@ end
 
 function LobbySettings:Refresh(settings)
 	for k, v in pairs(settings) do
+		local prereq_k = k..".prerequisite"
+
+		if self.inputs[prereq_k] then
+			self.inputs[prereq_k]:SetValue(self:GetPrerequisiteValue(k, v))
+		end
+
+		local list_k = string.match(k, "%.([^.]*)$")
+
 		if self.inputs[k] then
-			self.inputs[k]:SetValue(v)
+			self.inputs[k]:SetValue(v, true)
 		elseif self.list_inputs[k] then
-			self.list_inputs[k]:SetValue(k, v)
+			self.list_inputs[k]:SetValue(list_k, v, true)
 		end
 	end
 

@@ -334,17 +334,17 @@ function TimeInput:Finish()
 	TimeInput.super.Finish(self)
 end
 
-function TimeInput:OnValueChanged(v)
+function TimeInput:OnValueChanged(v, no_callback)
 	self.value = v
 
-	if self.on_change then
+	if not no_callback and self.on_change then
 		self.on_change(self, v)
 	end
 end
 
-function TimeInput:SetValue(v)
+function TimeInput:SetValue(v, no_callback)
 	self.panel.text:SetText(v)
-	self.panel.text:OnValueChange(v)
+	self.panel.text:OnValueChange(v, no_callback)
 end
 
 function TimeInput:OnMousePressed(mouse)

@@ -111,17 +111,17 @@ function TextInput:SetupPanel(text)
 	self.panel.text:SetText(text or self:GetAttribute "text" or "")
 end
 
-function TextInput:OnValueChanged(v)
+function TextInput:OnValueChanged(v, no_callback)
 	self.value = v
 
-	if self.on_change then
+	if not no_callback and self.on_change then
 		self.on_change(self, v)
 	end
 end
 
-function TextInput:SetValue(v)
+function TextInput:SetValue(v, no_callback)
 	self.panel.text:SetText(v)
-	self.panel.text:OnValueChange(v)
+	self.panel.text:OnValueChange(v, no_callback)
 end
 
 function TextInput:OnMousePressed(mouse)
