@@ -37,11 +37,11 @@ end
 function ProperPlayerName(ply)
 	local name
 
-	if IsLocalPlayer(ply) then
-		name = "you"
-	else
+	-- if IsLocalPlayer(ply) then
+	-- 	name = "you"
+	-- else
 		name = ply:GetName()
-	end
+	-- end
 
 	return name
 end

@@ -112,7 +112,7 @@ function StaminaService.Reload(lobby, settings)
 		else
 			local local_ply = LocalPlayer()
 	
-			if ply_class == local_ply.player_class.key then
+			if local_ply.player_class and ply_class == local_ply.player_class.key then
 				local_ply.stamina[stamina].infinite = v
 			end
 		end
