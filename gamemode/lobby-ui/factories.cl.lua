@@ -137,6 +137,9 @@ function LobbyUIService.CreatePrototypeList()
 	}
 end
 
+local lobby_request_cooldown = 5
+local last_request_lobby_time = 0
+
 function LobbyUIService.CreatePrototypeBar(proto)
 	return ButtonBar.New {
 		color = proto.color,
@@ -145,7 +148,14 @@ function LobbyUIService.CreatePrototypeBar(proto)
 		divider = true,
 
 		on_click = function (self)
-			NetService.Send("RequestLobby", proto)
+			local cur_time = CurTime()
+
+			if cur_time > (last_request_lobby_time + lobby_request_cooldown) then
+				NetService.Send("RequestLobby", proto)
+				last_request_lobby_time = CurTime()
+			else
+				chat.AddText(COLOR_RED, "Please wait ", tostring(-math.Round(cur_time - (last_request_lobby_time + lobby_request_cooldown))), " seconds before making a new lobby")
+			end
 		end
 	}
 end

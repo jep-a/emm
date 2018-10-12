@@ -49,7 +49,7 @@ function MinigameNetService.ReceiveLobbies(len)
 		end
 
 		local settings = net.ReadTable()
-		local proto = MinigameService.Prototype(proto_id)
+		local proto = table.Copy(MinigameService.Prototype(proto_id))
 
 		local lobby = MinigameService.CreateLobby({
 			id = lobby_id,

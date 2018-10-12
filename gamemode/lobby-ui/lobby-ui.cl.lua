@@ -132,6 +132,8 @@ function LobbyUIService.AddLobby(lobby)
 		if lobby_count > 0 then
 			LobbyUIService.lobby_list:AnimateState "contains_children"
 		end
+
+		chat.AddText(lobby.prototype.color, lobby.host:GetName(), " has made a ", lobby.prototype.name, " lobby")
 	end
 end
 hook.Add("LobbyInit", "LobbyUIService.AddLobby", LobbyUIService.AddLobby)
@@ -175,6 +177,10 @@ function LobbyUIService.SetLobbyHost(lobby, ply)
 			settings:Disable()
 		end
 	end
+
+	if lobby:IsLocal() then
+		chat.AddText(lobby.prototype.color, ply:GetName(), " has inherited host")
+	end
 end
 hook.Add("LobbyHostChange", "LobbyUIService.SetLobbyHost", LobbyUIService.SetLobbyHost)
 
@@ -204,6 +210,8 @@ function LobbyUIService.AddLobbyPlayer(lobby, ply)
 			lobby.card_element.switch:AnimateState("leave", ANIMATION_DURATION * 2)
 		end
 	end
+
+	chat.AddText(lobby.prototype.color, ply:GetName(), " has joined ", lobby.host:GetName(), "'s lobby")
 end
 hook.Add("LobbyPlayerJoin", "LobbyUIService.AddLobbyPlayer", LobbyUIService.AddLobbyPlayer)
 

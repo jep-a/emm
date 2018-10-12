@@ -2,7 +2,7 @@ EMM = EMM or {}
 
 EMM.client_includes = {}
 
-gamemode_name = string.match(debug.getinfo(1).source, "^@gamemodes/([^%/]+)/")
+gamemode_name = "emm"
 gamemode_lua_directory = gamemode_name.."/gamemode/"
 
 function engine.ActiveGamemode()

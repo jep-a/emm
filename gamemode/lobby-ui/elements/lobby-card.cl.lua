@@ -34,6 +34,9 @@ end
 
 LobbyCard = LobbyCard or Class.New(Element)
 
+local lobby_join_request_cooldown = 5
+local last_request_lobby_join_time = 0
+
 function LobbyCard:Init(lobby)
 	LobbyCard.super.Init(self, {
 		layout_direction = DIRECTION_COLUMN,
@@ -118,7 +121,14 @@ function LobbyCard:Init(lobby)
 		text = "Join",
 
 		on_click = function ()
-			NetService.Send("RequestLobbyJoin", lobby)
+			local cur_time = CurTime()
+
+			if cur_time > (last_request_lobby_join_time + lobby_join_request_cooldown) then
+				NetService.Send("RequestLobbyJoin", lobby)
+				last_request_lobby_join_time = CurTime()
+			else
+				chat.AddText(COLOR_RED, "Please wait ", tostring(-math.Round(cur_time - (last_request_lobby_join_time + lobby_join_request_cooldown))), " seconds before joining a new lobby")
+			end
 		end
 	})
 
