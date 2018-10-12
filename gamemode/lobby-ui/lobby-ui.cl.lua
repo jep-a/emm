@@ -52,7 +52,7 @@ function LobbyUIService.Init()
 	end
 
 	for _, lobby in pairs(MinigameService.lobbies) do
-		LobbyUIService.AddLobby(lobby)
+		LobbyUIService.AddLobby(lobby, true)
 	end
 
 	LobbyUIService.SetLobbyListHeaderText(table.Count(MinigameService.lobbies))
@@ -117,7 +117,7 @@ end
 
 -- # Hooks
 
-function LobbyUIService.AddLobby(lobby)
+function LobbyUIService.AddLobby(lobby, no_notify)
 	if LobbyUIService.container then
 		LobbyUIService.lobby_list:Add(LobbyBar.New(lobby))
 
@@ -133,7 +133,9 @@ function LobbyUIService.AddLobby(lobby)
 			LobbyUIService.lobby_list:AnimateState "contains_children"
 		end
 
-		chat.AddText(lobby.prototype.color, lobby.host:GetName(), " has made a ", lobby.prototype.name, " lobby")
+		if not no_notify then
+			chat.AddText(lobby.prototype.color, lobby.host:GetName(), " has made a ", lobby.prototype.name, " lobby")
+		end
 	end
 end
 hook.Add("LobbyInit", "LobbyUIService.AddLobby", LobbyUIService.AddLobby)
