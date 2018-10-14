@@ -27,7 +27,7 @@ SettingsService.New("cam_ui_smooth_multiplier", {
 	type = "number",
 	default = 1,
 	min = 0,
-	max = 4,
+	max = 100,
 	help = "3D UI smoothing multiplier",
 })
 

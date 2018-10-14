@@ -45,3 +45,9 @@ function ProperPlayerName(ply)
 
 	return name
 end
+
+concommand.Add("emm_reload_ui", function ()
+	LobbyUIService.Reload()
+	HUDService.Reload()
+	IndicatorService.Reload(true)
+end)

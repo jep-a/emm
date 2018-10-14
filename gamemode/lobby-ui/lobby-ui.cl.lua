@@ -8,7 +8,7 @@ function LobbyUIService.SmallScreen()
 end
 
 function LobbyUIService.HellaSmallScreen()
-	return 800 > ScrW()
+	return 1152 > ScrW()
 end
 
 function LobbyUIService.SetLobbyListHeaderText(count)
@@ -283,7 +283,7 @@ function LobbyUIService.UnSelectLobby()
 	
 		LobbyUIService.lobby_card_section:AnimateAttribute("layout_crop_x", 1, ANIMATION_DURATION * 4)
 
-		if lobby == LobbyUIService.selected_lobby then
+		if lobby == LobbyUIService.selected_lobby and LobbyUIService.lobby_card_container then
 			LobbyUIService.lobby_card_container:Finish()
 			LobbyUIService.lobby_card_container = nil
 		end

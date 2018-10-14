@@ -20,7 +20,9 @@ function ENT:Initialize()
 			smooth = true,
 
 			generate = function ()
-				return self:GetOwner().color
+				local owner = self:GetOwner()
+
+				return IsValid(owner) and owner.color or COLOR_WHITE
 			end
 		})
 	end
