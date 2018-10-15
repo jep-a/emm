@@ -112,8 +112,16 @@ end)
 
 -- # Disconnecting
 
+hook.Add("EntityRemoved", "PlayerDisconnected", function (ply)
+	if ply:IsPlayer() then
+		hook.Run("PlayerDisconnected", ply)
+	end
+end)
+
 NetService.Receive("PlayerDisconnected", function (ply)
-	hook.Run("PlayerDisconnected", ply)
+	if IsValid(ply) then
+		hook.Run("PlayerDisconnected", ply)
+	end
 end)
 
 
