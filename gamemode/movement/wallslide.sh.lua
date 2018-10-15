@@ -1,6 +1,6 @@
 WallslideService = WallslideService or {}
 
-local wallslide_effect_cooldown = 1/60
+local wallslide_effect_cooldown = SAFE_FRAME
 local wallslide_transition_velocity = 400
 
 

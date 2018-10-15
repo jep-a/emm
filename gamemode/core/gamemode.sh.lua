@@ -4,6 +4,7 @@ GM.Author = "arkade"
 EMM.Include {
 	"settings/settings",
 
+	"util/variables",
 	"util/util",
 	"util/palette",
 	"util/class",

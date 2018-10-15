@@ -1,6 +1,6 @@
 function PlayerClassService.ReceivePlayerClass(ply, id)
 	if IsValid(ply) then
-		if MinigameNetService.received_lobbies then
+		if MinigameNetService.received_lobbies and ply.lobby then
 			if id ~= 0 then
 				ply:SetPlayerClass(PlayerClassService.MinigamePlayerClass(ply, id))
 			else

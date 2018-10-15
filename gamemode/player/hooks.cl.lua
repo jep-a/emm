@@ -65,7 +65,7 @@ local function CallPlayerSpawnHooks(ply_index)
 				MinigameService.CallHook(ply.lobby, "PlayerProperties", ply)
 			end
 
-			timer.Simple(1/60, function ()
+			timer.Simple(SAFE_FRAME, function ()
 				ply.just_spawned = nil
 			end)
 		end)

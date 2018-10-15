@@ -118,18 +118,25 @@ function MinigameLobby:AddPlayer(ply)
 end
 
 function MinigameLobby:RemovePlayer(ply)
-	hook.Run("LobbyPlayerLeave", self, ply)
+	if IsValid(ply) then
+		hook.Run("LobbyPlayerLeave", self, ply)
 
-	if self:IsLocal() then
-		hook.Run("LocalLobbyPlayerLeave", self, ply)
+		if self:IsLocal() then
+			hook.Run("LocalLobbyPlayerLeave", self, ply)
 
-		if IsLocalPlayer(ply) then
-			NotificationService.FinishSticky "Lobby"
+			if IsLocalPlayer(ply) then
+				NotificationService.FinishSticky "Lobby"
+			end
 		end
+
+		MinigameService.CallHook(self, "PlayerLeave", ply)
+
+		ply.lobby = nil
+		table.RemoveByValue(self.players, ply)
 	end
-
-	MinigameService.CallHook(self, "PlayerLeave", ply)
-
-	ply.lobby = nil
-	table.RemoveByValue(self.players, ply)
 end
+hook.Add("PlayerDisconnected", "MinigameService.RemoveDisconnectedPlayer", function (ply)
+	if ply.lobby then
+		ply.lobby:RemovePlayer(ply)
+	end
+end)

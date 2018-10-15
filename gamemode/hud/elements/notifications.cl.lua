@@ -42,7 +42,7 @@ function NotificationContainer:AnimateStart()
 		layout_crop_y = 1
 	}
 
-	self:AnimateAttribute("crop_bottom", 0, 1/60)
+	self:AnimateAttribute("crop_bottom", 0, SAFE_FRAME)
 	self:AnimateAttribute("layout_crop_y", 0)
 end
 

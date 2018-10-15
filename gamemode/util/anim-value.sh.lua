@@ -177,9 +177,7 @@ function AnimatableValue:Animate()
 
 		local value
 
-		if first_anim.start_value == nil then
-			first_anim.start_value = first_anim.end_value
-		end
+		first_anim.start_value = Default(first_anim.start_value, first_anim.end_value)
 
 		if first_anim.end_value ~= nil then
 			if IsColor(self.current) then

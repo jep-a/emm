@@ -64,7 +64,7 @@ function MinigameLobby:AddPlayer(ply)
 end
 
 function MinigameLobby:RemovePlayer(ply, net, force)
-	net = net == nil and true or net
+	net = Default(net, true)
 
 	local has_plys = #self.players > 1
 

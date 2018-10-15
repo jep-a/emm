@@ -16,7 +16,7 @@ function player_metatable:SetPlayerClass(class)
 end
 
 function player_metatable:ClearPlayerClass(net)
-	net = net == nil and true or net
+	net = Default(net, true)
 
 	local old_class = self.player_class
 
