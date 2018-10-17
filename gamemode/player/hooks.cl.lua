@@ -112,8 +112,12 @@ end)
 
 -- # Disconnecting
 
-hook.Add("EntityRemoved", "PlayerDisconnected", function (ply)
-	if ply:IsPlayer() then
+gameevent.Listen "player_disconnect"
+
+hook.Add("player_disconnect", "PlayerDisconnected", function (data)
+	local ply = Player(data.userid)
+
+	if IsValid(ply) then
 		hook.Run("PlayerDisconnected", ply)
 	end
 end)
