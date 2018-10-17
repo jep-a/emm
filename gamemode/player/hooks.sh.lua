@@ -10,6 +10,16 @@ NetService.CreateSchema("PostPlayerDeath", {"entity"})
 hook.Add("InitPlayerProperties", "InitCorePlayerProperties", function (ply)
 	ply.color = COLOR_WHITE
 
+	if CLIENT then
+		ply.animatable_color = AnimatableValue.New(COLOR_WHITE, {
+			smooth = true,
+			
+			generate = function ()
+				return IsValid(ply) and ply.color or COLOR_WHITE
+			end
+		})
+	end
+
 	ply.can_regenerate_health = true
 	ply.max_health = 100
 	ply.health_regenerate_step = 1
@@ -22,6 +32,12 @@ hook.Add("InitPlayerProperties", "InitCorePlayerProperties", function (ply)
 
 	ply.death_cooldown = 2
 	ply.last_death_time = 0
+end)
+
+hook.Add("PlayerDisconnected", "FinishPlayerProperties", function (ply)
+	if CLIENT then
+		ply.animatable_color:Finish()
+	end
 end)
 
 hook.Add("PlayerProperties", "SetCollisionCheck", function (ply)

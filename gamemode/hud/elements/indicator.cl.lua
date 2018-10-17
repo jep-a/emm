@@ -32,24 +32,8 @@ function Indicator:Init(ent_or_vec)
 
 	self.world_alpha = AnimatableValue.New(not OffScreen() and 255 or 0)
 
-	self.animatable_color = AnimatableValue.New(COLOR_WHITE, {
-		smooth = true,
-	
-		generate = function ()
-			local color
-
-			if IsValid(self.entity) then
-				color = self.entity.color
-			else
-				color = COLOR_WHITE
-			end
-
-			return color
-		end
-	})
-
 	self:SetAttribute("color", function ()
-		return self.animatable_color.smooth
+		return GetSmoothPlayerColor(self.entity)
 	end)
 
 	self.off_screen = AnimatableValue.New(OffScreen(), {
@@ -116,7 +100,6 @@ function Indicator:AnimateFinish()
 			end
 
 			self.world_alpha:Finish()
-			self.animatable_color:Finish()
 			self.off_screen:Finish()
 			Indicator.super.Finish(self)
 		end

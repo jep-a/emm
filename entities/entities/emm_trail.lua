@@ -15,16 +15,6 @@ function ENT:Initialize()
 		self:SetSprite(sprite)
 		self:DeleteOnRemove(sprite)
 		self.width = AnimatableValue.New(4)
-	else
-		self.animatable_color = AnimatableValue.New(COLOR_WHITE, {
-			smooth = true,
-
-			generate = function ()
-				local owner = self:GetOwner()
-
-				return IsValid(owner) and owner.color or COLOR_WHITE
-			end
-		})
 	end
 end
 
@@ -49,12 +39,6 @@ function ENT:StartRemove()
 	})
 end
 
-function ENT:OnRemove()
-	if CLIENT then
-		self.animatable_color:Finish()
-	end
-end
-
 function ENT:SetWidth(w)
 	local sprite = self:GetSprite()
 
@@ -75,7 +59,7 @@ function ENT:Think()
 		local sprite = self:GetSprite()
 
 		if IsValid(sprite) then
-			sprite:SetColor(self.animatable_color.smooth)
+			sprite:SetColor(GetSmoothPlayerColor(owner))
 		end
 
 		local render_pos
