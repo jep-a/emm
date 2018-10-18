@@ -140,3 +140,9 @@ surface.CreateFont("CrosshairMeterValueSmall", {
 	font = "Roboto Mono",
 	size = 12
 })
+
+surface.CreateFont("Nametag", {
+	font = "Roboto Mono Bold Italic",
+	size = 16
+})
+

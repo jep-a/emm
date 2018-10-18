@@ -82,6 +82,7 @@ EMM.Include {
 	"hud/hud",
 	"hud/elements",
 	"hud/factories",
+	"hud/nametags",
 	"hud/indicators",
 	"hud/notifications",
 	"hud/elements/hud-meter",

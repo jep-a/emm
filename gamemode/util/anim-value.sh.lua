@@ -38,6 +38,7 @@ function AnimatableValue:Init(value, props)
 	props = props or {}
 
 	self.animations = {}
+	self.animating = false
 	self.current = value
 	self.generate = props.generate
 
@@ -85,7 +86,7 @@ function AnimatableValue:GetAnimationEndTime()
 	return end_time
 end
 
-function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay)
+function AnimatableValue:AnimateTo(v, props_or_duration, ease, delay)
 	if EMM.debug then
 		self.debug_trace = debug.traceback()
 	end
@@ -128,13 +129,13 @@ function AnimatableValue:AnimateTo(value, props_or_duration, ease, delay)
 	end
 
 	local anim = {
-		start_value = self.current,
-		end_value = value,
+		end_value = v,
 		start_time = start_time + delay,
 		end_time = start_time + duration + delay,
 		ease = ease,
 		delay = delay,
 		finish = finish,
+		attached = Class.InstanceOf(v, AnimatableValue),
 		animate_callback = animate_callback,
 		callback = callback
 	}
@@ -169,15 +170,23 @@ end
 
 function AnimatableValue:Animate()
 	local first_anim = self.animations[1]
+	local cur_time = CurTime()
 
-	if first_anim then
-		local time = math.TimeFraction(first_anim.start_time, first_anim.end_time, CurTime())
+	if first_anim and cur_time >= first_anim.start_time then
+		self.animating = true
+
+		if first_anim.attached then
+			self.thinker = true
+			self.attached_to = first_anim.end_value
+		end
+
+		local time = math.TimeFraction(first_anim.start_time, first_anim.end_time, cur_time)
 		local eased_time = first_anim.ease(time)
 		local inverted_eased_time = 1 - eased_time
 
 		local value
 
-		first_anim.start_value = Default(first_anim.start_value, first_anim.end_value)
+		first_anim.start_value = Default(first_anim.start_value, self.current, first_anim.end_value)
 
 		if first_anim.end_value ~= nil then
 			if IsColor(self.current) then
@@ -187,15 +196,17 @@ function AnimatableValue:Animate()
 					(inverted_eased_time * first_anim.start_value.b) + (eased_time * first_anim.end_value.b),
 					(inverted_eased_time * first_anim.start_value.a) + (eased_time * first_anim.end_value.a)
 				)
+			elseif first_anim.attached then
+				value = (inverted_eased_time * first_anim.start_value) + (eased_time * first_anim.end_value.current)
 			else
 				value = (inverted_eased_time * first_anim.start_value) + (eased_time * first_anim.end_value)
 			end
 		end
 
-		self.current = value
-
 		if self.smoothing then
-			self.smooth = value
+			self:SnapTo(value)
+		else
+			self.current = value
 		end
 
 		if self.animate_callback then
@@ -221,6 +232,8 @@ function AnimatableValue:Animate()
 				self:Finish()
 			end
 		end
+	else
+		self.animating = false
 	end
 end
 
@@ -245,6 +258,16 @@ end
 
 local function Smooth(mult, curr, last)
 	return (last + (curr * mult))/(mult + 1)
+end
+
+function AnimatableValue:SnapTo(v)
+	self.current = v
+
+	if self.smoothing then
+		self.last = v
+		self.smooth = v
+		self.new = v
+	end
 end
 
 function AnimatableValue:Smooth()
@@ -297,17 +320,27 @@ function AnimatableValue:UnFreeze()
 end
 
 function AnimatableValue:Think()
-	if self.generate then
-		self.current = self.generate(self.current)
+	if not self.animating then
+		if self.generate then
+			self.current = self.generate(self)
+		end
+
+		-- if self.attached_to then
+		-- 	self.current = self.attached_to.current
+		-- end
 	end
 
 	self:Animate()
+
+	if self.attached_to and not self.animating then
+		self.current = self.attached_to.current
+	end
 
 	if self.checking_changes then
 		self:DetectChanges()
 	end
 
-	if self.smoothing then
+	if self.smoothing and not self.animating then
 		self:Smooth()
 	end
 

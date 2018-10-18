@@ -4,7 +4,48 @@ local indicator_material = Material("emm2/shapes/arrow-2x.png", "noclamp smooth"
 local circle_material = Material("emm2/shapes/circle.png", "noclamp smooth")
 
 
--- # Init
+-- # Util
+
+function IndicatorService.Visible()
+	return SettingsService.Get "show_hud" and SettingsService.Get "show_indicators"
+end
+
+function IndicatorService.PlayerShouldHaveIndicator(ply)
+	local should_have_indicator
+
+	if IsLocalPlayer(ply) then
+		should_have_indicator = false
+	elseif ply.player_class then
+		should_have_indicator = true
+	else
+		should_have_indicator = false
+	end
+
+	return should_have_indicator
+end
+
+
+-- # Properties
+
+function IndicatorService.InitPlayerProperties(ply)
+	if not IsLocalPlayer(ply) then
+		cam.Start3D()
+
+		local x, y, visible, distance = IndicatorService.ScreenPosition(ply)
+
+		cam.End3D()
+
+		ply.pixel_visible_handle = util.GetPixelVisibleHandle()
+		ply.indicator_x = x
+		ply.indicator_y = y
+		ply.indicator_is_visible = visible
+		ply.indicator_distance = distance
+	end
+end
+hook.Add("InitPlayerProperties", "IndicatorService.InitPlayerProperties", IndicatorService.InitPlayerProperties)
+
+
+-- # Elements
 
 function IndicatorService.CreateContainer()
 	local element = Element.New {
@@ -17,62 +58,91 @@ function IndicatorService.CreateContainer()
 	return element
 end
 
+
+-- # Calculating
+
 function IndicatorService.Sort(ply, eye_pos)
 	local eye_pos = LocalPlayer():EyePos()
 	local indicators = IndicatorService.container.children
 
 	for i = 1, #indicators do
 		local indicator = indicators[i]
-
-		local pos
 	
-		if IsValid(indicator.entity) then
-			pos = indicator.entity:WorldSpaceCenter()
+		if IsValid(indicator.player) then
+			indicator.distance = indicator.player.indicator_distance
 		elseif indicator.position then
-			pos = indicator.position
+			indicator.distance = eye_pos:Distance(indicator.position)
 		end
 	
-		if pos then
-			indicator.distance = eye_pos:Distance(pos)
-			indicator.panel:SetZPos(i)
-		end
+		indicator.panel:SetZPos(i)
 	end
 
 	table.sort(indicators, function(a, b) return a.distance > b.distance end)
 end
 hook.Add("Think", "IndicatorService.Sort", IndicatorService.Sort)
 
-function IndicatorService.ScreenPosition(indicator)
-	local pos
-	
-	if IsValid(indicator.entity) then
-		pos = indicator.entity:WorldSpaceCenter()
-	elseif indicator.position then
-		pos = indicator.position
-	end
+function IndicatorService.ScreenPosition(ent_or_pos, eye_pos)
+	local pos = IsValid(ent_or_pos) and ent_or_pos:WorldSpaceCenter() or ent_or_pos
+	local distance = (eye_pos or LocalPlayer():EyePos()):Distance(pos)
+	local screen_pos = (pos + Vector(0, 0, Lerp(distance/600, 40, 45))):ToScreen()
 
-	if pos then
-		cam.Start3D()
-
-		local screen_pos = (pos + Vector(0, 0, Lerp(indicator.distance/600, 40, 45))):ToScreen()
-
-		cam.End3D()
-
-		local size = Lerp(indicator.distance/800, INDICATOR_WORLD_SIZE * 2, INDICATOR_WORLD_SIZE)
-		local x, y = screen_pos.x - (size/2), screen_pos.y - 6 - (size/2)
-
-		return x, y, size
-	end
+	return screen_pos.x, screen_pos.y, screen_pos.visible, distance
 end
 
-function IndicatorService.DrawWorldPositions(ply, eye_pos)
+function IndicatorService.CalculateScreenPositions(ply, eye_pos)
 	local eye_pos = LocalPlayer():EyePos()
+	local plys = player.GetAll()
+
+	cam.Start3D()
+
+	for i = 1, #plys do
+		local ply = plys[i]
+
+		if IsValid(ply) and not IsLocalPlayer(ply) then
+			local x, y, visible, distance = IndicatorService.ScreenPosition(ply, eye_pos)
+
+			ply.visible = util.PixelVisible(ply:WorldSpaceCenter(), 32, ply.pixel_visible_handle)
+			ply.indicator_x = x
+			ply.indicator_y = y
+			ply.indicator_is_visible = visible
+			ply.indicator_distance = distance
+		end
+	end
+
+	cam.End3D()
+end
+hook.Add("HUDPaint", "IndicatorService.CalculateScreenPositions", IndicatorService.CalculateScreenPositions)
+
+function IndicatorService.IndicatorPosition(indicator)
+	local x
+	local y
+	local distance
+
+	if IsValid(indicator.player) then
+		x = indicator.player.indicator_x
+		y = indicator.player.indicator_y
+		distance = indicator.player.indicator_distance
+	elseif indicator.position then
+		x, y, _, distance = IndicatorService.ScreenPosition(indicator.position, LocalPlayer():EyePos())
+	end
+
+	local size = Lerp(distance/800, INDICATOR_WORLD_SIZE * 2, INDICATOR_WORLD_SIZE)
+	local indicator_x = x - (size/2)
+	local indicator_y = y - 6 - (size/2)
+
+	return indicator_x, indicator_y, size
+end
+
+
+-- # Drawing/rendering
+
+function IndicatorService.DrawWorldPositions(ply)
 	local indicators = IndicatorService.container.children
 	local container_alpha = IndicatorService.container.attributes.alpha.current
 
 	for i = 1, #indicators do
 		local indicator = indicators[i]
-		local x, y, size = IndicatorService.ScreenPosition(indicator)
+		local x, y, size = IndicatorService.IndicatorPosition(indicator)
 
 		if x and y and size then
 			indicator.x = x
@@ -92,8 +162,8 @@ function IndicatorService.RenderCoasters()
 	for i = 1, #indicators do
 		local indicator = indicators[i]
 
-		if IsValid(indicator.entity) then
-			local pos = indicator.entity:GetPos() + Vector(0, 0, 5)
+		if IsValid(indicator.player) then
+			local pos = indicator.player:GetPos() + Vector(0, 0, 5)
 
 			local trace = util.TraceLine {
 				start = pos,
@@ -106,7 +176,7 @@ function IndicatorService.RenderCoasters()
 			if alpha > 0 then
 				cam.Start3D2D(trace.HitPos + (trace.HitNormal * Vector(0.5, 0.5, 0.5)), trace.HitNormal:Angle() + Angle(90, 0, 0), 0.25)
 				surface.SetAlphaMultiplier(alpha)
-				surface.SetDrawColor(indicator.entity.color)
+				surface.SetDrawColor(indicator.player.color)
 				surface.SetMaterial(circle_material)
 				surface.DrawTexturedRect(-INDICATOR_COASTER_SIZE/2, -INDICATOR_COASTER_SIZE/2, INDICATOR_COASTER_SIZE, INDICATOR_COASTER_SIZE)
 				surface.SetAlphaMultiplier(1)
@@ -117,23 +187,8 @@ function IndicatorService.RenderCoasters()
 end
 hook.Add("PreDrawOpaqueRenderables", "IndicatorService.RenderCoasters", IndicatorService.RenderCoasters)
 
-function IndicatorService.Visible()
-	return SettingsService.Get "show_hud" and SettingsService.Get "show_indicators"
-end
 
-function IndicatorService.PlayerShouldHaveIndicator(ply)
-	local should_have_indicator
-
-	if IsLocalPlayer(ply) then
-		should_have_indicator = false
-	elseif ply.player_class then
-		should_have_indicator = true
-	else
-		should_have_indicator = false
-	end
-
-	return should_have_indicator
-end
+-- # Hooks
 
 function IndicatorService.Init()
 	IndicatorService.container = IndicatorService.CreateContainer()

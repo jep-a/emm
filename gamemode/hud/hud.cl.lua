@@ -292,6 +292,7 @@ end
 hook.Add("OnLobbyUIOpen", "HUDService.LobbyUIHide", HUDService.LobbyUIHide)
 
 function HUDService.RenderHooks()
+	hook.Run "DrawNametags"
 	hook.Run "DrawIndicators"
 	hook.Run "DrawCamUI"
 end

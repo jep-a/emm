@@ -2,7 +2,7 @@ Indicator = Indicator or Class.New(Element)
 
 local indicator_material = Material("emm2/shapes/arrow.png", "noclamp smooth")
 
-function Indicator:Init(ent_or_vec)
+function Indicator:Init(ply_or_vec)
 	Indicator.super.Init(self, {
 		layout = false,
 		width_percent = 1,
@@ -11,17 +11,17 @@ function Indicator:Init(ent_or_vec)
 		alpha = 0
 	})
 
-	if isentity(ent_or_vec) then
-		ent_or_vec.indicator = self
-		self.entity = ent_or_vec
-		self.position = ent_or_vec:WorldSpaceCenter()
-	elseif isvector(ent_or_vec) then
-		self.position = ent_or_vec
+	if isentity(ply_or_vec) then
+		ply_or_vec.indicator = self
+		self.player = ply_or_vec
+		self.position = ply_or_vec:WorldSpaceCenter()
+	elseif isvector(ply_or_vec) then
+		self.position = ply_or_vec
 	end
 
 	self.distance = LocalPlayer():EyePos():Distance(self.position)
 
-	local x, y = IndicatorService.ScreenPosition(self)
+	local x, y = IndicatorService.IndicatorPosition(self)
 
 	self.x = x
 	self.y = y
@@ -33,7 +33,7 @@ function Indicator:Init(ent_or_vec)
 	self.world_alpha = AnimatableValue.New(not OffScreen() and 255 or 0)
 
 	self:SetAttribute("color", function ()
-		return GetSmoothPlayerColor(self.entity)
+		return GetSmoothPlayerColor(self.player)
 	end)
 
 	self.off_screen = AnimatableValue.New(OffScreen(), {
@@ -70,17 +70,18 @@ function Indicator:Think()
 		local scr_h = ScrH()
 		local half_scr_w = scr_w/2
 		local half_scr_h = scr_h/2
+		local half_w = attr.width.current/2
 		local half_h = attr.height.current/2
 		local periph_radius = half_scr_h - half_h
 
 		local x = self.x
 		local y = self.y
 
-		local rad_ang = math.atan2(y - half_scr_h, x - half_scr_w)
+		local rad_ang = math.atan2(y + (half_h/2) - half_scr_h, x + (half_w/2) - half_scr_w)
 		local periph_x = (math.cos(rad_ang) * periph_radius) + half_scr_w
 		local periph_y = (math.sin(rad_ang) * periph_radius) + half_scr_h
 
-		attr.x.current = periph_x - (attr.width.current/2)
+		attr.x.current = periph_x - half_w
 		attr.y.current = periph_y - half_h
 		attr.angle.current = -math.deg(rad_ang) + 90
 
@@ -91,7 +92,7 @@ end
 function Indicator:AnimateFinish()
 	self:AnimateAttribute("alpha", 0, {
 		callback = function ()
-			local ent = self.entity
+			local ent = self.player
 
 			if IsValid(ent) then
 				if self == ent.indicator then
