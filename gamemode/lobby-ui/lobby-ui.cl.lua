@@ -118,21 +118,23 @@ end
 hook.Add("LobbyFinish", "LobbyUIService.FinishLobby", LobbyUIService.FinishLobby)
 
 function LobbyUIService.SetLobbyHost(lobby, ply)
-	if lobby.bar_element then
-		lobby.bar_element.host:SetText(ProperPlayerName(ply))
-	end
+	if UIService.Active "Lobbies" then
+		if lobby.bar_element then
+			lobby.bar_element.host:SetText(ProperPlayerName(ply))
+		end
 
-	if lobby == LobbyUIService.selected_lobby then
-		lobby.card_element.header:SetText(string.upper(LobbyUIService.LobbyHostText(ply)))
+		if lobby == LobbyUIService.selected_lobby then
+			lobby.card_element.header:SetText(string.upper(LobbyUIService.LobbyHostText(ply)))
 
-		local settings = LobbyUIService.lobby_card_container.settings
+			local settings = LobbyUIService.lobby_card_container.settings
 
-		if IsLocalPlayer(ply) then
-			lobby.card_element:AddHostActions()
-			settings:Enable()
-		else
-			lobby.card_element:FinishHostActions()
-			settings:Disable()
+			if IsLocalPlayer(ply) then
+				lobby.card_element:AddHostActions()
+				settings:Enable()
+			else
+				lobby.card_element:FinishHostActions()
+				settings:Disable()
+			end
 		end
 	end
 
@@ -143,29 +145,31 @@ end
 hook.Add("LobbyHostChange", "LobbyUIService.SetLobbyHost", LobbyUIService.SetLobbyHost)
 
 function LobbyUIService.RefreshSettings(lobby, settings)
-	if lobby == LobbyUIService.selected_lobby then
+	if UIService.Active "Lobbies" and lobby == LobbyUIService.selected_lobby then
 		LobbyUIService.lobby_card_container.settings:Refresh(settings)
 	end
 end
 hook.Add("LobbySettingsChange", "LobbyUIService.RefreshSettings", LobbyUIService.RefreshSettings)
 
 function LobbyUIService.AddLobbyPlayer(lobby, ply)
-	local is_local_ply = IsLocalPlayer(ply)
+	if UIService.Active "Lobbies" then
+		local is_local_ply = IsLocalPlayer(ply)
 
-	if lobby.bar_element then
-		if is_local_ply then
-			lobby.bar_element.pulse:AnimateAttribute("alpha", 255)
+		if lobby.bar_element then
+			if is_local_ply then
+				lobby.bar_element.pulse:AnimateAttribute("alpha", 255)
+			end
+
+			lobby.bar_element.players:SetText(#lobby.players)
 		end
 
-		lobby.bar_element.players:SetText(#lobby.players)
-	end
+		if lobby == LobbyUIService.selected_lobby then
+			ply.lobby_card_element = lobby.card_element.players:Add(PlayerBar.New(ply))
+			ply.lobby_card_element:AnimateStart()
 
-	if lobby == LobbyUIService.selected_lobby then
-		ply.lobby_card_element = lobby.card_element.players:Add(PlayerBar.New(ply))
-		ply.lobby_card_element:AnimateStart()
-
-		if is_local_ply then
-			lobby.card_element.switch:AnimateState("leave", ANIMATION_DURATION * 2)
+			if is_local_ply then
+				lobby.card_element.switch:AnimateState("leave", ANIMATION_DURATION * 2)
+			end
 		end
 	end
 
@@ -174,23 +178,25 @@ end
 hook.Add("LobbyPlayerJoin", "LobbyUIService.AddLobbyPlayer", LobbyUIService.AddLobbyPlayer)
 
 function LobbyUIService.RemoveLobbyPlayer(lobby, ply)
-	local is_local_ply = IsLocalPlayer(ply)
+	if UIService.Active "Lobbies" then
+		local is_local_ply = IsLocalPlayer(ply)
 
-	if lobby.bar_element then
-		if is_local_ply then
-			lobby.bar_element.pulse:AnimateAttribute("alpha", 0)
+		if lobby.bar_element then
+			if is_local_ply then
+				lobby.bar_element.pulse:AnimateAttribute("alpha", 0)
+			end
+
+			lobby.bar_element.players:SetText(#lobby.players - 1)
 		end
 
-		lobby.bar_element.players:SetText(#lobby.players - 1)
-	end
+		if lobby == LobbyUIService.selected_lobby then
+			if ply.lobby_card_element then
+				ply.lobby_card_element:Finish()
+			end
 
-	if lobby == LobbyUIService.selected_lobby then
-		if ply.lobby_card_element then
-			ply.lobby_card_element:Finish()
-		end
-
-		if is_local_ply then
-			lobby.card_element.switch:RevertState(ANIMATION_DURATION * 2)
+			if is_local_ply then
+				lobby.card_element.switch:RevertState(ANIMATION_DURATION * 2)
+			end
 		end
 	end
 end
@@ -269,31 +275,33 @@ function LobbyUIService.HideSettings()
 end
 
 function LobbyUIService.MousePressed(panel)
-	if 
-		not (LobbyUIService.SmallScreen() and LobbyUIService.viewing_settings) and
-		not ListSelector.focused and (
-			panel == LobbyUIService.container.panel or
-			panel == LobbyUIService.container.inner_container.panel or
-			panel == LobbyUIService.new_lobby_section.panel or
-			panel == LobbyUIService.lobby_section.panel
-		) and
-		LobbyUIService.selected_lobby
-	then
-		if LobbyUIService.SmallScreen() then
-			LobbyUIService.HideSettings()
-		end
-
-		LobbyUIService.UnSelectLobby()
-	end
-	
-	if LobbyUIService.SmallScreen() and LobbyUIService.lobby_card_container then
-		if not LobbyUIService.lobby_card_container.settings.panel:IsCursorOutBoundsX() then
-			LobbyUIService.ViewSettings()
-		elseif
-			not LobbyUIService.new_lobby_section.panel:IsCursorOutBoundsX() or
-			not LobbyUIService.lobby_section.panel:IsCursorOutBoundsX()
+	if UIService.Active "Lobbies" then
+		if 
+			not (LobbyUIService.SmallScreen() and LobbyUIService.viewing_settings) and
+			not ListSelector.focused and (
+				panel == LobbyUIService.container.panel or
+				panel == LobbyUIService.container.inner_container.panel or
+				panel == LobbyUIService.new_lobby_section.panel or
+				panel == LobbyUIService.lobby_section.panel
+			) and
+			LobbyUIService.selected_lobby
 		then
-			LobbyUIService.HideSettings()
+			if LobbyUIService.SmallScreen() then
+				LobbyUIService.HideSettings()
+			end
+
+			LobbyUIService.UnSelectLobby()
+		end
+		
+		if LobbyUIService.SmallScreen() and LobbyUIService.lobby_card_container then
+			if not LobbyUIService.lobby_card_container.settings.panel:IsCursorOutBoundsX() then
+				LobbyUIService.ViewSettings()
+			elseif
+				not LobbyUIService.new_lobby_section.panel:IsCursorOutBoundsX() or
+				not LobbyUIService.lobby_section.panel:IsCursorOutBoundsX()
+			then
+				LobbyUIService.HideSettings()
+			end
 		end
 	end
 end
