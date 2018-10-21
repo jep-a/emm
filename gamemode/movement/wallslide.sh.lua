@@ -13,8 +13,8 @@ function WallslideService.InitPlayerProperties(ply)
 	ply.wallsliding = false
 	ply.wallslide_velocity = Vector(0, 0, 0)
 	ply.wallslide_distance = 40
-	ply.wallslide_regen_step = 0.25
-	ply.wallslide_decay_step = 0.25
+	ply.wallslide_regen_step = 0.2
+	ply.wallslide_decay_step = 0.2
 	ply.wallslide_cooldown = 2
 	ply.wallslide_init_cost = 5
 	ply.wallslide_sound_file = "physics/body/body_medium_scrape_smooth_loop1.wav"
