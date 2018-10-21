@@ -80,19 +80,21 @@ function StaminaService.UpdatePlayer(ply, cur_time)
 end
 
 function StaminaService.Update()
-	if IsFirstTimePredicted() then
-		local cur_time = CurTime()
+	local cur_time = CurTime()
 
-		if SERVER then
-			for _, ply in pairs(player.GetAll()) do
-				StaminaService.UpdatePlayer(ply, cur_time)
-			end
-		else
+	if SERVER then
+		for _, ply in pairs(player.GetAll()) do
+			StaminaService.UpdatePlayer(ply, cur_time)
+		end
+	else
+		local local_ply = LocalPlayer()
+
+		if IsValid(local_ply) and local_ply.stamina then
 			StaminaService.UpdatePlayer(LocalPlayer(), cur_time)
 		end
 	end
 end
-hook.Add("SetupMove", "StaminaService.Update", StaminaService.Update)
+hook.Add("Tick", "StaminaService.Update", StaminaService.Update)
 
 
 -- # Minigame settings reloading
