@@ -35,6 +35,7 @@ function IndicatorService.InitPlayerProperties(ply)
 
 		cam.End3D()
 
+		ply.visible = 0
 		ply.pixel_visible_handle = util.GetPixelVisibleHandle()
 		ply.indicator_x = x
 		ply.indicator_y = y
@@ -98,7 +99,7 @@ function IndicatorService.CalculateScreenPositions(ply, eye_pos)
 	for i = 1, #plys do
 		local ply = plys[i]
 
-		if IsValid(ply) and not IsLocalPlayer(ply) then
+		if IsValid(ply) and not IsLocalPlayer(ply) and ply.pixel_visible_handle then
 			local x, y, visible, distance = IndicatorService.ScreenPosition(ply, eye_pos)
 
 			ply.visible = util.PixelVisible(ply:WorldSpaceCenter(), 32, ply.pixel_visible_handle)

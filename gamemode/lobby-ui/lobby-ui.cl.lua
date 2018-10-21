@@ -56,72 +56,27 @@ function LobbyUIService.Init()
 	end
 
 	LobbyUIService.SetLobbyListHeaderText(table.Count(MinigameService.lobbies))
-end
-hook.Add("ReceiveLobbies", "LobbyUIService.Init", LobbyUIService.Init)
 
-function LobbyUIService.Reload()
-	LobbyUIService.selected_lobby = nil
-	LobbyUIService.container:Finish()
-	LobbyUIService.Init()
-end
-hook.Add("OnReloaded", "LobbyUIService.Reload", LobbyUIService.Reload)
-
-function LobbyUIService.Open()
-	RememberCursorPosition()
-	RestoreCursorPosition()
-
-	if LobbyUIService.focused then
-		LobbyUIService.UnFocus()
-	end
-
-	LobbyUIService.open = true
-
-	gui.EnableScreenClicker(true)
-	LobbyUIService.container.panel:SetMouseInputEnabled(true)
-	LobbyUIService.container.panel:MoveToFront()
-	LobbyUIService.container:AnimateAttribute("alpha", 255)
-	hook.Run "OnLobbyUIOpen"
-end
-
-function LobbyUIService.Close()
-	RememberCursorPosition()
-
-	if not LobbyUIService.focused then
-		LobbyUIService.open = false
-
-		gui.EnableScreenClicker(false)
-		LobbyUIService.container.panel:SetMouseInputEnabled(false)
-		LobbyUIService.container.panel:MoveToBack()
-		LobbyUIService.container:AnimateAttribute("alpha", 0)
-
-		if ListSelector.focused and ListSelector.focused:HasParent(LobbyUIService.container) then
-			ListSelector.focused:FinishList()
-		end
-	
-		hook.Run "OnLobbyUIClose"
+	if LobbyUIService.selected_lobby then
+		LobbyUIService.SelectLobby(LobbyUIService.selected_lobby, true)
 	end
 end
 
-function GM:OnSpawnMenuOpen()
-	LobbyUIService.Open()
-
-	return true
-end
-
-function GM:OnSpawnMenuClose()
-	LobbyUIService.Close()
-
-	return true
-end
+UIService.Register("Lobbies", LobbyUIService, {
+	open_hook = "OnSpawnMenuOpen",
+	close_hook = "OnSpawnMenuClose",
+})
 
 
 -- # Hooks
 
 function LobbyUIService.AddLobby(lobby, no_notify)
-	if LobbyUIService.container then
-		LobbyUIService.lobby_list:Add(LobbyBar.New(lobby))
+	if UIService.Active "Lobbies" then
+		local lobby_bar = LobbyBar.New(lobby)
 
-		if lobby:IsLocal() then
+		LobbyUIService.lobby_list:Add(lobby_bar)
+
+		if not no_notify and lobby:IsLocal() then
 			LobbyUIService.SelectLobby(lobby)
 		end
 
@@ -134,6 +89,7 @@ function LobbyUIService.AddLobby(lobby, no_notify)
 		end
 
 		if not no_notify then
+			lobby_bar:AnimateStart()
 			chat.AddText(lobby.prototype.color, lobby.host:GetName(), " has made a ", lobby.prototype.name, " lobby")
 		end
 	end
@@ -141,7 +97,7 @@ end
 hook.Add("LobbyInit", "LobbyUIService.AddLobby", LobbyUIService.AddLobby)
 
 function LobbyUIService.FinishLobby(lobby)
-	if LobbyUIService.container then
+	if UIService.Active "Lobbies" then
 		if lobby.bar_element then
 			lobby.bar_element:Finish()
 		end
@@ -240,11 +196,11 @@ function LobbyUIService.RemoveLobbyPlayer(lobby, ply)
 end
 hook.Add("LobbyPlayerLeave", "LobbyUIService.RemoveLobbyPlayer", LobbyUIService.RemoveLobbyPlayer)
 
-function LobbyUIService.SelectLobby(lobby)
-	if lobby and lobby ~= LobbyUIService.selected_lobby then
+function LobbyUIService.SelectLobby(lobby, no_notify)
+	if lobby and not lobby.card_element then
 		local small_screen = LobbyUIService.SmallScreen()
 
-		if LobbyUIService.selected_lobby then
+		if lobby ~= LobbyUIService.selected_lobby then
 			LobbyUIService.UnSelectLobby()
 		end
 
@@ -252,7 +208,11 @@ function LobbyUIService.SelectLobby(lobby)
 			LobbyUIService.container.inner_container:AnimateAttribute("offset_x", 168, ANIMATION_DURATION * 4)
 		end
 
-		LobbyUIService.lobby_card_section:AnimateAttribute("layout_crop_x", 0, ANIMATION_DURATION * 4)
+		if no_notify then
+			LobbyUIService.lobby_card_section:SetAttribute("layout_crop_x", 0)
+		else
+			LobbyUIService.lobby_card_section:AnimateAttribute("layout_crop_x", 0, ANIMATION_DURATION * 4)
+		end
 		
 		if lobby.bar_element then
 			lobby.bar_element:AnimateState "hover"
@@ -307,30 +267,6 @@ function LobbyUIService.HideSettings()
 	LobbyUIService.lobby_section:AnimateAttribute("alpha", 255)
 	LobbyUIService.lobby_card_container.settings:AnimateAttribute("alpha", QUARTER_ALPHA)
 end
-
-function LobbyUIService.Focus()
-	LobbyUIService.focused = true
-	LobbyUIService.container.panel:MakePopup()
-end
-
-function LobbyUIService.UnFocus()
-	LobbyUIService.focused = false
-	LobbyUIService.container.panel:SetKeyboardInputEnabled(false)
-end
-
-function LobbyUIService.FocusTextEntry(element)
-	if element:HasParent(LobbyUIService.container) then
-		LobbyUIService.Focus()
-	end
-end
-hook.Add("TextEntryFocus", "LobbyUIService.FocusTextEntry", LobbyUIService.FocusTextEntry)
-
-function LobbyUIService.UnFocusTextEntry(element)
-	if LobbyUIService.focused then
-		LobbyUIService.UnFocus()
-	end
-end
-hook.Add("TextEntryUnFocus", "LobbyUIService.UnFocusTextEntry", LobbyUIService.UnFocusTextEntry)
 
 function LobbyUIService.MousePressed(panel)
 	if 

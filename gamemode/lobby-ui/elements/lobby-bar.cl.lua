@@ -5,7 +5,6 @@ function LobbyBar:Init(lobby)
 		layout_justification_y = JUSTIFY_CENTER,
 		width_percent = 1,
 		height = 52,
-		crop_bottom = 1,
 		padding_x = 32,
 		inherit_color = false,
 		border = LINE_THICKNESS,
@@ -91,7 +90,10 @@ function LobbyBar:Init(lobby)
 			return self.last and 0 or 255
 		end
 	})
+end
 
+function LobbyBar:AnimateStart()
+	self:SetAttribute("crop_bottom", 1)
 	self:AnimateAttribute("crop_bottom", 0)
 	self:Add(NotificationService.CreateFlash())
 end
@@ -109,12 +111,16 @@ function LobbyBar:AnimateFinish()
 end
 
 function LobbyBar:Finish()
-	if self == self.lobby.bar_element then
-		self.lobby.bar_element = nil
-	end
+	if not self.finishing then
+		self.finishing = true
 
-	self.lobby = nil
-	self:AnimateFinish()
+		if self == self.lobby.bar_element then
+			self.lobby.bar_element = nil
+		end
+
+		self.lobby = nil
+		self:AnimateFinish()
+	end
 end
 
 function LobbyBar:OnMousePressed(mouse)

@@ -302,7 +302,7 @@ function LobbySettings:InitSettings()
 		end
 	end
 	
-	for _, setting in pairs(proto.adjustable_settings) do
+	for i, setting in pairs(proto.adjustable_settings) do
 		if string.match(setting.key, "player_classes%.%*") then
 			for _, ply_class_setting in pairs(setting.settings) do
 				self:AddPlayerClassSetting(ply_class_setting)
