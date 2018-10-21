@@ -212,13 +212,17 @@ end
 hook.Add("LocalLobbySetState", "LobbyCard.AdjustStateHostActions", LobbyCard.AdjustStateHostActions)
 
 function LobbyCard:FinishLobby()
-	if self == self.lobby.card_element then
-		self.lobby.card_element = nil
-	end
+	if not self.finishing then
+		self.finishing = true
 
-	for _, ply in pairs(self.lobby.players) do
-		ply.lobby_card_element = nil
-	end
+		if self == self.lobby.card_element then
+			self.lobby.card_element = nil
+		end
 
-	self.lobby = nil
+		for _, ply in pairs(self.lobby.players) do
+			ply.lobby_card_element = nil
+		end
+
+		self.lobby = nil
+	end
 end
