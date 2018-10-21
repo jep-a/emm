@@ -1,4 +1,4 @@
-GM.Name = "Extended Movement Mod (Parkour)"
+GM.Name = "Parkour"
 GM.Author = "arkade"
 
 EMM.Include {

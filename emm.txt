@@ -1,6 +1,6 @@
 "emm"
 {
 	"base" "base"
-	"title"	"Extended Movement Mod"
+	"title"	"Parkour"
 	"menusystem" "1"
 }
