@@ -113,6 +113,8 @@ function LobbyUIService.FinishLobby(lobby)
 		if lobby_count == 0 then
 			LobbyUIService.lobby_list:RevertState()
 		end
+	elseif lobby == LobbyUIService.selected_lobby then
+		LobbyUIService.selected_lobby = nil
 	end
 end
 hook.Add("LobbyFinish", "LobbyUIService.FinishLobby", LobbyUIService.FinishLobby)
