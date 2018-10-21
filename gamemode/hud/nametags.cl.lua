@@ -12,7 +12,7 @@ local function NametagAlpha(ply)
 	if LocalPlayer():Alive() and ply:Alive() and not_near_crosshair then
 		if ply.indicator then
 			alpha = 255
-		elseif ply.visible >= 1 then
+		elseif ply.visible >= 0.5 then
 			alpha = HALF_ALPHA
 		else
 			alpha = 0
