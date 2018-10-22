@@ -151,7 +151,7 @@ function IndicatorService.DrawWorldPositions(ply)
 		
 			surface.SetAlphaMultiplier(CombineAlphas(container_alpha, indicator.attributes.alpha.current, indicator.world_alpha.current))
 
-			if indicator.player then
+			if IsValid(indicator.player) then
 				Element.PaintTexture(indicator, indicator_material, x, y, size, size, 0, COLOR_BLACK)
 
 				local health_percent = indicator.player:Health()/indicator.player.max_health
