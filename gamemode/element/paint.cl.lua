@@ -8,6 +8,7 @@ function Element:PaintTexture(mat, x, y, w, h, ang, color)
 	ang = ang or (attr.angle and attr.angle.current) or 0
 	color = color or self:GetColor()
 
+	draw.NoTexture()
 	surface.SetDrawColor(color)
 	surface.SetMaterial(mat)
 

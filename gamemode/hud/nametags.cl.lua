@@ -7,7 +7,11 @@ local nametag_alpha_smooth_multiplier = 4
 local function NametagAlpha(ply)
 	local alpha
 
-	local not_near_crosshair = math.sqrt(((ply.indicator_x - (ScrW()/2)) ^ 2) + ((ply.indicator_y - (ScrH()/2) - height_offset) ^ 2)) > hide_radius
+	local not_near_crosshair
+	
+	if ply.indicator_x and ply.indicator_y then
+		not_near_crosshair = math.sqrt(((ply.indicator_x - (ScrW()/2)) ^ 2) + ((ply.indicator_y - (ScrH()/2) - height_offset) ^ 2)) > hide_radius
+	end
 
 	if LocalPlayer():Alive() and ply:Alive() and not_near_crosshair then
 		if ply.indicator then
@@ -51,7 +55,7 @@ function NametagService.Draw(ply)
 	for i = 1, #plys do
 		local ply = plys[i]
 
-		if not IsLocalPlayer(ply) then
+		if not IsLocalPlayer(ply) and ply.nametag_alpha then
 			local alpha = ply.nametag_alpha.smooth
 
 			if alpha > 0 then

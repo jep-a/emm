@@ -199,7 +199,7 @@ function LobbyCard:FinishHostActions()
 end
 
 function LobbyCard.AdjustStateHostActions(lobby, old_state, state)
-	if IsLocalPlayer(lobby.host) and lobby == LobbyUIService.selected_lobby then
+	if UIService.Active "Lobbies" and IsLocalPlayer(lobby.host) and lobby == LobbyUIService.selected_lobby then
 		local can_restart = lobby:CanRestart()
 
 		if lobby.card_element.restart and not can_restart then
