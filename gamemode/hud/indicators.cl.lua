@@ -150,21 +150,26 @@ function IndicatorService.DrawWorldPositions(ply)
 			indicator.y = y
 		
 			surface.SetAlphaMultiplier(CombineAlphas(container_alpha, indicator.attributes.alpha.current, indicator.world_alpha.current))
-			Element.PaintTexture(indicator, indicator_material, x, y, size, size, 0, COLOR_BLACK)
 
-			local health_percent = indicator.player:Health()/indicator.player.max_health
+			if indicator.player then
+				Element.PaintTexture(indicator, indicator_material, x, y, size, size, 0, COLOR_BLACK)
 
-			local visual_health_percent
+				local health_percent = indicator.player:Health()/indicator.player.max_health
 
-			if health_percent >= 1 then
-				visual_health_percent = 1
+				local visual_health_percent
+
+				if health_percent >= 1 then
+					visual_health_percent = 1
+				else
+					visual_health_percent = (health_percent * 0.33) + 0.33
+				end
+
+				render.SetScissorRect(x, y + (size * (1 - visual_health_percent)), x + size, y + size, true)
+				Element.PaintTexture(indicator, indicator_material, x, y, size, size, 0, indicator:GetColor())
+				render.SetScissorRect(0, 0, 0, 0, false)
 			else
-				visual_health_percent = (health_percent * 0.33) + 0.33
+				Element.PaintTexture(indicator, indicator_material, x, y, size, size, 0, indicator:GetColor())
 			end
-
-			render.SetScissorRect(x, y + (size * (1 - visual_health_percent)), x + size, y + size, true)
-			Element.PaintTexture(indicator, indicator_material, x, y, size, size, 0, indicator:GetColor())
-			render.SetScissorRect(0, 0, 0, 0, false)
 	
 			surface.SetAlphaMultiplier(1)
 		end
