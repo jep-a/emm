@@ -136,7 +136,21 @@ function MinigameLobby:RemovePlayer(ply)
 	end
 end
 hook.Add("PlayerDisconnected", "MinigameService.RemoveDisconnectedPlayer", function (ply)
-	if ply.lobby then
+	if IsValid(ply) and ply.lobby then
 		ply.lobby:RemovePlayer(ply)
+	else
+		for _, lobby in pairs(MinigameService.lobbies) do
+			local invalid_plys = {}
+
+			for _, ply in pairs(lobby.players) do
+				if not IsValid(ply) then
+					table.insert(invalid_plys, ply)
+				end
+			end
+
+			for _, ply in pairs(invalid_plys) do
+				table.RemoveByValue(lobby.players, ply)
+			end
+		end
 	end
 end)

@@ -13,7 +13,7 @@ local function NametagAlpha(ply)
 		not_near_crosshair = math.sqrt(((ply.indicator_x - (ScrW()/2)) ^ 2) + ((ply.indicator_y - (ScrH()/2) - height_offset) ^ 2)) > hide_radius
 	end
 
-	if LocalPlayer():Alive() and ply:Alive() and not_near_crosshair then
+	if IsValid(ply) and LocalPlayer():Alive() and ply:Alive() and not_near_crosshair then
 		if ply.indicator then
 			alpha = 255
 		elseif ply.visible >= 0.5 then
