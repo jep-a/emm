@@ -30,6 +30,8 @@ EMM.Include {
 	"movement/autojump",
 	"movement/airaccel-patch",
 	"movement/slide",
+	"movement/friction",
+	"movement/gravity",
 
 	"minigame/minigame",
 	"minigame/prototype",
