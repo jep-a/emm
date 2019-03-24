@@ -37,6 +37,12 @@ function MinigamePrototype:Init()
 
 			settings = {
 				{
+					key = "friction",
+					label = "Friction",
+					type = "number"
+				},
+
+				{
 					key = "can_walljump",
 					label = "Can walljump"
 				},
@@ -70,7 +76,7 @@ function MinigamePrototype:Init()
 					key = "has_infinite_wallslide",
 					label = "Has infinite wallslide stamina"
 				},
-			
+
 				{
 					key = "has_infinite_airaccel",
 					label = "Has infinite air-accelerate stamina"
