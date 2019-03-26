@@ -9,7 +9,7 @@ function FrictionService.GetDefaultFriction()
 end
 
 function FrictionService.InitPlayerProperties(ply)
-	ply.friction = GetConVar( "emm_friction" ):GetFloat()
+	ply.friction = GetConVar("emm_friction"):GetFloat()
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
@@ -25,8 +25,8 @@ function FrictionService.Velocity(friction, move)
   local	speed = vel:Length()
   local	drop = 0
   local newspeed, control
-  if (speed < GetConVar( "sv_stopspeed" ):GetFloat()) then
-    control = GetConVar( "sv_stopspeed" ):GetFloat()
+  if (speed < GetConVar("sv_stopspeed"):GetFloat()) then
+    control = GetConVar("sv_stopspeed"):GetFloat()
   else
     control = speed
   end
@@ -47,7 +47,6 @@ function FrictionService.SetupFriction(ply, move)
   if !ply.lobby and ply.friction != FrictionService.GetDefaultFriction() then
     ply.friction = FrictionService.GetDefaultFriction()
   end
-
   if move:GetVelocity():Length() < 0.1 or ply:GetGroundEntity() == NULL or (move:KeyPressed(IN_JUMP) and not move:KeyWasDown(IN_JUMP)) then
     return
   end
