@@ -23,41 +23,45 @@ hook.Add(
 
 function FrictionService.Velocity(friction, move)
 	local vel = move:GetVelocity()
-	local	speed = vel:Length()
-	local	drop = 0
-	local newspeed, control
+	local speed = vel:Length()
+	local stop_speed = GetConVar("sv_stopspeed"):GetFloat()
+	local drop = 0
 
-	if (GetConVar("sv_stopspeed"):GetFloat() > speed) then
-		control = GetConVar("sv_stopspeed"):GetFloat()
+	local new_speed
+	local control
+
+	if stop_speed > speed then
+		control = stop_speed
 	else
 		control = speed
 	end
 
 	drop = drop + (control * friction * FrameTime())
-	newspeed = speed - drop
+	new_speed = speed - drop
 
-	if 0 > newspeed then
-		newspeed = 0
+	if 0 > new_speed then
+		new_speed = 0
 	end
 
-	if newspeed != speed then
-		newspeed = newspeed/speed
-		vel = vel * newspeed
+	if new_speed ~= speed then
+		new_speed = new_speed/speed
+		vel = vel * new_speed
 	end
 
 	return vel
 end
 
-
 function FrictionService.SetupFriction(ply, move)
-	if not ply.lobby and ply.friction != FrictionService.GetDefaultFriction() then
+	if not ply.lobby and ply.friction ~= FrictionService.GetDefaultFriction() then
 		ply.friction = FrictionService.GetDefaultFriction()
 	end
 
-	if 0.1 > move:GetVelocity():Length() or ply:GetGroundEntity() == NULL or (move:KeyPressed(IN_JUMP) and not move:KeyWasDown(IN_JUMP)) then
-		return
+	if not (
+		move:GetVelocity():Length() < 0.1 or
+		not IsValidEntity(ply:GetGroundEntity()) or
+		(move:KeyPressed(IN_JUMP) and not move:KeyWasDown(IN_JUMP))
+	) then
+		move:SetVelocity(FrictionService.Velocity(ply.friction, move))
 	end
-
-	move:SetVelocity(FrictionService.Velocity(ply.friction, move))
 end
 hook.Add("SetupMove", "FrictionService.SetupFriction", FrictionService.SetupFriction)
