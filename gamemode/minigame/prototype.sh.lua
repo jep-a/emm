@@ -43,6 +43,12 @@ function MinigamePrototype:Init()
 				},
 
 				{
+					key = "gravity",
+					label = "Gravity",
+					type = "number"
+				},
+
+				{
 					key = "can_walljump",
 					label = "Can walljump"
 				},

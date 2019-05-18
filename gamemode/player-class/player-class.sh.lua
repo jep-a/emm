@@ -7,6 +7,7 @@ function PlayerClassService.CreatePlayerClass(props)
 		color = props.color,
 
 		friction = FrictionService.GetDefaultFriction(),
+		gravity = GravityService.GetDefaultGravity(),
 
 		can_walljump = true,
 		can_wallslide = true,
