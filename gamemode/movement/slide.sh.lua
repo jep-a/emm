@@ -95,13 +95,13 @@ function SlideService.SetupSlide(ply, move)
 			origin.y + (old_slide_vel.y * frame_time),
 			(origin.z - ply.slide_hover_height) + math.min(old_slide_vel.z * frame_time, 0)
 		), ply)
-	
+
 		pred_slide_vel = SlideService.Clip(ply.old_slide_velocity, pred_trace.HitNormal)
 	end
 
 	if SlideService.ShouldSlide(pred_slide_vel, pred_trace, ply.slide_minimum, ply.can_slide) then
 		local vel
-	
+
 		if init_trace.HitWorld then
 			origin.z = init_trace.HitPos.z + ply.slide_hover_height
 
@@ -125,7 +125,7 @@ function SlideService.SetupSlide(ply, move)
 
 		origin.z = init_trace.HitPos.z + ply.slide_hover_height
 		ply.old_slide_velocity = vel
-		
+
 		move:SetVelocity(vel)
 		move:SetOrigin(origin)
 		ply:SetGroundEntity(NULL)
