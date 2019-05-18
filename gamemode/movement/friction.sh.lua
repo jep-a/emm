@@ -58,7 +58,7 @@ function FrictionService.SetupFriction(ply, move)
 
 	if not (
 		move:GetVelocity():Length() < 0.1 or
-		not IsValidEntity(ply:GetGroundEntity()) or
+		not IsValid(ply:GetGroundEntity()) or
 		(move:KeyPressed(IN_JUMP) and not move:KeyWasDown(IN_JUMP))
 	) then
 		move:SetVelocity(FrictionService.Velocity(ply.friction, move))
