@@ -22,6 +22,17 @@ hook.Add(
 
 -- # Effects
 
+function WalljumpService.EffectTrace(ply, dir)
+	local ply_pos = ply:GetPos()
+	local trace = util.TraceLine {
+		start = ply_pos,
+		endpos = ply_pos - (dir * ply.walljump_distance * 2),
+		filter = ply
+	}
+
+	return trace
+end
+
 function WalljumpService.EffectOrigin(trace)
 	local trace_norm_right = trace.HitNormal:Angle():Right()
 	return trace.HitPos - (trace_norm_right:Dot(trace.HitPos - trace.StartPos) * trace_norm_right)
@@ -115,7 +126,7 @@ function WalljumpService.Walljump(ply, move, dir)
 		end
 		
 		if SERVER then
-			WalljumpService.Effect(ply, trace)
+			WalljumpService.Effect(ply, WalljumpService.EffectTrace(ply, dir))
 		end
 		
 		ply.last_walljump_time = CurTime()
