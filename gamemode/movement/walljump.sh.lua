@@ -67,10 +67,11 @@ end
 
 function WalljumpService.Trace(ply, dir)
 	local ply_pos = ply:GetPos()
-	local mins, maxs = ply:OBBMins(), ply:OBBMaxs()
+	local mins = ply:OBBMins()
+	local maxs = ply:OBBMaxs()
 	local walljump_distance = ply.walljump_distance - maxs.x
-	local perimeter_pos = (ply_pos - Vector(dir.x * 23, dir.y * 23, 0))
-	local OBB_trace = Vector(ply.walljump_distance/2, ply.walljump_distance/2, 0)
+	local perimeter_pos = ply_pos - Vector(dir.x * 23, dir.y * 23, 0)
+	local obb_trace = Vector(ply.walljump_distance/2, ply.walljump_distance/2, 0)
 
 	perimeter_pos.x = math.Clamp(perimeter_pos.x, ply_pos.x + mins.x, ply_pos.x + maxs.x)
 	perimeter_pos.y = math.Clamp(perimeter_pos.y, ply_pos.y + mins.y, ply_pos.y + maxs.y)
@@ -78,8 +79,8 @@ function WalljumpService.Trace(ply, dir)
 	local trace = util.TraceHull {
 		start = ply_pos,
 		endpos = perimeter_pos,
-		mins = -OBB_trace,
-		maxs = OBB_trace,
+		mins = -obb_trace,
+		maxs = obb_trace,
 		mask = MASK_PLAYERSOLID_BRUSHONLY,
 		filter = ply
 	}
