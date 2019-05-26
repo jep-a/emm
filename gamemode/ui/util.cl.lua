@@ -35,13 +35,11 @@ function GenerateSurfaceCircle(x, y, radius, arc, ang, quality)
 end
 
 function ProperPlayerName(ply)
-	local name
-
-	-- if IsLocalPlayer(ply) then
-	-- 	name = "you"
-	-- else
-		name = ply:GetName()
-	-- end
+	local name = "Disconnected"
+	
+	if (ply:IsValid()) then
+	    name = ply:GetName()
+    end
 
 	return name
 end
