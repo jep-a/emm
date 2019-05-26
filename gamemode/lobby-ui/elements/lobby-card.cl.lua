@@ -1,4 +1,3 @@
-
 LobbyCardContainer = LobbyCardContainer or Class.New(Element)
 
 function LobbyCardContainer:Init(lobby)
@@ -90,7 +89,9 @@ function LobbyCard:Init(lobby)
 	})
 
 	for _, ply in pairs(lobby.players) do
-		ply.lobby_card_element = self.players:Add(PlayerBar.New(ply))
+	    if (ply:IsValid()) then
+		    ply.lobby_card_element = self.players:Add(PlayerBar.New(ply))
+		end
 	end
 
 	self.actions = self:Add(Element.New {
@@ -220,7 +221,9 @@ function LobbyCard:FinishLobby()
 		end
 
 		for _, ply in pairs(self.lobby.players) do
-			ply.lobby_card_element = nil
+		    if (ply:IsValid()) then
+			    ply.lobby_card_element = nil
+			end
 		end
 
 		self.lobby = nil
