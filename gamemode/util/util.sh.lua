@@ -89,6 +89,7 @@ function GetPlayer(ply)
 				return local_ply:GetObserverTarget()
 			end
 		end
+		
 		return local_ply
 	end
 	return nil
