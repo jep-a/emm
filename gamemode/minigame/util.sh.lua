@@ -82,3 +82,32 @@ function MinigameService.ClosestPlayer(lobby, origin_ply, filter)
 
 	return closest_ply
 end
+
+function MinigameService.SoundIsolation(snd)
+	local ent = snd.Entity
+
+	if SERVER and IsPlayer(ent) and snd.DSP ~= 200 then
+		if IsValid(ent:GetActiveWeapon()) then
+			if (table.HasValue(MINIGAME_WEAPONS, ent:GetActiveWeapon():GetKeyValues().classname) and ent.lobby) then
+				local filter = RecipientFilter()
+
+				for _, ply in pairs(ent.lobby.players) do
+					if ply != ent then
+						filter:AddPlayer(ply)
+					end
+				end
+
+				local sound = CreateSound( ent, snd.SoundName, filter )
+				
+				sound:ChangeVolume(snd.Volume)
+				sound:ChangePitch(snd.Pitch)
+				sound:SetSoundLevel(snd.SoundLevel)
+				sound:SetDSP(200)
+				sound:Play()
+
+				return false
+			end
+		end
+	end
+end
+hook.Add( "EntityEmitSound", "MinigameService.SoundIsolation", MinigameService.SoundIsolation)
