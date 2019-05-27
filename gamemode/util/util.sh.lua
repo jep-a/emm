@@ -84,11 +84,11 @@ function GetPlayer(ply)
 		return ply
 	else
 		local local_ply = LocalPlayer()
-
-		if IsValid(local_ply:GetObserverTarget()) then
-			return local_ply:GetObserverTarget()
+		if IsValid(local_ply) then
+			if IsValid(local_ply:GetObserverTarget()) then
+				return local_ply:GetObserverTarget()
+			end
 		end
-
 		return local_ply
 	end
 	return nil

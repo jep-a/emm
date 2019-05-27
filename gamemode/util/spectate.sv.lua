@@ -67,6 +67,7 @@ function SpectateService.Spectate(ply, cmd, args)
 			ply.spectate_timeout = CurTime() + 1
 			TrailService.RemoveTrail(ply)
 			SpectateService.SendSpectateKeys(target.buttons, ply)
+			StaminaService.SendStamina(ply, target, "airaccel")
 		else
 			ply:ChatPrint("Player not found.")
 		end

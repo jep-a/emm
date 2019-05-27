@@ -25,7 +25,6 @@ concommand.Add("emm_spectate", function(ply, cmd, args)
 end, SpectateService.AutoComplete)
 
 function SpectateService.TargetKeyDown(key)
-
 	return bit.band(SpectateService.buttons, key)
 end
 

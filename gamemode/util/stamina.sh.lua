@@ -13,6 +13,23 @@ hook.Add(
 )
 
 
+-- # Utils
+
+function StaminaService.ReceiveStamina()
+	local ply = net.ReadEntity()
+	local stamina_type = net.ReadString()
+	local stamina_table = net.ReadTable()
+
+	ply.stamina[stamina_type].active = stamina_table.active
+	ply.stamina[stamina_type].amount = stamina_table.amount
+	ply.stamina[stamina_type].regen_step = stamina_table.regen_step
+	ply.stamina[stamina_type].decay_step = stamina_table.decay_step
+	ply.stamina[stamina_type].cooldown = stamina_table.cooldown
+	ply.stamina[stamina_type].last_active = stamina_table.last_active
+end
+net.Receive("UpdateStamina", StaminaService.ReceiveStamina)
+
+
 -- # Types
 
 StaminaType = StaminaType or {}
@@ -87,10 +104,10 @@ function StaminaService.Update()
 			StaminaService.UpdatePlayer(ply, cur_time)
 		end
 	else
-		local local_ply = LocalPlayer()
+		local ply = GetPlayer()
 
-		if IsValid(local_ply) and local_ply.stamina then
-			StaminaService.UpdatePlayer(LocalPlayer(), cur_time)
+		if IsValid(ply) and ply.stamina then
+			StaminaService.UpdatePlayer(GetPlayer(), cur_time)
 		end
 	end
 end
