@@ -37,11 +37,11 @@ end
 function ProperPlayerName(ply)
 	local name
 
-	-- if IsLocalPlayer(ply) then
-	-- 	name = "you"
-	-- else
-		name = ply:GetName()
-	-- end
+	if IsValid(ply) then
+	    name = ply:GetName()
+	else
+		name = "Disconnected"
+	end
 
 	return name
 end
