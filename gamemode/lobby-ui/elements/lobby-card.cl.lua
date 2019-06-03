@@ -221,7 +221,7 @@ function LobbyCard:FinishLobby()
 		end
 
 		for _, ply in pairs(self.lobby.players) do
-		    if (ply:IsValid()) then
+		    if IsValid(ply) then
 			    ply.lobby_card_element = nil
 			end
 		end
