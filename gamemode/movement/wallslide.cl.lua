@@ -1,5 +1,11 @@
 WallslideService = WallslideService or {}
 
+SettingsService.New("clientside_wallslide", {
+	type = "boolean",
+	default = true,
+	help = "Client-side predicted wallslide",
+})
+
 
 -- # Time maps
 

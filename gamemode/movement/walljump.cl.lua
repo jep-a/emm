@@ -1,5 +1,11 @@
 WalljumpService = WalljumpService or {}
 
+SettingsService.New("clientside_walljump", {
+	type = "boolean",
+	default = true,
+	help = "Client-side predicted walljump",
+})
+
 
 -- # Time maps
 

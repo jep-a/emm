@@ -29,11 +29,26 @@ function AiraccelService.SetupStamina(ply)
 	ply.stamina.airaccel.amount = 100
 end
 
-function AiraccelService.PlayerProperties(ply)
+function AiraccelService.LocalPlayerProperties(ply)
 	AiraccelService.SetupStamina(ply)
 end
 hook.Add(
-	SERVER and "PlayerProperties" or "LocalPlayerProperties",
+	"LocalPlayerProperties",
+	"AiraccelService.LocalPlayerProperties",
+	AiraccelService.LocalPlayerProperties
+)
+
+function AiraccelService.PlayerProperties(ply)
+	if CLIENT then
+		StaminaService.InitPlayerProperties(ply)
+		AiraccelService.InitPlayerProperties(ply)
+		AiraccelService.SetupStamina(ply)
+	else
+		AiraccelService.SetupStamina(ply)
+	end
+end
+hook.Add(
+	"PlayerProperties",
 	"AiraccelService.PlayerProperties",
 	AiraccelService.PlayerProperties
 )
@@ -63,6 +78,10 @@ function AiraccelService.Velocity(ply, move, amount)
 end
 
 function AiraccelService.SetupAiraccel(ply, move)
+	if CLIENT then
+		ply = GetPlayer()
+	end
+
 	if
 		ply:Alive() and
 		ply.can_airaccel and

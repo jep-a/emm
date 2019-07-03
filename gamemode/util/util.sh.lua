@@ -74,3 +74,23 @@ end
 function IsPlayer(ply)
 	return isentity(ply) and IsValid(ply) and ply:IsPlayer() 
 end
+
+function GetPlayer(ply)
+	if SERVER then
+		if IsValid(ply) and IsValid(ply:GetObserverTarget()) then
+			return ply:GetObserverTarget()
+		end
+
+		return ply
+	else
+		local local_ply = LocalPlayer()
+		if IsValid(local_ply) then
+			if IsValid(local_ply:GetObserverTarget()) then
+				return local_ply:GetObserverTarget()
+			end
+		end
+		
+		return local_ply
+	end
+	return nil
+end
