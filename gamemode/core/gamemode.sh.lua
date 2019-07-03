@@ -91,5 +91,6 @@ EMM.Include {
 	"hud/elements/crosshair-line",
 	"hud/elements/crosshair-meter",
 	"hud/elements/indicator",
-	"hud/elements/notifications"
+	"hud/elements/notifications",
+	"hud/elements/key-echo"
 }
