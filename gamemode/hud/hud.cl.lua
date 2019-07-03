@@ -5,7 +5,7 @@ local speed_icon_material = Material("emm2/hud/speed.png", "noclamp smooth")
 local airaccel_icon_material = Material("emm2/hud/airaccel.png", "noclamp smooth")
 
 function HUDService.KeyDown(key)
-	return LocalPlayer():KeyDown(key)
+	return LocalPlayer():KeyDown(key) or bit.band(SpectateService.buttons, key) ~= 0
 end
 
 function HUDService.InitContainers()
