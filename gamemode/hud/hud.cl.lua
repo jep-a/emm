@@ -5,7 +5,7 @@ local speed_icon_material = Material("emm2/hud/speed.png", "noclamp smooth")
 local airaccel_icon_material = Material("emm2/hud/airaccel.png", "noclamp smooth")
 
 function HUDService.KeyDown(key)
-	return LocalPlayer():KeyDown(key)
+	return LocalPlayer():KeyDown(key) or bit.band(SpectateService.buttons, key) ~= 0
 end
 
 function HUDService.InitContainers()
@@ -144,18 +144,16 @@ function HUDService.InitKeyEchoes()
 end
 
 function HUDService.InitMeters()
-	local local_ply = LocalPlayer()
-
 	local function Health()
-		return local_ply:Health()
+		return GetPlayer():Health()
 	end
 
 	local function Speed()
-		return math.Round(local_ply:GetVelocity():Length2D())
+		return math.Round(GetPlayer():GetVelocity():Length2D())
 	end
 
 	local function Airaccel()
-		return local_ply.can_airaccel and local_ply.stamina.airaccel:GetStamina() or 0
+		return GetPlayer().can_airaccel and GetPlayer().stamina.airaccel:GetStamina() or 0
 	end
 
 	if SettingsService.Get "show_hud_meters" then

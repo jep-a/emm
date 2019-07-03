@@ -54,7 +54,7 @@ function CamUIService.Render()
 	local half_scr_w = scr_w/2
 	local half_scr_h = scr_h/2
 	local cam_3d_vec = Vector(0, -half_scr_w, -half_scr_h)
-	local cam_3d_ang = CamUIService.eye_angle_2.smooth/cam_angle_divider
+	local cam_3d_ang = IsValid(LocalPlayer():GetObserverTarget()) and Angle(0, 0, 0) or CamUIService.eye_angle_2.smooth/cam_angle_divider
 
 	surface.DisableClipping(false)
 
