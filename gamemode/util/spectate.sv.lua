@@ -20,7 +20,7 @@ hook.Add(
 
 function SpectateService.FindPlayerByName(name)
 	for _, v in pairs(player.GetAll()) do
-		if string.find(string.lower(" " .. v:Nick()), name:lower()) then
+		if string.find(string.lower(" "..v:Nick()), name:lower()) then
 			return v
 		end
 	end

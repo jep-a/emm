@@ -5,12 +5,12 @@ SpectateService.buttons = 0
 
 -- # Utils
 
-function SpectateService.AutoComplete( cmd, args )
+function SpectateService.AutoComplete(cmd, args)
 	local tbl = {}
 
-	for _, v in pairs( player.GetAll() ) do
-		if string.find( string.lower( " " .. v:Nick() ), args:lower() ) then
-			table.insert( tbl, "emm_spectate " .. v:Nick() )
+	for _, v in pairs(player.GetAll()) do
+		if string.find(string.lower(" " .. v:Nick()), args:lower()) then
+			table.insert(tbl, "emm_spectate " .. v:Nick())
 		end
 	end
 
@@ -42,7 +42,7 @@ hook.Add("KeyPress", "SpectateService.UnSpectateCheck", SpectateService.UnSpecta
 
 function SpectateService.SpectateMode(ply, key)
 	if
-		IsFirstTimePredicted() and 
+		IsFirstTimePredicted() and
 		ply:GetObserverMode() ~= 0 and
 		key == IN_ATTACK
 	then
@@ -52,7 +52,7 @@ function SpectateService.SpectateMode(ply, key)
 			obs_mode = OBS_MODE_CHASE
 		end
 
-		ply:SetObserverMode( obs_mode )
+		ply:SetObserverMode(obs_mode)
 	end
 end
 hook.Add("KeyPress", "SpectateService.SpectateMode", SpectateService.SpectateMode)
