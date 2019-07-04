@@ -123,7 +123,7 @@ function Class.AddHook(class, name, func_k)
 				local success, error = pcall(function ()
 					class[func_k](instance, unpack(arguments))
 				end)
-		
+
 				if not success then
 					if instance.debug_trace then
 						Error(error.."\n"..instance.debug_trace.."\n")
