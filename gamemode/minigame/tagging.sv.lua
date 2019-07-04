@@ -1,4 +1,3 @@
-TaggingService = TaggingService or {}
 TaggingService.taggable_groups = TaggingService.taggable_groups or {}
 
 function TaggingService.InitPlayerProperties(ply)
@@ -8,14 +7,16 @@ function TaggingService.InitPlayerProperties(ply)
 end
 hook.Add("InitPlayerProperties", "TaggingService.InitPlayerProperties", TaggingService.InitPlayerProperties)
 
-local function SequentialTableHasValue(tab, val)
-	for i = 1, #tab do
-		if val == tab[i] then
-			return true
-		end
-	end
+function TaggingService.Tag(lobby, taggable, tagger)
+	taggable.last_tag_time = CurTime()
 
-	return false
+	MinigameService.CallNetHook(taggable.lobby, "Tag", taggable, tagger)
+
+	if taggable.player_class.swap_on_tag then
+		MinigameService.SwapPlayerClass(taggable, tagger, taggable.player_class.kill_on_tag, taggable.player_class.kill_tagger_on_tag)
+	elseif taggable.player_class.recruit_on_tag then
+		tagger:SetPlayerClass(taggable.player_class)
+	end
 end
 
 function TaggingService.Think()
@@ -23,13 +24,12 @@ function TaggingService.Think()
 		for _i = 1, #TaggingService.taggable_groups[i] do
 			local taggable = TaggingService.taggable_groups[i][_i]
 
-			if taggable.player_class and taggable.player_class.can_tag then
+			if IsValid(taggable) then
 				local ents = ents.FindInSphere(taggable:WorldSpaceCenter(), taggable.taggable_radius)
 
 				if
-					taggable:IsPlayer() and
 					taggable:Alive() and
-					CurTime() > (taggable.last_tag_time + 0.1)
+					CurTime() > (taggable.last_tag_time + taggable.taggable_cooldown)
 				then
 					for __i = 1, #ents do
 						local ent = ents[__i]
@@ -38,12 +38,11 @@ function TaggingService.Think()
 							taggable ~= ent and
 							ent:IsPlayer() and
 							ent:Alive() and
-							taggable.lobby == ent.lobby and
+							MinigameService.IsSharingLobby(taggable, ent) and
 							ent.player_class and
-							SequentialTableHasValue(taggable.player_class.can_tag, ent.player_class.key)
+							taggable.player_class.can_tag[ent.player_class.key]
 						then
-							taggable.last_tag_time = CurTime()
-							MinigameService.CallHook(taggable.lobby, "Tag", taggable, ent)
+							TaggingService.Tag(taggable.lobby, taggable, ent)
 						end
 					end
 				end
@@ -53,20 +52,20 @@ function TaggingService.Think()
 end
 hook.Add("Think", "TaggingService.Think", TaggingService.Think)
 
-function TaggingService.CreateLobby(lobby)
+function TaggingService.InitLobby(lobby)
 	for k, player_class in pairs(lobby.player_classes) do
 		if player_class.can_tag then
 			table.insert(TaggingService.taggable_groups, lobby[k])
 		end
 	end
 end
-hook.Add("CreateLobby", "TaggingService.CreateLobby", TaggingService.CreateLobby)
+hook.Add("LobbyInit", "TaggingService.InitLobby", TaggingService.InitLobby)
 
-function TaggingService.RemoveLobby(lobby)
+function TaggingService.FinishLobby(lobby)
 	for k, player_class in pairs(lobby.player_classes) do
 		if player_class.can_tag then
 			table.RemoveByValue(TaggingService.taggable_groups, lobby[k])
 		end
 	end
 end
-hook.Add("RemoveLobby", "TaggingService.RemoveLobby", TaggingService.RemoveLobby)
+hook.Add("LobbyFinish", "TaggingService.FinishLobby", TaggingService.FinishLobby)

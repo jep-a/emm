@@ -1,28 +1,32 @@
-function StateService.StartStateTimer(lobby)
-	timer.Create("StateService."..lobby.id, lobby.state.time, 1, function ()
+function MinigameStateService.StartStateTimer(lobby)
+	timer.Create("MinigameStateService."..lobby.id, lobby.state.time, 1, function ()
+		MinigameService.CallNetHook(lobby, "StateExpired")
 		lobby:NextState()
 	end)
 end
 
-function StateService.EndStateTimer(lobby)
-	timer.Remove("StateService."..lobby.id)
+function MinigameStateService.EndStateTimer(lobby)
+	timer.Remove("MinigameStateService."..lobby.id)
 end
 
 function MinigameLobby:SetState(state)
-	if self.state and self.state.time then
-		StateService.EndStateTimer(self)
+	local old_state = self.state
+
+	if old_state and old_state.time then
+		MinigameStateService.EndStateTimer(self)
 	end
 
 	self.state = state
 	self.last_state_start = CurTime()
 
 	if state.time then
-		StateService.StartStateTimer(self)
+		MinigameStateService.StartStateTimer(self)
 	end
 
-	MinigameService.CallHook(self, "StartState"..state.name, state)
-	hook.Run("LobbySetState", lobby, state)
-	MinigameService.NetworkLobbySetState(self)
+	MinigameService.CallHook(self, "StartState", old_state, state)
+	MinigameService.CallHook(self, "StartState"..state.name, old_state, state)
+	hook.Run("LobbyStateChange", lobby, old_state, state)
+	NetService.Send("LobbyState", self, state.id, self.last_state_start)
 end
 
 function MinigameLobby:NextState()

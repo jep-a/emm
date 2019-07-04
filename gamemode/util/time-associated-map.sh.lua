@@ -26,14 +26,14 @@ function TimeAssociatedMap:Value(...)
 	local cur_time = CurTime()
 
 	if not self.values[cur_time] then
-		self.values[cur_time] = self.lookup_func(args)
+		self.values[cur_time] = self.lookup_func(...)
 	end
 
 	return self.values[cur_time]
 end
 
 function TimeAssociatedMap:Update(...)
-	self.values[CurTime()] = self.lookup_func(args)
+	self.values[CurTime()] = self.lookup_func(...)
 end
 
 function TimeAssociatedMap:HasChecked()

@@ -4,7 +4,7 @@ SavepointService = SavepointService or {}
 -- # Properties
 
 function SavepointService.InitPlayerProperties(ply)
-	ply.can_savepoint = true
+	ply.can_savepoint = false
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
