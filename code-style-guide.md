@@ -115,37 +115,6 @@ function SpectateService.Spectate(...)
 end
 ```
 
-### Classes
-- Assign `class.__index` to `class`
-- Create the factory function in the namespace
-- If there are more than 2 optional parameters, use a property table to store them
-```lua
-function ClassNamespace.CreateClass(pos, props)
-```
-- Name the instanced table variable `instance`
-- Instance the table inside `setmetatable()`
-- Only assign properties that are unrelated to the class in the factory function like the `id` or `parent`
-- Assign any class-related properties in an `Init` method in the class
-```lua
-TimeAssociatedMap = TimeAssociatedMap or {}
-TimeAssociatedMap.__index = TimeAssociatedMap
-
-function TimeAssociatedMapService.CreateMap(cooldown, lookup_func)
-	local instance = setmetatable({}, TimeAssociatedMap)
-	instance:Init(cooldown, lookup_func)
-
-	table.insert(TimeAssociatedMapService.maps, instance)
-
-	return instance
-end
-
-function TimeAssociatedMap:Init(cooldown, lookup_func)
-	self.cooldown = cooldown
-	self.lookup_func = lookup_func
-	self.values = {}
-end
-```
-
 ### Function calls
 - If you are repeating function calls when you do not need to, save it to a variable once
 ```lua
