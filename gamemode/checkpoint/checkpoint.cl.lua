@@ -14,29 +14,16 @@ CHECKPOINT_SAVE_MODE_SIZE = 2
 
 -- # Util
 
-function CheckpointService.AngleFromIntersect(plane_pos, snap)
-	snap = snap == nil and true or snap
+function CheckpointService.PointFromIntersect(plane_pos)
+	local hit_pos = LocalPlayer():GetEyeTrace().HitPos
 
-	local ang
+	local trace = util.TraceLine {
+		start = plane_pos,
+		endpos = Vector(hit_pos.x, hit_pos.y, plane_pos.z),
+		collisiongroup = COLLISION_GROUP_WORLD
+	}
 
-	local intersect = util.IntersectRayWithPlane(
-		CheckpointService.eye_position,
-		CheckpointService.eye_normal,
-		plane_pos,
-		Vector(0, 0, 1)
-	)
-
-	if intersect then
-		ang = (plane_pos - intersect):Angle()
-	else
-		ang = CheckpointService.eye_angle + Angle(0, 180, 0)
-	end
-
-	if snap then
-		ang:SnapTo("y", 15)
-	end
-
-	return ang.y
+	return trace.HitPos
 end
 
 function CheckpointService.DistanceFromIntersect(plane_pos, plane_norm)
@@ -94,12 +81,13 @@ function CheckpointService.SetupCreating(ply, move)
 		end
 
 		if CheckpointService.save_mode == 1 then
-			CheckpointService.start_marker = CheckpointStartMarker.New({position = CheckpointService.saved_eyes[1].hit_position})
+			local position = CheckpointService.saved_eyes[1].hit_position
+
+			CheckpointService.start_marker = CheckpointHorizontalPlaneMarker.New(position)
+			CheckpointService.end_marker = CheckpointHorizontalPlaneMarker.New(position)
+			CheckpointService.horizontal_beam = CheckpointMarkerTwoPointBeam.New(position)
 		elseif CheckpointService.save_mode == 2 then
-			CheckpointService.start_marker = CheckpointStartMarker.New({
-				position = CheckpointService.saved_eyes[1].hit_position,
-				angle = CheckpointService.AngleFromIntersect(CheckpointService.saved_eyes[1].hit_position)
-			})
+
 		end
 	end
 
@@ -121,11 +109,12 @@ hook.Add("CalcView", "CheckpointService.CalcView", CheckpointService.CalcView)
 function CheckpointService.Think()
 	if CheckpointService.start_marker then
 		if CheckpointService.save_mode == 1 then
-			CheckpointService.start_marker.angle.current = CheckpointService.AngleFromIntersect(CheckpointService.start_marker.position)
+			local intersect = CheckpointService.PointFromIntersect(CheckpointService.start_marker.position)
+			CheckpointService.end_marker.position = intersect
+			CheckpointService.horizontal_beam.end_position = intersect
 		elseif CheckpointService.save_mode == 2 then
-			local plane_norm = Angle(0, CheckpointService.AngleFromIntersect(CheckpointService.saved_eyes[1].hit_position, false), 0):Right()
-			CheckpointService.start_marker.length.current = CheckpointService.DistanceFromIntersect(CheckpointService.start_marker.position, plane_norm)
+
 		end
 	end
 end
-hook.Add("Think", "CheckpointService.Think", CheckpointService.Think)
+hook.Add("PostDrawTranslucentRenderables", "CheckpointService.Think", CheckpointService.Think)
