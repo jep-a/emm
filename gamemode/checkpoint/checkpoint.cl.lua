@@ -94,9 +94,9 @@ function CheckpointService.SetupCreating(ply, move)
 		end
 
 		if CheckpointService.save_mode == 1 then
-			CheckpointService.start_marker = CheckpointService.CreateStartMarker({position = CheckpointService.saved_eyes[1].hit_position})
+			CheckpointService.start_marker = CheckpointStartMarker.New({position = CheckpointService.saved_eyes[1].hit_position})
 		elseif CheckpointService.save_mode == 2 then
-			CheckpointService.start_marker = CheckpointService.CreateStartMarker({
+			CheckpointService.start_marker = CheckpointStartMarker.New({
 				position = CheckpointService.saved_eyes[1].hit_position,
 				angle = CheckpointService.AngleFromIntersect(CheckpointService.saved_eyes[1].hit_position)
 			})
