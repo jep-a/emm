@@ -4,6 +4,11 @@ CheckpointService.save_mode = 0
 CheckpointService.save_mode_limit = 2
 CheckpointService.saved_eyes = {}
 
+CheckpointService.marker_render_position = AnimatableValue.New(Vector(0, 0, 0), {
+	smooth = true,
+	smooth_multiplier = 2
+})
+
 
 -- # Save mode enums
 
@@ -80,13 +85,17 @@ function CheckpointService.SaveCurrentEye()
 		last_hit_pos = hit_pos
 	end
 
-	CheckpointService.saved_eyes[CheckpointService.save_mode] = {
+	local eye = {
 		eye_position = CheckpointService.eye_position,
 		eye_angle = CheckpointService.eye_angle,
 		eye_normal = CheckpointService.eye_normal,
 		hit_position = hit_pos,
 		intersect_position = CheckpointService.PointFromIntersect(last_hit_pos),
 	}
+
+	CheckpointService.saved_eyes[CheckpointService.save_mode] = eye
+
+	return eye
 end
 
 function CheckpointService.ClearSavedEyes()
@@ -106,7 +115,9 @@ function CheckpointService.ProgressMode()
 	end
 
 	if CheckpointService.save_mode > 0 then
-		CheckpointService.SaveCurrentEye()
+		local eye = CheckpointService.SaveCurrentEye()
+
+		CheckpointService.marker_render_position:SnapTo(eye.hit_position)
 	else
 		CheckpointService.ClearSavedEyes()
 	end
@@ -127,6 +138,7 @@ function CheckpointService.ProgressMode()
 			end_position = xy_end_position
 		}
 	end
+
 end
 
 function CheckpointService.SetupCreating(ply, move)
@@ -150,10 +162,9 @@ hook.Add("CalcView", "CheckpointService.CalcView", CheckpointService.CalcView)
 function CheckpointService.Think()
 	if CheckpointService.start_marker then
 		if CheckpointService.save_mode == 1 then
-			local intersect = CheckpointService.PointFromIntersect(CheckpointService.start_marker.position)
-
-			CheckpointService.end_marker.position = intersect
-			CheckpointService.horizontal_beam.end_position = intersect
+			CheckpointService.marker_render_position.current = CheckpointService.PointFromIntersect(CheckpointService.start_marker.position)
+			CheckpointService.end_marker.position = CheckpointService.marker_render_position.smooth
+			CheckpointService.horizontal_beam.end_position = CheckpointService.marker_render_position.smooth
 		elseif CheckpointService.save_mode == 2 then
 
 		end
