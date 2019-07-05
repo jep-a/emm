@@ -1,4 +1,4 @@
-![Extended Movement Mod Logo](https://github.com/jep-a/raw/master/logo.png "Extended Movement Mod Logo")
+![Extended Movement Mod Logo](https://github.com/jep-a/emm/raw/master/logo.png "Extended Movement Mod Logo")
 
 # Extended Movement Mod
 
