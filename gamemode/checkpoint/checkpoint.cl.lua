@@ -19,7 +19,7 @@ CHECKPOINT_SAVE_MODE_SIZE = 2
 
 -- # Util
 
-function CheckpointService.PointFromIntersect(plane_pos)
+function CheckpointService.HorizontalPointFromIntersect(plane_pos)
 	local point
 
 	local intersect = util.IntersectRayWithPlane(
@@ -72,6 +72,42 @@ function CheckpointService.PointFromIntersect(plane_pos)
 	return snapped_trace.HitPos
 end
 
+function CheckpointService.VerticalPointFromIntersect(plane_pos, plane_norm)
+	local point
+
+	local rotated_plane_norm = plane_norm
+	rotated_plane_norm:Rotate(Angle(0, 90, 0))
+
+	local intersect = util.IntersectRayWithPlane(
+		CheckpointService.eye_position,
+		CheckpointService.eye_normal,
+		plane_pos,
+		plane_norm
+	)
+
+	local hit_pos = LocalPlayer():GetEyeTrace().HitPos
+
+	if intersect then
+		local intersect_trace = util.TraceLine {
+			start = plane_pos,
+			endpos = Vector(plane_pos.x, plane_pos.y, intersect.z),
+			collisiongroup = COLLISION_GROUP_WORLD
+		}
+
+		point = intersect_trace.HitPos
+	else
+		local trace = util.TraceLine {
+			start = plane_pos,
+			endpos = Vector(plane_pos.x, plane_pos.y, hit_pos.z),
+			collisiongroup = COLLISION_GROUP_WORLD
+		}
+
+		point = trace.HitPos
+	end
+
+	return point
+end
+
 
 -- # Saved hit positions
 
@@ -90,7 +126,7 @@ function CheckpointService.SaveCurrentEye()
 		eye_angle = CheckpointService.eye_angle,
 		eye_normal = CheckpointService.eye_normal,
 		hit_position = hit_pos,
-		intersect_position = CheckpointService.PointFromIntersect(last_hit_pos),
+		intersect_position = CheckpointService.HorizontalPointFromIntersect(last_hit_pos),
 	}
 
 	CheckpointService.saved_eyes[CheckpointService.save_mode] = eye
@@ -133,9 +169,22 @@ function CheckpointService.ProgressMode()
 		local xy_start_position = CheckpointService.saved_eyes[1].hit_position
 		local xy_end_position = CheckpointService.saved_eyes[2].intersect_position
 
-		CheckpointService.horizontal_beam = CheckpointMarkerTwoPointBeam.New{
+		CheckpointService.horizontal_beam_a = CheckpointMarkerTwoPointBeam.New{
 			start_position = xy_start_position,
 			end_position = xy_end_position
+		}
+
+		CheckpointService.horizontal_beam_b = CheckpointMarkerTwoPointBeam.New{
+			start_position = xy_start_position,
+			end_position = xy_end_position
+		}
+
+		CheckpointService.vertical_beam_a = CheckpointMarkerTwoPointBeam.New{
+			start_position = xy_start_position
+		}
+
+		CheckpointService.vertical_beam_b = CheckpointMarkerTwoPointBeam.New{
+			start_position = xy_end_position
 		}
 	end
 
@@ -162,11 +211,20 @@ hook.Add("CalcView", "CheckpointService.CalcView", CheckpointService.CalcView)
 function CheckpointService.Think()
 	if CheckpointService.start_marker then
 		if CheckpointService.save_mode == 1 then
-			CheckpointService.marker_render_position.current = CheckpointService.PointFromIntersect(CheckpointService.start_marker.position)
+			CheckpointService.marker_render_position.current = CheckpointService.HorizontalPointFromIntersect(CheckpointService.start_marker.position)
 			CheckpointService.end_marker.position = CheckpointService.marker_render_position.smooth
 			CheckpointService.horizontal_beam.end_position = CheckpointService.marker_render_position.smooth
 		elseif CheckpointService.save_mode == 2 then
+			local xy_start_position = CheckpointService.saved_eyes[1].hit_position
+			local xy_end_position = CheckpointService.saved_eyes[2].intersect_position
 
+			local z_start_point = CheckpointService.VerticalPointFromIntersect(xy_start_position, xy_start_position - xy_end_position)
+			local z_end_point = CheckpointService.VerticalPointFromIntersect(xy_end_position, xy_start_position - xy_end_position)
+
+			CheckpointService.vertical_beam_a.end_position = Vector(xy_start_position.x, xy_start_position.y, z_start_point.z)
+			CheckpointService.vertical_beam_b.end_position = Vector(xy_end_position.x, xy_end_position.y, z_end_point.z)
+			CheckpointService.horizontal_beam_b.start_position = CheckpointService.vertical_beam_a.end_position
+			CheckpointService.horizontal_beam_b.end_position = CheckpointService.vertical_beam_b.end_position
 		end
 	end
 end

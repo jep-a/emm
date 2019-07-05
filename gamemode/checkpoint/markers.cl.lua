@@ -61,11 +61,17 @@ function CheckpointMarkerTwoPointBeam:Finish(instant)
 end
 
 function CheckpointMarkerTwoPointBeam:Render()
+	local color = ColorAlpha(COLOR_YELLOW, self.opacity.current)
+
 	render.SetColorMaterialIgnoreZ()
+
 	render.StartBeam(3)
-	render.AddBeam(self.start_position, 2, 1, ColorAlpha(COLOR_YELLOW, self.opacity.current))
-	render.AddBeam(self.end_position, 2, 1, ColorAlpha(COLOR_YELLOW, self.opacity.current))
+	render.AddBeam(self.start_position, 2, 1, color)
+	render.AddBeam(self.end_position, 2, 1, color)
 	render.EndBeam()
+
+	render.DrawSphere(self.start_position, 1, 8, 8, color)
+	render.DrawSphere(self.end_position, 1, 8, 8, color)
 end
 Class.AddHook(CheckpointMarkerTwoPointBeam, "PostDrawTranslucentRenderables", "Render")
 
