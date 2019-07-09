@@ -81,8 +81,10 @@ function Class.SetupForHooks(class)
 		table.RemoveByValue(getmetatable(self).static.instances, self)
 	end
 
-	function class:Finish()
-		self:DisconnectFromHooks()
+	if not class.Finish then
+		function class:Finish()
+			self:DisconnectFromHooks()
+		end
 	end
 end
 
