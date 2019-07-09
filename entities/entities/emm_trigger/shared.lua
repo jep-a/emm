@@ -98,21 +98,30 @@ function ENT:GetBounds()
 	end
 end
 
+function ENT:PlayerInLobby(ply)
+	local ent_lobby = self:GetLobby()
+
+	if ply.lobby and ent_lobby > 0 then
+		if ply.lobby.id == ent_lobby then
+			return true
+		end
+	elseif not ply.lobby and ent_lobby == 0 then
+		return true
+	end
+
+	return false
+end
 
 -- # Touch
 
 function ENT:StartTouch(ply)
-	if IsValid(ply) and ply:IsPlayer() and ply:Team() != TEAM_SPECTATOR and ply.lobby then
-		if ply.lobby.id == self:GetLobby() then
-			hook.Call("Emm_Trigger_StartTouch", nil, ply, self:GetID(), self:GetType(), self)
-		end
+	if IsValid(ply) and ply:IsPlayer() and ply:Team() != TEAM_SPECTATOR and self:PlayerInLobby(ply) then
+		hook.Call("Emm_Trigger_StartTouch", nil, ply, self:GetID(), self:GetType(), self)
 	end
 end
 
 function ENT:EndTouch(ply)
-	if IsValid(ply) and ply:IsPlayer() and ply:Team() != TEAM_SPECTATOR and ply.lobby then
-		if ply.lobby.id == self:GetLobby() then
-			hook.Call("Emm_Trigger_EndTouch", nil, ply, self:GetID(), self:GetType(), self)
-		end
+	if IsValid(ply) and ply:IsPlayer() and ply:Team() != TEAM_SPECTATOR and self:PlayerInLobby(ply) then
+		hook.Call("Emm_Trigger_EndTouch", nil, ply, self:GetID(), self:GetType(), self)
 	end
 end

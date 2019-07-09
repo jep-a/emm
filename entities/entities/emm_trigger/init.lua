@@ -10,7 +10,7 @@ function ENT:Initialize()
 	
 	angle:Rotate(Angle(0, 90, 0))
 	self:SetWidth(self.width or 0) 
-	self:SetHeight((self.height ~= 0 and self.height) or (isnumber(self.height) and 1) or 0)
+	self:SetHeight((self.height ~= 0 and self.height) or 0)
 	self:SetNormal(angle)
 	self:SetDepth(self.depth or 0)
 	self:SetPos(self.pos)

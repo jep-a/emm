@@ -108,15 +108,13 @@ end
 function ENT:Draw()
 	local ply = GetPlayer()
 
-	if ply.lobby then
-		if ply.lobby.id == self:GetLobby() then
-			local color, thickness = self:GetDrawColor(), 2
+	if self:PlayerInLobby(ply) then
+		local color, thickness = self:GetDrawColor(), self.thickness
 			
-			if self:GetShape() == "sphere" then
-				self:RenderSphere(self:GetPos(), self:GetWidth(), thickness, color)
-			else
-				self:RenderBox(self:GetPos(), self:GetWidth(), self:GetHeight(), self:GetDepth(), self:GetNormal(), thickness, color)
-			end
+		if self:GetShape() == "sphere" then
+			self:RenderSphere(self:GetPos(), self:GetWidth(), thickness, color)
+		else
+			self:RenderBox(self:GetPos(), self:GetWidth(), self:GetHeight(), self:GetDepth(), self:GetNormal(), thickness, color)
 		end
 	end
 end
