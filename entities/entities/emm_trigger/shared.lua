@@ -112,6 +112,13 @@ function ENT:PlayerInLobby(ply)
 	return false
 end
 
+function ENT:Finish()
+	if IsValid(self) then
+		self:Remove()
+	end
+end
+
+
 -- # Touch
 
 function ENT:StartTouch(ply)

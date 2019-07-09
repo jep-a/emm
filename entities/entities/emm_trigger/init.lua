@@ -7,6 +7,7 @@ include('shared.lua')
 
 function ENT:Initialize()
 	local angle = self.angle or Vector(0,0,0)
+	local lobby = self.lobby
 	
 	angle:Rotate(Angle(0, 90, 0))
 	self:SetWidth(self.width or 0) 
@@ -23,6 +24,10 @@ function ENT:Initialize()
 	self:SetCollisionGroup(COLLISION_GROUP_WORLD)
 	self:SetTrigger(true)
 	self:SetCollision()
+	
+	if lobby > 0 then
+		table.insert(MinigameService.lobbies[lobby].ents, self)
+	end
 	
 	hook.Run("Emm_Trigger_Init", self)
 

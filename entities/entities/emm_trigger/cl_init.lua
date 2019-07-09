@@ -6,12 +6,18 @@ ENT.RenderGroup	= RENDERGROUP_TRANSLUCENT
 
 function ENT:Initialize()
 	local mins, maxs = self:GetBounds()
+	local lobby = self:GetLobby()
 
 	self.thickness = 2
 	self:SetDrawColor(COLOR_WHITE, 2)
 	self:SetNotSolid(false)
 	self:SetCollisionGroup(COLLISION_GROUP_WORLD)
 	self:SetRenderBounds(mins, maxs)
+
+	if lobby > 0 then
+		table.insert(MinigameService.lobbies[lobby].ents, self)
+	end
+	
 	hook.Run("Emm_Trigger_Init", self)
 end
 
