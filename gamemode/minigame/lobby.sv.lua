@@ -41,8 +41,8 @@ end
 function MinigameLobby:Finish()
 	hook.Run("LobbyFinish", self)
 
-	for _, ents in pairs(self.ents) do
-		ents:Finish()
+	for _, ent in pairs(self.ents) do
+		ent:Finish()
 	end
 	
 	for _, ply in pairs(self.players) do

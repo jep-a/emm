@@ -113,7 +113,13 @@ function ENT:PlayerInLobby(ply)
 end
 
 function ENT:Finish()
+	local lobby = self:GetLobby()
+
 	if IsValid(self) then
+		if lobby > 0 and MinigameService.lobbies[lobby] then
+			table.RemoveByValue(MinigameService.lobbies[lobby].ents, self)
+		end
+
 		self:Remove()
 	end
 end
