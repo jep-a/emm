@@ -123,12 +123,12 @@ end
 
 function ENT:StartTouch(ply)
 	if IsValid(ply) and ply:IsPlayer() and ply:Team() != TEAM_SPECTATOR and self:PlayerInLobby(ply) then
-		hook.Call("Emm_Trigger_StartTouch", nil, ply, self:GetID(), self:GetType(), self)
+		hook.Call("Emm_Trigger_StartTouch", nil, ply, self)
 	end
 end
 
 function ENT:EndTouch(ply)
 	if IsValid(ply) and ply:IsPlayer() and ply:Team() != TEAM_SPECTATOR and self:PlayerInLobby(ply) then
-		hook.Call("Emm_Trigger_EndTouch", nil, ply, self:GetID(), self:GetType(), self)
+		hook.Call("Emm_Trigger_EndTouch", nil, ply, self)
 	end
 end
