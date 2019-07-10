@@ -123,7 +123,9 @@ function ENT:Draw()
 
 	if self:PlayerInLobby(ply) then
 		local color, thickness = self:GetDrawColor(), self.thickness
-			
+
+		hook.Run("Emm_Trigger_Draw", self)
+
 		if self:GetShape() == "sphere" then
 			self:RenderSphere(self:GetPos(), self:GetWidth(), thickness, color)
 		else

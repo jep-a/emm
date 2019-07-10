@@ -115,6 +115,8 @@ end
 function ENT:Finish()
 	local lobby = self:GetLobby()
 
+	hook.Run("Emm_Trigger_Finish", self)
+	
 	if IsValid(self) then
 		if lobby > 0 and MinigameService.lobbies[lobby] then
 			table.RemoveByValue(MinigameService.lobbies[lobby].ents, self)
