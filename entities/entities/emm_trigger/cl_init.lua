@@ -6,19 +6,26 @@ ENT.RenderGroup	= RENDERGROUP_TRANSLUCENT
 
 function ENT:Initialize()
 	local mins, maxs = self:GetBounds()
-	local lobby = self:GetLobby()
+	local next_think = CurTime()
 
+	if table.Count(MinigameService.lobbies) == 0 and self:GetLobby() > 0 then
+		next_think = CurTime() + 1
+	end
+	
 	self.thickness = 2
 	self:SetDrawColor(COLOR_WHITE, 2)
 	self:SetNotSolid(false)
 	self:SetCollisionGroup(COLLISION_GROUP_WORLD)
 	self:SetRenderBounds(mins, maxs)
+	self:SetNextClientThink( next_think )
+end
 
-	if lobby > 0 then
-		table.insert(MinigameService.lobbies[lobby].ents, self)
+function ENT:Think()
+	if self:GetLobby() > 0 then
+		table.insert(MinigameService.lobbies[self:GetLobby()].ents, self)
 	end
-	
 	hook.Run("Emm_Trigger_Init", self)
+	return true
 end
 
 

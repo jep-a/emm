@@ -62,6 +62,10 @@ end
 function MinigameLobby:Finish()
 	hook.Run("LobbyFinish", self)
 
+	for _, ent in pairs(self.ents) do
+		ent:Finish()
+	end
+	
 	if self:IsLocal() then
 		hook.Run("LocalLobbyFinish", self)
 	end

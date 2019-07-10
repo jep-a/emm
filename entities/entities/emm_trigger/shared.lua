@@ -120,7 +120,11 @@ function ENT:Finish()
 			table.RemoveByValue(MinigameService.lobbies[lobby].ents, self)
 		end
 
-		self:Remove()
+		if CLIENT then
+			self.color:Finish()
+		else
+			self:Remove()
+		end
 	end
 end
 
