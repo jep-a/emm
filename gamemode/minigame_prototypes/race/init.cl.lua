@@ -17,11 +17,8 @@ end)
 
 function MINIGAME.LobbyPlayerJoin(lobby, ply)
 	if lobby.key == "Race" and ply == LocalPlayer() then
-		local timer_notification = NotificationService.PushMetaText(ply.race_timer, "Race_Timer", 3)
-		local pr_notification = NotificationService.PushMetaText(ply.race_timer, "Race_PR", 4)
-
-		timer_notification.children[1]:SetText(MINIGAME.GetTime(0))
-		pr_notification.children[1]:SetText(MINIGAME.GetTime(0))
+		MINIGAME.TimerNotification(0)
+		MINIGAME.PRNotification(0)
 	end
 end
 hook.Add("LocalLobbyPlayerJoin", "MINIGAME.LobbyPlayerJoin", MINIGAME.LobbyPlayerJoin)
@@ -29,8 +26,8 @@ hook.Add("LocalLobbyInit", "MINIGAME.LobbyPlayerJoin", MINIGAME.LobbyPlayerJoin)
 
 function MINIGAME.LobbyPlayerLeave(lobby, ply)
 	if lobby.key == "Race" and ply == LocalPlayer() then
-		NotificationService.stickies["Race_Timer"].children[1]:Finish()
-		NotificationService.stickies["Race_PR"].children[1]:Finish()
+		NotificationService.FinishSticky("Race_Timer")
+		NotificationService.FinishSticky("Race_PR")
 	end
 
 end

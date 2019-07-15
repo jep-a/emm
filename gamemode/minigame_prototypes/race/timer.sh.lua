@@ -17,7 +17,7 @@ function MINIGAME.UpdateLeaderboard(ply, mode, time)
 	else
 		local steam_id = ply:EntIndex()
 		local personal_record = MINIGAME.GetPR(ply, mode)
-
+		
 		if personal_record >= time or personal_record == 0 then
 			ply.lobby.leaderboard[mode][steam_id] = {
 				["time"] = time,
@@ -29,20 +29,20 @@ end
 
 function MINIGAME.GetPR(ply, mode)
 	local steam_id = ply:EntIndex()
-
+	
 	if ply.lobby.leaderboard[mode] then
 		if ply.lobby.leaderboard[mode][steam_id] then
 			return ply.lobby.leaderboard[mode][steam_id].time
 		end
 	end
-
+	
 	return 0
 end
 
 function MINIGAME.GetPlacement(lobby, mode, ply)
 	if lobby.leaderboard[mode] then
 		local steam_id = ply:EntIndex()
-
+		
 		if lobby.leaderboard[mode][steam_id] then
 			table.sort( lobby.leaderboard[mode], function( a, b ) return a.time > b.time end )
 			PrintTable(lobby.leaderboard[mode])
@@ -58,7 +58,7 @@ function MINIGAME.GetBest(lobby, mode)
 		local time = 0
 		local steam_id
 		local nick
-
+		
 		for k, v in pairs(lobby.leaderboard[mode]) do
 			if time > v.time or time == 0 then
 				time = v.time
@@ -66,7 +66,7 @@ function MINIGAME.GetBest(lobby, mode)
 				nick = v.name
 			end
 		end
-
+		
 		return time, steamid, nick
 	end
 	
@@ -98,27 +98,27 @@ function MINIGAME.Reset(ply)
 	ply.race_frozen = true
 	ply.race_start_time = 0
 	ply.race_checkpoints = {}
-
+	
 	if ply.lobby then
 		if ply.lobby.zones.checkpoint then
 			if #ply.lobby.zones.checkpoint > 0 and CLIENT then
 				for k, v in pairs(ply.lobby.zones.checkpoint) do
 					v:SetDrawColor(MINIGAME.ZONES["checkpoint"], 2)
 				end
-
+				
 				ply.lobby.zones.checkpoint[1]:SetDrawColor(MINIGAME.ZONES["checkpoint_active"], 2)
 			end
 		end
 	end
-
-	if CLIENT and NotificationService.stickies["Race_Timer"] then
-		NotificationService.stickies["Race_Timer"].children[1]:Finish()
+	
+	if CLIENT then
+		NotificationService.FinishSticky("Race_Timer")
 	elseif SERVER then
 		TrailService.RemoveTrail(ply)
 		TrailService.SetupTrail(ply)
-
+		
 		net.Start "Race_Reset"
-			net.WriteEntity(ply)
+		net.WriteEntity(ply)
 		net.Send(MINIGAME.GetPlayers(ply.lobby))
 	end
 end
@@ -127,7 +127,7 @@ function MINIGAME.GetTime(start, last)
 	if isnumber(start) then
 		return string.ToMinutesSecondsMilliseconds(math.abs(start - (last or 0)))
 	end
-
+	
 	return start
 end
 
@@ -144,10 +144,10 @@ end
 
 function MINIGAME.StopTimer(ply, time)
 	ply.race_start_time = 0
-
+	
 	if time then
 		ply.race_timer = time
-
+		
 		if CLIENT then
 			if ply == GetPlayer() then
 				MINIGAME.TimerNotification(time)
@@ -173,7 +173,7 @@ function MINIGAME.StartMove(ply, mv)
 		if ply.lobby.key == "Race" and ply.lobby.zones and ply.race_frozen then
 			if IsValid(ply.lobby.zones.start) then
 				local validKeys = bit.band( mv:GetButtons(), bit.bor( unpack(MINIGAME.START_KEYS) ) )
-
+				
 				mv:SetOrigin(ply.lobby.zones.start:GetPos())
 				mv:SetVelocity(Vector(0,0,0))
 				
