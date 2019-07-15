@@ -31,6 +31,10 @@ function Snap(n, snap)
 	return n - mod + (math.Round(mod/snap) * snap)
 end
 
+function ClampVector(vector, mins, maxs)
+	return Vector(math.Clamp(vector.x, mins.x, maxs.x), math.Clamp(vector.y, mins.y, maxs.y), math.Clamp(vector.z, mins.z, maxs.z))
+end
+
 function SequentialTableHasValue(tab, val)
 	for i = 1, #tab do
 		if val == tab[i] then
@@ -84,6 +88,7 @@ function GetPlayer(ply)
 		return ply
 	else
 		local local_ply = LocalPlayer()
+		
 		if IsValid(local_ply) then
 			if IsValid(local_ply:GetObserverTarget()) then
 				return local_ply:GetObserverTarget()
@@ -94,3 +99,4 @@ function GetPlayer(ply)
 	end
 	return nil
 end
+
