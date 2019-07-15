@@ -33,12 +33,13 @@ end
 
 function CheckpointMarkerFadeBeam:Render()
 	local length = self.length * self.parent.size_multiplier.current
+	local color = HSVToColor(ColorToHSV(MinigameService.prototypes["Race"].ZONES[CheckpointService.type]), 0.4, 0.9)
 
 	render.SetColorMaterialIgnoreZ()
 	render.StartBeam(3)
-	render.AddBeam(self.parent.position, 2, 1, ColorAlpha(COLOR_YELLOW, self.opacity.current))
-	render.AddBeam(self.parent.position + (self.direction * (length - (length/4))), 2, 1, ColorAlpha(COLOR_YELLOW, self.opacity.current))
-	render.AddBeam(self.parent.position + (self.direction * length), 2, 1, ColorAlpha(COLOR_YELLOW, 0))
+	render.AddBeam(self.parent.position, 2, 1, ColorAlpha(color, self.opacity.current))
+	render.AddBeam(self.parent.position + (self.direction * (length - (length/4))), 2, 1, ColorAlpha(color, self.opacity.current))
+	render.AddBeam(self.parent.position + (self.direction * length), 2, 1, ColorAlpha(color, 0))
 	render.EndBeam()
 end
 Class.AddHook(CheckpointMarkerFadeBeam, "PostDrawTranslucentRenderables", "Render")
@@ -61,8 +62,8 @@ function CheckpointMarkerTwoPointBeam:Finish(instant)
 end
 
 function CheckpointMarkerTwoPointBeam:Render()
-	local color = ColorAlpha(COLOR_YELLOW, self.opacity.current)
-
+	local color = ColorAlpha(HSVToColor(ColorToHSV(MinigameService.prototypes["Race"].ZONES[CheckpointService.type]), 0.4, 0.9), self.opacity.current)
+	
 	render.SetColorMaterialIgnoreZ()
 
 	render.StartBeam(3)
@@ -124,6 +125,7 @@ function CheckpointHorizontalPlaneMarker:Finish(instant)
 		for _, beam in pairs(self.beams) do
 			beam:Finish()
 		end
+		
 	end
 end
 
@@ -138,7 +140,7 @@ end
 
 function CheckpointHorizontalPlaneMarker:Render()
 	render.SetColorMaterialIgnoreZ()
-	render.DrawSphere(self.position, 1, 8, 8, ColorAlpha(COLOR_YELLOW, self.opacity.current))
+	render.DrawSphere(self.position, 1, 8, 8, ColorAlpha(HSVToColor(ColorToHSV(MinigameService.prototypes["Race"].ZONES[CheckpointService.type]), 0.4, 0.9), self.opacity.current))
 end
 Class.AddHook(CheckpointHorizontalPlaneMarker, "PostDrawTranslucentRenderables", "Render")
 

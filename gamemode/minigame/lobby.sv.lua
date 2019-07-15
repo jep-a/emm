@@ -6,7 +6,7 @@ function MinigameService.CreateLobby(props)
 
 	local lobby = MinigameLobby.New(props)
 	MinigameService.lobbies[id] = lobby
-
+	
 	return lobby
 end
 
@@ -20,6 +20,7 @@ function MinigameLobby:Init(props)
 	self.prototype = props.prototype
 	self.host = props.host
 	self.players = props.players or {}
+	self.ents = props.ents or {}
 
 	for _, ply in pairs(self.players) do
 		ply.lobby = self
@@ -40,6 +41,10 @@ end
 function MinigameLobby:Finish()
 	hook.Run("LobbyFinish", self)
 
+	for _, ent in pairs(self.ents) do
+		ent:Finish()
+	end
+	
 	for _, ply in pairs(self.players) do
 		self:RemovePlayer(ply, false, true)
 	end
@@ -88,6 +93,7 @@ function MinigameLobby:RemovePlayer(ply, net, force)
 		MinigameService.FinishLobby(self)
 	end
 end
+
 hook.Add("PlayerDisconnected", "MinigameService.RemoveDisconnectedPlayer", function (ply)
 	if ply.lobby then
 		ply.lobby:RemovePlayer(ply)
