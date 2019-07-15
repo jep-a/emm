@@ -68,9 +68,9 @@ net.Receive("Race_Timer", function()
 	local mode = net.ReadString()
 	local pr = MINIGAME.GetPR(ply, mode)
 	
-	MINIGAME.PRNotification(time)
 	MINIGAME.StopTimer(ply, time)
 	MINIGAME.UpdateLeaderboard(ply, mode, time)
+	MINIGAME.PRNotification(MINIGAME.GetPR(ply, mode))
 	MINIGAME.Notification(ply, mode, pr, time)
 end)
 
