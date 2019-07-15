@@ -52,12 +52,12 @@ function MINIGAME.Notification(ply, mode, pr, time)
 	
 	if ply == LocalPlayer() then
 		NotificationService.PushSideText(message)
-		MsgC( ply.lobby.color, message, "\n")
+		MsgC(ply.lobby.color, message, "\n")
 	else
 		if sign == "-" then
 			message = string.Replace(message, "You", ply:Nick())
 			NotificationService.PushSideText(message)
-			MsgC( ply.lobby.color, message, "\n")
+			MsgC(ply.lobby.color, message, "\n")
 		end
 	end
 end
@@ -67,6 +67,7 @@ net.Receive("Race_Timer", function()
 	local time = net.ReadFloat()
 	local mode = net.ReadString()
 	local pr = MINIGAME.GetPR(ply, mode)
+	
 	MINIGAME.PRNotification(time)
 	MINIGAME.StopTimer(ply, time)
 	MINIGAME.UpdateLeaderboard(ply, mode, time)

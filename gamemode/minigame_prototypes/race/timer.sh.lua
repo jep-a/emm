@@ -44,7 +44,7 @@ function MINIGAME.GetPlacement(lobby, mode, ply)
 		local steam_id = ply:EntIndex()
 		
 		if lobby.leaderboard[mode][steam_id] then
-			table.sort( lobby.leaderboard[mode], function( a, b ) return a.time > b.time end )
+			table.sort(lobby.leaderboard[mode], function(a, b) return a.time > b.time end)
 			PrintTable(lobby.leaderboard[mode])
 			--return lobby.leaderboard[mode][placement],
 		end
@@ -118,7 +118,7 @@ function MINIGAME.Reset(ply)
 		TrailService.SetupTrail(ply)
 		
 		net.Start "Race_Reset"
-		net.WriteEntity(ply)
+			net.WriteEntity(ply)
 		net.Send(MINIGAME.GetPlayers(ply.lobby))
 	end
 end
@@ -162,7 +162,6 @@ function MINIGAME.Timer(ply, move)
 		
 		if CLIENT then
 			MINIGAME.TimerNotification(ply.race_timer)
-			--NotificationService.stickies["Zone"].children[1]:SetAttribute("text_color", Color(255,0,0))
 		end
 	end
 end
@@ -172,7 +171,7 @@ function MINIGAME.StartMove(ply, mv)
 	if ply.lobby then
 		if ply.lobby.key == "Race" and ply.lobby.zones and ply.race_frozen then
 			if IsValid(ply.lobby.zones.start) then
-				local validKeys = bit.band( mv:GetButtons(), bit.bor( unpack(MINIGAME.START_KEYS) ) )
+				local validKeys = bit.band(mv:GetButtons(), bit.bor(unpack(MINIGAME.START_KEYS)))
 				
 				mv:SetOrigin(ply.lobby.zones.start:GetPos())
 				mv:SetVelocity(Vector(0,0,0))

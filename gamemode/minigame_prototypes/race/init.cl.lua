@@ -6,12 +6,12 @@ concommand.Add("leaderboard", function(ply, cmd, args)
 	if ply.lobby.leaderboard then
 		for mode, tbl in pairs(ply.lobby.leaderboard) do
 			print(mode .. ": ")
+
 			for place, v in pairs(tbl) do
 				print(place .. ": " .. v.name .. " : " .. MINIGAME.GetTime(v.time))
 				print(v.time)
 			end
 		end
-		--PrintTable(ply.lobby.leaderboard)
 	end
 end)
 
@@ -39,10 +39,11 @@ hook.Add("LocalLobbyPlayerLeave", "MINIGAME.LobbyPlayerLeave", MINIGAME.LobbyPla
 concommand.Add("remove", function(ply, cmd, args)
 	if args[1] then
 		MINIGAME.RemoveZone("checkpoint", args[1], ply.lobby.id)
+
 		net.Start "RemoveZone"
-		net.WriteString("checkpoint")
-		net.WriteInt(args[1], 8)
-		net.WriteInt(ply.lobby.id, 8)
+			net.WriteString("checkpoint")
+			net.WriteInt(args[1], 8)
+			net.WriteInt(ply.lobby.id, 8)
 		net.SendToServer()
 	end
 end)

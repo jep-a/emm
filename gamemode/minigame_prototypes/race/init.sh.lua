@@ -1,6 +1,5 @@
 EMM.Include "minigame_prototypes/race/timer"
 
-
 MINIGAME.name = "Race"
 MINIGAME.color = COLOR_YELLOW
 MINIGAME.default_player_class = "Racer"
@@ -69,9 +68,10 @@ hook.Add("LobbyInit", "MINIGAME.LobbyInit", MINIGAME.LobbyInit)
 
 function MINIGAME.CanNoclip(ply)
 	MINIGAME.StopTimer(ply)
+
 	return (ply.lobby and ply.lobby.key == "Race" and ply.lobby.host == ply)
 end
-hook.Add( "PlayerNoClip", "MINIGAME.CanNoclip", MINIGAME.CanNoclip )
+hook.Add("PlayerNoClip", "MINIGAME.CanNoclip", MINIGAME.CanNoclip)
 
 function MINIGAME.GetMode(ply)
 	local ply_class = ply.player_class
@@ -157,7 +157,9 @@ function MINIGAME.RemoveZone(zone_type, zone_id, lobby_id)
 		if SERVER then
 			zones[zone_id]:Finish()
 		end
+
 		table.remove(MinigameService.lobbies[lobby_id].zones[zone_type], zone_id)
+
 		for i = zone_id, #MinigameService.lobbies[lobby_id].zones[zone_type] do
 			MinigameService.lobbies[lobby_id].zones[zone_type][i]:SetID(i)
 		end
@@ -176,7 +178,6 @@ function MINIGAME.AddCheckpoint(ply, id, sync)
 			ply.race_checkpoints[id] = ply.race_timer
 
 			if CLIENT then
-				
 				ply.lobby.zones.checkpoint[next_checkpoint]:SetDrawColor(MINIGAME.ZONES["checkpoint_activated"], 2)
 
 				if ply.lobby.zones.checkpoint[next_checkpoint+1] then
@@ -223,21 +224,14 @@ end
 net.Receive("Race_UpdateEnt", MINIGAME.UpdateCheckpoint)
 
 function MINIGAME.InCheckPoint(ply, zone)
-	local zone_id = zone:GetID()
-	local zone_type = zone:GetType()
-	
-	if zone_type == "checkpoint" then
-		MINIGAME.AddCheckpoint(ply, zone_id, true)
+	if zone:GetType() == "checkpoint" then
+		MINIGAME.AddCheckpoint(ply, zone:GetID(), true)
 	end
 end
 hook.Add("Emm_Trigger_StartTouch", "MINIGAME.InCheckPoint", MINIGAME.InCheckPoint)
 
 function MINIGAME.InEnd(ply, zone)
-	local zone_id = zone:GetID()
-	local zone_type = zone:GetType()
-	local temp = {}
-
-	if zone_type == "end" and MINIGAME.CheckpointsLeft(ply) == 0 and ply.race_start_time ~= 0 then
+	if zone:GetType() == "end" and MINIGAME.CheckpointsLeft(ply) == 0 and ply.race_start_time ~= 0 then
 		local mode = MINIGAME.GetMode(ply)
 
 		MINIGAME.StopTimer(ply)

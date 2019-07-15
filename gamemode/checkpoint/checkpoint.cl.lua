@@ -39,6 +39,7 @@ function CheckpointService.ClampPoint(vec)
 		
 		return ClampVector(vec, origin - size, origin + size)
 	end
+	
 	return vec
 end
 
@@ -159,6 +160,7 @@ end
 
 function CheckpointService.ClearSavedEyes()
 	CheckpointService.saved_eyes = {}
+	CheckpointService.saved_data = {}
 end
 
 
@@ -166,11 +168,12 @@ end
 
 function CheckpointService.Save()
 	local ply = LocalPlayer()
+	
 	if CheckpointService.save_mode == 3 then
 		local angle = CheckpointService.saved_data.angle
+
 		angle:Rotate(Angle(0, 90, 0))
-		CheckpointService.saved_data.depth = ClampVector(CheckpointService.EyeTrace(LocalPlayer(), CheckpointService.trace_distance).HitPos - CheckpointService.saved_data.pos, (-CheckpointService.max_size), CheckpointService.max_size):Dot(angle)
-		--CheckpointService.saved_data.depth = angle * ClampVector(CheckpointService.EyeTrace(LocalPlayer(), CheckpointService.trace_distance).HitPos - CheckpointService.saved_data.pos, (-CheckpointService.max_size), CheckpointService.max_size):Dot(angle)
+		CheckpointService.saved_data.depth = ClampVector(CheckpointService.EyeTrace(ply, CheckpointService.trace_distance).HitPos - CheckpointService.saved_data.pos, (-CheckpointService.max_size), CheckpointService.max_size):Dot(angle)
 	end
 
 	net.Start "Race_CreateEnt"
@@ -205,7 +208,6 @@ function CheckpointService.ProgressMode()
 		CheckpointService.start_marker = CheckpointHorizontalPlaneMarker.New(position)
 		CheckpointService.end_marker = CheckpointHorizontalPlaneMarker.New(position)
 		CheckpointService.horizontal_beam = CheckpointMarkerTwoPointBeam.New()
-
 		CheckpointService.saved_data.pos = position
 	elseif CheckpointService.save_mode == 2 then
 		local xy_start_position = CheckpointService.saved_eyes[1].hit_position
@@ -234,7 +236,6 @@ function CheckpointService.ProgressMode()
 	elseif CheckpointService.save_mode == 3 then
 		local xy_start_position = CheckpointService.saved_eyes[1].hit_position
 		local xy_end_position = CheckpointService.saved_eyes[2].intersect_position
-
 		local z_end_point_a = CheckpointService.vertical_beam_a.end_position
 		local z_end_point_b = CheckpointService.vertical_beam_b.end_position
 
@@ -288,7 +289,6 @@ function CheckpointService.ProgressMode()
 		CheckpointService.horizontal_beam_h = CheckpointMarkerTwoPointBeam.New()
 		CheckpointService.vertical_beam_e = CheckpointMarkerTwoPointBeam.New()
 		CheckpointService.vertical_beam_f = CheckpointMarkerTwoPointBeam.New()
-
 		CheckpointService.saved_data.height = z_end_point_a.z - xy_start_position.z
 	end
 
@@ -297,12 +297,6 @@ end
 function CheckpointService.SetupCreating(ply, move)
 	if IsFirstTimePredicted() then
 		if ply.lobby then
-			if move:KeyDown(IN_WALK) then
-				CheckpointService.trace_distance = 10
-			else
-				CheckpointService.trace_distance = 999999
-			end
-
 			if (move:KeyPressed(IN_ATTACK) or 
 				(move:KeyReleased(IN_ATTACK) and CheckpointService.save_mode >= 1 and CurTime() > (CheckpointService.start_time + 0.25))) and 
 				CheckpointService.creating and
@@ -360,12 +354,11 @@ function CheckpointService.Think()
 		elseif CheckpointService.save_mode == 3 then
 			local xy_start_position = CheckpointService.saved_eyes[1].hit_position
 			local xy_end_position = CheckpointService.saved_eyes[2].intersect_position
-
+			
 			local z_end_point_a = CheckpointService.vertical_beam_a.end_position
 			local z_end_point_b = CheckpointService.vertical_beam_b.end_position
-
 			local depth = ClampVector(CheckpointService.EyeTrace(LocalPlayer(), CheckpointService.trace_distance).HitPos - CheckpointService.saved_data.pos, -CheckpointService.max_size, CheckpointService.max_size)
-			local checkpoint_angle =  (xy_start_position - xy_end_position):GetNormalized()
+			local checkpoint_angle = (xy_start_position - xy_end_position):GetNormalized()
 
 			checkpoint_angle:Rotate(Angle(0, 90, 0))
 			depth = checkpoint_angle * depth:Dot(checkpoint_angle)
