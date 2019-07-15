@@ -22,6 +22,17 @@ hook.Add(
 
 -- # Effects
 
+function WalljumpService.EffectTrace(ply, dir)
+	local ply_pos = ply:GetPos()
+	local trace = util.TraceLine {
+		start = ply_pos,
+		endpos = ply_pos - (dir * ply.walljump_distance * 2),
+		filter = ply
+	}
+
+	return trace
+end
+
 function WalljumpService.EffectOrigin(trace)
 	local trace_norm_right = trace.HitNormal:Angle():Right()
 	return trace.HitPos - (trace_norm_right:Dot(trace.HitPos - trace.StartPos) * trace_norm_right)
@@ -52,11 +63,36 @@ function WalljumpService.PressedWalljumpButtons(buttons, old_buttons)
 	return walljump_buttons_down > bit.band(walljump_buttons_down, old_buttons)
 end
 
+function WalljumpService.GetAngle(dir, wall_normal)
+	local angle = dir:Angle()
+	local wall_ang = wall_normal:Angle()
+
+	wall_ang:Normalize()
+	angle:Normalize()
+
+	wall_ang = wall_ang.y
+	angle = math.abs(angle.y) - math.abs(wall_ang)
+
+	return math.abs(angle)
+end
+
 function WalljumpService.Trace(ply, dir)
 	local ply_pos = ply:GetPos()
-	local trace = util.TraceLine {
+	local mins = ply:OBBMins()
+	local maxs = ply:OBBMaxs()
+	local walljump_distance = ply.walljump_distance - maxs.x
+	local perimeter_pos = ply_pos - Vector(dir.x * 23, dir.y * 23, 0)
+	local obb_trace = Vector(ply.walljump_distance/2, ply.walljump_distance/2, 0)
+
+	perimeter_pos.x = math.Clamp(perimeter_pos.x, ply_pos.x + mins.x, ply_pos.x + maxs.x)
+	perimeter_pos.y = math.Clamp(perimeter_pos.y, ply_pos.y + mins.y, ply_pos.y + maxs.y)
+
+	local trace = util.TraceHull {
 		start = ply_pos,
-		endpos = ply_pos - (dir * ply.walljump_distance),
+		endpos = perimeter_pos,
+		mins = -obb_trace,
+		maxs = obb_trace,
+		mask = MASK_PLAYERSOLID_BRUSHONLY,
 		filter = ply
 	}
 
@@ -72,14 +108,29 @@ end
 
 function WalljumpService.Walljump(ply, move, dir)
 	local did_walljump
-	
 	local trace = WalljumpService.Trace(ply, dir)
 
-	if trace.Hit and (ply.can_walljump_sky or not trace.HitSky) then
+	if
+		trace.Hit and
+		(ply.can_walljump_sky or not trace.HitSky) and
+		(58 > WalljumpService.GetAngle(dir, trace.HitNormal))
+	then
 		did_walljump = true
 
-		move:SetVelocity(move:GetVelocity() + WalljumpService.Velocity(ply, dir))
-		--WalljumpService.Effect(ply, trace)
+		if SERVER or SettingsService.Get "clientside_walljump" then
+			move:SetVelocity(move:GetVelocity() + WalljumpService.Velocity(ply, dir))
+		end
+
+		if ply:OnGround() then
+			ply:SetGroundEntity(NULL)
+			move:SetOrigin(move:GetOrigin() + Vector(0, 0, 1))
+			move:SetVelocity(move:GetVelocity() + Vector(0, 0, ply:GetJumpPower()))
+		end
+
+		if SERVER then
+			WalljumpService.Effect(ply, WalljumpService.EffectTrace(ply, dir))
+		end
+
 		ply.last_walljump_time = CurTime()
 
 		if not WalljumpService.PlayedSound(ply) then

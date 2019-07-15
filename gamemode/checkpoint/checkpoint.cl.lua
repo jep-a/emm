@@ -4,6 +4,11 @@ CheckpointService.save_mode = 0
 CheckpointService.save_mode_limit = 2
 CheckpointService.saved_eyes = {}
 
+CheckpointService.marker_render_position = AnimatableValue.New(Vector(0, 0, 0), {
+	smooth = true,
+	smooth_multiplier = 2
+})
+
 
 -- # Save mode enums
 
@@ -14,10 +19,8 @@ CHECKPOINT_SAVE_MODE_SIZE = 2
 
 -- # Util
 
-function CheckpointService.AngleFromIntersect(plane_pos, snap)
-	snap = snap == nil and true or snap
-
-	local ang
+function CheckpointService.HorizontalPointFromIntersect(plane_pos)
+	local point
 
 	local intersect = util.IntersectRayWithPlane(
 		CheckpointService.eye_position,
@@ -26,21 +29,54 @@ function CheckpointService.AngleFromIntersect(plane_pos, snap)
 		Vector(0, 0, 1)
 	)
 
+	local hit_pos = LocalPlayer():GetEyeTrace().HitPos
+
 	if intersect then
-		ang = (plane_pos - intersect):Angle()
+		local intersect_trace = util.TraceLine {
+			start = plane_pos,
+			endpos = Vector(intersect.x, intersect.y, plane_pos.z),
+			collisiongroup = COLLISION_GROUP_WORLD
+		}
+
+		local eye_trace = util.TraceLine {
+			start = plane_pos,
+			endpos = Vector(hit_pos.x, hit_pos.y, plane_pos.z),
+			collisiongroup = COLLISION_GROUP_WORLD
+		}
+
+		if intersect_trace.HitPos:Distance(CheckpointService.eye_position) > eye_trace.HitPos:Distance(CheckpointService.eye_position) then
+			point = eye_trace.HitPos
+		else
+			point = intersect_trace.HitPos
+		end
 	else
-		ang = CheckpointService.eye_angle + Angle(0, 180, 0)
+		local trace = util.TraceLine {
+			start = plane_pos,
+			endpos = Vector(hit_pos.x, hit_pos.y, plane_pos.z),
+			collisiongroup = COLLISION_GROUP_WORLD
+		}
+
+		point = trace.HitPos
 	end
 
-	if snap then
-		ang:SnapTo("y", 15)
-	end
+	local distance = plane_pos:Distance(point)
+	local ang = (plane_pos - point):Angle()
+	local snapped_ang = Angle(ang.p, Snap(ang.y, 7.5), ang.r)
 
-	return ang.y
+	local snapped_trace = util.TraceLine {
+		start = plane_pos,
+		endpos = plane_pos + (snapped_ang:Forward() * -distance),
+		collisiongroup = COLLISION_GROUP_WORLD
+	}
+
+	return snapped_trace.HitPos
 end
 
-function CheckpointService.DistanceFromIntersect(plane_pos, plane_norm)
-	local dist
+function CheckpointService.VerticalPointFromIntersect(plane_pos, plane_norm)
+	local point
+
+	local rotated_plane_norm = plane_norm
+	rotated_plane_norm:Rotate(Angle(0, 90, 0))
 
 	local intersect = util.IntersectRayWithPlane(
 		CheckpointService.eye_position,
@@ -49,25 +85,53 @@ function CheckpointService.DistanceFromIntersect(plane_pos, plane_norm)
 		plane_norm
 	)
 
+	local hit_pos = LocalPlayer():GetEyeTrace().HitPos
+
 	if intersect then
-		dist = math.min(plane_pos:Distance(intersect), 32000)
+		local intersect_trace = util.TraceLine {
+			start = plane_pos,
+			endpos = Vector(plane_pos.x, plane_pos.y, intersect.z),
+			collisiongroup = COLLISION_GROUP_WORLD
+		}
+
+		point = intersect_trace.HitPos
 	else
-		dist = 32000
+		local trace = util.TraceLine {
+			start = plane_pos,
+			endpos = Vector(plane_pos.x, plane_pos.y, hit_pos.z),
+			collisiongroup = COLLISION_GROUP_WORLD
+		}
+
+		point = trace.HitPos
 	end
 
-	return dist
+	return point
 end
 
 
 -- # Saved hit positions
 
 function CheckpointService.SaveCurrentEye()
-	CheckpointService.saved_eyes[CheckpointService.save_mode] = {
+	local hit_pos = LocalPlayer():GetEyeTrace().HitPos
+	local last_hit_pos
+
+	if CheckpointService.save_mode > 1 then
+		last_hit_pos = CheckpointService.saved_eyes[CheckpointService.save_mode - 1].hit_position
+	else
+		last_hit_pos = hit_pos
+	end
+
+	local eye = {
 		eye_position = CheckpointService.eye_position,
 		eye_angle = CheckpointService.eye_angle,
 		eye_normal = CheckpointService.eye_normal,
-		hit_position = LocalPlayer():GetEyeTrace().HitPos
+		hit_position = hit_pos,
+		intersect_position = CheckpointService.HorizontalPointFromIntersect(last_hit_pos),
 	}
+
+	CheckpointService.saved_eyes[CheckpointService.save_mode] = eye
+
+	return eye
 end
 
 function CheckpointService.ClearSavedEyes()
@@ -77,36 +141,62 @@ end
 
 -- # Creating
 
-function CheckpointService.SetupCreating(ply, move)
-	if IsFirstTimePredicted() and move:KeyPressed(IN_ATTACK) then
-		CheckpointService.ClearMarkers()
+function CheckpointService.ProgressMode()
+	CheckpointService.ClearMarkers()
 
-		if CheckpointService.save_mode == CheckpointService.save_mode_limit then
-			CheckpointService.save_mode = 0
-		else
-			CheckpointService.save_mode = CheckpointService.save_mode + 1
-		end
-
-		if CheckpointService.save_mode > 0 then
-			CheckpointService.SaveCurrentEye()
-		else
-			CheckpointService.ClearSavedEyes()
-		end
-
-		if CheckpointService.save_mode == 1 then
-			CheckpointService.start_marker = CheckpointService.CreateStartMarker({position = CheckpointService.saved_eyes[1].hit_position})
-		elseif CheckpointService.save_mode == 2 then
-			CheckpointService.start_marker = CheckpointService.CreateStartMarker({
-				position = CheckpointService.saved_eyes[1].hit_position,
-				angle = CheckpointService.AngleFromIntersect(CheckpointService.saved_eyes[1].hit_position)
-			})
-		end
+	if CheckpointService.save_mode == CheckpointService.save_mode_limit then
+		CheckpointService.save_mode = 0
+	else
+		CheckpointService.save_mode = CheckpointService.save_mode + 1
 	end
 
-	if IsFirstTimePredicted() and move:KeyDown(IN_ATTACK) then
-		CheckpointService.holding = true
+	if CheckpointService.save_mode > 0 then
+		local eye = CheckpointService.SaveCurrentEye()
+
+		CheckpointService.marker_render_position:SnapTo(eye.hit_position)
 	else
-		CheckpointService.holding = false
+		CheckpointService.ClearSavedEyes()
+	end
+
+	if CheckpointService.save_mode == 1 then
+		local position = CheckpointService.saved_eyes[1].hit_position
+
+		CheckpointService.start_time = CurTime()
+		CheckpointService.start_marker = CheckpointHorizontalPlaneMarker.New(position)
+		CheckpointService.end_marker = CheckpointHorizontalPlaneMarker.New(position)
+		CheckpointService.horizontal_beam = CheckpointMarkerTwoPointBeam.New()
+	elseif CheckpointService.save_mode == 2 then
+		local xy_start_position = CheckpointService.saved_eyes[1].hit_position
+		local xy_end_position = CheckpointService.saved_eyes[2].intersect_position
+
+		CheckpointService.horizontal_beam_a = CheckpointMarkerTwoPointBeam.New{
+			start_position = xy_start_position,
+			end_position = xy_end_position
+		}
+
+		CheckpointService.horizontal_beam_b = CheckpointMarkerTwoPointBeam.New{
+			start_position = xy_start_position,
+			end_position = xy_end_position
+		}
+
+		CheckpointService.vertical_beam_a = CheckpointMarkerTwoPointBeam.New{
+			start_position = xy_start_position
+		}
+
+		CheckpointService.vertical_beam_b = CheckpointMarkerTwoPointBeam.New{
+			start_position = xy_end_position
+		}
+	end
+
+end
+
+function CheckpointService.SetupCreating(ply, move)
+	if IsFirstTimePredicted() then
+		if move:KeyPressed(IN_ATTACK) or (
+			move:KeyReleased(IN_ATTACK) and CheckpointService.save_mode == 1 and CurTime() > (CheckpointService.start_time + 0.25)
+		) then
+			CheckpointService.ProgressMode()
+		end
 	end
 end
 hook.Add("SetupMove", "CheckpointService.SetupCreating", CheckpointService.SetupCreating)
@@ -121,11 +211,21 @@ hook.Add("CalcView", "CheckpointService.CalcView", CheckpointService.CalcView)
 function CheckpointService.Think()
 	if CheckpointService.start_marker then
 		if CheckpointService.save_mode == 1 then
-			CheckpointService.start_marker.angle.current = CheckpointService.AngleFromIntersect(CheckpointService.start_marker.position)
+			CheckpointService.marker_render_position.current = CheckpointService.HorizontalPointFromIntersect(CheckpointService.start_marker.position)
+			CheckpointService.end_marker.position = CheckpointService.marker_render_position.smooth
+			CheckpointService.horizontal_beam.end_position = CheckpointService.marker_render_position.smooth
 		elseif CheckpointService.save_mode == 2 then
-			local plane_norm = Angle(0, CheckpointService.AngleFromIntersect(CheckpointService.saved_eyes[1].hit_position, false), 0):Right()
-			CheckpointService.start_marker.length.current = CheckpointService.DistanceFromIntersect(CheckpointService.start_marker.position, plane_norm)
+			local xy_start_position = CheckpointService.saved_eyes[1].hit_position
+			local xy_end_position = CheckpointService.saved_eyes[2].intersect_position
+
+			local z_start_point = CheckpointService.VerticalPointFromIntersect(xy_start_position, xy_start_position - xy_end_position)
+			local z_end_point = CheckpointService.VerticalPointFromIntersect(xy_end_position, xy_start_position - xy_end_position)
+
+			CheckpointService.vertical_beam_a.end_position = Vector(xy_start_position.x, xy_start_position.y, z_start_point.z)
+			CheckpointService.vertical_beam_b.end_position = Vector(xy_end_position.x, xy_end_position.y, z_end_point.z)
+			CheckpointService.horizontal_beam_b.start_position = CheckpointService.vertical_beam_a.end_position
+			CheckpointService.horizontal_beam_b.end_position = CheckpointService.vertical_beam_b.end_position
 		end
 	end
 end
-hook.Add("Think", "CheckpointService.Think", CheckpointService.Think)
+hook.Add("PostDrawTranslucentRenderables", "CheckpointService.Think", CheckpointService.Think)

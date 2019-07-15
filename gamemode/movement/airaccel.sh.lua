@@ -5,6 +5,7 @@ AiraccelService = AiraccelService or {}
 
 function AiraccelService.InitPlayerProperties(ply)
 	ply.can_airaccel = true
+	ply.has_infinite_airaccel = false
 	ply.airaccel_regen_step = 0.1
 	ply.airaccel_decay_step = 0.1
 	ply.airaccel_cooldown = 2
@@ -24,21 +25,39 @@ function AiraccelService.SetupStamina(ply)
 	ply.stamina.airaccel.regen_step = ply.airaccel_regen_step
 	ply.stamina.airaccel.decay_step = ply.airaccel_decay_step
 	ply.stamina.airaccel.cooldown = ply.airaccel_cooldown
+	ply.stamina.airaccel.infinite = ply.has_infinite_airaccel
 	ply.stamina.airaccel.amount = 100
 end
 
-function AiraccelService.PlayerProperties(ply)
+function AiraccelService.LocalPlayerProperties(ply)
 	AiraccelService.SetupStamina(ply)
 end
 hook.Add(
-	SERVER and "PlayerProperties" or "LocalPlayerProperties",
+	"LocalPlayerProperties",
+	"AiraccelService.LocalPlayerProperties",
+	AiraccelService.LocalPlayerProperties
+)
+
+function AiraccelService.PlayerProperties(ply)
+	if CLIENT then
+		StaminaService.InitPlayerProperties(ply)
+		AiraccelService.InitPlayerProperties(ply)
+		AiraccelService.SetupStamina(ply)
+	else
+		AiraccelService.SetupStamina(ply)
+	end
+end
+hook.Add(
+	"PlayerProperties",
 	"AiraccelService.PlayerProperties",
 	AiraccelService.PlayerProperties
 )
 
--- # Sound effects
+
+-- # Util
+
 function AiraccelService.KeyPress(ply, key)
-	if IsFirstTimePredicted() and key == IN_SPEED and not ply.airaccel_started then
+	if IsFirstTimePredicted() and ply.can_airaccel and key == IN_SPEED and not ply.airaccel_started then
 		ply.airaccel_started = true
 		PredictedSoundService.PlaySound(ply, ply.airaccel_sound)
 	end
@@ -59,6 +78,10 @@ function AiraccelService.Velocity(ply, move, amount)
 end
 
 function AiraccelService.SetupAiraccel(ply, move)
+	if CLIENT then
+		ply = GetPlayer()
+	end
+
 	if
 		ply:Alive() and
 		ply.can_airaccel and
@@ -76,7 +99,7 @@ function AiraccelService.SetupAiraccel(ply, move)
 		end
 	else
 		if IsFirstTimePredicted() and ply.airaccel_started then
-			if CLIENT then
+			if CLIENT and ply.can_airaccel then
 				PredictedSoundService.PlaySound(ply, ply.airaccel_sound, 100, 75, 0.2)
 			end
 

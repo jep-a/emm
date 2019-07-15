@@ -1,0 +1,1 @@
+SAFE_FRAME = 1/60
