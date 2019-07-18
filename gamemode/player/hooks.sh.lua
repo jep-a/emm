@@ -13,7 +13,7 @@ hook.Add("InitPlayerProperties", "InitCorePlayerProperties", function (ply)
 	if CLIENT then
 		ply.animatable_color = AnimatableValue.New(COLOR_WHITE, {
 			smooth = true,
-			
+
 			generate = function ()
 				return IsValid(ply) and ply.color or COLOR_WHITE
 			end
@@ -47,7 +47,7 @@ end)
 hook.Add("ShouldCollide", "EMM.ShouldCollide", function (a, b)
 	local should_collide
 
-	if MinigameService.IsSharingLobby(a, b) then
+	if a:GetClass() ~= "prop_ragdoll" and b:GetClass() ~= "prop_ragdoll" and MinigameService.IsSharingLobby(a, b) then
 		should_collide = true
 	else
 		should_collide = false

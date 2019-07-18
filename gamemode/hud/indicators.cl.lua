@@ -16,14 +16,17 @@ function IndicatorService.PlayerShouldHaveIndicator(ply)
 	if IsLocalPlayer(ply) then
 		should_have_indicator = false
 	elseif ply.player_class then
-		should_have_indicator = true
+		if ply.ghosting then
+			should_have_indicator = IsValid(ply.ghost_ragdoll)
+		else
+			should_have_indicator = true
+		end
 	else
 		should_have_indicator = false
 	end
 
 	return should_have_indicator
 end
-
 
 -- # Properties
 
@@ -68,13 +71,13 @@ function IndicatorService.Sort(ply, eye_pos)
 
 	for i = 1, #indicators do
 		local indicator = indicators[i]
-	
+
 		if IsValid(indicator.player) then
 			indicator.distance = indicator.player.indicator_distance
 		elseif indicator.position then
 			indicator.distance = eye_pos:Distance(indicator.position)
 		end
-	
+
 		indicator.panel:SetZPos(i)
 	end
 
@@ -100,7 +103,7 @@ function IndicatorService.CalculateScreenPositions(ply, eye_pos)
 		local ply = plys[i]
 
 		if IsValid(ply) and not IsLocalPlayer(ply) and ply.pixel_visible_handle then
-			local x, y, visible, distance = IndicatorService.ScreenPosition(ply, eye_pos)
+			local x, y, visible, distance = IndicatorService.ScreenPosition(GhostService.Position(ply), eye_pos)
 
 			ply.visible = util.PixelVisible(ply:WorldSpaceCenter(), 32, ply.pixel_visible_handle)
 			ply.indicator_x = x
@@ -148,7 +151,7 @@ function IndicatorService.DrawWorldPositions(ply)
 		if x and y and size then
 			indicator.x = x
 			indicator.y = y
-		
+
 			surface.SetAlphaMultiplier(CombineAlphas(container_alpha, indicator.attributes.alpha.current, indicator.world_alpha.current))
 
 			if IsValid(indicator.player) then
@@ -170,7 +173,7 @@ function IndicatorService.DrawWorldPositions(ply)
 			else
 				Element.PaintTexture(indicator, indicator_material, x, y, size, size, 0, indicator:GetColor())
 			end
-	
+
 			surface.SetAlphaMultiplier(1)
 		end
 	end
@@ -182,9 +185,10 @@ function IndicatorService.RenderCoasters()
 
 	for i = 1, #indicators do
 		local indicator = indicators[i]
+		local ply = indicator.player
 
-		if IsValid(indicator.player) then
-			local pos = indicator.player:GetPos() + Vector(0, 0, 5)
+		if IsValid(ply) then
+			local pos = GhostService.Position(ply) + Vector(0, 0, 5)
 
 			local trace = util.TraceLine {
 				start = pos,
@@ -226,7 +230,7 @@ function IndicatorService.Reload(soft_reload)
 
 	if IndicatorService.Visible() then
 		local lobby = LocalPlayer().lobby
-	
+
 		if lobby then
 			IndicatorService.InitLobby(lobby)
 		end
@@ -254,6 +258,22 @@ function IndicatorService.AddPlayerIndicator(ply)
 	end
 end
 
+function IndicatorService.RefreshPlayerIndicator(ply, hide)
+	if IndicatorService.Visible() then
+		local should_have_indicator = IndicatorService.PlayerShouldHaveIndicator(ply)
+
+		if should_have_indicator then
+			if ply.indicator then
+				ply.indicator:AnimateAttribute("alpha", hide and 0 or 255)
+			else
+				IndicatorService.AddPlayerIndicator(ply)
+			end
+		elseif not should_have_indicator and ply.indicator then
+			ply.indicator:Finish()
+		end
+	end
+end
+
 function IndicatorService.LobbyPlayerJoin(lobby, ply)
 	if IndicatorService.Visible() then
 		if IsLocalPlayer(ply) then
@@ -277,29 +297,17 @@ end
 hook.Add("LocalLobbyPlayerLeave", "IndicatorService.LobbyPlayerLeave", IndicatorService.LobbyPlayerLeave)
 
 function IndicatorService.LobbyPlayerSpawn(lobby, ply)
-	if IndicatorService.Visible() and IndicatorService.PlayerShouldHaveIndicator(ply) then
-		ply.indicator:AnimateAttribute("alpha", 255)
-	end
+	IndicatorService.RefreshPlayerIndicator(ply)
 end
 hook.Add("LocalLobbyPlayerSpawn", "IndicatorService.LobbyPlayerSpawn", IndicatorService.LobbyPlayerSpawn)
 
 function IndicatorService.LobbyPlayerDeath(lobby, ply)
-	if IndicatorService.Visible() and IndicatorService.PlayerShouldHaveIndicator(ply) then
-		ply.indicator:AnimateAttribute("alpha", 0)
-	end
+	IndicatorService.RefreshPlayerIndicator(ply, true)
 end
 hook.Add("LocalLobbyPlayerDeath", "IndicatorService.LobbyPlayerDeath", IndicatorService.LobbyPlayerDeath)
 
 function IndicatorService.LobbyPlayerClassChange(ply)
-	if IndicatorService.Visible() then
-		local should_have_indicator = IndicatorService.PlayerShouldHaveIndicator(ply)
-
-		if should_have_indicator and not ply.indicator then
-			IndicatorService.AddPlayerIndicator(ply)
-		elseif not should_have_indicator and ply.indicator then
-			ply.indicator:Finish()
-		end
-	end
+	IndicatorService.RefreshPlayerIndicator(ply)
 end
 hook.Add("LocalLobbyPlayerClassChange", "IndicatorService.LobbyPlayerClassChange", IndicatorService.LobbyPlayerClassChange)
 

@@ -1,4 +1,8 @@
 function MinigameService.IsSharingLobby(a, b)
+	if CLIENT then
+		b = b or LocalPlayer()
+	end
+
 	local sharing
 	local lobby_a
 	local lobby_b
