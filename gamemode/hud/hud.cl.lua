@@ -327,9 +327,7 @@ function HUDService.HideAll()
 end
 
 function HUDService.SpawnShow()
-	print "SpawnShow"
 	if SettingsService.Get "show_hud" and not LobbyUIService.open then
-		print(HUDService.container)
 		if HUDService.container then
 			HUDService.ShowMeters()
 			HUDService.ShowCrosshair()
