@@ -229,11 +229,11 @@ function HUDService.Init()
 		end
 
 		if not LobbyUIService.open then
-			if LocalPlayer():Alive() then
+			-- if LocalPlayer():Alive() then
 				HUDService.ShowAll()
-			else
-				HUDService.ShowNotifications()
-			end
+			-- else
+			-- 	HUDService.ShowNotifications()
+			-- end
 		end
 
 		hook.Run("InitHUDElements")
@@ -327,7 +327,9 @@ function HUDService.HideAll()
 end
 
 function HUDService.SpawnShow()
+	print "SpawnShow"
 	if SettingsService.Get "show_hud" and not LobbyUIService.open then
+		print(HUDService.container)
 		if HUDService.container then
 			HUDService.ShowMeters()
 			HUDService.ShowCrosshair()

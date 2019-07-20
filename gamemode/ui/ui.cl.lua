@@ -8,6 +8,8 @@ function UIService.Register(name, service, props)
 	UIService.menus[name].service = service
 	UIService.menus[name].properties = props
 
+	local GM = GM or GAMEMODE
+
 	hook.Add("Initialize", "UIService.Add"..name.."MenuHooks", 	function ()
 		if props.toggle_hook then
 			hook.Add(props.toggle_hook, name, function ()
@@ -38,7 +40,6 @@ function UIService.Register(name, service, props)
 end
 
 function UIService.Open(name)
-	print(name)
 	RememberCursorPosition()
 	RestoreCursorPosition()
 
