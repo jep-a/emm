@@ -27,9 +27,9 @@ MINIGAME:AddPlayerClass({
 	taggable_radius = 512,
 	can_tag = {Tagger = true},
 	tag_victim = true,
-	swap_on_tag = true,
-	swap_with_attacker = true
+	swap_on_tag = true
 }, {
+	cloud_set = false,
 	taggable = false,
 	swap_closest_on_death = true
 })
@@ -38,19 +38,27 @@ MINIGAME:AddPlayerClass {
 	name = "Tagger"
 }
 
+MINIGAME:AddAdjustableSetting {
+	key = "player_classes.Cloud.taggable_radius",
+	label = "Cloud tag radius",
+	type = "number"
+}
+
 if SERVER then
 	function MINIGAME:SetCloud(ply)
 		GhostService.Ghost(ply)
 
-		ply.dynamic_player_class.taggable = true
-		ply.dynamic_player_class.swap_closest_on_death = false
+		local dynamic_ply_class = ply.dynamic_player_class
+		dynamic_ply_class.cloud_set = true
+		dynamic_ply_class.taggable = true
+		dynamic_ply_class.swap_closest_on_death = false
 
 		MinigameService.CallNetHookWithoutMethod(self, "SetCloud", ply)
 	end
-end
 
-function MINIGAME.player_classes.Cloud:SetupMove(move)
-	if SERVER and IsFirstTimePredicted() and not self.taggable and self:Alive() and move:KeyPressed(IN_ATTACK) then
-		self.lobby:SetCloud(self)
+	function MINIGAME.player_classes.Cloud:SetupMove(move)
+		if IsFirstTimePredicted() and not self.cloud_set and self:Alive() and move:KeyPressed(IN_ATTACK) then
+			self.lobby:SetCloud(self)
+		end
 	end
 end
