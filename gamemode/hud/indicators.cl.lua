@@ -263,7 +263,7 @@ function IndicatorService.RefreshPlayerIndicator(ply, hide)
 		if should_have_indicator then
 			if ply.indicator and not GhostService.IsGhostingWithoutRagdoll(ply) then
 				ply.indicator:AnimateAttribute("alpha", hide and 0 or 255)
-			else
+			elseif not ply.indicator then
 				IndicatorService.AddPlayerIndicator(ply)
 			end
 		elseif not should_have_indicator and ply.indicator then
@@ -304,11 +304,8 @@ function IndicatorService.LobbyPlayerDeath(lobby, ply)
 end
 hook.Add("LocalLobbyPlayerDeath", "IndicatorService.LobbyPlayerDeath", IndicatorService.LobbyPlayerDeath)
 
-function IndicatorService.LobbyPlayerClassChange(ply)
-	IndicatorService.RefreshPlayerIndicator(ply)
-end
-hook.Add("LocalLobbyPlayerClassChange", "IndicatorService.LobbyPlayerClassChange", IndicatorService.LobbyPlayerClassChange)
-hook.Add("LocalPlayerGhost", "IndicatorService.LobbyPlayerClassChange", IndicatorService.LobbyPlayerClassChange)
+hook.Add("LocalLobbyPlayerClassChange", "IndicatorService.RefreshPlayerIndicator", IndicatorService.RefreshPlayerIndicator)
+hook.Add("LocalPlayerGhost", "IndicatorService.RefreshPlayerIndicator", IndicatorService.RefreshPlayerIndicator)
 
 function IndicatorService.Show()
 	if IndicatorService.Visible() then

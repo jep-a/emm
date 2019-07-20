@@ -92,11 +92,11 @@ end
 function Indicator:AnimateFinish()
 	self:AnimateAttribute("alpha", 0, {
 		callback = function ()
-			local ent = self.player
+			local ply = self.player
 
-			if IsValid(ent) then
-				if self == ent.indicator then
-					ent.indicator = nil
+			if IsValid(ply) then
+				if self == ply.indicator then
+					ply.indicator = nil
 				end
 			end
 
