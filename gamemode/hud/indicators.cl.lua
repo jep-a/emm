@@ -145,19 +145,21 @@ function IndicatorService.DrawWorldPositions(ply)
 		local x, y, size = IndicatorService.IndicatorPosition(indicator)
 
 		if x and y and size then
+			local indicator_ply = indicator.player
+
 			indicator.x = x
 			indicator.y = y
 
 			surface.SetAlphaMultiplier(CombineAlphas(container_alpha, indicator.attributes.alpha.current, indicator.world_alpha.current))
 
-			if IsValid(indicator.player) then
+			if IsValid(indicator_ply) then
 				Element.PaintTexture(indicator, indicator_material, x, y, size, size, 0, COLOR_BLACK)
 
-				local health_percent = indicator.player:Health()/indicator.player.max_health
+				local health_percent = indicator_ply:Health()/indicator_ply.max_health
 
 				local visual_health_percent
 
-				if health_percent >= 1 then
+				if GhostService.IsGhostingWithoutRagdoll(indicator_ply) or health_percent >= 1 then
 					visual_health_percent = 1
 				else
 					visual_health_percent = (health_percent * 0.33) + 0.33
@@ -259,7 +261,7 @@ function IndicatorService.RefreshPlayerIndicator(ply, hide)
 		local should_have_indicator = IndicatorService.PlayerShouldHaveIndicator(ply)
 
 		if should_have_indicator then
-			if ply.indicator then
+			if ply.indicator and not GhostService.IsGhostingWithoutRagdoll(ply) then
 				ply.indicator:AnimateAttribute("alpha", hide and 0 or 255)
 			else
 				IndicatorService.AddPlayerIndicator(ply)

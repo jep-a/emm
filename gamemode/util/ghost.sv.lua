@@ -1,6 +1,6 @@
 util.AddNetworkString "Ghosts"
 
-GhostService.ghosts = {}
+GhostService.ghosts = GhostService.ghosts or {}
 
 function GhostService.Ragdoll(ply, freeze)
 	local ragdoll = ents.Create "prop_ragdoll"
@@ -86,7 +86,6 @@ function GhostService.UnGhost(ply)
 		NetService.Send("UnGhost", ply)
 	end
 end
-hook.Add("PlayerDeath", "GhostService.UnGhost", GhostService.UnGhost)
 hook.Add("EndPlayerClass", "GhostService.UnGhost", GhostService.UnGhost)
 
 function GhostService.EntityTakeDamage(victim, dmg)

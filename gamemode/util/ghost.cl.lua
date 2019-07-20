@@ -1,4 +1,8 @@
-GhostService.queued_ragdolls = {}
+GhostService.queued_ragdolls = GhostService.queued_ragdolls or {}
+
+function GhostService.IsGhostingWithoutRagdoll(ply)
+	return ply.ghosting and not IsValid(ply.ghost_ragdoll)
+end
 
 function GhostService.Ghost(ply, pos, ragdoll_id)
 	ply.ghosting = true

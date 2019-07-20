@@ -1,10 +1,10 @@
 MINIGAME.name = "Cloud"
 MINIGAME.color = COLOR_ROYAL
-MINIGAME.default_player_class = "Jumper"
+MINIGAME.default_player_class = "Tagger"
 
 MINIGAME.random_player_classes = {
 	class_key = "Cloud",
-	rejected_class_key = "Jumper"
+	rejected_class_key = "Tagger"
 }
 
 hook.Add("CreateMinigameHookSchemas", "Cloud", function ()
@@ -25,7 +25,7 @@ MINIGAME:AddPlayerClass({
 	name = "Cloud",
 	color = COLOR_CLOUD,
 	taggable_radius = 512,
-	can_tag = {Jumper = true},
+	can_tag = {Tagger = true},
 	tag_victim = true,
 	swap_on_tag = true,
 	swap_with_attacker = true
@@ -50,7 +50,7 @@ if SERVER then
 end
 
 function MINIGAME.player_classes.Cloud:SetupMove(move)
-	if SERVER and IsFirstTimePredicted() and not self.taggable and move:KeyPressed(IN_ATTACK) then
+	if SERVER and IsFirstTimePredicted() and not self.taggable and self:Alive() and move:KeyPressed(IN_ATTACK) then
 		self.lobby:SetCloud(self)
 	end
 end
