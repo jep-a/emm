@@ -40,7 +40,6 @@ function UIService.Register(name, service, props)
 end
 
 function UIService.Open(name)
-	print(name)
 	RememberCursorPosition()
 	RestoreCursorPosition()
 
