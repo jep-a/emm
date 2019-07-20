@@ -35,7 +35,7 @@ MINIGAME:AddPlayerClass({
 })
 
 MINIGAME:AddPlayerClass {
-	name = "Jumper"
+	name = "Tagger"
 }
 
 if SERVER then

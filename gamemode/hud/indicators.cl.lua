@@ -13,13 +13,11 @@ end
 function IndicatorService.PlayerShouldHaveIndicator(ply)
 	local should_have_indicator
 
-	if IsLocalPlayer(ply) then
-		should_have_indicator = false
-	elseif ply.player_class then
+	if ply.player_class then
 		if ply.ghosting then
-			should_have_indicator = IsValid(ply.ghost_ragdoll)
-		else
 			should_have_indicator = true
+		else
+			should_have_indicator = not IsLocalPlayer(ply)
 		end
 	else
 		should_have_indicator = false
@@ -31,20 +29,18 @@ end
 -- # Properties
 
 function IndicatorService.InitPlayerProperties(ply)
-	if not IsLocalPlayer(ply) then
-		cam.Start3D()
+	cam.Start3D()
 
-		local x, y, visible, distance = IndicatorService.ScreenPosition(ply)
+	local x, y, visible, distance = IndicatorService.ScreenPosition(ply)
 
-		cam.End3D()
+	cam.End3D()
 
-		ply.visible = 0
-		ply.pixel_visible_handle = util.GetPixelVisibleHandle()
-		ply.indicator_x = x
-		ply.indicator_y = y
-		ply.indicator_is_visible = visible
-		ply.indicator_distance = distance
-	end
+	ply.visible = 0
+	ply.pixel_visible_handle = util.GetPixelVisibleHandle()
+	ply.indicator_x = x
+	ply.indicator_y = y
+	ply.indicator_is_visible = visible
+	ply.indicator_distance = distance
 end
 hook.Add("InitPlayerProperties", "IndicatorService.InitPlayerProperties", IndicatorService.InitPlayerProperties)
 
@@ -102,7 +98,7 @@ function IndicatorService.CalculateScreenPositions(ply, eye_pos)
 	for i = 1, #plys do
 		local ply = plys[i]
 
-		if IsValid(ply) and not IsLocalPlayer(ply) and ply.pixel_visible_handle then
+		if IsValid(ply) and ply.pixel_visible_handle then
 			local x, y, visible, distance = IndicatorService.ScreenPosition(GhostService.Position(ply), eye_pos)
 
 			ply.visible = util.PixelVisible(ply:WorldSpaceCenter(), 32, ply.pixel_visible_handle)
@@ -310,6 +306,7 @@ function IndicatorService.LobbyPlayerClassChange(ply)
 	IndicatorService.RefreshPlayerIndicator(ply)
 end
 hook.Add("LocalLobbyPlayerClassChange", "IndicatorService.LobbyPlayerClassChange", IndicatorService.LobbyPlayerClassChange)
+hook.Add("LocalPlayerGhost", "IndicatorService.LobbyPlayerClassChange", IndicatorService.LobbyPlayerClassChange)
 
 function IndicatorService.Show()
 	if IndicatorService.Visible() then
