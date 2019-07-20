@@ -1,14 +1,14 @@
 "VertexLitGeneric"
 {
-	"$baseTexture"			"models\cloud\cloud"
-	"$bumpmap"				"models\cloud\phong"
+	"$baseTexture"			"emm2\models\cloud\cloud"
+	"$bumpmap"				"emm2\models\cloud\phong"
 	"$halflambert"			"1"
 
 	"$phong"				"1"
 	"$phongalbedotint"		"1"
 	"$phongboost"			"7"
 	"$phongexponent"		"15"
-	"$phongexponenttexture"	"models\cloud\albedo"
+	"$phongexponenttexture"	"emm2\models\cloud\albedo"
 	"$phongfresnelranges"	"[.1 .5 .75]"
 
 	"$rimlight"				"1"

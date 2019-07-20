@@ -85,6 +85,7 @@ function EMM.AddResourceDirectory(dir)
 	end
 end
 
+EMM.AddResourceDirectory "models/emm2"
 EMM.AddResourceDirectory "materials/emm2"
 EMM.AddResourceDirectory "resource/fonts"
 include(gamemode_name..".lua")

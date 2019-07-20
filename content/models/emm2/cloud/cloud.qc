@@ -1,6 +1,6 @@
 // Created by Crowbar 0.56
 
-$modelname "models/cloud/cloud.mdl"
+$modelname "models/emm2/cloud/cloud.mdl"
 
 $model "Cloud" "cloud.smd" {	
 }
@@ -13,4 +13,4 @@ $contents "solid"
 
 $illumposition 0.508 0 17.851
 
-$cdmaterials "models\cloud\"
+$cdmaterials "emm2\models\cloud\"
