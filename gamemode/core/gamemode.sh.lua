@@ -36,6 +36,7 @@ EMM.Include {
 	"minigame/minigame",
 	"minigame/prototype",
 	"minigame/lobby",
+	"minigame/hooks",
 	"minigame/net",
 	"minigame/states",
 	"minigame/settings",
