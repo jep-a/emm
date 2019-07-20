@@ -8,9 +8,9 @@ function UIService.Register(name, service, props)
 	UIService.menus[name].service = service
 	UIService.menus[name].properties = props
 
-	local GM = GM or GAMEMODE
+	local function MenuHook()
+		local GM = GM or GAMEMODE
 
-	hook.Add("Initialize", "UIService.Add"..name.."MenuHooks", 	function ()
 		if props.toggle_hook then
 			hook.Add(props.toggle_hook, name, function ()
 				if service.active then
@@ -36,7 +36,10 @@ function UIService.Register(name, service, props)
 				return true
 			end
 		end
-	end)
+	end
+
+	hook.Add("Initialize", "UIService.Add"..name.."MenuHooks", MenuHook)
+	hook.Add("OnReloaded", "UIService.Reload"..name.."MenuHooks", MenuHook)
 end
 
 function UIService.Open(name)
