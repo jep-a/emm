@@ -1,6 +1,6 @@
 PlayerClassService = PlayerClassService or {}
 
-function PlayerClassService.CreatePlayerClass(props)
+function PlayerClassService.CreatePlayerClass(props, dynamic_props)
 	local ply_class = table.Merge({
 		key = props.key or props.name,
 		display_name = true,
@@ -27,6 +27,8 @@ function PlayerClassService.CreatePlayerClass(props)
 		notify_on_killed_by_player = true,
 		notify_on_killed_by_other = false
 	}, props)
+
+	ply_class.dynamic_properties = dynamic_props
 
 	return ply_class
 end

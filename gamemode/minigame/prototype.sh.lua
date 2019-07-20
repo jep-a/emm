@@ -106,8 +106,8 @@ function MinigamePrototype:Init()
 	end
 end
 
-function MinigamePrototype:AddPlayerClass(props)
-	ply_class = PlayerClassService.CreatePlayerClass(props)
+function MinigamePrototype:AddPlayerClass(props, dynamic_props)
+	ply_class = PlayerClassService.CreatePlayerClass(props, dynamic_props)
 	ply_class.id = table.Count(self.player_classes) + 1
 	ply_class.color = props.color or self.color
 	self.player_classes[ply_class.key] = ply_class

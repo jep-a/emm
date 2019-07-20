@@ -73,17 +73,21 @@ function GhostService.Ghost(ply, options)
 end
 
 function GhostService.UnGhost(ply)
-	ply.ghosting = false
+	if ply.ghosting then
+		ply.ghosting = false
 
-	if IsValid(ply.ghost_ragdoll) then
-		ply.ghost_ragdoll:Remove()
+		if IsValid(ply.ghost_ragdoll) then
+			ply.ghost_ragdoll:Remove()
+		end
+
+		table.RemoveByValue(GhostService.ghosts, ply)
+
+		hook.Run("PlayerUnGhost", ply)
+		NetService.Send("UnGhost", ply)
 	end
-
-	table.RemoveByValue(GhostService.ghosts, ply)
-
-	hook.Run("PlayerUnGhost", ply)
-	NetService.Send("UnGhost", ply)
 end
+hook.Add("PlayerDeath", "GhostService.UnGhost", GhostService.UnGhost)
+hook.Add("EndPlayerClass", "GhostService.UnGhost", GhostService.UnGhost)
 
 function GhostService.EntityTakeDamage(victim, dmg)
 	if victim:GetClass() == "prop_ragdoll" then

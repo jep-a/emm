@@ -1,6 +1,7 @@
 TaggingService.taggable_groups = TaggingService.taggable_groups or {}
 
 function TaggingService.InitPlayerProperties(ply)
+	ply.taggable = true
 	ply.taggable_radius = 80
 	ply.taggable_cooldown = 1
 	ply.last_tag_time = 0
@@ -28,6 +29,7 @@ function TaggingService.Think()
 				local ents = ents.FindInSphere(GhostService.Position(taggable), taggable.taggable_radius)
 
 				if
+					taggable.taggable and
 					taggable:Alive() and
 					CurTime() > (taggable.last_tag_time + taggable.taggable_cooldown)
 				then

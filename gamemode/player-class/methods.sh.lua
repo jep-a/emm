@@ -7,6 +7,16 @@ function player_metatable:__index(key)
 	local tab = ent_get_table(self)
 
 	if tab then
+		local dynamic_ply_class = tab.dynamic_player_class
+
+		if dynamic_ply_class then
+			local dynamic_ply_class_val = dynamic_ply_class[key]
+
+			if dynamic_ply_class_val ~= nil then
+				return dynamic_ply_class_val
+			end
+		end
+
 		local ply_class = tab.player_class
 
 		if ply_class then
@@ -50,7 +60,10 @@ function player_metatable:HasPlayerClass()
 end
 
 function player_metatable:SetupPlayerClass()
+	self.dynamic_player_class = table.Copy(self.player_class.dynamic_properties)
 	self:SetupCoreProperties()
+
+	hook.Run("SetupPlayerClass", self)
 
 	if CLIENT and IsLocalPlayer(self) then
 		hook.Run("LocalPlayerProperties", self)
@@ -64,5 +77,8 @@ function player_metatable:SetupPlayerClass()
 end
 
 function player_metatable:EndPlayerClass()
+	self.dynamic_player_class_properties = nil
 	self:SetupCoreProperties()
+
+	hook.Run("EndPlayerClass", self)
 end
