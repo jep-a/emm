@@ -5,7 +5,9 @@ function GhostService.Ghost(ply, pos, ragdoll_id)
 	ply.ghost_position = pos
 	ply.ghost_ragdoll_id = ragdoll_id
 
-	GhostService.queued_ragdolls[ragdoll_id] = ply
+	if ragdoll_id then
+		GhostService.queued_ragdolls[ragdoll_id] = ply
+	end
 
 	if IsLocalPlayer(ply) then
 		hook.Run("LocalPlayerGhost", ply)
