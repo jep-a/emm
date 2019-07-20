@@ -1,0 +1,20 @@
+"VertexLitGeneric"
+{
+	"$baseTexture"			"models\cloud\cloud"
+	"$bumpmap"				"models\cloud\phong"
+	"$halflambert"			"1"
+
+	"$phong"				"1"
+	"$phongalbedotint"		"1"
+	"$phongboost"			"7"
+	"$phongexponent"		"15"
+	"$phongexponenttexture"	"models\cloud\albedo"
+	"$phongfresnelranges"	"[.1 .5 .75]"
+
+	"$rimlight"				"1"
+	"$rimlightboost"		"2"
+
+	"$blendtintbybasealpha"	"1"
+	"$color2"				"{255 255 255}"
+}
+
