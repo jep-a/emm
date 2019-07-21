@@ -25,6 +25,8 @@ NetService.Receive("LobbyFinish", CallIfReceivedLobbies(MinigameService.FinishLo
 NetService.Receive("LobbyHost", CallIfReceivedLobbies(MinigameLobby.SetHost))
 NetService.Receive("LobbyPlayer", CallIfReceivedLobbies(MinigameLobby.AddPlayer))
 NetService.Receive("LobbyPlayerLeave", CallIfReceivedLobbies(MinigameLobby.RemovePlayer))
+NetService.Receive("LobbyEntity", CallIfReceivedLobbies(MinigameLobby.AddEntity))
+NetService.Receive("LobbyEntityRemove", CallIfReceivedLobbies(MinigameLobby.RemoveEntity))
 
 function MinigameNetService.RequestLobbies()
 	NetService.Send "RequestLobbies"
@@ -41,11 +43,18 @@ function MinigameNetService.ReceiveLobbies(len)
 		local last_state_start = net.ReadFloat()
 		local host = net.ReadEntity()
 		local ply_count = NetService.ReadID()
+		local ent_count = NetService.ReadID()
 
 		local plys = {}
 
 		for i = 1, ply_count do
 			plys[i] = net.ReadEntity()
+		end
+
+		local ents = {}
+
+		for i = 1, ent_count do
+			ents[i] = net.ReadEntity()
 		end
 
 		local settings = net.ReadTable()
@@ -57,7 +66,8 @@ function MinigameNetService.ReceiveLobbies(len)
 			state = MinigameStateService.State(proto, state_id),
 			last_state_start = last_state_start,
 			host = host,
-			players = plys
+			players = plys,
+			entities = ents
 		}, false)
 
 		MinigameSettingsService.Adjust(lobby, settings)

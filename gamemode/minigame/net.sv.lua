@@ -12,8 +12,13 @@ function MinigameNetService.SendLobbies(ply)
 		net.WriteFloat(lobby.last_state_start)
 		net.WriteEntity(lobby.host)
 		net.WriteUInt(#lobby.players, 8)
+		net.WriteUInt(#lobby.entities, 8)
 
 		for _, ply in pairs(lobby.players) do
+			net.WriteEntity(ply)
+		end
+
+		for _, ply in pairs(lobby.entities) do
 			net.WriteEntity(ply)
 		end
 

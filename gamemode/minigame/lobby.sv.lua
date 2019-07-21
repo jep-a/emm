@@ -45,6 +45,10 @@ function MinigameLobby:Finish()
 		self:RemovePlayer(ply, false, true)
 	end
 
+	for _, ent in pairs(self.entities) do
+		ent:Remove()
+	end
+
 	NetService.Send("LobbyFinish", self)
 	table.Empty(self)
 end
@@ -83,8 +87,6 @@ function MinigameLobby:RemovePlayer(ply, net, force)
 		if has_plys and self.host == ply then
 			self:SetHost(self.players[1])
 		end
-
-		ply.leaving_lobby = nil
 	else
 		MinigameService.FinishLobby(self)
 	end
@@ -94,3 +96,30 @@ hook.Add("PlayerDisconnected", "MinigameService.RemoveDisconnectedPlayer", funct
 		ply.lobby:RemovePlayer(ply)
 	end
 end)
+
+function MinigameLobby:AddEntity(ent)
+	ent.lobby = self
+	table.insert(self.entities, ent)
+
+	ent:CallOnRemove("LobbyFinish", function ()
+		self:RemoveEntity(ent, false)
+	end)
+
+	NetService.Send("LobbyEntity", self, ent)
+	hook.Run("LobbyEntityAdd", self, ent)
+	MinigameService.CallHook(self, "EntityAdd", ent)
+end
+
+function MinigameLobby:RemoveEntity(ent, net)
+	net = Default(net, true)
+
+	MinigameService.CallHook(self, "EntityRemove", ent)
+	hook.Run("LobbyEntityRemove", self, ent)
+
+	ent.lobby = nil
+	table.RemoveByValue(self.entities, ent)
+
+	if net then
+		NetService.Send("LobbyEntityRemove", self, ent)
+	end
+end

@@ -70,6 +70,10 @@ function MinigameLobby:Finish()
 		self:RemovePlayer(ply, false)
 	end
 
+	for _, ent in pairs(self.entities) do
+		self:RemoveEntity(ent, false)
+	end
+
 	table.Empty(self)
 end
 
@@ -136,6 +140,7 @@ function MinigameLobby:RemovePlayer(ply)
 		table.RemoveByValue(self.players, ply)
 	end
 end
+
 hook.Add("PlayerDisconnected", "MinigameService.RemoveDisconnectedPlayer", function (ply)
 	if IsValid(ply) and ply.lobby then
 		ply.lobby:RemovePlayer(ply)
@@ -155,3 +160,35 @@ hook.Add("PlayerDisconnected", "MinigameService.RemoveDisconnectedPlayer", funct
 		end
 	end
 end)
+
+function MinigameLobby:AddEntity(ent)
+	ent.lobby = self
+	table.insert(self.entities, ent)
+
+	ent:CallOnRemove("LobbyFinish", function ()
+		self:RemoveEntity(ent)
+	end)
+
+	hook.Run("LobbyEntityAdd", self, ent)
+
+	if self:IsLocal() then
+		hook.Run("LocalLobbyEntityAdd", self, ent)
+	end
+
+	MinigameService.CallHook(self, "EntityAdd", ent)
+end
+
+function MinigameLobby:RemoveEntity(ent)
+	if IsValid(ent) then
+		hook.Run("LobbyEntityRemove", self, ent)
+
+		if self:IsLocal() then
+			hook.Run("LocalLobbyEntityRemove", self, ent)
+		end
+
+		MinigameService.CallHook(self, "EntityRemove", ent)
+
+		ent.lobby = nil
+		table.RemoveByValue(self.entities, ent)
+	end
+end
