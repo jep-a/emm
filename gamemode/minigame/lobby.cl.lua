@@ -42,6 +42,11 @@ function MinigameLobby:Init(props)
 		ply.lobby = self
 	end
 
+	for _, ent in pairs(self.entities) do
+		ent.lobby = self
+		hook.Run("LobbyEntityProperties", ent)
+	end
+
 	for k, _ in pairs(self.prototype.player_classes) do
 		self[k] = self[k] or {}
 	end
@@ -176,6 +181,7 @@ function MinigameLobby:AddEntity(ent)
 	end
 
 	MinigameService.CallHook(self, "EntityAdd", ent)
+	hook.Run("LobbyEntityProperties", ent)
 end
 
 function MinigameLobby:RemoveEntity(ent)

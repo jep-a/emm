@@ -4,19 +4,23 @@ local hide_radius = 32
 local height_offset = 24
 local nametag_alpha_smooth_multiplier = 4
 
-local function NametagAlpha(ply)
+local function NametagAlpha(ent)
 	local alpha
 
 	local not_near_crosshair
 
-	if ply.indicator_x and ply.indicator_y then
-		not_near_crosshair = math.sqrt(((ply.indicator_x - (ScrW()/2)) ^ 2) + ((ply.indicator_y - (ScrH()/2) - height_offset) ^ 2)) > hide_radius
+	if ent.indicator_x and ent.indicator_y then
+		not_near_crosshair = math.sqrt(((ent.indicator_x - (ScrW()/2)) ^ 2) + ((ent.indicator_y - (ScrH()/2) - height_offset) ^ 2)) > hide_radius
 	end
 
-	if IsValid(ply) and LocalPlayer():Alive() and (ply:Alive() or GhostService.IsGhostingWithoutRagdoll(ply)) and not_near_crosshair then
-		if ply.indicator then
+	if IsValid(ent) and LocalPlayer():Alive() and not_near_crosshair and (
+		not IsPlayer(ent) or
+		ent:Alive() or
+		GhostService.IsGhostingWithoutRagdoll(ent)
+	) then
+		if ent.indicator then
 			alpha = 255
-		elseif ply.visible >= 0.5 then
+		elseif ent.visible and ent.visible >= 0.5 then
 			alpha = HALF_ALPHA
 		else
 			alpha = 0
@@ -28,19 +32,19 @@ local function NametagAlpha(ply)
 	return alpha
 end
 
-function NametagService.InitPlayerProperties(ply)
-	if not IsLocalPlayer(ply) then
-		ply.nametag_alpha = AnimatableValue.New(0, {
+function NametagService.InitEntityProperties(ent)
+	if not IsLocalPlayer(ent) then
+		ent.nametag_alpha = AnimatableValue.New(0, {
 			smooth = true,
 			smooth_multiplier = nametag_alpha_smooth_multiplier,
 
 			generate = function ()
-				return NametagAlpha(ply)
+				return NametagAlpha(ent)
 			end
 		})
 	end
 end
-hook.Add("InitPlayerProperties", "NametagService.InitPlayerProperties", NametagService.InitPlayerProperties)
+hook.Add("InitPlayerProperties", "NametagService.InitPlayerProperties", NametagService.InitEntityProperties)
 
 function NametagService.FinishPlayerProperties(ply)
 	if not IsLocalPlayer(ply) then
@@ -49,8 +53,26 @@ function NametagService.FinishPlayerProperties(ply)
 end
 hook.Add("PlayerDisconnected", "NametagService.FinishPlayerProperties", NametagService.FinishPlayerProperties)
 
-function NametagService.Draw(ply)
+function NametagService.InitEntityProperties(ent)
+	ent.nametag_alpha = AnimatableValue.New(0, {
+		smooth = true,
+		smooth_multiplier = nametag_alpha_smooth_multiplier,
+
+		generate = function ()
+			return NametagAlpha(ent)
+		end
+	})
+end
+hook.Add("LobbyEntityProperties", "NametagService.InitEntityProperties", NametagService.InitEntityProperties)
+
+function NametagService.FinishEntityProperties(lobby, ply)
+	ent.nametag_alpha:Finish()
+end
+hook.Add("LobbyEntityRemove", "NametagService.FinishEntityProperties", NametagService.FinishEntityProperties)
+
+function NametagService.Draw()
 	local plys = player.GetAll()
+	local lobby = LocalPlayer().lobby
 
 	for i = 1, #plys do
 		local ply = plys[i]
@@ -68,6 +90,31 @@ function NametagService.Draw(ply)
 				surface.SetTextColor(ColorAlpha(color, CombineAlphas(color.a, alpha) * 255))
 				surface.SetTextPos(ply.indicator_x - (w/2), ply.indicator_y - (h/2) - height_offset)
 				surface.DrawText(ply_name)
+			end
+		end
+	end
+
+	if lobby then
+		local ents = lobby.entities
+
+		for i = 1, #ents do
+			local ent = ents[i]
+			local ent_name = ent.indicator_name or ent.GetName and ent:GetName()
+
+			if ent_name then
+				local alpha = ent.nametag_alpha.smooth
+
+				if alpha > 0 then
+					surface.SetFont "Nametag"
+
+					local upper_name = string.upper(ent_name)
+					local w, h = surface.GetTextSize(upper_name)
+					local color = GetAnimatableEntityColor(ent)
+
+					surface.SetTextColor(ColorAlpha(color, CombineAlphas(color.a, alpha) * 255))
+					surface.SetTextPos(ent.indicator_x - (w/2), ent.indicator_y - (h/2) - height_offset)
+					surface.DrawText(upper_name)
+				end
 			end
 		end
 	end
