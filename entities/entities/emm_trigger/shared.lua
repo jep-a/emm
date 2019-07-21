@@ -18,6 +18,10 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Vector", 0, "Normal")
 	self:NetworkVar("String", 0, "IndicatorName")
 	self:NetworkVar("String", 1, "IndicatorIcon")
+	self:NetworkVar("String", 2, "CanTagString")
+	self:NetworkVar("Float", 3, "CanTagStringCRC")
+
+	self.can_tag_tables = {}
 end
 
 function ENT:GetShape()
@@ -30,6 +34,28 @@ function ENT:GetShape()
 	end
 
 	return shape
+end
+
+function ENT:SetCanTag(can_tag)
+	local str = table.ToString(can_tag)
+
+	self:SetCanTagString(str)
+	self:SetCanTagStringCRC(util.CRC(str))
+end
+
+function ENT:GetCanTag()
+	local crc = self:GetCanTagStringCRC()
+	local cached_tab = self.can_tag_tables[crc]
+
+	if cached_tab then
+		return cached_tab
+	else
+		local tab = string.ToTable(self:SetCanTagString())
+
+		self.can_tag_tables[crc] = tab
+
+		return tab
+	end
 end
 
 function ENT:GetCollision()
@@ -109,7 +135,7 @@ function ENT:GetBounds()
 end
 
 function ENT:CanTouchEntity(ent)
-	return IsPlayer(ent) and MinigameService.IsSharingLobby(self, ent)
+	return IsPlayer(ent) and MinigameService.IsSharingLobby(self, ent) and ent.player_class and self:GetCanTag()[ent.player_class.key]
 end
 
 function ENT:StartTouch(ent)

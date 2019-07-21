@@ -22,6 +22,10 @@ function ENT:Initialize()
 		self:SetIndicatorIcon(self.indicator_icon)
 	end
 
+	if self.can_tag then
+		self:SetCanTag(self.can_tag)
+	end
+
 	self:SetNotSolid(true)
 	self:SetNoDraw(false)
 	self:DrawShadow(false)
