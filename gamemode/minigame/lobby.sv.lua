@@ -113,13 +113,16 @@ end
 function MinigameLobby:RemoveEntity(ent, net)
 	net = Default(net, true)
 
-	MinigameService.CallHook(self, "EntityRemove", ent)
-	hook.Run("LobbyEntityRemove", self, ent)
+	if not ent.removed_from_lobby then
+		MinigameService.CallHook(self, "EntityRemove", ent)
+		hook.Run("LobbyEntityRemove", self, ent)
 
-	ent.lobby = nil
-	table.RemoveByValue(self.entities, ent)
+		ent.lobby = nil
+		ent.removed_from_lobby = true
+		table.RemoveByValue(self.entities, ent)
 
-	if net then
-		NetService.Send("LobbyEntityRemove", self, ent)
+		if net then
+			NetService.Send("LobbyEntityRemove", self, ent)
+		end
 	end
 end

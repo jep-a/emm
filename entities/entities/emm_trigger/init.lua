@@ -6,6 +6,8 @@ function ENT:Initialize()
 	local ang = self.angle
 	local lobby = self.lobby
 
+	self.can_tag_tables = {}
+
 	self:SetPos(self.position)
 	self:SetWidth(self.width or 0)
 	self:SetHeight(self.height or 0)

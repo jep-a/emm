@@ -185,7 +185,7 @@ function MinigameLobby:AddEntity(ent)
 end
 
 function MinigameLobby:RemoveEntity(ent)
-	if IsValid(ent) then
+	if IsValid(ent) and not ent.removed_from_lobby then
 		hook.Run("LobbyEntityRemove", self, ent)
 
 		if self:IsLocal() then
@@ -195,6 +195,7 @@ function MinigameLobby:RemoveEntity(ent)
 		MinigameService.CallHook(self, "EntityRemove", ent)
 
 		ent.lobby = nil
+		ent.removed_from_lobby = true
 		table.RemoveByValue(self.entities, ent)
 	end
 end

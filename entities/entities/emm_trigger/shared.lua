@@ -20,8 +20,6 @@ function ENT:SetupDataTables()
 	self:NetworkVar("String", 1, "IndicatorIcon")
 	self:NetworkVar("String", 2, "CanTagString")
 	self:NetworkVar("Float", 3, "CanTagStringCRC")
-
-	self.can_tag_tables = {}
 end
 
 function ENT:GetShape()
@@ -40,7 +38,7 @@ function ENT:SetCanTag(can_tag)
 	local str = table.ToString(can_tag)
 
 	self:SetCanTagString(str)
-	self:SetCanTagStringCRC(util.CRC(str))
+	self:SetCanTagStringCRC(tonumber(util.CRC(str)))
 end
 
 function ENT:GetCanTag()
@@ -50,7 +48,7 @@ function ENT:GetCanTag()
 	if cached_tab then
 		return cached_tab
 	else
-		local tab = string.ToTable(self:SetCanTagString())
+		local tab = string.ToTable(self:GetCanTagString())
 
 		self.can_tag_tables[crc] = tab
 

@@ -24,13 +24,10 @@ end
 MINIGAME:AddPlayerClass({
 	name = "Cloud",
 	color = COLOR_CLOUD,
-	taggable_radius = 512,
-	can_tag = {Tagger = true},
 	tag_victim = true,
 	swap_on_tag = true
 }, {
 	cloud_set = false,
-	taggable = false,
 	swap_closest_on_death = true
 })
 
@@ -38,19 +35,18 @@ MINIGAME:AddPlayerClass {
 	name = "Tagger"
 }
 
-MINIGAME:AddAdjustableSetting {
-	key = "player_classes.Cloud.taggable_radius",
-	label = "Cloud tag radius",
-	type = "number"
-}
-
 if SERVER then
 	function MINIGAME:SetCloud(ply)
-		GhostService.Ghost(ply)
+		TriggerService.CreateTrigger(self, {
+			position = ply:GetPos(),
+			width = 512,
+			indicator_name = ply:GetName().."'s cloud",
+			indicator_icon = "emm2/minigames/cloud.png",
+			can_tag = {Tagger = true}
+		})
 
 		local dynamic_ply_class = ply.dynamic_player_class
 		dynamic_ply_class.cloud_set = true
-		dynamic_ply_class.taggable = true
 		dynamic_ply_class.swap_closest_on_death = false
 
 		MinigameService.CallNetHookWithoutMethod(self, "SetCloud", ply)

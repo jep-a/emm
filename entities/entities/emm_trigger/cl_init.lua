@@ -5,6 +5,8 @@ ENT.RenderGroup	= RENDERGROUP_TRANSLUCENT
 function ENT:Initialize()
 	local min, max = self:GetBounds()
 
+	self.can_tag_tables = {}
+
 	self:SetNotSolid(false)
 	self:SetCollisionGroup(COLLISION_GROUP_WORLD)
 	self:SetRenderBounds(min, max)
