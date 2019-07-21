@@ -65,7 +65,7 @@ function NametagService.InitEntityProperties(ent)
 end
 hook.Add("LobbyEntityProperties", "NametagService.InitEntityProperties", NametagService.InitEntityProperties)
 
-function NametagService.FinishEntityProperties(lobby, ply)
+function NametagService.FinishEntityProperties(lobby, ent)
 	ent.nametag_alpha:Finish()
 end
 hook.Add("LobbyEntityRemove", "NametagService.FinishEntityProperties", NametagService.FinishEntityProperties)
