@@ -17,6 +17,7 @@ EMM.Include {
 	"util/savepoint",
 	"util/spectate",
 	"util/trail",
+	"util/trigger",
 	"util/ghost",
 
 	"player/hooks",
