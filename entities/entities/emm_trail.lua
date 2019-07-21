@@ -59,7 +59,7 @@ function ENT:Think()
 		local sprite = self:GetSprite()
 
 		if IsValid(sprite) then
-			sprite:SetColor(GetSmoothPlayerColor(owner))
+			sprite:SetColor(GetAnimatableEntityColor(owner))
 		end
 
 		local render_pos

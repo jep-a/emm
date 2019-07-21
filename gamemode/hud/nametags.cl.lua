@@ -63,7 +63,7 @@ function NametagService.Draw(ply)
 
 				local ply_name = string.upper(ply:GetName())
 				local w, h = surface.GetTextSize(ply_name)
-				local color = GetSmoothPlayerColor(ply)
+				local color = GetAnimatableEntityColor(ply)
 
 				surface.SetTextColor(ColorAlpha(color, CombineAlphas(color.a, alpha) * 255))
 				surface.SetTextPos(ply.indicator_x - (w/2), ply.indicator_y - (h/2) - height_offset)

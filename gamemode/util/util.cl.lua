@@ -16,11 +16,11 @@ function PNGMaterial(mat)
 	return cached_png_materials[mat]
 end
 
-function GetSmoothPlayerColor(ply)
+function GetAnimatableEntityColor(ent)
 	local color
 
-	if IsValid(ply) and ply.animatable_color then
-		color = ply.animatable_color.smooth
+	if IsValid(ent) and ent.animatable_color then
+		color = ent.animatable_color.smooth
 	else
 		color = COLOR_WHITE_CLEAR
 	end

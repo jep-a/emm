@@ -2,7 +2,7 @@ Indicator = Indicator or Class.New(Element)
 
 local indicator_material = PNGMaterial "emm2/shapes/arrow.png"
 
-function Indicator:Init(ply_or_vec)
+function Indicator:Init(ent_or_vec)
 	Indicator.super.Init(self, {
 		layout = false,
 		width_percent = 1,
@@ -11,12 +11,13 @@ function Indicator:Init(ply_or_vec)
 		alpha = 0
 	})
 
-	if isentity(ply_or_vec) then
-		ply_or_vec.indicator = self
-		self.player = ply_or_vec
-		self.position = ply_or_vec:WorldSpaceCenter()
-	elseif isvector(ply_or_vec) then
-		self.position = ply_or_vec
+	if isentity(ent_or_vec) then
+		ent_or_vec.indicator = self
+
+		self.entity = ent_or_vec
+		self.position = ent_or_vec:WorldSpaceCenter()
+	elseif isvector(ent_or_vec) then
+		self.position = ent_or_vec
 	end
 
 	self.distance = LocalPlayer():EyePos():Distance(self.position)
@@ -33,7 +34,7 @@ function Indicator:Init(ply_or_vec)
 	self.world_alpha = AnimatableValue.New(not OffScreen() and 255 or 0)
 
 	self:SetAttribute("color", function ()
-		return GetSmoothPlayerColor(self.player)
+		return GetAnimatableEntityColor(self.entity)
 	end)
 
 	self.off_screen = AnimatableValue.New(OffScreen(), {
@@ -92,16 +93,17 @@ end
 function Indicator:AnimateFinish()
 	self:AnimateAttribute("alpha", 0, {
 		callback = function ()
-			local ply = self.player
+			local ent = self.entity
 
-			if IsValid(ply) then
-				if self == ply.indicator then
-					ply.indicator = nil
+			if IsValid(ent) then
+				if self == ent.indicator then
+					ent.indicator = nil
 				end
 			end
 
 			self.world_alpha:Finish()
 			self.off_screen:Finish()
+
 			Indicator.super.Finish(self)
 		end
 	})

@@ -69,8 +69,8 @@ function IndicatorService.Sort(ply, eye_pos)
 	for i = 1, #indicators do
 		local indicator = indicators[i]
 
-		if IsValid(indicator.player) then
-			indicator.distance = indicator.player.indicator_distance
+		if IsValid(indicator.entity) then
+			indicator.distance = indicator.entity.indicator_distance
 		elseif indicator.position then
 			indicator.distance = eye_pos:Distance(indicator.position)
 		end
@@ -119,10 +119,10 @@ function IndicatorService.IndicatorPosition(indicator)
 	local y
 	local distance
 
-	if IsValid(indicator.player) then
-		x = indicator.player.indicator_x
-		y = indicator.player.indicator_y
-		distance = indicator.player.indicator_distance
+	if IsValid(indicator.entity) then
+		x = indicator.entity.indicator_x
+		y = indicator.entity.indicator_y
+		distance = indicator.entity.indicator_distance
 	elseif indicator.position then
 		x, y, _, distance = IndicatorService.ScreenPosition(indicator.position, LocalPlayer():EyePos())
 	end
@@ -137,7 +137,7 @@ end
 
 -- # Drawing/rendering
 
-function IndicatorService.DrawWorldPositions(ply)
+function IndicatorService.DrawWorldPositions()
 	local indicators = IndicatorService.container.children
 	local container_alpha = IndicatorService.container.attributes.alpha.current
 
@@ -146,21 +146,21 @@ function IndicatorService.DrawWorldPositions(ply)
 		local x, y, size = IndicatorService.IndicatorPosition(indicator)
 
 		if x and y and size then
-			local indicator_ply = indicator.player
+			local indicator_ent = indicator.entity
 
 			indicator.x = x
 			indicator.y = y
 
 			surface.SetAlphaMultiplier(CombineAlphas(container_alpha, indicator.attributes.alpha.current, indicator.world_alpha.current))
 
-			if IsValid(indicator_ply) then
+			if IsValid(indicator_ent) then
 				Element.PaintTexture(indicator, indicator_material, x, y, size, size, 0, COLOR_BLACK)
 
-				local health_percent = indicator_ply:Health()/indicator_ply.max_health
+				local health_percent = indicator_ent:Health()/indicator_ent.max_health
 
 				local visual_health_percent
 
-				if GhostService.IsGhostingWithoutRagdoll(indicator_ply) or health_percent >= 1 then
+				if GhostService.IsGhostingWithoutRagdoll(indicator_ent) or health_percent >= 1 then
 					visual_health_percent = 1
 				else
 					visual_health_percent = (health_percent * 0.33) + 0.33
@@ -184,10 +184,10 @@ function IndicatorService.RenderCoasters()
 
 	for i = 1, #indicators do
 		local indicator = indicators[i]
-		local ply = indicator.player
+		local ent = indicator.entity
 
-		if IsValid(ply) then
-			local pos = GhostService.Position(ply) + Vector(0, 0, 5)
+		if IsValid(ent) then
+			local pos = GhostService.Position(ent) + Vector(0, 0, 5)
 
 			local trace = util.TraceLine {
 				start = pos,
@@ -200,7 +200,7 @@ function IndicatorService.RenderCoasters()
 			if alpha > 0 then
 				cam.Start3D2D(trace.HitPos + (trace.HitNormal * Vector(0.5, 0.5, 0.5)), trace.HitNormal:Angle() + Angle(90, 0, 0), 0.25)
 				surface.SetAlphaMultiplier(alpha)
-				surface.SetDrawColor(indicator.player.color)
+				surface.SetDrawColor(indicator.entity.color)
 				surface.SetMaterial(circle_material)
 				surface.DrawTexturedRect(-INDICATOR_COASTER_SIZE/2, -INDICATOR_COASTER_SIZE/2, INDICATOR_COASTER_SIZE, INDICATOR_COASTER_SIZE)
 				surface.SetAlphaMultiplier(1)
@@ -252,7 +252,7 @@ end
 function IndicatorService.AddPlayerIndicator(ply)
 	IndicatorService.container:Add(Indicator.New(ply))
 
-	if ply.just_spawned or ply:Alive() then
+	if not ply:IsPlayer() or ply.just_spawned or ply:Alive() then
 		ply.indicator:AnimateAttribute("alpha", 255)
 	end
 end
