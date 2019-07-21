@@ -6,13 +6,22 @@ function ENT:Initialize()
 	local ang = self.angle
 	local lobby = self.lobby
 
+	self:SetPos(self.position)
 	self:SetWidth(self.width or 0)
 	self:SetHeight(self.height or 0)
 	self:SetDepth(self.depth or 0)
 	self:SetNormal(ang:Right())
-	self:SetPos(self.position)
 	self:SetID(self.id)
 	self:SetType(self.type)
+
+	if self.indicator_name then
+		self:SetIndicatorName(self.indicator_name)
+	end
+
+	if self.indicator_icon then
+		self:SetIndicatorIcon(self.indicator_icon)
+	end
+
 	self:SetNotSolid(true)
 	self:SetNoDraw(false)
 	self:DrawShadow(false)

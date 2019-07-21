@@ -16,6 +16,8 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Float", 1, "Height")
 	self:NetworkVar("Float", 2, "Depth")
 	self:NetworkVar("Vector", 0, "Normal")
+	self:NetworkVar("String", 0, "IndicatorName")
+	self:NetworkVar("String", 1, "IndicatorIcon")
 end
 
 function ENT:GetShape()

@@ -153,8 +153,23 @@ function IndicatorService.IndicatorPosition(indicator)
 	return indicator_x, indicator_y, size
 end
 
+function IndicatorService.IndicatorIconPosition(indicator)
+	local x = indicator.entity.indicator_x or 0
+	local y = indicator.entity.indicator_y or 0
+	local distance = indicator.entity.indicator_distance or 0
+	local size = Lerp(distance/800, INDICATOR_ICON_SIZE * 2, INDICATOR_ICON_SIZE)
+	local indicator_x = x - (size/2)
+	local indicator_y = y - Lerp(distance/800, 48, 44) - (size/2)
+
+	return indicator_x, indicator_y, size
+end
+
 
 -- # Drawing/rendering
+
+function IndicatorService.IndicatorIcon(ent)
+	return ent.indicator_icon or ent.GetIndicatorIcon and ent:GetIndicatorIcon()
+end
 
 function IndicatorService.DrawWorldPositions()
 	local indicators = IndicatorService.container.children
@@ -192,6 +207,14 @@ function IndicatorService.DrawWorldPositions()
 				render.SetScissorRect(x, y + (size * (1 - indicator_percent)), x + size, y + size, true)
 				Element.PaintTexture(indicator, indicator_material, x, y, size, size, 0, indicator:GetColor())
 				render.SetScissorRect(0, 0, 0, 0, false)
+
+				local indicator_material = IndicatorService.IndicatorIcon(indicator_ent)
+
+				if indicator_material then
+					local icon_x, icon_y, icon_size = IndicatorService.IndicatorIconPosition(indicator)
+
+					Element.PaintTexture(indicator, PNGMaterial(indicator_material), icon_x, icon_y, icon_size, icon_size, 0, indicator:GetColor())
+				end
 			else
 				Element.PaintTexture(indicator, indicator_material, x, y, size, size, 0, indicator:GetColor())
 			end
@@ -201,6 +224,7 @@ function IndicatorService.DrawWorldPositions()
 	end
 end
 hook.Add("DrawIndicators", "IndicatorService.DrawWorldPositions", IndicatorService.DrawWorldPositions)
+
 
 function IndicatorService.RenderCoasters()
 	local indicators = IndicatorService.container.children

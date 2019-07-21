@@ -11,11 +11,13 @@ function Indicator:Init(ent_or_vec)
 		alpha = 0
 	})
 
-	if isentity(ent_or_vec) then
-		ent_or_vec.indicator = self
+	local ent = isentity(ent_or_vec) and ent_or_vec
 
-		self.entity = ent_or_vec
-		self.position = ent_or_vec:WorldSpaceCenter()
+	if ent then
+		ent.indicator = self
+
+		self.entity = ent
+		self.position = ent:WorldSpaceCenter()
 	elseif isvector(ent_or_vec) then
 		self.position = ent_or_vec
 	end

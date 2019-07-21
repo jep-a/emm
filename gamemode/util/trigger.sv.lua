@@ -9,6 +9,8 @@ function TriggerService.CreateTrigger(lobby, props)
 	trigger.height = props.height or 0
 	trigger.depth = props.depth or 0
 	trigger.angle = props.angle or Angle()
+	trigger.indicator_name = props.indicator_name
+	trigger.indicator_icon = props.indicator_icon
 	trigger:Spawn()
 
 	lobby:AddEntity(trigger)

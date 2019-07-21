@@ -70,6 +70,10 @@ function NametagService.FinishEntityProperties(lobby, ply)
 end
 hook.Add("LobbyEntityRemove", "NametagService.FinishEntityProperties", NametagService.FinishEntityProperties)
 
+function NametagService.Name(ent)
+	return ent.indicator_name or ent.GetIndicatorName and ent:GetIndicatorName() or ent.GetName and ent:GetName()
+end
+
 function NametagService.Draw()
 	local plys = player.GetAll()
 	local lobby = LocalPlayer().lobby
@@ -83,7 +87,7 @@ function NametagService.Draw()
 			if alpha > 0 then
 				surface.SetFont "Nametag"
 
-				local ply_name = string.upper(ply:GetName())
+				local ply_name = string.upper(NametagService.Name(ply))
 				local w, h = surface.GetTextSize(ply_name)
 				local color = GetAnimatableEntityColor(ply)
 
@@ -99,7 +103,7 @@ function NametagService.Draw()
 
 		for i = 1, #ents do
 			local ent = ents[i]
-			local ent_name = ent.indicator_name or ent.GetName and ent:GetName()
+			local ent_name = NametagService.Name(ent)
 
 			if ent_name then
 				local alpha = ent.nametag_alpha.smooth
