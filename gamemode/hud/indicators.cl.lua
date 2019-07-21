@@ -139,9 +139,9 @@ function IndicatorService.IndicatorPosition(indicator)
 	local distance
 
 	if IsValid(indicator.entity) then
-		x = indicator.entity.indicator_x
-		y = indicator.entity.indicator_y
-		distance = indicator.entity.indicator_distance
+		x = indicator.entity.indicator_x or 0
+		y = indicator.entity.indicator_y or 0
+		distance = indicator.entity.indicator_distance or 0
 	elseif indicator.position then
 		x, y, _, distance = IndicatorService.ScreenPosition(indicator.position, LocalPlayer():EyePos())
 	end
@@ -175,17 +175,21 @@ function IndicatorService.DrawWorldPositions()
 			if IsValid(indicator_ent) then
 				Element.PaintTexture(indicator, indicator_material, x, y, size, size, 0, COLOR_BLACK)
 
-				local health_percent = indicator_ent:Health()/indicator_ent.max_health
+				local indicator_percent
 
-				local visual_health_percent
+				if indicator_ent:IsPlayer() then
+					local health_percent = indicator_ent:Health()/indicator_ent.max_health
 
-				if GhostService.IsGhostingWithoutRagdoll(indicator_ent) or health_percent >= 1 then
-					visual_health_percent = 1
+					if GhostService.IsGhostingWithoutRagdoll(indicator_ent) or (health_percent >= 1) then
+						indicator_percent = 1
+					else
+						indicator_percent = (health_percent * 0.33) + 0.33
+					end
 				else
-					visual_health_percent = (health_percent * 0.33) + 0.33
+					indicator_percent = 1
 				end
 
-				render.SetScissorRect(x, y + (size * (1 - visual_health_percent)), x + size, y + size, true)
+				render.SetScissorRect(x, y + (size * (1 - indicator_percent)), x + size, y + size, true)
 				Element.PaintTexture(indicator, indicator_material, x, y, size, size, 0, indicator:GetColor())
 				render.SetScissorRect(0, 0, 0, 0, false)
 			else
@@ -219,7 +223,7 @@ function IndicatorService.RenderCoasters()
 			if alpha > 0 then
 				cam.Start3D2D(trace.HitPos + (trace.HitNormal * Vector(0.5, 0.5, 0.5)), trace.HitNormal:Angle() + Angle(90, 0, 0), 0.25)
 				surface.SetAlphaMultiplier(alpha)
-				surface.SetDrawColor(indicator.entity.color)
+				surface.SetDrawColor(GetAnimatableEntityColor(indicator.entity))
 				surface.SetMaterial(circle_material)
 				surface.DrawTexturedRect(-INDICATOR_COASTER_SIZE/2, -INDICATOR_COASTER_SIZE/2, INDICATOR_COASTER_SIZE, INDICATOR_COASTER_SIZE)
 				surface.SetAlphaMultiplier(1)
@@ -261,6 +265,10 @@ function IndicatorService.InitLobby(lobby)
 		if IndicatorService.PlayerShouldHaveIndicator(ply) then
 			IndicatorService.AddEntityIndicator(ply)
 		end
+	end
+
+	for _, ent in pairs(lobby.entities) do
+		IndicatorService.AddEntityIndicator(ent)
 	end
 end
 

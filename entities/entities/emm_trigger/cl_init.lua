@@ -93,7 +93,7 @@ function ENT:RenderBox(pos, width, height, depth, norm, thickness, color)
 end
 
 function ENT:Draw()
-	-- if MinigameService.IsSharingLobby(LocalPlayer()) then
+	if MinigameService.IsSharingLobby(LocalPlayer()) then
 		local pos = self:GetPos()
 		local width = self:GetWidth()
 		local color = self.animatable_color.smoth
@@ -107,7 +107,7 @@ function ENT:Draw()
 		end
 
 		surface.SetAlphaMultiplier(1)
-	-- end
+	end
 end
 
 function ENT:Finish()

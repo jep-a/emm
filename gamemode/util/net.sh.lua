@@ -11,7 +11,7 @@ function NetService.WriteID(id)
 	net.WriteUInt(id or 0, 8)
 end
 
-NetService.type_readers = {
+NetService.type_readers = NetService.type_readers or {
 	boolean = net.ReadBool,
 
 	id = function ()
@@ -43,7 +43,7 @@ NetService.type_readers = {
 	end
 }
 
-NetService.type_writers = {
+NetService.type_writers = NetService.type_writers or {
 	boolean = net.WriteBool,
 
 	id = function (id)
@@ -77,7 +77,7 @@ function NetService.CreateWriter(name, schema)
 
 	local sender = function (...)
 		net.Start(name)
-	
+
 		for i = 1, #schema do
 			NetService.type_writers[schema[i]](select(i, ...))
 		end

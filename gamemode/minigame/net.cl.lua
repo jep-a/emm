@@ -25,7 +25,30 @@ NetService.Receive("LobbyFinish", CallIfReceivedLobbies(MinigameService.FinishLo
 NetService.Receive("LobbyHost", CallIfReceivedLobbies(MinigameLobby.SetHost))
 NetService.Receive("LobbyPlayer", CallIfReceivedLobbies(MinigameLobby.AddPlayer))
 NetService.Receive("LobbyPlayerLeave", CallIfReceivedLobbies(MinigameLobby.RemovePlayer))
-NetService.Receive("LobbyEntity", CallIfReceivedLobbies(MinigameLobby.AddEntity))
+
+local queued_lobby_entities = {}
+
+function MinigameNetService.ReceiveLobbyEntity(lobby, ent_id)
+	local ent = Entity(ent_id)
+
+	if IsValid(ent) then
+		lobby:AddEntity(ent)
+	else
+		queued_lobby_entities[ent_id] = lobby
+	end
+end
+NetService.Receive("LobbyEntity", CallIfReceivedLobbies(MinigameNetService.ReceiveLobbyEntity))
+
+hook.Add("OnEntityCreated", "MinigameService.LobbyEntity", function (ent)
+	local ent_index = ent:EntIndex()
+	local lobby = queued_lobby_entities[ent_index]
+
+	if lobby then
+		lobby:AddEntity(ent)
+		queued_lobby_entities[ent_index] = nil
+	end
+end)
+
 NetService.Receive("LobbyEntityRemove", CallIfReceivedLobbies(MinigameLobby.RemoveEntity))
 
 function MinigameNetService.RequestLobbies()

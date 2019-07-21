@@ -22,7 +22,7 @@ NetService.CreateSchema("LobbyHost", {"minigame_lobby", "entity"})
 NetService.CreateSchema("LobbyState", {"minigame_lobby", "id", "float"})
 NetService.CreateSchema("LobbyPlayer", {"minigame_lobby", "entity"})
 NetService.CreateSchema("LobbyPlayerLeave", {"minigame_lobby", "entity"})
-NetService.CreateSchema("LobbyEntity", {"minigame_lobby", "entity"})
+NetService.CreateSchema("LobbyEntity", {"minigame_lobby", "id"})
 NetService.CreateSchema("LobbyEntityRemove", {"minigame_lobby", "entity"})
 NetService.CreateSchema("LobbyHost", {"minigame_lobby", "entity"})
 NetService.CreateUpstreamSchema "RequestLobbies"
