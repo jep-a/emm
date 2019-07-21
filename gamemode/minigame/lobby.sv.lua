@@ -20,6 +20,7 @@ function MinigameLobby:Init(props)
 	self.prototype = props.prototype
 	self.host = props.host
 	self.players = props.players or {}
+	self.entities = props.entities or {}
 
 	for _, ply in pairs(self.players) do
 		ply.lobby = self

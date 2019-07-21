@@ -107,7 +107,7 @@ function ENT:GetBounds()
 end
 
 function ENT:CanTouchEntity(ent)
-	return IsValid(ent) and ent:IsPlayer() and MinigameService.IsSharingLobby(self, ent)
+	return IsPlayer(ent) and MinigameService.IsSharingLobby(self, ent)
 end
 
 function ENT:StartTouch(ent)

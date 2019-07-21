@@ -36,6 +36,7 @@ function MinigameLobby:Init(props)
 	self.last_state_start = props.last_state_start
 	self.host = props.host
 	self.players = props.players or {}
+	self.entities = props.entities or {}
 
 	for _, ply in pairs(self.players) do
 		ply.lobby = self

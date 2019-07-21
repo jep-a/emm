@@ -64,7 +64,7 @@ function ENT:Think()
 
 		local render_pos
 
-		if IsValid(owner) and owner:IsPlayer() then
+		if IsPlayer(owner) then
 			local parent_is_valid = IsValid(parent)
 
 			local pos

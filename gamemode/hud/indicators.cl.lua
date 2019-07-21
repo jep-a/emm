@@ -83,15 +83,17 @@ end
 hook.Add("Think", "IndicatorService.Sort", IndicatorService.Sort)
 
 function IndicatorService.ScreenPosition(ent_or_pos, eye_pos)
-	local pos = IsValid(ent_or_pos) and ent_or_pos:WorldSpaceCenter() or ent_or_pos
+	local pos = isentity(ent_or_pos) and ent_or_pos:WorldSpaceCenter() or ent_or_pos
 	local distance = (eye_pos or LocalPlayer():EyePos()):Distance(pos)
 	local screen_pos = (pos + Vector(0, 0, Lerp(distance/600, 40, 45))):ToScreen()
 
 	return screen_pos.x, screen_pos.y, screen_pos.visible, distance
 end
 
-function IndicatorService.CalculateScreenPositions(ply, eye_pos)
-	local eye_pos = LocalPlayer():EyePos()
+function IndicatorService.CalculateScreenPositions()
+	local local_ply = LocalPlayer()
+	local lobby = local_ply.lobby
+	local eye_pos = local_ply:EyePos()
 	local plys = player.GetAll()
 
 	cam.Start3D()
@@ -107,6 +109,23 @@ function IndicatorService.CalculateScreenPositions(ply, eye_pos)
 			ply.indicator_y = y
 			ply.indicator_is_visible = visible
 			ply.indicator_distance = distance
+		end
+	end
+
+	if lobby then
+		local ents = lobby.entities
+
+		for i = 1, #ents do
+			local ent = ents[i]
+
+			if IsValid(ent) then
+				local x, y, visible, distance = IndicatorService.ScreenPosition(ent, eye_pos)
+
+				ent.indicator_x = x
+				ent.indicator_y = y
+				ent.indicator_is_visible = visible
+				ent.indicator_distance = distance
+			end
 		end
 	end
 
@@ -252,7 +271,7 @@ end
 function IndicatorService.AddPlayerIndicator(ply)
 	IndicatorService.container:Add(Indicator.New(ply))
 
-	if not ply:IsPlayer() or ply.just_spawned or ply:Alive() then
+	if not IsPlayer(ply) or ply.just_spawned or ply:Alive() then
 		ply.indicator:AnimateAttribute("alpha", 255)
 	end
 end
