@@ -35,7 +35,7 @@ function ENT:GetShape()
 end
 
 function ENT:SetCanTag(can_tag)
-	local str = table.ToString(can_tag)
+	local str = util.TableToJSON(can_tag)
 
 	self:SetCanTagString(str)
 	self:SetCanTagStringCRC(tonumber(util.CRC(str)))
@@ -48,7 +48,7 @@ function ENT:GetCanTag()
 	if cached_tab then
 		return cached_tab
 	else
-		local tab = string.ToTable(self:GetCanTagString())
+		local tab = util.JSONToTable(self:GetCanTagString())
 
 		self.can_tag_tables[crc] = tab
 
