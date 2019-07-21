@@ -259,7 +259,7 @@ hook.Add("OnReloaded", "IndicatorService.Reload", IndicatorService.Reload)
 function IndicatorService.InitLobby(lobby)
 	for _, ply in pairs(lobby.players) do
 		if IndicatorService.PlayerShouldHaveIndicator(ply) then
-			IndicatorService.AddPlayerIndicator(ply)
+			IndicatorService.AddEntityIndicator(ply)
 		end
 	end
 end
@@ -268,11 +268,11 @@ function IndicatorService.Clear()
 	IndicatorService.container:Clear()
 end
 
-function IndicatorService.AddPlayerIndicator(ply)
-	IndicatorService.container:Add(Indicator.New(ply))
+function IndicatorService.AddEntityIndicator(ent)
+	IndicatorService.container:Add(Indicator.New(ent))
 
-	if not IsPlayer(ply) or ply.just_spawned or ply:Alive() then
-		ply.indicator:AnimateAttribute("alpha", 255)
+	if not IsPlayer(ent) or ent.just_spawned or ent:Alive() then
+		ent.indicator:AnimateAttribute("alpha", 255)
 	end
 end
 
@@ -284,7 +284,7 @@ function IndicatorService.RefreshPlayerIndicator(ply, hide)
 			if ply.indicator and not GhostService.IsGhostingWithoutRagdoll(ply) then
 				ply.indicator:AnimateAttribute("alpha", hide and 0 or 255)
 			elseif not ply.indicator then
-				IndicatorService.AddPlayerIndicator(ply)
+				IndicatorService.AddEntityIndicator(ply)
 			end
 		elseif not should_have_indicator and ply.indicator then
 			ply.indicator:Finish()
@@ -297,7 +297,7 @@ function IndicatorService.LobbyPlayerJoin(lobby, ply)
 		if IsLocalPlayer(ply) then
 			IndicatorService.InitLobby(lobby)
 		elseif IndicatorService.PlayerShouldHaveIndicator(ply) then
-			IndicatorService.AddPlayerIndicator(ply)
+			IndicatorService.AddEntityIndicator(ply)
 		end
 	end
 end
@@ -326,6 +326,20 @@ hook.Add("LocalLobbyPlayerDeath", "IndicatorService.LobbyPlayerDeath", Indicator
 
 hook.Add("LocalLobbyPlayerClassChange", "IndicatorService.RefreshPlayerIndicator", IndicatorService.RefreshPlayerIndicator)
 hook.Add("LocalPlayerGhost", "IndicatorService.RefreshPlayerIndicator", IndicatorService.RefreshPlayerIndicator)
+
+function IndicatorService.LobbyEntityAdd(lobby, ent)
+	if IndicatorService.Visible() then
+		IndicatorService.AddEntityIndicator(ent)
+	end
+end
+hook.Add("LocalLobbyEntityAdd", "IndicatorService.LobbyEntityAdd", IndicatorService.LobbyEntityAdd)
+
+function IndicatorService.LobbyEntityRemove(lobby, ent)
+	if IndicatorService.Visible() then
+		ent.indicator:Finish()
+	end
+end
+hook.Add("LocalLobbyEntityRemove", "IndicatorService.LobbyEntityRemove", IndicatorService.LobbyEntityRemove)
 
 function IndicatorService.Show()
 	if IndicatorService.Visible() then
