@@ -1,8 +1,8 @@
 HUDService = HUDService or {}
 
-local health_icon_material = Material("emm2/hud/health.png", "noclamp smooth")
-local speed_icon_material = Material("emm2/hud/speed.png", "noclamp smooth")
-local airaccel_icon_material = Material("emm2/hud/airaccel.png", "noclamp smooth")
+local health_icon_material = PNGMaterial "emm2/hud/health.png"
+local speed_icon_material = PNGMaterial "emm2/hud/speed.png"
+local airaccel_icon_material = PNGMaterial "emm2/hud/airaccel.png"
 
 function HUDService.KeyDown(key)
 	return IsValid(LocalPlayer():GetObserverTarget()) and (bit.band(SpectateService.buttons, key) ~= 0) or LocalPlayer():KeyDown(key)
@@ -236,7 +236,7 @@ function HUDService.Init()
 			-- end
 		end
 
-		hook.Run("InitHUDElements")
+		hook.Run "InitHUDElements"
 	end
 end
 hook.Add("InitUI", "HUDService.Init", HUDService.Init)

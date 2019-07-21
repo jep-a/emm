@@ -1,7 +1,7 @@
 IndicatorService = IndicatorService or {}
 
-local indicator_material = Material("emm2/shapes/arrow-2x.png", "noclamp smooth")
-local circle_material = Material("emm2/shapes/circle.png", "noclamp smooth")
+local indicator_material = PNGMaterial "emm2/shapes/arrow-2x.png"
+local circle_material = PNGMaterial "emm2/shapes/circle.png"
 
 
 -- # Util
@@ -25,6 +25,7 @@ function IndicatorService.PlayerShouldHaveIndicator(ply)
 
 	return should_have_indicator
 end
+
 
 -- # Properties
 

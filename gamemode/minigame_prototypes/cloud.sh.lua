@@ -14,7 +14,7 @@ end)
 if CLIENT then
 	MINIGAME:AddHookNotification("SetCloud", function (self, involves_local_ply, cloud)
 		if involves_local_ply then
-			NotificationService.PushText("you set cloud")
+			NotificationService.PushText "you set cloud"
 		else
 			NotificationService.PushAvatarText(cloud, "set cloud")
 		end

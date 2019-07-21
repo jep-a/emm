@@ -1,4 +1,4 @@
-local player_metatable = FindMetaTable("Player")
+local player_metatable = FindMetaTable "Player"
 
 function player_metatable:SetPlayerClass(class)
 	local old_class = self.player_class

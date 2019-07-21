@@ -32,7 +32,7 @@ end
 
 function SavepointService.RequestSavepoint(ply, cmd, args)
 	if ply.can_savepoint then
-		ply:ChatPrint("Savepoint created!")
+		ply:ChatPrint "Savepoint created!"
 		ply.savepoint = SavepointService.CreateSavepoint(ply)
 	end
 end
@@ -40,7 +40,7 @@ concommand.Add("emm_savepoint", SavepointService.RequestSavepoint)
 
 function SavepointService.RequestLoadSavepoint(ply, cmd, args)
 	if ply.can_savepoint and ply.savepoint then
-		ply:ChatPrint("Savepoint loaded!")
+		ply:ChatPrint "Savepoint loaded!"
 		SavepointService.LoadSavepoint(ply, ply.savepoint)
 	end
 end

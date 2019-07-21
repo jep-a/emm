@@ -1,4 +1,4 @@
-local player_metatable = FindMetaTable("Player")
+local player_metatable = FindMetaTable "Player"
 
 function player_metatable:SetupCoreProperties()
 	if SERVER then

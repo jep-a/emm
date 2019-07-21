@@ -5,7 +5,7 @@ function TrailService.SetupTrail(ent)
 		ent.trail:StartRemove()
 	end
 
-	local trail = ents.Create("emm_trail")
+	local trail = ents.Create "emm_trail"
 	trail:SetOwner(ent)
 	trail:SetPos(ent:GetPos())
 	trail:SetParent(ent)

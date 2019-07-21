@@ -1,6 +1,6 @@
-local player_metatable = FindMetaTable("Player")
+local player_metatable = FindMetaTable "Player"
 
-local ent_metatable =  FindMetaTable("Entity")
+local ent_metatable =  FindMetaTable "Entity"
 local ent_get_table = ent_metatable.GetTable
 
 function player_metatable:__index(key)

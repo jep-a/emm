@@ -35,7 +35,7 @@ function SpectateService.UnSpectateCheck(ply, key)
 		bit.band(SpectateService.unspectate_keys, key) ~= 0
 	then
 		SpectateService.buttons = 0
-		ply:ConCommand("emm_unspectate")
+		ply:ConCommand "emm_unspectate"
 	end
 end
 hook.Add("KeyPress", "SpectateService.UnSpectateCheck", SpectateService.UnSpectateCheck)

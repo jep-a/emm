@@ -44,17 +44,20 @@ function SpectateService.Spectate(ply, cmd, args)
 		if target then
 			if ply:GetObserverMode() == OBS_MODE_NONE then
 				if not ply:IsOnGround() then
-					ply:ChatPrint("You can't spectate in the air.")
+					ply:ChatPrint "You can't spectate in the air."
+
 					return
 				end
 
 				if ply:Crouching() then
-					ply:ChatPrint("You can't spectate while crouching.")
+					ply:ChatPrint "You can't spectate while crouching."
+
 					return
 				end
 
 				if target == ply then
-					ply:ChatPrint("You can't spectate yourself.")
+					ply:ChatPrint "You can't spectate yourself."
+
 					return
 				end
 
@@ -69,7 +72,7 @@ function SpectateService.Spectate(ply, cmd, args)
 			SpectateService.SendSpectateKeys(target.buttons, ply)
 			StaminaService.SendStamina(ply, target, "airaccel")
 		else
-			ply:ChatPrint("Player not found.")
+			ply:ChatPrint "Player not found."
 		end
 	end
 end

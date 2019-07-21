@@ -1,1 +1,1 @@
-local player_metatable = FindMetaTable("Player")
+local player_metatable = FindMetaTable "Player"

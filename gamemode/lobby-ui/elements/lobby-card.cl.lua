@@ -23,7 +23,7 @@ function LobbyCardContainer:AnimateFinish()
 			LobbyCardContainer.super.Finish(self)
 		end
 	})
-	
+
 	self.lobby_card:FinishLobby()
 end
 
@@ -118,7 +118,7 @@ function LobbyCard:Init(lobby)
 	self.join = self.switch:Add(ButtonBar.New {
 		background_color = lobby.prototype.color,
 		color = COLOR_WHITE,
-		material = PNGMaterial("emm2/ui/join.png"),
+		material = PNGMaterial "emm2/ui/join.png",
 		text = "Join",
 
 		on_click = function ()
@@ -136,7 +136,7 @@ function LobbyCard:Init(lobby)
 	self.leave = self.switch:Add(ButtonBar.New {
 		background_color = lobby.prototype.color,
 		color = COLOR_WHITE,
-		material = PNGMaterial("emm2/ui/leave.png"),
+		material = PNGMaterial "emm2/ui/leave.png",
 		text = "Leave",
 
 		on_click = function ()
@@ -154,7 +154,7 @@ function LobbyCard:AddRestartAction()
 		crop_bottom = 1,
 		background_color = COLOR_GRAY,
 		color = self.lobby.prototype.color,
-		material = PNGMaterial("emm2/ui/restart.png"),
+		material = PNGMaterial "emm2/ui/restart.png",
 		text = "Restart",
 
 		on_click = function ()
@@ -166,7 +166,7 @@ function LobbyCard:AddRestartAction()
 		crop_bottom = 1,
 		alpha = 0
 	}
-	
+
 	self.restart:AnimateAttribute("crop_bottom", 0, ANIMATION_DURATION * 2)
 	self.restart:AnimateAttribute("alpha", 255, ANIMATION_DURATION * 2)
 end

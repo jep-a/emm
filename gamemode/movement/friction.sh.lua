@@ -6,11 +6,11 @@ FrictionService = FrictionService or {}
 CreateConVar("emm_friction", 8, FCVAR_REPLICATED, "Player friction")
 
 function FrictionService.GetDefaultFriction()
-	return GetConVar("emm_friction"):GetFloat()
+	return GetConVar "emm_friction":GetFloat()
 end
 
 function FrictionService.InitPlayerProperties(ply)
-	ply.friction = GetConVar("emm_friction"):GetFloat()
+	ply.friction = GetConVar "emm_friction":GetFloat()
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
@@ -24,7 +24,7 @@ hook.Add(
 function FrictionService.Velocity(friction, move)
 	local vel = move:GetVelocity()
 	local speed = vel:Length()
-	local stop_speed = GetConVar("sv_stopspeed"):GetFloat()
+	local stop_speed = GetConVar "sv_stopspeed":GetFloat()
 	local drop = 0
 
 	local new_speed
