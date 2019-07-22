@@ -99,6 +99,7 @@ end
 
 function MinigamePrototype:AddDefaultHooks()
 	self:AddHook("StartStateWaiting", "ClearPlayerClasses", MinigameService.ClearPlayerClasses)
+	self:AddHook("StartStateWaiting", "ClearEntities", MinigameService.ClearEntities)
 	self:AddHook("StartStatePlaying", "PickPlayerClasses", self.PickPlayerClasses)
 	self:AddStateHook("Playing", "PlayerJoin", "Respawn", self.Respawn)
 	self:AddStateHook("Playing", "PlayerJoin", "SetDefaultPlayerClass", self.SetDefaultPlayerClass)

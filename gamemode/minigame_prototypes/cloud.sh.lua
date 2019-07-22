@@ -36,8 +36,15 @@ MINIGAME:AddPlayerClass {
 }
 
 if SERVER then
+	function MINIGAME:RemoveCloud()
+		if IsValid(self.cloud_trigger) then
+			self.cloud_trigger:Remove()
+		end
+	end
+	MINIGAME:AddHook("StartStateStarting", "RemoveCloud", MINIGAME.RemoveCloud)
+
 	function MINIGAME:SetCloud(ply)
-		TriggerService.CreateTrigger(self, {
+		self.cloud_trigger = TriggerService.CreateTrigger(self, {
 			owner = ply,
 			position = ply:GetPos(),
 			width = 512,
