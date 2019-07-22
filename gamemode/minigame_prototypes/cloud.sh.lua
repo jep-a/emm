@@ -12,7 +12,7 @@ hook.Add("CreateMinigameHookSchemas", "Cloud", function ()
 end)
 
 if SERVER then
-	MINIGAME:AddHook("StartStateStarting", "ClearEntities", MINIGAME.ClearEntities)
+	MINIGAME:AddHook("StartStateStarting", "ClearEntities", MinigameService.ClearEntities)
 else
 	MINIGAME:AddHookNotification("SetCloud", function (self, involves_local_ply, cloud)
 		if involves_local_ply then

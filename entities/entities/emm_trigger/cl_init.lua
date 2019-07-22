@@ -74,7 +74,28 @@ function ENT:RenderSphere(pos, radius, thickness, color)
 
 	render.SetStencilCompareFunction(STENCIL_EQUAL)
 	render.SetColorMaterialIgnoreZ()
-	render.DrawSphere(pos, -radius , 50, 50, color)
+	render.DrawSphere(pos, -radius, 50, 50, color)
+
+	render.SetStencilPassOperation(STENCIL_REPLACE)
+	render.SetStencilZFailOperation(STENCIL_KEEP)
+	render.SetStencilFailOperation(STENCIL_KEEP)
+	render.SetStencilCompareFunction(STENCIL_ALWAYS)
+
+	render.DrawSphere(pos, -radius, 50, 50, COLOR_WHITE_CLEAR)
+
+	render.SetStencilZFailOperation(STENCIL_KEEP)
+	render.DrawSphere(pos, radius, 50, 50, COLOR_WHITE_CLEAR)
+
+	render.SetStencilZFailOperation(STENCIL_KEEP)
+	render.SetStencilPassOperation(STENCIL_INCR)
+	render.DrawSphere(pos, -radius + thickness, 50, 50, COLOR_WHITE_CLEAR)
+
+	render.SetStencilZFailOperation(STENCIL_KEEP)
+	render.DrawSphere(pos, radius - thickness, 50, 50, COLOR_WHITE_CLEAR)
+
+	render.SetStencilCompareFunction(STENCIL_EQUAL)
+	render.SetColorMaterialIgnoreZ()
+	render.DrawSphere(pos, -radius, 50, 50, color)
 
 	render.SetStencilEnable(false)
 end
