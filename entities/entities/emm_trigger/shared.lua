@@ -138,6 +138,10 @@ end
 function ENT:StartTouch(ent)
 	if self:CanTouchEntity(ent) then
 		hook.Run("TriggerStartTouch", self, ent)
+
+		if SERVER then
+			TaggingService.Tag(self.lobby, self:GetOwner(), ent)
+		end
 	end
 end
 

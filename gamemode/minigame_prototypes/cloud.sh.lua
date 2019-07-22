@@ -11,7 +11,9 @@ hook.Add("CreateMinigameHookSchemas", "Cloud", function ()
 	MinigameNetService.CreateHookSchema("SetCloud", {"entity"})
 end)
 
-if CLIENT then
+if SERVER then
+	MINIGAME:AddHook("StartStateStarting", "ClearEntities", MINIGAME.ClearEntities)
+else
 	MINIGAME:AddHookNotification("SetCloud", function (self, involves_local_ply, cloud)
 		if involves_local_ply then
 			NotificationService.PushText "you set cloud"
@@ -36,15 +38,8 @@ MINIGAME:AddPlayerClass {
 }
 
 if SERVER then
-	function MINIGAME:RemoveCloud()
-		if IsValid(self.cloud_trigger) then
-			self.cloud_trigger:Remove()
-		end
-	end
-	MINIGAME:AddHook("StartStateStarting", "RemoveCloud", MINIGAME.RemoveCloud)
-
 	function MINIGAME:SetCloud(ply)
-		self.cloud_trigger = TriggerService.CreateTrigger(self, {
+		ply.cloud_trigger = TriggerService.CreateTrigger(self, {
 			owner = ply,
 			position = ply:GetPos(),
 			width = 512,
@@ -53,11 +48,17 @@ if SERVER then
 			indicator_icon = "emm2/minigames/cloud.png"
 		})
 
+		self.cloud_trigger = ply.cloud_trigger
+
 		local dynamic_ply_class = ply.dynamic_player_class
 		dynamic_ply_class.cloud_set = true
 		dynamic_ply_class.swap_closest_on_death = false
 
 		MinigameService.CallNetHookWithoutMethod(self, "SetCloud", ply)
+	end
+
+	function MINIGAME:Tag(taggable, tagger)
+		taggable.cloud_trigger:Remove()
 	end
 
 	function MINIGAME.player_classes.Cloud:SetupMove(move)
