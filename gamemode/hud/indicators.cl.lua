@@ -26,6 +26,10 @@ function IndicatorService.PlayerShouldHaveIndicator(ply)
 	return should_have_indicator
 end
 
+function IndicatorService.IndicatorIcon(ent)
+	return ent.indicator_icon or ent.GetIndicatorIcon and ent:GetIndicatorIcon() or ent:GetNWString "IndicatorIcon"
+end
+
 
 -- # Properties
 
@@ -166,10 +170,6 @@ end
 
 
 -- # Drawing/rendering
-
-function IndicatorService.IndicatorIcon(ent)
-	return ent.indicator_icon or ent.GetIndicatorIcon and ent:GetIndicatorIcon() or ent:GetNWString "IndicatorIcon"
-end
 
 function IndicatorService.DrawWorldPositions()
 	local indicators = IndicatorService.container.children
@@ -356,7 +356,11 @@ function IndicatorService.LobbyPlayerDeath(lobby, ply)
 end
 hook.Add("LocalLobbyPlayerDeath", "IndicatorService.LobbyPlayerDeath", IndicatorService.LobbyPlayerDeath)
 
-hook.Add("LocalLobbyPlayerClassChange", "IndicatorService.RefreshPlayerIndicator", IndicatorService.RefreshPlayerIndicator)
+function IndicatorService.LobbyClassChange(lobby, ply)
+	IndicatorService.RefreshPlayerIndicator(ply)
+end
+hook.Add("LocalLobbyPlayerClassChange", "IndicatorService.LobbyClassChange", IndicatorService.LobbyClassChange)
+
 hook.Add("LocalPlayerGhost", "IndicatorService.RefreshPlayerIndicator", IndicatorService.RefreshPlayerIndicator)
 
 function IndicatorService.LobbyEntityAdd(lobby, ent)
