@@ -356,10 +356,10 @@ function IndicatorService.LobbyPlayerDeath(lobby, ply)
 end
 hook.Add("LocalLobbyPlayerDeath", "IndicatorService.LobbyPlayerDeath", IndicatorService.LobbyPlayerDeath)
 
-function IndicatorService.LobbyClassChange(lobby, ply)
+function IndicatorService.LobbyPlayerClassChange(lobby, ply)
 	IndicatorService.RefreshPlayerIndicator(ply)
 end
-hook.Add("LocalLobbyPlayerClassChange", "IndicatorService.LobbyClassChange", IndicatorService.LobbyClassChange)
+hook.Add("LocalLobbyPlayerClassChange", "IndicatorService.LobbyPlayerClassChange", IndicatorService.LobbyPlayerClassChange)
 
 hook.Add("LocalPlayerGhost", "IndicatorService.RefreshPlayerIndicator", IndicatorService.RefreshPlayerIndicator)
 

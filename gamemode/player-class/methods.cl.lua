@@ -14,7 +14,7 @@ function player_metatable:SetPlayerClass(class)
 	hook.Run("PlayerClassChange", self, old_class, class)
 
 	if self.lobby:IsLocal() then
-		hook.Run("LocalLobbyPlayerClassChange", self, old_class, class)
+		hook.Run("LocalLobbyPlayerClassChange", self.lobby, self, old_class, class)
 	end
 
 	MinigameService.CallHook(self.lobby, "PlayerClassChange", self, old_class, class)
@@ -35,7 +35,7 @@ function player_metatable:ClearPlayerClass(switching)
 		hook.Run("PlayerClassChange", self, old_class)
 
 		if self.lobby:IsLocal() then
-			hook.Run("LocalLobbyPlayerClassChange", self, old_class)
+			hook.Run("LocalLobbyPlayerClassChange", self.lobby, self, old_class)
 		end
 
 		MinigameService.CallHook(self.lobby, "PlayerClassChange", self, old_class)

@@ -33,13 +33,15 @@ function Indicator:Init(ent_or_vec)
 		return 0 > self.x or self.x > ScrW() or 0 > self.y or self.y > ScrH()
 	end
 
-	self.world_alpha = AnimatableValue.New(not OffScreen() and 255 or 0)
+	local already_off_screen = OffScreen()
+
+	self.world_alpha = AnimatableValue.New(not already_off_screen and 255 or 0)
 
 	self:SetAttribute("color", function ()
 		return GetAnimatableEntityColor(self.entity)
 	end)
 
-	self.off_screen = AnimatableValue.New(OffScreen(), {
+	self.off_screen = AnimatableValue.New(already_off_screen, {
 		generate = OffScreen,
 
 		callback = function (anim_v)
@@ -59,7 +61,7 @@ function Indicator:Init(ent_or_vec)
 		height = INDICATOR_PERIPHERAL_SIZE,
 		material = indicator_material,
 		angle = 0,
-		alpha = 0
+		alpha = already_off_screen and 255 or 0
 	})
 end
 
