@@ -41,7 +41,10 @@ function ENT:SetCollision()
 	self:SetSolid(SOLID_VPHYSICS)
 
 	if self:GetShape() == EMM_TRIGGER_SHAPE_SPHERE then
+		local size = self:GetWidth()
+
 		self:PhysicsInitSphere(self:GetWidth(), "default")
+		self:SetCollisionBounds(Vector(-size, -size, -size ), Vector(size, size, size))
 	else
 		self:PhysicsInitConvex(self:GetCollision())
 	end
