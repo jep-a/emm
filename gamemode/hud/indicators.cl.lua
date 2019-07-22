@@ -168,7 +168,7 @@ end
 -- # Drawing/rendering
 
 function IndicatorService.IndicatorIcon(ent)
-	return ent.indicator_icon or ent.GetIndicatorIcon and ent:GetIndicatorIcon()
+	return ent.indicator_icon or ent.GetIndicatorIcon and ent:GetIndicatorIcon() or ent:GetNWString "IndicatorIcon"
 end
 
 function IndicatorService.DrawWorldPositions()
@@ -210,7 +210,7 @@ function IndicatorService.DrawWorldPositions()
 
 				local indicator_material = IndicatorService.IndicatorIcon(indicator_ent)
 
-				if indicator_material then
+				if not Falsy(indicator_material) then
 					local icon_x, icon_y, icon_size = IndicatorService.IndicatorIconPosition(indicator)
 
 					Element.PaintTexture(indicator, PNGMaterial(indicator_material), icon_x, icon_y, icon_size, icon_size, 0, indicator:GetColor())

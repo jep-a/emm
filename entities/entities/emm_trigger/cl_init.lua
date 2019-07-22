@@ -22,6 +22,29 @@ function ENT:Initialize()
 	self.opacity:AnimateTo(255, 0.2)
 end
 
+function ENT:GetIndicatorName()
+	local name
+	local owner = self:GetOwner()
+
+	if self.indicator_name then
+		name = self.indicator_name
+	else
+		local indicator_name = self:GetNWString "IndicatorName"
+
+		if IsValid(owner) then
+			if IsLocalPlayer(owner) then
+				name = "your "..indicator_name
+			else
+				name = owner:GetName().."'s "..indicator_name
+			end
+		else
+			name = indicator_name
+		end
+	end
+
+	return name
+end
+
 function ENT:RenderSphere(pos, radius, thickness, color)
 	render.ClearStencil()
 

@@ -16,14 +16,6 @@ function ENT:Initialize()
 	self:SetID(self.id)
 	self:SetType(self.type)
 
-	if self.indicator_name then
-		self:SetIndicatorName(self.indicator_name)
-	end
-
-	if self.indicator_icon then
-		self:SetIndicatorIcon(self.indicator_icon)
-	end
-
 	if self.can_tag then
 		self:SetCanTag(self.can_tag)
 	end

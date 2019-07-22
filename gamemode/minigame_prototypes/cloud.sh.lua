@@ -38,11 +38,12 @@ MINIGAME:AddPlayerClass {
 if SERVER then
 	function MINIGAME:SetCloud(ply)
 		TriggerService.CreateTrigger(self, {
+			owner = ply,
 			position = ply:GetPos(),
 			width = 512,
-			indicator_name = ply:GetName().."'s cloud",
-			indicator_icon = "emm2/minigames/cloud.png",
-			can_tag = {Tagger = true}
+			can_tag = {Tagger = true},
+			indicator_name = "cloud",
+			indicator_icon = "emm2/minigames/cloud.png"
 		})
 
 		local dynamic_ply_class = ply.dynamic_player_class
