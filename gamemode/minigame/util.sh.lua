@@ -8,13 +8,17 @@ function MinigameService.IsSharingLobby(a, b)
 	local lobby_b
 
 	if isentity(a) then
-		lobby_a = a.lobby
+		local owner = a:GetOwner()
+
+		lobby_a = IsValid(owner) and owner.lobby or a.lobby
 	else
 		lobby_a = a
 	end
 
 	if isentity(b) then
-		lobby_b = b.lobby
+		local owner = b:GetOwner()
+
+		lobby_b = IsValid(owner) and owner.lobby or b.lobby
 	else
 		lobby_b = b
 	end
