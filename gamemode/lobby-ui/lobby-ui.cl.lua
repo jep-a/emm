@@ -94,7 +94,7 @@ function LobbyUIService.AddLobby(lobby, no_notify)
 		end
 	end
 end
-hook.Add("LobbyInit", "LobbyUIService.AddLobby", LobbyUIService.AddLobby)
+hook.Add("LobbyCreate", "LobbyUIService.AddLobby", LobbyUIService.AddLobby)
 
 function LobbyUIService.FinishLobby(lobby)
 	if UIService.Active "Lobbies" then

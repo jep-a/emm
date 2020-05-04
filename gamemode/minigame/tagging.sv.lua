@@ -59,7 +59,7 @@ function TaggingService.InitLobby(lobby)
 		end
 	end
 end
-hook.Add("LobbyInit", "TaggingService.InitLobby", TaggingService.InitLobby)
+hook.Add("LobbyCreate", "TaggingService.InitLobby", TaggingService.InitLobby)
 
 function TaggingService.FinishLobby(lobby)
 	for k, player_class in pairs(lobby.player_classes) do

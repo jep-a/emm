@@ -26,9 +26,19 @@ function NetService.CreateReader(name, schema)
 	return receiver
 end
 
+--- Broadcast net message to all clients
+---@param name string | "Signal name"
 function NetService.Broadcast(name, ...)
 	NetService.writers[name](...)
 	net.Broadcast()
+end
+
+--- Send a net message to the specified player(s)
+---@param name string | "Signal name"
+---@param plys player|table | "Player or table of Players"
+function NetService.Send(name, plys, ...)
+	NetService.writers[name](...)
+	net.Send(plys)
 end
 
 function NetService.SendCustom(name, sender, ...)
