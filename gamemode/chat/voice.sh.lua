@@ -1,0 +1,2 @@
+VoiceService = VoiceService or {}
+
