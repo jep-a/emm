@@ -26,7 +26,7 @@ function NetService.CreateReader(name, schema)
 	return receiver
 end
 
-function NetService.Send(name, ...)
+function NetService.Broadcast(name, ...)
 	NetService.writers[name](...)
 	net.Broadcast()
 end
