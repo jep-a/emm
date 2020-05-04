@@ -32,7 +32,7 @@ function MinigameLobby:Init(props)
 	self:InitSettings()
 
 	NetService.Broadcast("Lobby", self.id, self.prototype, self.host)
-	hook.Run("LobbyInit", self)
+	hook.Run("LobbyCreate", self)
 
 	self:SetState(self.states[self.default_state])
 end
