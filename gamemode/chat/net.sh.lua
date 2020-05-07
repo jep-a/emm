@@ -10,9 +10,9 @@ end
 
 -- Server -> Client
 -- CreateVoiceChannel: {ChannelID: obj_id, Creator: player, isPrivate: bool}
-NetService.CreateSchema("CreateVoiceChannel", {"chat_channel", "entity", "bool"})
+NetService.CreateSchema("CreateVoiceChannel", {"id", "entity", "bool"})
 -- CreateTextChannel: {ChannelID: obj_id, Creator: player, isPrivate: bool}
-NetService.CreateSchema("CreateTextChannel", {"chat_channel", "entity", "bool"})
+NetService.CreateSchema("CreateTextChannel", {"id", "entity", "bool"})
 -- -- SyncChannelPlayerList: {ChannelID: obj_id, Players: entities}
 -- NetService.CreateSchema("SyncChannelPlayerList", {"chat_channel", "entities"})
 -- -- SyncChannelMuteList: {ChannelID: obj_id, Players: entities}
@@ -28,6 +28,8 @@ NetService.CreateSchema("ChatChannelInvite", {"chat_channel", "entity"})
 NetService.CreateSchema("PlayerJoinChannel", {"chat_channel", "entity"})
 -- PlayerLeaveChannel: {ChannelID: obj_id, Who: player}
 NetService.CreateSchema("PlayerLeaveChannel", {"chat_channel", "entity"})
+-- SyncLobbyData: {ChannelID: obj_id, data: String}
+NetService.CreateSchema("SyncLobbyData", {"chat_channel", "entity"})
 
 -- Client -> Server
 -- ReqCreateVoiceChannel: {isPrivate: bool}
@@ -41,5 +43,7 @@ NetService.CreateUpstreamSchema("ReqJoinChannel", {"chat_channel"})
 NetService.CreateUpstreamSchema("ReqChannelInvite", {"chat_channel", "entity"})
 -- ReqChannelInvite: {ChannelID: obj_id}
 NetService.CreateUpstreamSchema("ReqAcceptChatInvite", {"chat_channel"})
+-- ReqSyncLobbies
+NetService.CreateUpstreamSchema "ReqSyncLobbies"
 -- -- LeaveChannel: {ChannelID: obj_id}
 -- NetService.CreateUpstreamSchema("ReqLeaveChannel", {"chat_channel"})

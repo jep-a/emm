@@ -8,19 +8,19 @@ ChatNetService = ChatNetService or {}
     Need to change the type reader to id.
 ]]
 --- Voice channel created
----@param channel ChatChannel | "New channel"
+---@param channel_id uint8 | "New channel ID"
 ---@param creator Player | "Creator of the channel"
 ---@param is_private bool | "Is the channel private?"
-function ChatNetService.CreateVoiceChannel(channel, creator, is_private)
+function ChatNetService.CreateVoiceChannel(channel_id, creator, is_private)
     -- Update UI with a new voice channel
 end
 NetService.Receive("CreateVoiceChannel", ChatNetService.CreateVoiceChannel)
 
 --- Text channel created
----@param channel ChatChannel | "New channel"
+---@param channel_id uint8 | "New channel ID"
 ---@param creator any
 ---@param is_private any
-function ChatNetService.CreateTextChannel(channel, creator, is_private)
+function ChatNetService.CreateTextChannel(channel_id, creator, is_private)
     -- Update UI with a new text channel
 end
 NetService.Receive("CreateTextChannel", ChatNetService.CreateTextChannel)
