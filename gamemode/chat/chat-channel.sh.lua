@@ -1,38 +1,60 @@
 ChatChannel = ChatChannel or Class.New()
+ChatChannel.MUTED = 1   --0b0001
+ChatChannel.OP = 1<<1   --0b0010
 
-function ChatChannel:Init()
-    self.id = 0
-    self.host = nil
-    self.private = false
+function ChatChannel:Init(id, host, private)
+    self.id = id
+    self.host = host
+    self.private = private
     self.players = {}
     self.bans = {}
-    self.mute = {}
 end
 
 function ChatChannel:GetPlayers()
     return self.players
 end
 
-function ChatChannel:AddPlayer(ply)
-    table.insert(self.players, ply)
+function ChatChannel:HasPlayer(ply)
+    return this.players[ply] ~= nil
+end
+
+function ChatChannel:AddPlayer(ply, flags)
+    self.players[ply] = flags or 0
 end
 
 function ChatChannel:RemovePlayer(ply)
-    table.RemoveByValue(self.players, ply)
+    self.players[ply] = nil
 end
 
-function ChatChannel:AddBan(ply)
-    table.insert(self.bans, ply)
+function ChatChannel:Ban(ply)
+    self.bans[ply] = true
 end
 
 function ChatChannel:RemoveBan(ply)
-    table.RemoveByValue(self.bans, ply)
+    self.bans[ply] = nil
 end
 
-function ChatChannel:AddMute(ply, time)
-    table.insert(self.mute, ply)
+function ChatChannel:CheckBan(ply)
+    return self.bans[ply] ~= nil
+end
+
+function ChatChannel:Mute(ply)
+    if self:HasPlayer(ply) then
+        self.players[ply] = self.players[ply] | ChatChannel.MUTE
+    end
 end
 
 function ChatChannel:RemoveMute(ply)
-    table.RemoveByValue(self.mute, ply)
+    if self:HasPlayer(ply) then
+        self.players[ply] = self.players[ply] & (~ChatChannel.MUTE)
+    end
 end
+
+function ChatChannel:CheckMute(ply)
+    return self.players[ply] & ChatChannel.MUTE
+end
+
+function ChatChannel:PlyCount()
+    table.Count(self)
+end
+
