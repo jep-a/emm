@@ -82,12 +82,10 @@ NetService.Receive("ReqChannelInvite", ChatNetService.ReqChannelInvite)
 ---@param ply Player | "Player requesting to leave"
 ---@param channel ChatChannel | "Channel the player is leaving"
 function ChatNetService.ReqLeaveChannel(ply, channel)
-    -- Check if the channel is one of the public channels
-    -- Remove player from current channel
-    -- Broadcast PlayerLeaveChannel
-    -- If it's a voice channel:
-        -- Put player in public channel
-        -- Broadcast PlayerJoinChannel
+    if channel.id > 2 then
+        ChatService.RemovePlayer(channel, ply)
+        ChatService.AddPlayer(ChatService.channels[2], ply)
+    end
 end
 NetService.Receive("ReqLeaveChannel", ChatNetService.ReqLeaveChannel)
 
