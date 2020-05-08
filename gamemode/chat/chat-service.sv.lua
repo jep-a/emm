@@ -35,7 +35,7 @@ function ChatService.ChannelsToPacket()
         channel_tab.ply_flags = {}
 
         channel_tab.id = channel_id
-        channel_tab.voice = channel_data.voice
+        channel_tab.voice = Class.InstanceOf(channel_tab, VoiceChannel)
         channel_tab.host_id = channel_data.host:UserID()
         channel_tab.private = channel_data.private
         for ply, ply_flags in pairs(channel_data.flags) do

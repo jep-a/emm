@@ -4,13 +4,9 @@ ChatChannel.OP = 1<<1   --0b0010
 
 function ChatChannel:Init(id, host, private)
     self.id = 0
-    self.voice = false
     self.host = nil
     self.private = false
-    -- We can search through flags 
-    -- to find out which players are
-    -- in a lobby
-    -- self.players = {}
+    self.players = {}
     self.flags = {}
     self.bans = {}
 end
@@ -20,7 +16,7 @@ function ChatChannel:GetPlayers()
 end
 
 function ChatChannel:HasPlayer(ply)
-    return this.players[ply] ~= nil
+    return self.players[ply] ~= nil
 end
 
 function ChatChannel:AddPlayer(ply, flags)
@@ -60,6 +56,6 @@ function ChatChannel:CheckMute(ply)
 end
 
 function ChatChannel:PlyCount()
-    table.Count(self)
+    table.Count(self.players)
 end
 

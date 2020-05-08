@@ -21,13 +21,14 @@ end
 function ChatService.PacketToChannels(packet_str)
     local channel_info = util.JSONToTable(util.Decompress(packet_str))
     for channel_id, channel_data in pairs(channel_info) do
+        local new_channel = {}
         if channel_data.voice then
-            local channel = ChatService.CreateVoiceChannel(channel_id, channel_data.private, Player(channel_data.host))
+            new_channel = ChatService.CreateVoiceChannel(channel_id, channel_data.private, Player(channel_data.host))
         else
-            local channel = ChatService.CreateTextChannel(channel_id, channel_data.private, Player(channel_data.host))
+            new_channel = ChatService.CreateTextChannel(channel_id, channel_data.private, Player(channel_data.host))
         end
         for ply_id, flags in pairs(channel_tab.ply_flags) do
-            channel.flags[Player(ply)] = flags
+            new_channel.players[Player(ply_id)] = flags
         end
     end
 end

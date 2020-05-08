@@ -1,2 +1,0 @@
-VoiceService = VoiceService or {}
-

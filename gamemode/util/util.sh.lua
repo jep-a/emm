@@ -94,3 +94,19 @@ function GetPlayer(ply)
 	end
 	return nil
 end
+
+function Map(tbl, f)
+	local newt = {}
+	for k, v in pairs(tbl) do
+		newt[k] = f(v)
+	end
+	return newt
+end
+
+
+function ForEach(tbl, f)
+	for k, v in pairs(tbl) do
+		f(v, k)
+	end
+end
+

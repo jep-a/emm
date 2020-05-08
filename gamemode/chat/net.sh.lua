@@ -46,9 +46,9 @@ NetService.CreateUpstreamSchema("ReqLeaveChannel", {"chat_channel"})
 NetService.CreateUpstreamSchema("ReqChannelBanPlayer", {"chat_channel", "entity"})
 -- ReqChannelSetFlags: {ChannelID: obj_id, Who: entity, Flag: uint8, Set: bool}
 NetService.CreateUpstreamSchema("ReqChannelSetFlags", {"chat_channel", "entity", "id", "boolean"})
--- ReqChannelInvite: {ChannelID: obj_id}
+-- ReqAcceptChatInvite: {ChannelID: obj_id}
 NetService.CreateUpstreamSchema("ReqAcceptChatInvite", {"chat_channel"})
 -- ReqSyncLobbies
 NetService.CreateUpstreamSchema "ReqSyncLobbies"
--- -- LeaveChannel: {ChannelID: obj_id}
--- NetService.CreateUpstreamSchema("ReqLeaveChannel", {"chat_channel"})
+-- ReqClChatMute: {ChannelID: obj_id}
+NetService.CreateUpstreamSchema("ReqClChatMute", {"entity"})

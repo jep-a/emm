@@ -33,7 +33,6 @@ NetService.Receive("ReqCreateTextChannel", ChatService.ReqCreateTextChannel)
 ---@param channel ChatChannel | "Channel to put the player into"
 function ChatNetService.ReqJoinChannel(ply, channel)
     -- Check if the target channel is private
-    -- ?? If it is send a join error ??
     -- Remove the player from their current channel
     -- Broadcast player left signal
     -- Add the player to the new channel
@@ -55,6 +54,12 @@ NetService.Receive("ReqChannelInvite", ChatService.ReqChannelInvite)
 ---@param ply Player | "Player requesting to leave"
 ---@param channel ChatChannel | "Channel the player is leaving"
 function ChatService.ReqLeaveChannel(ply, channel)
+    -- Check if the channel is one of the public channels
+    -- Remove player from current channel
+    -- Broadcast PlayerLeaveChannel
+    -- If it's a voice channel:
+        -- Put player in public channel
+        -- Broadcast PlayerJoinChannel
 end
 NetService.Receive("ReqLeaveChannel", ChatService.ReqLeaveChannel)
 
@@ -83,9 +88,5 @@ NetService.Receive("ReqSyncLobbies", ChatService.ReqSyncLobbies)
 -- ---@param ply Player | "Player requesting to leave"
 -- ---@param channel ChatChannel | "Channel the player is leaving"
 -- function ChatNetService.ReqLeaveChannel(ply, channel)
---     -- Remove player from current channel
---     -- Broadcast PlayerLeaveChannel
---     -- Put player in new channel
---     -- Broadcast PlayerJoinChannel
 -- end
 -- NetService.Receive("ReqLeaveChannel", ChatNetService.ReqLeaveChannel)

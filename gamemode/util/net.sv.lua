@@ -45,3 +45,5 @@ function NetService.SendCustom(name, sender, ...)
 	NetService.writers[name](...)
 	sender()
 end
+
+--return lsn.canHear[tlk]
