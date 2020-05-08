@@ -19,15 +19,17 @@ end
 function VoiceChannel:Mute(ply)
     self.super.Mute(self, ply)
 
-    self:Silence(ply)
     self.flags[ply] = self.flags[ply] | self.MUTE
+    self:Silence(ply)
 end
 
 function VoiceChannel:RemoveMute(ply)
     self.super.Mute(self, ply)
 
-    self:Silence(ply)
     self.flags[ply] = self.flags[ply] & ~self.MUTE
+    if self:HasPlayer(ply) then
+        self:Silence(ply, false)
+    end
 end
 
 function VoiceChannel:Ban(ply)
@@ -36,7 +38,7 @@ function VoiceChannel:Ban(ply)
     self:RemovePlayer(ply)
 end
 
---Internal fucntion
+--Internal function
 function VoiceChannel:Silence(ply, enable)
     for _,lst in pairs(self.players) do
         lst.canHear[ply] = enable and not enable or false
