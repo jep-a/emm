@@ -16,18 +16,21 @@ function ChatChannel:GetPlayers()
 end
 
 function ChatChannel:HasPlayer(ply)
-    return self.players[ply] ~= nil
+    return self.flags[ply] ~= nil
 end
 
 function ChatChannel:AddPlayer(ply, flags)
-    self.players[ply] = flags or 0
+    table.insert(self.players,ply)
+    self.flags[ply] = flags or 0
 end
 
 function ChatChannel:RemovePlayer(ply)
-    self.players[ply] = nil
+    table.RemovePlayer(self.flags, ply)
+    self.flags[ply] = nil
 end
 
 function ChatChannel:Ban(ply)
+    self:RemovePlayer(ply)
     self.bans[ply] = true
 end
 
@@ -41,18 +44,18 @@ end
 
 function ChatChannel:Mute(ply)
     if self:HasPlayer(ply) then
-        self.players[ply] = self.players[ply] | ChatChannel.MUTE
+        self.flags[ply] = self.flags[ply] | ChatChannel.MUTE
     end
 end
 
 function ChatChannel:RemoveMute(ply)
     if self:HasPlayer(ply) then
-        self.players[ply] = self.players[ply] & (~ChatChannel.MUTE)
+        self.flags[ply] = self.flags[ply] & (~ChatChannel.MUTE)
     end
 end
 
 function ChatChannel:CheckMute(ply)
-    return self.players[ply] & ChatChannel.MUTE
+    return self.flags[ply] & ChatChannel.MUTE
 end
 
 function ChatChannel:PlyCount()
