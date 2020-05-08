@@ -46,6 +46,11 @@ function ChatService.ChannelsToPacket()
     return util.Compress(util.TableToJSON(channel_info))
 end
 
+function ChatService.AddPlayer(channel, ply)
+    channel:AddPlayer(ply)
+    NetService.Broadcast("PlayerJoinChannel", channel, ply)
+end
+
 --- Remove player from the lobby and broadcast
 ---@param channel ChatChannel | "Channel to remove the player from"
 ---@param player Player | "Player to remove from the channel"
