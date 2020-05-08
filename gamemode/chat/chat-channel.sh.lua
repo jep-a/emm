@@ -3,12 +3,16 @@ ChatChannel.MUTED = 1   --0b0001
 ChatChannel.OP = 1<<1   --0b0010
 
 function ChatChannel:Init(id, host, private)
-    self.id = 0
-    self.host = nil
-    self.private = false
+    self.id = id or 0
+    self.host = host or nil
+    self.private = private or nil
     self.players = {}
     self.flags = {}
     self.bans = {}
+    if(host ~= nil) then
+        self:AddPlayer(host)
+        self.flags[host] = ChatChannel.OP
+    end
 end
 
 function ChatChannel:GetPlayers()
