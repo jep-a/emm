@@ -22,8 +22,8 @@ end
 function ChatService.CreateTextChannel(host, is_private)
     local new_id = NextFreeChannelID()
     --- TODO: Update this statement when the text channel class is complete
-    ChatService.channels[new_id] = TextChannelClass.New(is_private)
-    return ChatService.channels[new_id]
+    ChatService.channels[new_id] = TextChannel.New(new_id, host, is_private)
+    NetService.Broadcast("CreateTextChannel", ChatService.channels[new_id], host, is_private)
 end
 
 --- Return compressed string representing the channel info
