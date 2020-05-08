@@ -50,7 +50,10 @@ function ChatNetService.ReqChannelInvite(ply, channel, recipient)
 end
 NetService.Receive("ReqChannelInvite", ChatNetService.ReqChannelInvite)
 
-function ChatNetService.ReqAcceptChatInvite(channel, recipient)
+--- Handle request to accept invite to chat channel
+---@param recipient Player | "Player that accepted the invite"
+---@param channel ChatChannel | "Chat channel to join"
+function ChatNetService.ReqAcceptChatInvite(recipient, channel)
     -- Remove player from current channel
     -- Broadcast PlayerLeaveChannel
     -- Put player in new channel
