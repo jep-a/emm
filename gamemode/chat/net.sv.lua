@@ -72,9 +72,10 @@ NetService.Receive("ReqJoinChannel", ChatNetService.ReqJoinChannel)
 ---@param channel ChatChannel | "Chat channel the player is requesting to invite to"
 ---@param recipient Player | "Recipient of the invite"
 function ChatNetService.ReqChannelInvite(ply, channel, recipient)
-    -- Check if the ply has op flag
-    -- Send SendChannelInvite -> recipient + everyone in the channel
-    
+    if channel.flags[ply] & ChatChannel.OP then
+        NetService.Send("ChatChannelInvite", recipient, channel, recipient)
+        NetService.Send("ChatChannelInvite", channel.players, channel, recipient)
+    end
 end
 NetService.Receive("ReqChannelInvite", ChatNetService.ReqChannelInvite)
 
