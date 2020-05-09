@@ -54,11 +54,14 @@ NetService.Receive("ReqCreateTextChannel", ChatNetService.ReqCreateTextChannel)
 function ChatNetService.ReqJoinChannel(ply, channel)
     -- Check if the target channel is private or the player is banned
     if channel.private or channel:CheckBan(ply) then return end
+    if channel:HasPlayer(ply) then return end
     local current_channel = {}
-    for channel_id, current_channel in pairs(ChatService.channels) do
-        if current_channel:HasPlayer(creator) then
-            ChatService.RemovePlayer(current_channel, ply)
-            break
+    if channel:InstanceOf(VoiceChannel) then
+        for channel_id, current_channel in pairs(ChatService.channels) do
+            if current_channel:HasPlayer(ply) and current_channel:InstanceOf(VoiceChannel) then
+                ChatService.RemovePlayer(current_channel, ply)
+                break
+            end
         end
     end
     
