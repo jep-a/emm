@@ -96,8 +96,18 @@ NetService.Receive("ReqLeaveChannel", ChatNetService.ReqLeaveChannel)
 function ChatNetService.ReqAcceptChatInvite(recipient, channel)
     -- Remove player from current channel
     -- Broadcast PlayerLeaveChannel
+    if channel:InstanceOf(VoiceChannel) then
+        for channel_id, current_channel in pairs(ChatService.channels) do
+            if current_channel:HasPlayer(recipient) and current_channel:InstanceOf(VoiceChannel) then
+                ChatService.RemovePlayer(current_channel, recipient)
+                break
+            end
+        end
+    end
     -- Put player in new channel
     -- Broadcast PlayerJoinChannel
+    channel:AddPlayer(recipient)
+    NetService.Broadcast("PlayerJoinChannel", channel, recipient)
 end
 NetService.Receive("ReqAcceptChatInvite", ChatNetService.ReqAcceptChatInvite)
 
