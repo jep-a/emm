@@ -1,7 +1,5 @@
 ChatService = ChatService or {}
 ChatService.channels = ChatService.channels or {}
-ChatService.flag.OP = 1
-ChatService.flag.MUTED = 1<<1
 
 --- Remove channel from the channel list
 ---@param channel_id uint8

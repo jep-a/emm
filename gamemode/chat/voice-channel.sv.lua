@@ -1,5 +1,5 @@
-function VoiceChannel:AddPlayer(ply, flags) 
-    self.super.AddPlayer(self, ply, flags)
+function VoiceChannel:AddPlayer(ply, flags)
+    VoiceChannel.super.AddPlayer(self, ply, flags)
 
     for _, lst in pairs(self.players) do
        lst.canHear[ply] = flags ~= nil and not (flags & self.MUTE) or true
@@ -8,7 +8,7 @@ function VoiceChannel:AddPlayer(ply, flags)
 end
 
 function VoiceChannel:RemovePlayer(ply)
-    self.super.RemovePlayer(self, ply)
+    VoiceChannel.super.RemovePlayer(self, ply)
 
     self:Silence(ply)
     for _, lst in pairs(self.players) do
@@ -17,14 +17,14 @@ function VoiceChannel:RemovePlayer(ply)
 end
 
 function VoiceChannel:Mute(ply)
-    self.super.Mute(self, ply)
+    VoiceChannel.super.Mute(self, ply)
 
     self.flags[ply] = self.flags[ply] | self.MUTE
     self:Silence(ply)
 end
 
 function VoiceChannel:RemoveMute(ply)
-    self.super.Mute(self, ply)
+    VoiceChannel.super.RemoveMute(self, ply)
 
     self.flags[ply] = self.flags[ply] & ~self.MUTE
     if self:HasPlayer(ply) then
@@ -32,15 +32,9 @@ function VoiceChannel:RemoveMute(ply)
     end
 end
 
-function VoiceChannel:Ban(ply)
-    self.super.Ban(self, ply)
-
-    self:RemovePlayer(ply)
-end
-
 --Internal function
 function VoiceChannel:Silence(ply, enable)
     for _,lst in pairs(self.players) do
-        lst.canHear[ply] = enable and not enable or false
+        lst.can_hear[ply] = enable and not enable or false
     end
 end

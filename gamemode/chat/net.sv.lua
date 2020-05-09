@@ -64,7 +64,7 @@ function ChatNetService.ReqJoinChannel(ply, channel)
             end
         end
     end
-    
+
     channel:AddPlayer(ply)
     NetService.Broadcast("PlayerJoinChannel", channel, ply)
 end
@@ -97,8 +97,6 @@ NetService.Receive("ReqLeaveChannel", ChatNetService.ReqLeaveChannel)
 ---@param recipient Player | "Player that accepted the invite"
 ---@param channel ChatChannel | "Chat channel to join"
 function ChatNetService.ReqAcceptChatInvite(recipient, channel)
-    -- Remove player from current channel
-    -- Broadcast PlayerLeaveChannel
     if channel:InstanceOf(VoiceChannel) then
         for channel_id, current_channel in pairs(ChatService.channels) do
             if current_channel:HasPlayer(recipient) and current_channel:InstanceOf(VoiceChannel) then
@@ -107,8 +105,6 @@ function ChatNetService.ReqAcceptChatInvite(recipient, channel)
             end
         end
     end
-    -- Put player in new channel
-    -- Broadcast PlayerJoinChannel
     channel:AddPlayer(recipient)
     NetService.Broadcast("PlayerJoinChannel", channel, recipient)
 end
@@ -116,7 +112,7 @@ NetService.Receive("ReqAcceptChatInvite", ChatNetService.ReqAcceptChatInvite)
 
 --- Handle request to sync lobbies to a player
 ---@param ply Player | "Player to send the lobbies to"
-function ChatNetService.ReqSyncLobbies(ply) 
+function ChatNetService.ReqSyncLobbies(ply)
     NetService.Send("SyncLobbyData",ply, ChatService.ChannelsToPacket())
 end
 NetService.Receive("ReqSyncLobbies", ChatNetService.ReqSyncLobbies)

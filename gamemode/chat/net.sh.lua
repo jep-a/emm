@@ -13,12 +13,6 @@ end
 NetService.CreateSchema("CreateVoiceChannel", {"id", "entity", "bool"})
 -- CreateTextChannel: {ChannelID: obj_id, Creator: player, isPrivate: bool}
 NetService.CreateSchema("CreateTextChannel", {"id", "entity", "bool"})
--- -- SyncChannelPlayerList: {ChannelID: obj_id, Players: entities}
--- NetService.CreateSchema("SyncChannelPlayerList", {"chat_channel", "entities"})
--- -- SyncChannelMuteList: {ChannelID: obj_id, Players: entities}
--- NetService.CreateSchema("SyncChannelMuteList", {"chat_channel", "entities"})
--- -- SyncChannelBanList: {ChannelID: obj_id, Players: entities}
--- NetService.CreateSchema("SyncChannelBanList", {"chat_channel", "entities"})
 
 -- DestroyChannel: {ChannelID: obj_id}
 NetService.CreateSchema("DestroyChannel", {"chat_channel"})
@@ -28,8 +22,8 @@ NetService.CreateSchema("ChatChannelInvite", {"chat_channel", "entity"})
 NetService.CreateSchema("PlayerJoinChannel", {"chat_channel", "entity"})
 -- PlayerLeaveChannel: {ChannelID: obj_id, Who: player}
 NetService.CreateSchema("PlayerLeaveChannel", {"chat_channel", "entity"})
--- SyncLobbyData: {ChannelID: obj_id, data: String}
-NetService.CreateSchema("SyncLobbyData", {"chat_channel", "entity"})
+-- SyncLobbyData: {data: String}
+NetService.CreateSchema("SyncLobbyData", {"string"})
 
 -- Client -> Server
 -- ReqCreateVoiceChannel: {isPrivate: bool}
