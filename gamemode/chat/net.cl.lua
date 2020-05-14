@@ -70,13 +70,13 @@ NetService.Receive("ChannelUnmutedPlayer", ChatNetService.ChannelUnmutedPlayer)
 
 -- ChannelSetOP: {ChannelID: obj_id, Who: player}
 function ChatNetService.ChannelSetOP(channel, ply)
-    channel:OP(ply)
+    channel:AddOperator(ply)
 end
 NetService.Receive("ChannelSetOP", ChatNetService.ChannelSetOP)
 
 -- ChannelUnsetOP: {ChannelID: obj_id, Who: player}
 function ChatNetService.ChannelUnsetOP(channel, ply)
-    channel:RemoveOP(ply)
+    channel:RemoveOperator(ply)
 end
 NetService.Receive("ChannelUnsetOP", ChatNetService.ChannelUnsetOP)
 

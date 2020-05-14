@@ -55,18 +55,7 @@ function ChatNetService.ReqJoinChannel(ply, channel)
     -- Check if the target channel is private or the player is banned
     if channel.private or channel:CheckBan(ply) then return end
     if channel:HasPlayer(ply) then return end
-    local current_channel = {}
-    if channel:InstanceOf(VoiceChannel) then
-        for channel_id, current_channel in pairs(ChatService.channels) do
-            if current_channel:HasPlayer(ply) and current_channel:InstanceOf(VoiceChannel) then
-                ChatService.RemovePlayer(current_channel, ply)
-                break
-            end
-        end
-    end
-
-    channel:AddPlayer(ply)
-    NetService.Broadcast("PlayerJoinChannel", channel, ply)
+    ChatService.AddPlayer(channel, ply)
 end
 NetService.Receive("ReqJoinChannel", ChatNetService.ReqJoinChannel)
 
@@ -93,18 +82,11 @@ function ChatNetService.ReqLeaveChannel(ply, channel)
 end
 NetService.Receive("ReqLeaveChannel", ChatNetService.ReqLeaveChannel)
 
+-- TODO: Make this more secure
 --- Handle request to accept invite to chat channel
 ---@param recipient Player | "Player that accepted the invite"
 ---@param channel ChatChannel | "Chat channel to join"
 function ChatNetService.ReqAcceptChatInvite(recipient, channel)
-    if channel:InstanceOf(VoiceChannel) then
-        for channel_id, current_channel in pairs(ChatService.channels) do
-            if current_channel:HasPlayer(recipient) and current_channel:InstanceOf(VoiceChannel) then
-                ChatService.RemovePlayer(current_channel, recipient)
-                break
-            end
-        end
-    end
     channel:AddPlayer(recipient)
     NetService.Broadcast("PlayerJoinChannel", channel, recipient)
 end

@@ -9,6 +9,7 @@ function ChatChannel:Init(id, host, private)
     self.players = {}
     self.flags = {}
     self.bans = {}
+    self.invites = {}
 
     if host ~= nil then
         self:AddPlayer(host)
@@ -73,6 +74,7 @@ function ChatChannel:RemoveMute(ply)
     end
 end
 
+
 function ChatChannel:CheckMute(ply)
     if self.flags[ply] ~= nil then return false end
 
@@ -83,3 +85,23 @@ function ChatChannel:PlyCount()
     table.Count(self.players)
 end
 
+function ChatChannel:AddInvite(ply, timeout)
+    self.invites[ply] = true
+    if(timeout) then 
+        timer.Create("chatinvite_ch"..self.id.."_pl"..ply.UserID(), timeout, 1, function()
+           self.invites[ply] = nil 
+        end)
+    end
+end
+
+function ChatChannel:RemoveInvite(ply)
+    local timer_id = "chatinvite_ch"..self.id.."_pl"..ply.UserID()
+    if timer.Exists(timer_id) then
+        timer.Remove(timer_id)
+    end
+    self.invites[ply] = nil
+end
+
+function ChatChannel:HasInvite(ply)
+    return self.invites[ply] == true
+end

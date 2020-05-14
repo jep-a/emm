@@ -4,4 +4,3 @@ function VoiceChannel:Init(id, host, private)
     VoiceChannel.super.Init(self, id, host, private)
 end
 
-

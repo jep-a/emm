@@ -1,6 +1,11 @@
 function VoiceChannel:AddPlayer(ply, flags)
     VoiceChannel.super.AddPlayer(self, ply, flags)
 
+    if ply.voice_channel then
+        ply.voice_channel:RemovePlayer(ply)
+    end
+
+    ply.voice_channel = self
     for _, lst in pairs(self.players) do
        lst.canHear[ply] = flags ~= nil and not (flags & self.MUTE) or true
        ply.canHear[lst] = self.flags[lst] ~= nil and not (self.flags[lst] & self.MUTE) or true
