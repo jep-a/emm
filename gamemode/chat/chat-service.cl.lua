@@ -18,8 +18,9 @@ function ChatService.CreateTextChannel(channel_id, is_private, host)
 end
 
 --- Converts the packet to channels
-function ChatService.PacketToChannels(packet_str)
-    local channel_info = util.JSONToTable(util.Decompress(packet_str))
+---@param packet String | "Packet data to turn into channels"
+function ChatService.PacketToChannels(packet)
+    local channel_info = util.JSONToTable(util.Decompress(packet))
     for channel_id, channel_data in pairs(channel_info) do
         local new_channel = {}
         if channel_data.voice then
@@ -27,6 +28,7 @@ function ChatService.PacketToChannels(packet_str)
         else
             new_channel = ChatService.CreateTextChannel(channel_id, channel_data.private, Player(channel_data.host))
         end
+        --What about bans?
         for ply_id, flags in pairs(channel_tab.ply_flags) do
             new_channel.players[Player(ply_id)] = flags
         end

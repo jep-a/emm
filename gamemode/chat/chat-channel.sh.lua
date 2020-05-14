@@ -12,7 +12,7 @@ function ChatChannel:Init(id, host, private)
 
     if host ~= nil then
         self:AddPlayer(host)
-        self.flags[host] = ChatChannel.OPERATOR
+        self:AddOperator(host)
     end
 end
 
@@ -32,6 +32,20 @@ end
 function ChatChannel:RemovePlayer(ply)
     table.remove(self.flags, ply)
     self.flags[ply] = nil
+end
+
+function ChatChannel:AddOperator(ply)
+    self.flags[ply] = self.flags[ply] | ChatChannel.OPERATOR
+end
+
+function ChatChannel:RemoveOperator(ply)
+    self.flags[ply] = self.flags[ply] & ~ChatChannel.OPERATOR
+end
+
+function ChatChannel:CheckOperator(ply)
+    if self.flags[ply] ~= nil then return false end
+    
+    return self.flags[ply] & ChatChannel.MUTE
 end
 
 function ChatChannel:Ban(ply)
@@ -55,11 +69,13 @@ end
 
 function ChatChannel:RemoveMute(ply)
     if ChatChannel.HasPlayer(self, ply) then
-        self.flags[ply] = self.flags[ply] & (~ChatChannel.MUTE)
+        self.flags[ply] = self.flags[ply] & ~ChatChannel.MUTE
     end
 end
 
 function ChatChannel:CheckMute(ply)
+    if self.flags[ply] ~= nil then return false end
+
     return self.flags[ply] & ChatChannel.MUTE
 end
 

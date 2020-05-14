@@ -46,6 +46,9 @@ function ChatService.ChannelsToPacket()
     return util.Compress(util.TableToJSON(channel_info))
 end
 
+--- Add player to the channel and broadcast to all players
+---@param channel | "Channel to add the player to" 
+---@param ply | "Player to add to the channel"
 function ChatService.AddPlayer(channel, ply)
     channel:AddPlayer(ply)
     NetService.Broadcast("PlayerJoinChannel", channel, ply)

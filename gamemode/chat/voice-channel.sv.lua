@@ -32,9 +32,9 @@ function VoiceChannel:RemoveMute(ply)
     end
 end
 
---Internal function
+--Internal functions
 function VoiceChannel:Silence(ply, enable)
-    for _,lst in pairs(self.players) do
-        lst.can_hear[ply] = enable and not enable or false
+    for _,listener in pairs(self.players) do
+        listener.can_hear[ply] = enable and not enable or false
     end
 end

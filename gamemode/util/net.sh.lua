@@ -95,7 +95,9 @@ function NetService.CreateWriter(name, schema)
 	return sender
 end
 
-
+--- Receive a net message
+---@param name String | "Name of the signal"
+---@param func function | "Callback function"
 function NetService.Receive(name, func)
 	NetService.hooks[name] = func
 end

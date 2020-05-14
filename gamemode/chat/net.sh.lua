@@ -6,7 +6,7 @@ NetService.type_readers.chat_channel = function()
     return ChatService.channels[NetService.ReadID()]
 end
 
--- Signal name - {Schema Description}
+-- Signal name: {Schema Description}
 
 -- Server -> Client
 -- CreateVoiceChannel: {ChannelID: obj_id, Creator: player, isPrivate: bool}
@@ -22,6 +22,18 @@ NetService.CreateSchema("ChatChannelInvite", {"chat_channel", "entity"})
 NetService.CreateSchema("PlayerJoinChannel", {"chat_channel", "entity"})
 -- PlayerLeaveChannel: {ChannelID: obj_id, Who: player}
 NetService.CreateSchema("PlayerLeaveChannel", {"chat_channel", "entity"})
+-- ChannelBannedPlayer: {ChannelID: obj_id, Who: player}
+NetService.CreateSchema("ChannelBannedPlayer", {"chat_channel", "entity"})
+-- ChannelUnbannedPlayer: {ChannelID: obj_id, Who: player}
+NetService.CreateSchema("ChannelUnbannedPlayer", {"chat_channel", "entity"})
+-- ChannelMutedPlayer: {ChannelID: obj_id, Who: player}
+NetService.CreateSchema("ChannelMutedPlayer", {"chat_channel", "entity"})
+-- ChannelUnmutedPlayer: {ChannelID: obj_id, Who: player}
+NetService.CreateSchema("ChannelUnmutedPlayer", {"chat_channel", "entity"})
+-- ChannelSetOP: {ChannelID: obj_id, Who: player}
+NetService.CreateSchema("ChannelSetOP", {"chat_channel", "entity"})
+-- ChannelUnsetOP: {ChannelID: obj_id, Who: player}
+NetService.CreateSchema("ChannelUnsetOP", {"chat_channel", "entity"})
 -- SyncLobbyData: {data: String}
 NetService.CreateSchema("SyncLobbyData", {"string"})
 
@@ -38,8 +50,16 @@ NetService.CreateUpstreamSchema("ReqChannelInvite", {"chat_channel", "entity"})
 NetService.CreateUpstreamSchema("ReqLeaveChannel", {"chat_channel"})
 -- ReqChannelBanPlayer: {ChannelID: obj_id, Who: entity}
 NetService.CreateUpstreamSchema("ReqChannelBanPlayer", {"chat_channel", "entity"})
--- ReqChannelSetFlags: {ChannelID: obj_id, Who: entity, Flag: uint8, Set: bool}
-NetService.CreateUpstreamSchema("ReqChannelSetFlags", {"chat_channel", "entity", "id", "boolean"})
+-- ReqChannelSetOP: {ChannelID: obj_id, Who: entity}
+NetService.CreateUpstreamSchema("ReqChannelSetOP", {"chat_channel", "entity"})
+-- ReqChannelSetMute: {ChannelID: obj_id, Who: entity}
+NetService.CreateUpstreamSchema("ReqChannelSetMute", {"chat_channel", "entity"})
+-- ReqChannelUnbanPlayer: {ChannelID: obj_id, Who: entity}
+NetService.CreateUpstreamSchema("ReqChannelUnbanPlayer", {"chat_channel", "entity"})
+-- ReqChannelUnsetOP: {ChannelID: obj_id, Who: entity}
+NetService.CreateUpstreamSchema("ReqChannelUnsetOP", {"chat_channel", "entity"})
+-- ReqChannelUnsetMute: {ChannelID: obj_id, Who: entity}
+NetService.CreateUpstreamSchema("ReqChannelUnsetMute", {"chat_channel", "entity"})
 -- ReqAcceptChatInvite: {ChannelID: obj_id}
 NetService.CreateUpstreamSchema("ReqAcceptChatInvite", {"chat_channel"})
 -- ReqSyncLobbies
