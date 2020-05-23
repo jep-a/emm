@@ -24,6 +24,6 @@ end
 net.Receive("PlayerClasses", PlayerClassService.ReceivePlayerClasses)
 
 function PlayerClassService.RequestPlayerClasses()
-	NetService.Send "RequestPlayerClasses"
+	NetService.Broadcast "RequestPlayerClasses"
 end
 hook.Add("ReceiveLobbies", "PlayerClassService.RequestPlayerClasses", PlayerClassService.RequestPlayerClasses)
