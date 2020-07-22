@@ -41,6 +41,11 @@ SettingsService.New("show_crosshair_meters", {
 	callback = ReloadHUD
 })
 
+SettingsService.New("show_nametags", {
+	default = true,
+	help = "Show nametags"
+})
+
 SettingsService.New("show_indicators", {
 	default = true,
 	help = "Show indicators",
@@ -48,6 +53,11 @@ SettingsService.New("show_indicators", {
 	callback = function ()
 		IndicatorService.Reload(true)
 	end
+})
+
+SettingsService.New("show_outlines", {
+	default = true,
+	help = "Show indicator outlines"
 })
 
 SettingsService.New("show_keys", {

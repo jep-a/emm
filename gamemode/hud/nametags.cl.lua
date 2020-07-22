@@ -75,49 +75,51 @@ function NametagService.Name(ent)
 end
 
 function NametagService.Draw()
-	local plys = player.GetAll()
-	local lobby = LocalPlayer().lobby
+	if SettingsService.Get "show_nametags" then
+		local plys = player.GetAll()
+		local lobby = LocalPlayer().lobby
 
-	for i = 1, #plys do
-		local ply = plys[i]
+		for i = 1, #plys do
+			local ply = plys[i]
 
-		if not IsLocalPlayer(ply) and ply.nametag_alpha then
-			local alpha = ply.nametag_alpha.smooth
-
-			if alpha > 0 then
-				surface.SetFont "Nametag"
-
-				local ply_name = string.upper(NametagService.Name(ply))
-				local w, h = surface.GetTextSize(ply_name)
-				local color = GetAnimatableEntityColor(ply)
-
-				surface.SetTextColor(ColorAlpha(color, CombineAlphas(color.a, alpha) * 255))
-				surface.SetTextPos(ply.indicator_x - (w/2), ply.indicator_y - (h/2) - height_offset)
-				surface.DrawText(ply_name)
-			end
-		end
-	end
-
-	if lobby then
-		local ents = lobby.entities
-
-		for i = 1, #ents do
-			local ent = ents[i]
-			local ent_name = NametagService.Name(ent)
-
-			if ent_name then
-				local alpha = ent.nametag_alpha.smooth
+			if not IsLocalPlayer(ply) and ply.nametag_alpha then
+				local alpha = ply.nametag_alpha.smooth
 
 				if alpha > 0 then
 					surface.SetFont "Nametag"
 
-					local upper_name = string.upper(ent_name)
-					local w, h = surface.GetTextSize(upper_name)
-					local color = GetAnimatableEntityColor(ent)
+					local ply_name = string.upper(NametagService.Name(ply))
+					local w, h = surface.GetTextSize(ply_name)
+					local color = GetAnimatableEntityColor(ply)
 
 					surface.SetTextColor(ColorAlpha(color, CombineAlphas(color.a, alpha) * 255))
-					surface.SetTextPos(ent.indicator_x - (w/2), ent.indicator_y - (h/2) - height_offset)
-					surface.DrawText(upper_name)
+					surface.SetTextPos(ply.indicator_x - (w/2), ply.indicator_y - (h/2) - height_offset)
+					surface.DrawText(ply_name)
+				end
+			end
+		end
+
+		if lobby then
+			local ents = lobby.entities
+
+			for i = 1, #ents do
+				local ent = ents[i]
+				local ent_name = NametagService.Name(ent)
+
+				if ent_name then
+					local alpha = ent.nametag_alpha.smooth
+
+					if alpha > 0 then
+						surface.SetFont "Nametag"
+
+						local upper_name = string.upper(ent_name)
+						local w, h = surface.GetTextSize(upper_name)
+						local color = GetAnimatableEntityColor(ent)
+
+						surface.SetTextColor(ColorAlpha(color, CombineAlphas(color.a, alpha) * 255))
+						surface.SetTextPos(ent.indicator_x - (w/2), ent.indicator_y - (h/2) - height_offset)
+						surface.DrawText(upper_name)
+					end
 				end
 			end
 		end

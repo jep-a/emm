@@ -1,6 +1,7 @@
 MINIGAME.name = "Cloud"
 MINIGAME.color = COLOR_ROYAL
 MINIGAME.default_player_class = "Tagger"
+MINIGAME.required_players = 1
 
 MINIGAME.random_player_classes = {
 	class_key = "Cloud",
@@ -45,7 +46,9 @@ if SERVER then
 			width = 512,
 			can_tag = {Tagger = true},
 			indicator_name = "cloud",
-			indicator_icon = "emm2/minigames/cloud.png"
+			indicator_icon = "emm2/minigames/cloud.png",
+			model = "models/emm2/cloud.mdl",
+			model_scale = 3.5
 		})
 
 		self.cloud_trigger = ply.cloud_trigger

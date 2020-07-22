@@ -21,11 +21,16 @@ function ENT:Initialize()
 	end
 
 	self:SetNotSolid(true)
-	self:SetNoDraw(false)
+	self:SetNoDraw(!self.model)
 	self:DrawShadow(false)
 	self:SetCollisionGroup(COLLISION_GROUP_WORLD)
 	self:SetTrigger(true)
 	self:SetCollision()
+
+	if self.model then
+		self:SetModel(self.model)
+		self:SetModelScale(self.model_scale or 1)
+	end
 
 	hook.Run("TriggerInit", self)
 

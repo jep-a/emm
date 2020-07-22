@@ -2,6 +2,14 @@ IndicatorService = IndicatorService or {}
 
 local indicator_material = PNGMaterial "emm2/shapes/arrow-2x.png"
 local circle_material = PNGMaterial "emm2/shapes/circle.png"
+local copy_material = Material "pp/copy"
+local outline_material = CreateMaterial("OutlineMaterial", "UnlitGeneric", {
+	["$ignorez"] = 1,
+	["$alphatest"] = 1
+})
+local store_texture = render.GetScreenEffectTexture(0)
+local draw_texture = render.GetScreenEffectTexture(1)
+local render_entity = NULL
 
 
 -- # Util
@@ -89,7 +97,7 @@ hook.Add("Think", "IndicatorService.Sort", IndicatorService.Sort)
 function IndicatorService.ScreenPosition(ent_or_pos, eye_pos)
 	local pos = isentity(ent_or_pos) and ent_or_pos:WorldSpaceCenter() or ent_or_pos
 	local distance = (eye_pos or LocalPlayer():EyePos()):Distance(pos)
-	local screen_pos = (pos + Vector(0, 0, Lerp(distance/600, 40, 45))):ToScreen()
+	local screen_pos = (pos + Vector(0, 0, Lerp(distance/10000, 40, 140))):ToScreen()
 
 	return screen_pos.x, screen_pos.y, screen_pos.visible, distance
 end
@@ -225,6 +233,103 @@ function IndicatorService.DrawWorldPositions()
 end
 hook.Add("DrawIndicators", "IndicatorService.DrawWorldPositions", IndicatorService.DrawWorldPositions)
 
+function IndicatorService.RenderOutlines()
+	local indicators = IndicatorService.container.children
+
+	if SettingsService.Get "show_outlines" and #indicators > 0 then
+		local scene = render.GetRenderTarget()
+		local scr_w = ScrW()
+		local scr_h = ScrH()
+
+		render.CopyRenderTargetToTexture(store_texture)
+		render.Clear(0, 0, 0, 0, true, true)
+		render.SetStencilEnable(true)
+
+		cam.IgnoreZ(true)
+
+		render.SuppressEngineLighting(true)
+		render.SetStencilWriteMask(0xFF)
+		render.SetStencilTestMask(0xFF)
+		render.SetStencilCompareFunction(STENCIL_ALWAYS)
+		render.SetStencilFailOperation(STENCIL_KEEP)
+		render.SetStencilZFailOperation(STENCIL_REPLACE)
+		render.SetStencilPassOperation(STENCIL_REPLACE)
+
+		cam.Start3D()
+
+		for i = 1, #indicators do
+			local indicator = indicators[i]
+			local ent = indicator.entity
+
+			render.SetStencilReferenceValue(i)
+
+			if IsValid(ent) then
+				local alpha = indicator.attributes.alpha.current
+
+				if alpha > 0 then
+					render_entity = ent
+					ent:DrawModel()
+				end
+			end
+		end
+
+		render_entity = NULL
+
+		cam.End3D()
+
+		render.SetStencilCompareFunction(STENCIL_EQUAL)
+
+		cam.Start2D()
+
+		for i = 1, #indicators do
+			local indicator = indicators[i]
+			local ent = indicator.entity
+
+			render.SetStencilReferenceValue(i)
+
+			if IsValid(ent) then
+				local alpha = indicator.attributes.alpha.current
+
+				if alpha > 0 then
+					surface.SetDrawColor(GetAnimatableEntityColor(ent))
+					surface.DrawRect(0, 0, scr_w, scr_h)
+				end
+			end
+		end
+
+		cam.End2D()
+
+		render.SuppressEngineLighting(false)
+
+		cam.IgnoreZ(false)
+
+		render.SetStencilEnable(false)
+		render.CopyRenderTargetToTexture(draw_texture)
+		render.SetRenderTarget(scene)
+
+		copy_material:SetTexture("$basetexture", store_texture)
+
+		render.SetMaterial(copy_material)
+		render.DrawScreenQuad()
+		render.SetStencilEnable(true)
+		render.SetStencilReferenceValue(0)
+		render.SetStencilCompareFunction(STENCIL_EQUAL)
+
+		outline_material:SetTexture("$basetexture", draw_texture)
+
+		render.SetMaterial(outline_material)
+		render.DrawScreenQuadEx(-1, -1, scr_w, scr_h)
+		render.DrawScreenQuadEx(-1, 0, scr_w, scr_h)
+		render.DrawScreenQuadEx(-1, 1, scr_w, scr_h)
+		render.DrawScreenQuadEx(0, -1, scr_w, scr_h)
+		render.DrawScreenQuadEx(0, 1, scr_w, scr_h)
+		render.DrawScreenQuadEx(1, 1, scr_w, scr_h)
+		render.DrawScreenQuadEx(1, 0, scr_w, scr_h)
+		render.DrawScreenQuadEx(1, 1, scr_w, scr_h)
+		render.SetStencilEnable(false)
+	end
+end
+hook.Add("PostDrawEffects", "IndicatorService.RenderOutlines", IndicatorService.RenderOutlines)
 
 function IndicatorService.RenderCoasters()
 	local indicators = IndicatorService.container.children

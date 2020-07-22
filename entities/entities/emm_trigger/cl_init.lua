@@ -142,11 +142,13 @@ function ENT:Draw()
 	if MinigameService.IsSharingLobby(LocalPlayer()) then
 		local pos = self:GetPos()
 		local width = self:GetWidth()
-		local color = self.animatable_color.smoth
+		local color = self.animatable_color.smooth
 
 		surface.SetAlphaMultiplier(self.opacity.current/255)
 
-		if self:GetShape() == EMM_TRIGGER_SHAPE_SPHERE then
+		if self:GetModel() then
+			self:DrawModel()
+		elseif self:GetShape() == EMM_TRIGGER_SHAPE_SPHERE then
 			self:RenderSphere(pos, width, self.thickness, color)
 		elseif self:GetShape() == EMM_TRIGGER_SHAPE_BOX then
 			self:RenderBox(pos, width, self:GetHeight(), self:GetDepth(), self:GetNormal(), self.thickness, color)

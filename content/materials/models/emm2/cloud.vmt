@@ -1,0 +1,12 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/emm2/cloud"
+	"$surfaceprop" "metal"
+	"$bumpmap" "models/emm2/cloud_bump"
+	"$phong" "1"
+	"$selfillum" "1"
+	"$halflambert" "1"
+	"$rimlight" "1"
+	"$rimlightexponent" "2"
+	"$rimlightboost" "0.2"
+}
