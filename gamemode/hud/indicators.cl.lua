@@ -44,7 +44,7 @@ end
 function IndicatorService.InitPlayerProperties(ply)
 	cam.Start3D()
 
-	local x, y, visible, distance = IndicatorService.ScreenPosition(ply)
+	local x, y, visible, distance = IndicatorService.ScreenPosition(ply, nil, ply)
 
 	cam.End3D()
 
@@ -94,12 +94,30 @@ function IndicatorService.Sort(ply, eye_pos)
 end
 hook.Add("Think", "IndicatorService.Sort", IndicatorService.Sort)
 
-function IndicatorService.ScreenPosition(ent_or_pos, eye_pos)
-	local pos = isentity(ent_or_pos) and ent_or_pos:WorldSpaceCenter() or ent_or_pos
-	local distance = (eye_pos or LocalPlayer():EyePos()):Distance(pos)
-	local screen_pos = (pos + Vector(0, 0, Lerp(distance/10000, 40, 140))):ToScreen()
+function IndicatorService.ScreenPosition(ent_or_pos, eye_pos, ent)
+	local eye_pos = eye_pos or LocalPlayer():EyePos()
+	local pos
+	local y_offset
+	local dist
 
-	return screen_pos.x, screen_pos.y, screen_pos.visible, distance
+	if IsValid(ent) then
+		local radius = ent:GetModelRadius() * ent:GetModelScale()
+
+		pos = ent:GetPos() + Vector(0, 0, radius)
+		dist = eye_pos:Distance(pos)
+
+		local ang = math.abs(math.NormalizeAngle((pos - eye_pos):Angle().p))
+
+		y_offset = RemapClamp(ang, 20, 70, 0, RemapClamp(radius, 72, 512, -4, -48) * RemapClamp(dist, 0, 6000, 4, 1))
+	else
+		pos = ent_or_pos
+		dist = eye_pos:Distance(pos)
+		y_offset = 0
+	end
+
+	local screen_pos = pos:ToScreen()
+
+	return screen_pos.x, screen_pos.y + y_offset, screen_pos.visible, dist
 end
 
 function IndicatorService.CalculateScreenPositions()
@@ -114,13 +132,13 @@ function IndicatorService.CalculateScreenPositions()
 		local ply = plys[i]
 
 		if IsValid(ply) and ply.pixel_visible_handle then
-			local x, y, visible, distance = IndicatorService.ScreenPosition(GhostService.Position(ply), eye_pos)
+			local x, y, vis, dist = IndicatorService.ScreenPosition(GhostService.Position(ply), eye_pos, ply)
 
 			ply.visible = util.PixelVisible(ply:WorldSpaceCenter(), 32, ply.pixel_visible_handle)
 			ply.indicator_x = x
-			ply.indicator_y = y
-			ply.indicator_is_visible = visible
-			ply.indicator_distance = distance
+			ply.indicator_y = y - 10
+			ply.indicator_is_visible = vis
+			ply.indicator_distance = dist
 		end
 	end
 
@@ -131,12 +149,12 @@ function IndicatorService.CalculateScreenPositions()
 			local ent = ents[i]
 
 			if IsValid(ent) then
-				local x, y, visible, distance = IndicatorService.ScreenPosition(ent, eye_pos)
+				local x, y, vis, dist = IndicatorService.ScreenPosition(ent, eye_pos, ent)
 
 				ent.indicator_x = x
 				ent.indicator_y = y
-				ent.indicator_is_visible = visible
-				ent.indicator_distance = distance
+				ent.indicator_is_visible = vis
+				ent.indicator_distance = dist
 			end
 		end
 	end
@@ -171,7 +189,7 @@ function IndicatorService.IndicatorIconPosition(indicator)
 	local distance = indicator.entity.indicator_distance or 0
 	local size = Lerp(distance/800, INDICATOR_ICON_SIZE * 2, INDICATOR_ICON_SIZE)
 	local indicator_x = x - (size/2)
-	local indicator_y = y - Lerp(distance/800, 48, 44) - (size/2)
+	local indicator_y = y - Lerp(distance/800, 64, 44) - (size/2)
 
 	return indicator_x, indicator_y, size
 end

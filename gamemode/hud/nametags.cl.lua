@@ -1,7 +1,6 @@
 NametagService = NametagService or {}
 
 local hide_radius = 32
-local height_offset = 24
 local nametag_alpha_smooth_multiplier = 4
 
 local function NametagAlpha(ent)
@@ -10,7 +9,7 @@ local function NametagAlpha(ent)
 	local not_near_crosshair
 
 	if ent.indicator_x and ent.indicator_y then
-		not_near_crosshair = math.sqrt(((ent.indicator_x - (ScrW()/2)) ^ 2) + ((ent.indicator_y - (ScrH()/2) - height_offset) ^ 2)) > hide_radius
+		not_near_crosshair = math.sqrt(((ent.indicator_x - (ScrW()/2)) ^ 2) + ((ent.indicator_y - (ScrH()/2)) ^ 2)) > hide_radius
 	end
 
 	if IsValid(ent) and LocalPlayer():Alive() and not_near_crosshair and (
@@ -92,8 +91,16 @@ function NametagService.Draw()
 					local w, h = surface.GetTextSize(ply_name)
 					local color = GetAnimatableEntityColor(ply)
 
+					local dist_offset
+
+					if MinigameService.IsSharingLobby(ply) then
+						dist_offset = Lerp(ply.indicator_distance/800, 32, 24)
+					else
+						dist_offset = 0
+					end
+
 					surface.SetTextColor(ColorAlpha(color, CombineAlphas(color.a, alpha) * 255))
-					surface.SetTextPos(ply.indicator_x - (w/2), ply.indicator_y - (h/2) - height_offset)
+					surface.SetTextPos(ply.indicator_x - (w/2), ply.indicator_y - (h/2) - dist_offset)
 					surface.DrawText(ply_name)
 				end
 			end
@@ -115,9 +122,10 @@ function NametagService.Draw()
 						local upper_name = string.upper(ent_name)
 						local w, h = surface.GetTextSize(upper_name)
 						local color = GetAnimatableEntityColor(ent)
+						local dist_offset = Lerp(ent.indicator_distance/800, 32, 24)
 
 						surface.SetTextColor(ColorAlpha(color, CombineAlphas(color.a, alpha) * 255))
-						surface.SetTextPos(ent.indicator_x - (w/2), ent.indicator_y - (h/2) - height_offset)
+						surface.SetTextPos(ent.indicator_x - (w/2), ent.indicator_y - (h/2) - dist_offset)
 						surface.DrawText(upper_name)
 					end
 				end

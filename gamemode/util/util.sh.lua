@@ -25,9 +25,13 @@ function Default(...)
 	return final_v
 end
 
+function RemapClamp(n, in_min, in_max, out_min, out_max)
+	return math.Remap(math.Clamp(n, in_min, in_max), in_min, in_max, out_min, out_max)
+end
+
 function Snap(n, snap)
 	local mod = n % snap
-	
+
 	return n - mod + (math.Round(mod/snap) * snap)
 end
 
@@ -72,7 +76,7 @@ function IsColor(color)
 end
 
 function IsPlayer(ply)
-	return isentity(ply) and IsValid(ply) and ply:IsPlayer() 
+	return isentity(ply) and IsValid(ply) and ply:IsPlayer()
 end
 
 function GetPlayer(ply)
@@ -89,7 +93,7 @@ function GetPlayer(ply)
 				return local_ply:GetObserverTarget()
 			end
 		end
-		
+
 		return local_ply
 	end
 	return nil

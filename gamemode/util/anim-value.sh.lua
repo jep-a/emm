@@ -3,7 +3,15 @@
 local DefaultEase = CubicBezier(0, 0.66, 0.33, 1)
 
 local function FrameMultiplier()
-	return RealFrameTime() * 10
+	local time
+
+	if SERVER then
+		time = FrameTime()
+	else
+		time = RealFrameTime()
+	end
+
+	return time * 10
 end
 
 
@@ -222,7 +230,7 @@ function AnimatableValue:Animate()
 
 			if first_anim.animate_callback then
 				first_anim.animate_callback(self)
-			end	
+			end
 
 			if first_anim.callback then
 				first_anim.callback(self)

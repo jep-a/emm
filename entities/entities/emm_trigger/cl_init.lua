@@ -7,19 +7,27 @@ function ENT:Initialize()
 
 	self.can_tag_tables = {}
 
-	self:SetNotSolid(false)
-	self:SetCollisionGroup(COLLISION_GROUP_WORLD)
 	self:SetRenderBounds(min, max)
 	self:CallOnRemove("Finish", self.Finish)
 
 	self.thickness = 4
+	self.closest_player = self:GetClosestPlayer()
 
 	self.animatable_color = AnimatableValue.New(self:GetColor(), {
 		smooth = true
 	})
 
+	self.animatable_angle = AnimatableValue.New(Angle(0, 0, 0), {
+		smooth = true,
+		smooth_multiplier = 0.66
+	})
+
 	self.opacity = AnimatableValue.New()
 	self.opacity:AnimateTo(255, 0.2)
+
+	if IsValid(self.closest_player) then
+		self.animatable_angle:SnapTo((self:GetPos() - self.closest_player:WorldSpaceCenter()):Angle())
+	end
 end
 
 function ENT:GetIndicatorName()
@@ -138,9 +146,45 @@ function ENT:RenderBox(pos, width, height, depth, norm, thickness, color)
 	render.DrawSphere(box_pos + box_width + box_height + box_depth, thickness/2, 15, 15, color)
 end
 
+function ENT:Think()
+	self.closest_player = self:GetClosestPlayer()
+end
+
+function ENT:GetClosestPlayer()
+	local closest_ply
+
+	if self.lobby then
+		local plys = self.lobby.players
+		local pos = self:GetPos()
+
+		for i = 1, #plys do
+			local ply = plys[i]
+
+			if (not IsValid(closest_ply) or pos:Distance(closest_ply:GetPos()) > pos:Distance(ply:GetPos())) and ply ~= self:GetOwner() then
+				closest_ply = ply
+			else
+				closest_ply = closest_ply
+			end
+		end
+	end
+
+	return closest_ply
+end
+
 function ENT:Draw()
+	local touching
+
+	local sp = ents.FindInSphere(self:GetPos(), 512)
+
+	for k, v in pairs(sp) do
+		if v:GetClass() == "player" then
+			touching = true
+		end
+	end
+
 	if MinigameService.IsSharingLobby(LocalPlayer()) then
 		local pos = self:GetPos()
+		local radius = self:GetRadius()
 		local width = self:GetWidth()
 		local color = self.animatable_color.smooth
 
@@ -148,8 +192,16 @@ function ENT:Draw()
 
 		if self:GetModel() then
 			self:DrawModel()
+
+			if IsValid(self.closest_player) then
+				self.animatable_angle.current = (self:GetPos() - self.closest_player:WorldSpaceCenter()):Angle()
+				self.animatable_angle.current:Normalize()
+			end
+
+			self:SetRenderOrigin(self:GetPos() + Vector(0, 0, math.sin(CurTime() * 2)/16))
+			self:SetRenderAngles(Angle(-self.animatable_angle.smooth.p, self.animatable_angle.smooth.y - 180, 0))
 		elseif self:GetShape() == EMM_TRIGGER_SHAPE_SPHERE then
-			self:RenderSphere(pos, width, self.thickness, color)
+			self:RenderSphere(pos, self:GetRadius(), self.thickness, color)
 		elseif self:GetShape() == EMM_TRIGGER_SHAPE_BOX then
 			self:RenderBox(pos, width, self:GetHeight(), self:GetDepth(), self:GetNormal(), self.thickness, color)
 		end
@@ -160,5 +212,6 @@ end
 
 function ENT:Finish()
 	self.animatable_color:Finish()
+	self.animatable_angle:Finish()
 	self.opacity:Finish()
 end

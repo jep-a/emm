@@ -27,6 +27,7 @@ end
 MINIGAME:AddPlayerClass({
 	name = "Cloud",
 	color = COLOR_CLOUD,
+	tag_word = "reached",
 	tag_victim = true,
 	swap_on_tag = true
 }, {
@@ -43,12 +44,14 @@ if SERVER then
 		ply.cloud_trigger = TriggerService.CreateTrigger(self, {
 			owner = ply,
 			position = ply:GetPos(),
-			width = 512,
+			radius = 512,
+			owner_tag = true,
 			can_tag = {Tagger = true},
 			indicator_name = "cloud",
-			indicator_icon = "emm2/minigames/cloud.png",
 			model = "models/emm2/cloud.mdl",
-			model_scale = 3.5
+			model_scale = 3.33,
+			looks_at_players = true,
+			floats = true
 		})
 
 		self.cloud_trigger = ply.cloud_trigger
@@ -61,6 +64,7 @@ if SERVER then
 	end
 
 	function MINIGAME:Tag(taggable, tagger)
+		print(taggable)
 		taggable.cloud_trigger:Remove()
 	end
 

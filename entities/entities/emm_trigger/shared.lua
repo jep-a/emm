@@ -6,25 +6,28 @@ EMM_TRIGGER_CLOUD = 3
 EMM_TRIGGER_SHAPE_SPHERE = 0
 EMM_TRIGGER_SHAPE_BOX = 1
 
-ENT.Type = "anim"
 ENT.Base = "base_anim"
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Int", 0, "ID")
 	self:NetworkVar("Int", 1, "Type")
-	self:NetworkVar("Float", 0, "Width")
-	self:NetworkVar("Float", 1, "Height")
-	self:NetworkVar("Float", 2, "Depth")
+	self:NetworkVar("Float", 0, "Radius")
+	self:NetworkVar("Float", 1, "Width")
+	self:NetworkVar("Float", 2, "Height")
+	self:NetworkVar("Float", 3, "Depth")
 	self:NetworkVar("Vector", 0, "Normal")
 	self:NetworkVar("String", 0, "Name")
-	self:NetworkVar("String", 2, "CanTagString")
-	self:NetworkVar("Float", 3, "CanTagStringCRC")
+	self:NetworkVar("String", 1, "CanTagString")
+	self:NetworkVar("Float", 4, "CanTagStringCRC")
+	self:NetworkVar("Bool", 0, "OwnerTag")
+	self:NetworkVar("Bool", 1, "LooksAtPlayers")
+	self:NetworkVar("Bool", 2, "Floats")
 end
 
 function ENT:GetShape()
 	local shape
 
-	if self:GetHeight() == 0 and self:GetDepth() == 0 and self:GetWidth() > 0 then
+	if self:GetRadius() > 0 then
 		shape = EMM_TRIGGER_SHAPE_SPHERE
 	else
 		shape = EMM_TRIGGER_SHAPE_BOX
@@ -93,7 +96,7 @@ end
 
 function ENT:GetBounds()
 	if self:GetShape() == EMM_TRIGGER_SHAPE_SPHERE then
-		local radius = self:GetWidth()
+		local radius = self:GetRadius()
 		local bounds = Vector(radius, radius, radius)
 
 		return -bounds, bounds
@@ -133,20 +136,4 @@ end
 
 function ENT:CanTouchEntity(ent)
 	return IsPlayer(ent) and MinigameService.IsSharingLobby(self, ent) and ent.player_class and self:GetCanTag()[ent.player_class.key]
-end
-
-function ENT:StartTouch(ent)
-	if self:CanTouchEntity(ent) then
-		hook.Run("TriggerStartTouch", self, ent)
-
-		if SERVER then
-			TaggingService.Tag(self.lobby, self:GetOwner(), ent)
-		end
-	end
-end
-
-function ENT:EndTouch(ent)
-	if self:CanTouchEntity(ent) then
-		hook.Run("TriggerEndTouch", self, ent)
-	end
 end

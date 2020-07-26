@@ -13,10 +13,12 @@ function TaggingService.Tag(lobby, taggable, tagger)
 
 	MinigameService.CallNetHook(taggable.lobby, "Tag", taggable, tagger)
 
-	if taggable.player_class.swap_on_tag then
-		MinigameService.SwapPlayerClass(taggable, tagger, taggable.player_class.kill_on_tag, taggable.player_class.kill_tagger_on_tag)
-	elseif taggable.player_class.recruit_on_tag then
-		tagger:SetPlayerClass(taggable.player_class)
+	if taggable.player_class then
+		if taggable.player_class.swap_on_tag then
+			MinigameService.SwapPlayerClass(taggable, tagger, taggable.player_class.kill_on_tag, taggable.player_class.kill_tagger_on_tag)
+		elseif taggable.player_class.recruit_on_tag then
+			tagger:SetPlayerClass(taggable.player_class)
+		end
 	end
 end
 
@@ -53,6 +55,11 @@ function TaggingService.Think()
 	end
 end
 hook.Add("Think", "TaggingService.Think", TaggingService.Think)
+
+hook.Add("TriggerStartTouch", "TaggingService.Tag", function (a, b)
+	print(a, b)
+	TaggingService.Tag(a.lobby, a.owner_tag and a:GetOwner() or a, b)
+end)
 
 function TaggingService.InitLobby(lobby)
 	for k, player_class in pairs(lobby.player_classes) do
