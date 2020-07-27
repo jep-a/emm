@@ -90,8 +90,11 @@ function LobbyUIService.AddLobby(lobby, no_notify)
 
 		if not no_notify then
 			lobby_bar:AnimateStart()
-			chat.AddText(lobby.prototype.color, lobby.host:GetName(), " has made a ", lobby.prototype.name, " lobby")
 		end
+	end
+
+	if not no_notify then
+		chat.AddText(lobby.prototype.color, lobby.host:GetName(), " has made a ", lobby.prototype.name, " lobby")
 	end
 end
 hook.Add("LobbyInit", "LobbyUIService.AddLobby", LobbyUIService.AddLobby)
