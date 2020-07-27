@@ -57,7 +57,6 @@ end
 hook.Add("Think", "TaggingService.Think", TaggingService.Think)
 
 hook.Add("TriggerStartTouch", "TaggingService.Tag", function (a, b)
-	print(a, b)
 	TaggingService.Tag(a.lobby, a.owner_tag and a:GetOwner() or a, b)
 end)
 

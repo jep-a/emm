@@ -64,7 +64,6 @@ if SERVER then
 	end
 
 	function MINIGAME:Tag(taggable, tagger)
-		print(taggable)
 		taggable.cloud_trigger:Remove()
 	end
 
