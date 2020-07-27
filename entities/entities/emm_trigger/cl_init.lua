@@ -172,17 +172,7 @@ function ENT:GetClosestPlayer()
 end
 
 function ENT:Draw()
-	local touching
-
-	local sp = ents.FindInSphere(self:GetPos(), 512)
-
-	for k, v in pairs(sp) do
-		if v:GetClass() == "player" then
-			touching = true
-		end
-	end
-
-	if MinigameService.IsSharingLobby(LocalPlayer()) then
+	if MinigameService.IsSharingLobby(self) then
 		local pos = self:GetPos()
 		local radius = self:GetRadius()
 		local width = self:GetWidth()
