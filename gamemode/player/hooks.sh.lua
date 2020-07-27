@@ -74,7 +74,7 @@ hook.Add("OnEntityCreated", "AssignLobby", function (ent)
 end)
 
 hook.Add("PlayerNoClip", "EMM.PlayerNoclip", function (ply, noclip)
-	local should_noclip = noclip
+	-- local should_noclip = noclip
 
-	return true
+	return false
 end)
