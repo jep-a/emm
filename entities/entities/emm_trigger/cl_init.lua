@@ -147,7 +147,9 @@ function ENT:RenderBox(pos, width, height, depth, norm, thickness, color)
 end
 
 function ENT:Think()
-	self.closest_player = self:GetClosestPlayer()
+	if MinigameService.IsSharingLobby(self) then
+		self.closest_player = self:GetClosestPlayer()
+	end
 end
 
 function ENT:GetClosestPlayer()
@@ -160,7 +162,7 @@ function ENT:GetClosestPlayer()
 		for i = 1, #plys do
 			local ply = plys[i]
 
-			if (not IsValid(closest_ply) or pos:Distance(closest_ply:GetPos()) > pos:Distance(ply:GetPos())) and ply ~= self:GetOwner() then
+			if IsValid(ply) and (not IsValid(closest_ply) or pos:Distance(closest_ply:GetPos()) > pos:Distance(ply:GetPos())) and ply ~= self:GetOwner() then
 				closest_ply = ply
 			else
 				closest_ply = closest_ply
