@@ -100,9 +100,7 @@ function SettingsService.Set(name, v)
 			n = 0
 		end
 
-		local validated = SettingsService.ValidateNumber(name, number_v)
-
-		convar:SetFloat(validated)
+		convar:SetFloat(SettingsService.ValidateNumber(name, n))
 	else
 		convar:SetBool(v)
 	end
