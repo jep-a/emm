@@ -12,9 +12,9 @@ function SettingsService.New(name, props)
 	else
 		default = Default(props.default, 0)
 	end
-	
+
 	if not SettingsService.convars[name] then
-		CreateClientConVar(gamemode_prefix..name, default, true, false, props.help)
+		CreateClientConVar(gamemode_prefix..name, default, true, props.userinfo, props.help)
 		cvars.AddChangeCallback(gamemode_prefix..name, SettingsService.OnConvarChanged)
 	end
 
@@ -84,7 +84,7 @@ function SettingsService.Set(name, v)
 		if number_v == "" or Nily(number_v) then
 			number_v = 0
 		end
-	
+
 		convar:SetFloat(SettingsService.ValidateNumber(name, number_v))
 	else
 		convar:SetBool(v)
