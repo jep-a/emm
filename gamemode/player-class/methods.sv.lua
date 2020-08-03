@@ -12,7 +12,7 @@ function player_metatable:SetPlayerClass(class)
 	self:SetupPlayerClass()
 
 	MinigameService.CallHook(self.lobby, "PlayerClassChange", ply, old_class, class)
-	NetService.Send("PlayerClass", self, class.id)
+	NetService.Broadcast("PlayerClass", self, class.id)
 end
 
 function player_metatable:ClearPlayerClass(net)
@@ -26,7 +26,7 @@ function player_metatable:ClearPlayerClass(net)
 
 	if net then
 		MinigameService.CallHook(self.lobby, "PlayerClassChange", ply, old_class)
-		NetService.Send("PlayerClass", self)
+		NetService.Broadcast("PlayerClass", self)
 	end
 end
 hook.Add("LobbyPlayerLeave", "ClearPlayerClass", function (_, ply)

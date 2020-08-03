@@ -26,7 +26,7 @@ function MinigameLobby:SetState(state)
 	MinigameService.CallHook(self, "StartState", old_state, state)
 	MinigameService.CallHook(self, "StartState"..state.name, old_state, state)
 	hook.Run("LobbyStateChange", lobby, old_state, state)
-	NetService.Send("LobbyState", self, state.id, self.last_state_start)
+	NetService.Broadcast("LobbyState", self, state.id, self.last_state_start)
 end
 
 function MinigameLobby:NextState()

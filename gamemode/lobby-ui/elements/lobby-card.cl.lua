@@ -125,7 +125,7 @@ function LobbyCard:Init(lobby)
 			local cur_time = CurTime()
 
 			if cur_time > (last_request_lobby_join_time + lobby_join_request_cooldown) then
-				NetService.Send("RequestLobbyJoin", lobby)
+				NetService.Broadcast("RequestLobbyJoin", lobby)
 				last_request_lobby_join_time = CurTime()
 			else
 				chat.AddText(COLOR_RED, "Please wait ", tostring(-math.Round(cur_time - (last_request_lobby_join_time + lobby_join_request_cooldown))), " seconds before joining a new lobby")
@@ -140,7 +140,7 @@ function LobbyCard:Init(lobby)
 		text = "Leave",
 
 		on_click = function ()
-			NetService.Send "RequestLobbyLeave"
+			NetService.Broadcast "RequestLobbyLeave"
 		end
 	})
 
@@ -158,7 +158,7 @@ function LobbyCard:AddRestartAction()
 		text = "Restart",
 
 		on_click = function ()
-			NetService.Send "RequestLobbyRestart"
+			NetService.Broadcast "RequestLobbyRestart"
 		end
 	})
 
