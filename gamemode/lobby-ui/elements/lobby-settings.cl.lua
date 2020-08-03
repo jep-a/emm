@@ -326,5 +326,5 @@ function LobbySettings:Save()
 		end
 	end
 
-	NetService.Broadcast("LobbySettings", self.lobby, changed_v)
+	NetService.SendToServer("LobbySettings", self.lobby, changed_v)
 end
