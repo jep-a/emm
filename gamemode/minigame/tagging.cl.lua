@@ -18,7 +18,7 @@ hook.Add("CreateMinigameHooks", "TaggingService", function (proto)
 
 			NotificationService.PushAvatarText(taggable_is_local_ply and tagger or taggable, text)
 		else
-			local action = " has "..taggable.tag_word.." "
+			local action = " has "..tag_word.." "
 			local taggable_name = taggable:GetName()
 			local tagger_name = tagger:GetName()
 
