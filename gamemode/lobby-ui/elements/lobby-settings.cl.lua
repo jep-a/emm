@@ -33,7 +33,7 @@ function LobbySettings:Init(lobby)
 
 	self.game_settings = {}
 	self.settings = {}
-	
+
 	self.inputs = {}
 	self.input_containers = {}
 	self.list_inputs = {}
@@ -52,7 +52,7 @@ function LobbySettings:Finish()
 	self.values = {}
 
 	self.settings = {}
-	
+
 	self.inputs = {}
 	self.input_containers = {}
 	self.list_inputs = {}
@@ -172,7 +172,7 @@ function LobbySettings:AddSetting(setting, ply_class_k, setting_row)
 	local safe_v = MinigameSettingsService.Get(self.lobby, k)
 	local actual_v = MinigameSettingsService.Get(self.lobby, k, true)
 	local prereq_v
-	
+
 	if istable(safe_v) then
 		for _k, _v in pairs(safe_v) do
 			self.original_values[k..".".._k] = _v
@@ -220,7 +220,7 @@ function LobbySettings:AddSetting(setting, ply_class_k, setting_row)
 		self.input_containers[k] = category:Add(InputBar.New(setting.label, setting.type, actual_v, input_props))
 		self.inputs[k] = self.input_containers[k].input
 	end
-	
+
 	if list then
 		for _, option in pairs(setting.options) do
 			self.list_inputs[k.."."..option] = self.inputs[k]
@@ -301,7 +301,7 @@ function LobbySettings:InitSettings()
 			})
 		end
 	end
-	
+
 	for i, setting in pairs(proto.adjustable_settings) do
 		if string.match(setting.key, "player_classes%.%*") then
 			for _, ply_class_setting in pairs(setting.settings) do
@@ -326,5 +326,5 @@ function LobbySettings:Save()
 		end
 	end
 
-	NetService.Broadcast("LobbySettings", self.lobby, changed_v)
+	NetService.SendToServer("LobbySettings", self.lobby, changed_v)
 end

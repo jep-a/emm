@@ -23,7 +23,7 @@ function LobbyCardContainer:AnimateFinish()
 			LobbyCardContainer.super.Finish(self)
 		end
 	})
-	
+
 	self.lobby_card:FinishLobby()
 end
 
@@ -125,7 +125,7 @@ function LobbyCard:Init(lobby)
 			local cur_time = CurTime()
 
 			if cur_time > (last_request_lobby_join_time + lobby_join_request_cooldown) then
-				NetService.Broadcast("RequestLobbyJoin", lobby)
+				NetService.SendToServer("RequestLobbyJoin", lobby)
 				last_request_lobby_join_time = CurTime()
 			else
 				chat.AddText(COLOR_RED, "Please wait ", tostring(-math.Round(cur_time - (last_request_lobby_join_time + lobby_join_request_cooldown))), " seconds before joining a new lobby")
@@ -140,7 +140,7 @@ function LobbyCard:Init(lobby)
 		text = "Leave",
 
 		on_click = function ()
-			NetService.Broadcast "RequestLobbyLeave"
+			NetService.SendToServer "RequestLobbyLeave"
 		end
 	})
 
@@ -158,7 +158,7 @@ function LobbyCard:AddRestartAction()
 		text = "Restart",
 
 		on_click = function ()
-			NetService.Broadcast "RequestLobbyRestart"
+			NetService.SendToServer "RequestLobbyRestart"
 		end
 	})
 
@@ -166,7 +166,7 @@ function LobbyCard:AddRestartAction()
 		crop_bottom = 1,
 		alpha = 0
 	}
-	
+
 	self.restart:AnimateAttribute("crop_bottom", 0, ANIMATION_DURATION * 2)
 	self.restart:AnimateAttribute("alpha", 255, ANIMATION_DURATION * 2)
 end

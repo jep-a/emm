@@ -27,7 +27,7 @@ NetService.Receive("LobbyPlayer", CallIfReceivedLobbies(MinigameLobby.AddPlayer)
 NetService.Receive("LobbyPlayerLeave", CallIfReceivedLobbies(MinigameLobby.RemovePlayer))
 
 function MinigameNetService.RequestLobbies()
-	NetService.Broadcast "RequestLobbies"
+	NetService.SendToServer "RequestLobbies"
 end
 hook.Add("InitPostEntity", "MinigameNetService.RequestLobbies", MinigameNetService.RequestLobbies)
 
