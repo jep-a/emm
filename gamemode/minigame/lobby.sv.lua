@@ -105,7 +105,7 @@ function MinigameLobby:AddEntity(ent)
 		self:RemoveEntity(ent, false)
 	end)
 
-	NetService.Send("LobbyEntity", self, ent:EntIndex())
+	NetService.Broadcast("LobbyEntity", self, ent:EntIndex())
 	hook.Run("LobbyEntityAdd", self, ent)
 	MinigameService.CallHook(self, "EntityAdd", ent)
 end
@@ -122,7 +122,7 @@ function MinigameLobby:RemoveEntity(ent, net)
 		table.RemoveByValue(self.entities, ent)
 
 		if net then
-			NetService.Send("LobbyEntityRemove", self, ent)
+			NetService.Broadcast("LobbyEntityRemove", self, ent)
 		end
 	end
 end
