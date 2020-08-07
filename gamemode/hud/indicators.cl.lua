@@ -95,29 +95,31 @@ end
 hook.Add("Think", "IndicatorService.Sort", IndicatorService.Sort)
 
 function IndicatorService.ScreenPosition(ent_or_pos, eye_pos, ent)
-	local eye_pos = eye_pos or LocalPlayer():EyePos()
-	local pos
-	local y_offset
-	local dist
+	if IsValid(LocalPlayer()) then
+		local eye_pos = eye_pos or LocalPlayer():EyePos()
+		local pos
+		local y_offset
+		local dist
 
-	if IsValid(ent) then
-		local radius = ent:GetModelRadius() * ent:GetModelScale()
+		if IsValid(ent) then
+			local radius = ent:GetModelRadius() * ent:GetModelScale()
 
-		pos = ent:GetPos() + Vector(0, 0, radius)
-		dist = eye_pos:Distance(pos)
+			pos = ent:GetPos() + Vector(0, 0, radius)
+			dist = eye_pos:Distance(pos)
 
-		local ang = math.abs(math.NormalizeAngle((pos - eye_pos):Angle().p))
+			local ang = math.abs(math.NormalizeAngle((pos - eye_pos):Angle().p))
 
-		y_offset = RemapClamp(ang, 20, 70, 0, RemapClamp(radius, 72, 512, -4, -48) * RemapClamp(dist, 0, 6000, 4, 1))
-	else
-		pos = ent_or_pos
-		dist = eye_pos:Distance(pos)
-		y_offset = 0
+			y_offset = RemapClamp(ang, 20, 70, 0, RemapClamp(radius, 72, 512, -4, -48) * RemapClamp(dist, 0, 6000, 4, 1))
+		else
+			pos = ent_or_pos
+			dist = eye_pos:Distance(pos)
+			y_offset = 0
+		end
+
+		local screen_pos = pos:ToScreen()
+
+		return screen_pos.x, screen_pos.y + y_offset, screen_pos.visible, dist
 	end
-
-	local screen_pos = pos:ToScreen()
-
-	return screen_pos.x, screen_pos.y + y_offset, screen_pos.visible, dist
 end
 
 function IndicatorService.CalculateScreenPositions()
