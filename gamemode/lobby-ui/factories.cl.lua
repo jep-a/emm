@@ -151,7 +151,7 @@ function LobbyUIService.CreatePrototypeBar(proto)
 			local cur_time = CurTime()
 
 			if cur_time > (last_request_lobby_time + lobby_request_cooldown) then
-				NetService.Send("RequestLobby", proto)
+				NetService.SendToServer("RequestLobby", proto)
 				last_request_lobby_time = CurTime()
 			else
 				chat.AddText(COLOR_RED, "Please wait ", tostring(-math.Round(cur_time - (last_request_lobby_time + lobby_request_cooldown))), " seconds before making a new lobby")

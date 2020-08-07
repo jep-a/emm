@@ -11,7 +11,10 @@ function NetService.WriteID(id)
 	net.WriteUInt(id or 0, 8)
 end
 
-NetService.type_readers = NetService.type_readers or {
+--[[
+	Built-in type readers
+]]
+NetService.type_readers = {
 	boolean = net.ReadBool,
 
 	id = function ()
@@ -43,7 +46,7 @@ NetService.type_readers = NetService.type_readers or {
 	end
 }
 
-NetService.type_writers = NetService.type_writers or {
+NetService.type_writers = {
 	boolean = net.WriteBool,
 
 	id = function (id)
@@ -69,6 +72,10 @@ NetService.type_writers = NetService.type_writers or {
 
 	table = function (tab)
 		net.WriteTable(tab)
+	end,
+
+	obj_id = function(obj)
+		NetService.WriteID(obj)
 	end
 }
 
@@ -87,6 +94,7 @@ function NetService.CreateWriter(name, schema)
 
 	return sender
 end
+
 
 function NetService.Receive(name, func)
 	NetService.hooks[name] = func

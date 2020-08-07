@@ -97,7 +97,7 @@ function LobbyUIService.AddLobby(lobby, no_notify)
 		chat.AddText(lobby.prototype.color, lobby.host:GetName(), " has made a ", lobby.prototype.name, " lobby")
 	end
 end
-hook.Add("LobbyInit", "LobbyUIService.AddLobby", LobbyUIService.AddLobby)
+hook.Add("LobbyCreate", "LobbyUIService.AddLobby", LobbyUIService.AddLobby)
 
 function LobbyUIService.FinishLobby(lobby)
 	if UIService.Active "Lobbies" then

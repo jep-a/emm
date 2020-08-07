@@ -77,7 +77,7 @@ end
 hook.Add("PostPlayerDraw", "GhostService.PostPlayerDraw", GhostService.PostPlayerDraw)
 
 function GhostService.RequestGhosts()
-	NetService.Send "RequestGhosts"
+	NetService.SendToServer "RequestGhosts"
 end
 hook.Add("InitPostEntity", "GhostService.RequestGhosts", GhostService.RequestGhosts)
 

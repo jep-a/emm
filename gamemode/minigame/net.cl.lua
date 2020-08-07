@@ -52,7 +52,7 @@ end)
 NetService.Receive("LobbyEntityRemove", CallIfReceivedLobbies(MinigameLobby.RemoveEntity))
 
 function MinigameNetService.RequestLobbies()
-	NetService.Send "RequestLobbies"
+	NetService.SendToServer "RequestLobbies"
 end
 hook.Add("InitPostEntity", "MinigameNetService.RequestLobbies", MinigameNetService.RequestLobbies)
 
