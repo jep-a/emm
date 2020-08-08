@@ -50,6 +50,12 @@ SettingsService.New("show_indicators", {
 	end
 })
 
+SettingsService.New("show_keys", {
+	default = false,
+	help = "Show key echoes",
+	callback = ReloadHUD
+})
+
 SettingsService.New("show_notifications", {
 	default = true,
 	help = "Show notifications",
@@ -141,8 +147,18 @@ surface.CreateFont("CrosshairMeterValueSmall", {
 	size = 12
 })
 
+surface.CreateFont("KeyEcho", {
+	font = "Roboto",
+	size = 42
+})
+
+surface.CreateFont("KeyEchoSmall", {
+	font = "Roboto Mono",
+	size = 14,
+	weight = 900
+})
+
 surface.CreateFont("Nametag", {
 	font = "Roboto Mono Bold Italic",
 	size = 16
 })
-

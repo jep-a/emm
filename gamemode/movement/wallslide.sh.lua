@@ -110,10 +110,10 @@ function WallslideService.SetupWallslide(ply, move)
 				ply.wallslide_velocity = ply:GetVelocity()
 				ply.wallsliding = true
 				ply.last_wallslide_time = cur_time
-	
+
 				ply.stamina.wallslide:SetActive(true)
 				ply.stamina.wallslide:ReduceStamina(ply.wallslide_init_cost)
-	
+
 				PredictedSoundService.PlayWallslideSound(ply)
 
 				if CLIENT then
@@ -121,9 +121,11 @@ function WallslideService.SetupWallslide(ply, move)
 				end
 			end
 
-			move:SetVelocity(WallslideService.Velocity(trace, WallslideService.LastWallslideTime(ply), WallslideService.WallslideVelocity(ply)))
+			if SERVER or SettingsService.Get "clientside_wallslide" then
+				move:SetVelocity(WallslideService.Velocity(trace, WallslideService.LastWallslideTime(ply), WallslideService.WallslideVelocity(ply)))
+			end
 
-			if SERVER and cur_time > (ply.last_wallslide_effect_time + wallslide_effect_cooldown) then 
+			if SERVER and cur_time > (ply.last_wallslide_effect_time + wallslide_effect_cooldown) then
 				WallslideService.Effect(ply, trace)
 				ply.last_wallslide_effect_time = cur_time
 			end

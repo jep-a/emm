@@ -4,6 +4,10 @@ local health_icon_material = Material("emm2/hud/health.png", "noclamp smooth")
 local speed_icon_material = Material("emm2/hud/speed.png", "noclamp smooth")
 local airaccel_icon_material = Material("emm2/hud/airaccel.png", "noclamp smooth")
 
+function HUDService.KeyDown(key)
+	return IsValid(LocalPlayer():GetObserverTarget()) and (bit.band(SpectateService.buttons, key) ~= 0) or LocalPlayer():KeyDown(key)
+end
+
 function HUDService.InitContainers()
 	HUDService.container = HUDService.CreateContainer()
 
@@ -59,19 +63,97 @@ function HUDService.InitContainers()
 	HUDService.crosshair_meter_container = HUDService.container:Add(HUDService.CreateCrosshairContainer(true))
 end
 
-function HUDService.InitMeters()
-	local local_ply = LocalPlayer()
+function HUDService.InitKeyEchoes()
+	HUDService.key_echos = HUDService.quadrant_h:Add(KeyEchos.New())
 
+	HUDService.key_forward = HUDService.key_echos:Add(KeyEcho.New {
+		origin_justification_x = JUSTIFY_CENTER,
+		origin_justification_y = JUSTIFY_START,
+		position_justification_x = JUSTIFY_CENTER,
+		position_justification_y = JUSTIFY_START,
+		arrow = "↑",
+		key = IN_FORWARD
+	})
+
+	HUDService.key_left = HUDService.key_echos:Add(KeyEcho.New {
+		origin_justification_x = JUSTIFY_START,
+		origin_justification_y = JUSTIFY_CENTER,
+		position_justification_x = JUSTIFY_START,
+		position_justification_y = JUSTIFY_CENTER,
+		arrow = "←",
+		key = IN_MOVELEFT
+	})
+
+	HUDService.key_back = HUDService.key_echos:Add(KeyEcho.New {
+		origin_justification_x = JUSTIFY_CENTER,
+		origin_justification_y = JUSTIFY_CENTER,
+		position_justification_x = JUSTIFY_CENTER,
+		position_justification_y = JUSTIFY_CENTER,
+		arrow = "↓",
+		key = IN_BACK
+	})
+
+	HUDService.key_right = HUDService.key_echos:Add(KeyEcho.New {
+		origin_justification_x = JUSTIFY_END,
+		origin_justification_y = JUSTIFY_CENTER,
+		position_justification_x = JUSTIFY_END,
+		position_justification_y = JUSTIFY_CENTER,
+		arrow = "→",
+		key = IN_MOVERIGHT
+	})
+
+	HUDService.key_sprint = HUDService.key_echos:Add(KeyEcho.New {
+		origin_justification_x = JUSTIFY_START,
+		origin_justification_y = JUSTIFY_END,
+		position_justification_x = JUSTIFY_START,
+		position_justification_y = JUSTIFY_END,
+		font = "KeyEchoSmall",
+		text = "SPRINT",
+		key = IN_SPEED
+	})
+
+	HUDService.key_duck = HUDService.key_echos:Add(KeyEcho.New {
+		origin_justification_x = JUSTIFY_CENTER,
+		origin_justification_y = JUSTIFY_END,
+		position_justification_x = JUSTIFY_CENTER,
+		position_justification_y = JUSTIFY_END,
+		font = "KeyEchoSmall",
+		text = "DUCK",
+		key = IN_DUCK
+	})
+
+	HUDService.key_jump = HUDService.key_echos:Add(KeyEcho.New {
+		origin_justification_x = JUSTIFY_END,
+		origin_justification_y = JUSTIFY_END,
+		position_justification_x = JUSTIFY_END,
+		position_justification_y = JUSTIFY_END,
+		font = "KeyEchoSmall",
+		text = "JUMP",
+		key = IN_JUMP
+	})
+
+	HUDService.key_attack2 = HUDService.key_echos:Add(KeyEcho.New {
+		origin_justification_x = JUSTIFY_END,
+		origin_justification_y = JUSTIFY_START,
+		position_justification_x = JUSTIFY_END,
+		position_justification_y = JUSTIFY_START,
+		font = "KeyEchoSmall",
+		text = "ATTACK 2",
+		key = IN_ATTACK2
+	})
+end
+
+function HUDService.InitMeters()
 	local function Health()
-		return local_ply:Health()
+		return GetPlayer():Health()
 	end
 
 	local function Speed()
-		return math.Round(local_ply:GetVelocity():Length2D())
+		return math.Round(GetPlayer():GetVelocity():Length2D())
 	end
 
 	local function Airaccel()
-		return local_ply.can_airaccel and local_ply.stamina.airaccel:GetStamina() or 0
+		return GetPlayer().can_airaccel and GetPlayer().stamina.airaccel:GetStamina() or 0
 	end
 
 	if SettingsService.Get "show_hud_meters" then
@@ -104,7 +186,7 @@ function HUDService.InitMeters()
 			value_func = Health,
 			angle = CROSSHAIR_METER_ARC_ANGLE
 		})
-		
+
 		HUDService.crosshair_meter_container:Add(CrosshairMeter.New {
 			show_value = true,
 			hide_value_on_empty = true,
@@ -112,7 +194,7 @@ function HUDService.InitMeters()
 			value_divider = HUD_SPEED_METER_DIVIDER,
 			sub_value = true
 		})
-		
+
 		HUDService.crosshair_meter_container:Add(CrosshairMeter.New {
 			value_func = Airaccel,
 			angle = -CROSSHAIR_METER_ARC_ANGLE
@@ -135,6 +217,11 @@ function HUDService.Init()
 		})
 
 		HUDService.InitContainers()
+
+		if SettingsService.Get "show_keys" then
+			HUDService.InitKeyEchoes()
+		end
+
 		HUDService.InitMeters()
 
 		if SettingsService.Get "show_crosshair" then
@@ -142,11 +229,11 @@ function HUDService.Init()
 		end
 
 		if not LobbyUIService.open then
-			if LocalPlayer():Alive() then
+			-- if LocalPlayer():Alive() then
 				HUDService.ShowAll()
-			else
-				HUDService.ShowNotifications()
-			end
+			-- else
+			-- 	HUDService.ShowNotifications()
+			-- end
 		end
 
 		hook.Run("InitHUDElements")

@@ -1,3 +1,5 @@
+![Extended Movement Mod Logo](https://github.com/jep-a/emm/raw/master/logo.png "Extended Movement Mod Logo")
+
 # Extended Movement Mod
 
 This is a [Garry's Mod](https://gmod.facepunch.com) gamemode that adds a new way to move around: walljumping. With this new movement capability, players can move around the map in a way much more enjoyable than walking or running. On top of the ability to walljump, this gamemode adds a minigame lobby system where players can participate with other players in minigames like tag, hunted, deathmatch, and etc.

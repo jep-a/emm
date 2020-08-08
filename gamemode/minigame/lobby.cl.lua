@@ -47,10 +47,10 @@ function MinigameLobby:Init(props)
 
 	self:InitSettings()
 
-	hook.Run("LobbyInit", self)
+	hook.Run("LobbyCreate", self)
 
 	if self:IsLocal() then
-		hook.Run("LocalLobbyInit", self)
+		hook.Run("LocalLobbyCreate", self)
 
 		if IsLocalPlayer(self.host) then
 			MinigameService.PushLobbyMetaText(self)

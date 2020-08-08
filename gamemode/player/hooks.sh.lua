@@ -13,7 +13,7 @@ hook.Add("InitPlayerProperties", "InitCorePlayerProperties", function (ply)
 	if CLIENT then
 		ply.animatable_color = AnimatableValue.New(COLOR_WHITE, {
 			smooth = true,
-			
+
 			generate = function ()
 				return IsValid(ply) and ply.color or COLOR_WHITE
 			end

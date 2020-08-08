@@ -81,8 +81,10 @@ function Class.SetupForHooks(class)
 		table.RemoveByValue(getmetatable(self).static.instances, self)
 	end
 
-	function class:Finish()
-		self:DisconnectFromHooks()
+	if not class.Finish then
+		function class:Finish()
+			self:DisconnectFromHooks()
+		end
 	end
 end
 
@@ -123,7 +125,7 @@ function Class.AddHook(class, name, func_k)
 				local success, error = pcall(function ()
 					class[func_k](instance, unpack(arguments))
 				end)
-		
+
 				if not success then
 					if instance.debug_trace then
 						Error(error.."\n"..instance.debug_trace.."\n")

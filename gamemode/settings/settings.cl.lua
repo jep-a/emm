@@ -2,6 +2,7 @@ SettingsService = SettingsService or {}
 
 SettingsService.convars = SettingsService.convars or {}
 SettingsService.ordered_convars = {}
+SettingsService.values = {}
 SettingsService.hooks = SettingsService.hooks or {}
 
 local gamemode_prefix = engine.ActiveGamemode().."_"
@@ -12,9 +13,9 @@ function SettingsService.New(name, props)
 	else
 		default = Default(props.default, 0)
 	end
-	
+
 	if not SettingsService.convars[name] then
-		CreateClientConVar(gamemode_prefix..name, default, true, false, props.help)
+		CreateClientConVar(gamemode_prefix..name, default, true, props.userinfo, props.help)
 		cvars.AddChangeCallback(gamemode_prefix..name, SettingsService.OnConvarChanged)
 	end
 
@@ -55,9 +56,8 @@ function SettingsService.ValidateNumber(name, v)
 	return v
 end
 
-function SettingsService.Get(name)
+function SettingsService.GetValidated(name)
 	local v
-
 	local convar_props = SettingsService.convars[name]
 	local convar = GetConVar(gamemode_prefix..name)
 
@@ -72,20 +72,35 @@ function SettingsService.Get(name)
 	return v
 end
 
+function SettingsService.Get(name)
+	local v
+
+	if SettingsService.values[name] == nil then
+		v = SettingsService.GetValidated(name)
+		SettingsService.values[name] = v
+	else
+		v = SettingsService.values[name]
+	end
+
+	return v
+end
+
 function SettingsService.Set(name, v)
 	local convar_props = SettingsService.convars[name]
 	local convar = GetConVar(gamemode_prefix..name)
 
 	if convar_props.type == "string" then
-		convar:SetString(v or "")
-	elseif convar_props.type == "number" then
-		local number_v = tonumber(v)
+		local str = v or ""
 
-		if number_v == "" or Nily(number_v) then
-			number_v = 0
+		convar:SetString(str)
+	elseif convar_props.type == "number" then
+		local n = tonumber(v)
+
+		if n == "" or Nily(n) then
+			n = 0
 		end
-	
-		convar:SetFloat(SettingsService.ValidateNumber(name, number_v))
+
+		convar:SetFloat(SettingsService.ValidateNumber(name, n))
 	else
 		convar:SetBool(v)
 	end
@@ -93,9 +108,10 @@ end
 
 function SettingsService.OnConvarChanged(name)
 	local unprefixed_name = string.sub(name, #gamemode_prefix + 1)
-	local v = SettingsService.Get(unprefixed_name)
-
+	local v = SettingsService.GetValidated(unprefixed_name)
 	local callback = SettingsService.convars[unprefixed_name].callback
+
+	SettingsService.values[unprefixed_name] = v
 
 	if callback then
 		callback(v)

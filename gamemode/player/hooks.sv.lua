@@ -2,7 +2,7 @@
 
 hook.Add("PlayerInitialSpawn", "EMM.PlayerInitialSpawn", function (ply)
 	hook.Run("InitPlayerProperties", ply)
-	NetService.Send("PlayerInitialSpawn", ply)
+	NetService.Broadcast("PlayerInitialSpawn", ply)
 end)
 
 hook.Add("PlayerSpawn", "EMM.PlayerSpawn", function (ply)
@@ -16,14 +16,14 @@ hook.Add("PlayerSpawn", "EMM.PlayerSpawn", function (ply)
 		MinigameService.CallHook(ply.lobby, "PlayerProperties", ply)
 	end
 
-	NetService.Send("PlayerSpawn", ply)
+	NetService.Broadcast("PlayerSpawn", ply)
 end)
 
 
 -- # Disconnecting
 
 hook.Add("PlayerDisconnected", "NetworkPlayerDisconnected", function (ply)
-	NetService.Send("PlayerDisconnected", ply)
+	NetService.Broadcast("PlayerDisconnected", ply)
 end)
 
 
@@ -47,7 +47,7 @@ function GM:PlayerDeath(ply, inflictor, attacker)
 
 	if infl_valid and inflictor == attacker and (inflictor:IsPlayer() or inflictor:IsNPC()) then
 		inflictor = inflictor:GetActiveWeapon()
-	
+
 		if not infl_valid then
 			inflictor = attacker
 		end
@@ -64,7 +64,7 @@ hook.Add("DoPlayerDeath", "EMM.PrePlayerDeath", function (ply, attacker, dmg)
 	end
 
 	hook.Run("PrePlayerDeath", ply, attacker, dmg)
-	NetService.Send("PrePlayerDeath", ply, attacker)
+	NetService.Broadcast("PrePlayerDeath", ply, attacker)
 end)
 
 hook.Add("PlayerDeath", "EMM.PlayerDeath", function (ply, inflictor, attacker)
@@ -74,16 +74,16 @@ hook.Add("PlayerDeath", "EMM.PlayerDeath", function (ply, inflictor, attacker)
 		MinigameService.CallHook(ply.lobby, "PlayerDeath", ply, inflictor, attacker)
 	end
 
-	NetService.Send("PlayerDeath", ply, inflictor, attacker)
+	NetService.Broadcast("PlayerDeath", ply, inflictor, attacker)
 end)
 
 hook.Add("PostPlayerDeath", "NetworkPostPlayerDeath", function (ply)
-	NetService.Send("PostPlayerDeath", ply)
+	NetService.Broadcast("PostPlayerDeath", ply)
 end)
 
 hook.Add("PlayerDeathThink", "Respawn", function (ply)
 	local cur_time = CurTime()
-	
+
 	local allow_spawn
 
 	if cur_time > (ply.last_death_time + ply.death_cooldown) then
@@ -129,7 +129,7 @@ local function ShouldTakeDamage(victim, attacker, dmg)
 			attacker:IsPlayer() and
 			attacker.player_class and
 			victim.player_class and
-			(inflictor and victim.lobby == inflictor.lobby)
+			(inflictor and MinigameService.IsSharingLobby(victim, inflictor))
 		then
 			should_damage = attacker.player_class.can_damage_everyone or attacker.player_class.can_damage[victim.player_class.key]
 		else
@@ -160,7 +160,7 @@ hook.Add("GetFallDamage", "EMM.FallDamage", function (ply, speed)
 
 	if ply.can_take_fall_damage then
 		fall_damage = (speed - 580) * ply.fall_damage_multiplier
-	
+
 		local view_punch = fall_damage/20
 
 		ply:ViewPunch(Angle(math.random(-view_punch, view_punch), math.random(-view_punch, view_punch), 0))
