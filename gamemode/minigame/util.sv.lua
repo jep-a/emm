@@ -51,7 +51,7 @@ function MinigameService.PickRandomPlayerClasses(lobby, props)
 		end
 	end
 
-	return picked_plys, rejected_class
+	return picked_plys, rejected_plys
 end
 
 function MinigameService.PickClosestPlayerClass(lobby, origin_ply, props)
