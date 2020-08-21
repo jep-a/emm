@@ -11,6 +11,7 @@ function player_metatable:SetPlayerClass(class)
 	table.insert(self.lobby[class.key], self)
 	self:SetupPlayerClass()
 
+	hook.Run("PlayerClassChange", self, old_class, class)
 	MinigameService.CallHook(self.lobby, "PlayerClassChange", ply, old_class, class)
 	NetService.Broadcast("PlayerClass", self, class.id)
 end
@@ -25,6 +26,7 @@ function player_metatable:ClearPlayerClass(net)
 	self:EndPlayerClass()
 
 	if net then
+		hook.Run("PlayerClassChange", self, old_class)
 		MinigameService.CallHook(self.lobby, "PlayerClassChange", ply, old_class)
 		NetService.Broadcast("PlayerClass", self)
 	end
