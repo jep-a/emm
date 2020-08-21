@@ -90,7 +90,7 @@ function IndicatorService.Sort(ply, eye_pos)
 		indicator.panel:SetZPos(i)
 	end
 
-	table.sort(indicators, function(a, b) return a.distance > b.distance end)
+	table.sort(indicators, function(a, b) return a.distance and b.distance and a.distance > b.distance end)
 end
 hook.Add("Think", "IndicatorService.Sort", IndicatorService.Sort)
 
