@@ -1,5 +1,7 @@
 TriggerService = TriggerService or {}
 
+local owned_triggers = {}
+
 function TriggerService.CreateTrigger(lobby, props)
 	local trigger = ents.Create "emm_trigger"
 
@@ -23,6 +25,7 @@ function TriggerService.CreateTrigger(lobby, props)
 
 	if props.owner then
 		trigger:SetOwner(props.owner)
+		table.insert(owned_triggers, trigger)
 	end
 
 	trigger:Spawn()
@@ -31,3 +34,17 @@ function TriggerService.CreateTrigger(lobby, props)
 
 	return trigger
 end
+
+function TriggerService.EndOwnedTriggers(ply)
+	print("EndOwnedTriggers", ply)
+
+	for _, trigger in pairs(owned_triggers)	do
+		print("EndOwnedTriggers.loop", trigger)
+		if ply == trigger:GetOwner() then
+			print("EndOwnedTriggers.loop.success")
+			table.RemoveByValue(owned_triggers, trigger)
+			trigger:Remove()
+		end
+	end
+end
+hook.Add("EndPlayerClass", "TriggerService.EndOwnedTriggers", TriggerService.EndOwnedTriggers)
