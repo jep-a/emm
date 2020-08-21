@@ -36,12 +36,8 @@ function TriggerService.CreateTrigger(lobby, props)
 end
 
 function TriggerService.EndOwnedTriggers(ply)
-	print("EndOwnedTriggers", ply)
-
 	for _, trigger in pairs(owned_triggers)	do
-		print("EndOwnedTriggers.loop", trigger)
 		if ply == trigger:GetOwner() then
-			print("EndOwnedTriggers.loop.success")
 			table.RemoveByValue(owned_triggers, trigger)
 			trigger:Remove()
 		end
