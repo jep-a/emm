@@ -3,6 +3,8 @@ AiraccelService = AiraccelService or {}
 
 -- # Properties
 
+CreateConVar("emm_airaccelerate", 10, FCVAR_REPLICATED, "Air acceleration")
+
 function AiraccelService.InitPlayerProperties(ply)
 	ply.can_airaccel = true
 	ply.has_infinite_airaccel = false
@@ -12,7 +14,7 @@ function AiraccelService.InitPlayerProperties(ply)
 	ply.airaccel_velocity_cost = 0.01
 	ply.airaccel_boost_velocity = 10000
 	ply.airaccel_sound = "player/suit_sprint.wav"
-	ply.air_accelerate = 10
+	ply.air_accelerate = GetConVar("emm_airaccelerate"):GetFloat()
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
@@ -55,7 +57,7 @@ hook.Add(
 )
 
 function AiraccelService.GetDefaultAiraccel()
-	return 10
+	return GetConVar("emm_airaccelerate"):GetFloat()
 end
 
 
