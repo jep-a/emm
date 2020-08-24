@@ -12,6 +12,7 @@ function AiraccelService.InitPlayerProperties(ply)
 	ply.airaccel_velocity_cost = 0.01
 	ply.airaccel_boost_velocity = 10000
 	ply.airaccel_sound = "player/suit_sprint.wav"
+	ply.air_accelerate = 10
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
@@ -53,6 +54,10 @@ hook.Add(
 	AiraccelService.PlayerProperties
 )
 
+function AiraccelService.GetDefaultAiraccel()
+	return 10
+end
+
 
 -- # Util
 
@@ -64,17 +69,16 @@ function AiraccelService.KeyPress(ply, key)
 end
 hook.Add("KeyPress", "AiraccelService.KeyPress", AiraccelService.KeyPress)
 
-
 -- # Airacceling
 
 function AiraccelService.Velocity(ply, move, amount)
 	local fwd = move:GetMoveAngles():Forward()
-	local strafe_vel = (Vector(fwd.x, fwd.y, 0):GetNormalized() * move:GetForwardSpeed()) + (Vector(fwd.y, -fwd.x, 0):GetNormalized() * move:GetSideSpeed())
-	local strafe_vel_length = math.Clamp(strafe_vel:Length(), 0, 50)
+	local strafe_vel = (Vector(fwd.x, fwd.y, 0):GetNormalized() * move:GetForwardSpeed()) + (Vector(fwd.y, -fwd.x, 0):GetNormalized() * move:GetSideSpeed() * 1.05)
+	local strafe_vel_length = math.Clamp(strafe_vel:Length(), 0, 300)
 	local strafe_vel_norm = strafe_vel:GetNormalized()
-	local vel_diff = strafe_vel_length - move:GetVelocity():Dot(strafe_vel_norm)
+	local vel_diff = strafe_vel_length/10 - move:GetVelocity():Dot(strafe_vel_norm)
 
-	return vel_diff, move:GetVelocity() + (strafe_vel_norm * math.Clamp(strafe_vel_length * amount * FrameTime(), 0, vel_diff))
+	return vel_diff, move:GetVelocity() + (strafe_vel_norm * math.Clamp(ply:GetMaxSpeed() * amount * FrameTime(), 0, vel_diff))
 end
 
 function AiraccelService.SetupAiraccel(ply, move)
@@ -107,6 +111,14 @@ function AiraccelService.SetupAiraccel(ply, move)
 		end
 
 		ply.stamina.airaccel:SetActive(false)
+
+		if ply:Alive() and not ply:OnGround() then
+			local vel_diff, new_vel = AiraccelService.Velocity(ply, move, ply.air_accelerate)
+			
+			if vel_diff > 0 then
+				move:SetVelocity(new_vel)
+			end
+		end
 	end
 end
 hook.Add("SetupMove", "AiraccelService.SetupAiraccel", AiraccelService.SetupAiraccel)
