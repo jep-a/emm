@@ -21,7 +21,7 @@ function MinigamePrototype:ReplacePlayerClass(ply)
 	end
 end
 
-function MinigamePrototype:ForfeitPlayerClassToClosest(ply, inflictor, attacker)
+function MinigamePrototype:ForfeitDeadPlayerClassToClosest(ply, inflictor, attacker)
 	local ply_class = ply.player_class
 
 	if ply_class and ply_class.swap_closest_on_death and not (ply_class.swap_with_attacker and IsPlayer(attacker) and ply ~= attacker and ply_class ~= attacker.player_class) then
@@ -31,7 +31,23 @@ function MinigamePrototype:ForfeitPlayerClassToClosest(ply, inflictor, attacker)
 		})
 
 		if closest_ply then
-			MinigameService.CallNetHook(self, "PlayerClassForfeitToClosest", ply, closest_ply)
+			MinigameService.CallNetHook(self, "DeadPlayerClassForfeitToClosest", ply, closest_ply)
+		end
+	end
+end
+
+function MinigamePrototype:ForfeitDepartedPlayerClassToClosest(ply)
+	local ply_class = ply.player_class
+
+	PrintTable(ply_class)
+	if ply_class and ply_class.swap_closest_on_leave then
+		local closest_ply = MinigameService.PickClosestPlayerClass(self, ply, {
+			blacklist_class_key = ply_class.key,
+			swap_player_class = true
+		})
+
+		if closest_ply then
+			MinigameService.CallNetHook(self, "DepartedPlayerClassForfeitToClosest", ply, closest_ply)
 		end
 	end
 end
@@ -103,11 +119,11 @@ function MinigamePrototype:AddDefaultHooks()
 	self:AddHook("StartStatePlaying", "PickPlayerClasses", self.PickPlayerClasses)
 	self:AddStateHook("Playing", "PlayerJoin", "Respawn", self.Respawn)
 	self:AddStateHook("Playing", "PlayerJoin", "SetDefaultPlayerClass", self.SetDefaultPlayerClass)
-	self:AddStateHook("Playing", "PlayerLeave", "ReplacePlayerClass", self.ReplacePlayerClass)
-	self:AddStateHook("Playing", "PlayerLeave", "ForfeitPlayerClassToClosest", self.ForfeitPlayerClassToClosest)
-	self:AddStateHook("Playing", "PlayerDeath", "ForfeitPlayerClassToClosest", self.ForfeitPlayerClassToClosest)
+	self:AddStateHook("Playing", "PlayerDeath", "ForfeitDeadPlayerClassToClosest", self.ForfeitDeadPlayerClassToClosest)
 	self:AddStateHook("Playing", "PlayerDeath", "ForfeitPlayerClassToAttacker", self.ForfeitPlayerClassToAttacker)
 	self:AddStateHook("Playing", "PlayerDeath", "SetPlayerClassOnDeath", self.SetPlayerClassOnDeath)
+	self:AddStateHook("Playing", "PlayerLeave", "ReplacePlayerClass", self.ReplacePlayerClass)
+	self:AddStateHook("Playing", "PlayerLeave", "ForfeitDepartedPlayerClassToClosest", self.ForfeitDepartedPlayerClassToClosest)
 	self:AddStateHook("Playing", "PlayerClassChange", "EndIfNoPlayerClasses", self.CheckIfNoPlayerClasses)
 	self:AddStateHook("Playing", "SettingsChange", "ReloadLoadouts", self.ReloadLoadouts)
 end

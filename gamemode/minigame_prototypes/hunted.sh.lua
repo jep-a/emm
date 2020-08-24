@@ -15,6 +15,7 @@ MINIGAME:AddPlayerClass {
 	swap_on_tag = true,
 	kill_on_tag = true,
 	swap_closest_on_death = true,
+	swap_closest_on_leave = true,
 	swap_with_attacker = true
 }
 

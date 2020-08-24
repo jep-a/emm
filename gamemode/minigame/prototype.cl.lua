@@ -10,13 +10,24 @@ function MinigamePrototype:NotifyRandomPlayerClassesPicked(involves_local_ply, p
 	end
 end
 
-function MinigamePrototype:NotifyPlayerClassForfeitToClosest(involves_local_ply, forfeiter, closest_ply)
+function MinigamePrototype:NotifyDeadPlayerClassForfeitToClosest(involves_local_ply, forfeiter, closest_ply)
 	local ply_class_name = closest_ply.player_class.name
 
 	if involves_local_ply then
 		local forfeiter_is_local_ply = IsLocalPlayer(forfeiter)
 
 		NotificationService.PushAvatarText(forfeiter_is_local_ply and closest_ply or forfeiter, forfeiter_is_local_ply and "forfeited "..ply_class_name.." to" or "inherited "..ply_class_name.." from")
+	else
+		NotificationService.PushSideText(closest_ply:GetName().." has inherited "..ply_class_name.." from "..forfeiter:GetName())
+	end
+end
+
+function MinigamePrototype:NotifyDepartedPlayerClassForfeitToClosest(involves_local_ply, forfeiter, closest_ply)
+	local ply_class_name = closest_ply.player_class.name
+	local inheriter_is_local_ply = IsLocalPlayer(closest_ply)
+
+	if involves_local_ply and inheriter_is_local_ply then
+		NotificationService.PushAvatarText(forfeiter, "inherited "..ply_class_name.." from")
 	else
 		NotificationService.PushSideText(closest_ply:GetName().." has inherited "..ply_class_name.." from "..forfeiter:GetName())
 	end
@@ -61,7 +72,7 @@ function MinigamePrototype:NotifyPlayerDeath(involves_local_ply, ply, inflictor,
 			if ply_class.notify_on_killed_by_player and IsPlayer(attacker) and ply ~= attacker then
 				if involves_local_ply then
 					local attacker_is_local_ply = IsLocalPlayer(attacker)
-			
+
 					NotificationService.PushAvatarText(attacker_is_local_ply and ply or attacker, attacker_is_local_ply and "killed" or "killed by")
 				else
 					NotificationService.PushSideText(attacker:GetName().." has killed "..ply:GetName())
@@ -142,7 +153,8 @@ function MinigamePrototype:AddDefaultHooks()
 	self:AddHookNotification("StartState", self.NotifyStateCountdown)
 	self:AddHookNotification("StartStateWaiting", self.NotifyWaitingForPlayers)
 	self:AddHookNotification("RandomPlayerClassesPicked", self.NotifyRandomPlayerClassesPicked)
-	self:AddHookNotification("PlayerClassForfeitToClosest", self.NotifyPlayerClassForfeitToClosest)
+	self:AddHookNotification("DeadPlayerClassForfeitToClosest", self.NotifyDeadPlayerClassForfeitToClosest)
+	self:AddHookNotification("DepartedPlayerClassForfeitToClosest", self.NotifyDepartedPlayerClassForfeitToClosest)
 	self:AddHookNotification("PlayerClassForfeitToAttacker", self.NotifyPlayerClassForfeitToAttacker)
 	self:AddHookNotification("PlayerClassChangeFromDeath", self.NotifyPlayerClassChangeFromDeath)
 	self:AddHookNotification("PlayerDeath", self.NotifyPlayerDeath)

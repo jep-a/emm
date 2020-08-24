@@ -29,7 +29,8 @@ MINIGAME:AddPlayerClass({
 	color = COLOR_CLOUD,
 	tag_word = "reached",
 	tag_victim = true,
-	swap_on_tag = true
+	swap_on_tag = true,
+	swap_closest_on_leave = true
 }, {
 	cloud_set = false,
 	swap_closest_on_death = true
