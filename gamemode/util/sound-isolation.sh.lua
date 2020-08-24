@@ -1,6 +1,28 @@
 SoundIsolationService = SoundIsolationService or {}
 SoundIsolationService.Sounds = SoundIsolationService.Sounds or {}
 
+if CLIENT then
+	SettingsService.New("sound_isolation", {
+		default = false,
+		userinfo = true,
+		help = "Toggle weapon sounds"
+	})
+end
+
+function SoundIsolationService.GetRecipientFilter(shooter)
+	local rf = RecipientFilter()
+
+	for _, ply in pairs(player.GetAll()) do
+		local concommand = ply:GetInfoNum ("emm_sound_isolation", 1)
+
+		if ply != shooter and (concommand == 1 or (concommand == 0 and MinigameService.IsSharingLobby(ply, ent))) then
+			rf:AddPlayer(ply)
+		end
+	end
+
+	return rf
+end
+
 function SoundIsolationService.PlaySound(ent, name, volume, pitch, level, filter)
 	local sound = CreateSound(ent, name, filter)
             
@@ -16,24 +38,16 @@ end
 
 function SoundIsolationService.WeaponSound(snd)
 	local ent = snd.Entity
-
+	
 	if IsValid(ent:GetOwner()) then
 		ent = ent:GetOwner()
-    end
-    
+	end
+	
 	if SERVER and IsPlayer(ent) and snd.DSP ~= 60 then
 		if IsValid(ent:GetActiveWeapon()) then
 			if ((table.HasValue(MINIGAME_WEAPONS, ent:GetActiveWeapon():GetKeyValues().classname) or snd.Channel == CHAN_WEAPON) and snd.OriginalSoundName:Split("_")[1] == "Weapon") then
 				if ent.lobby then 
-					local filter = RecipientFilter()
-
-					for _, ply in pairs(ent.lobby.players) do
-						if ply != ent then
-							filter:AddPlayer(ply)
-						end
-					end
-					
-					SoundIsolationService.PlaySound(ent, snd.SoundName, snd.Volume, snd.Pitch, snd.SoundLevel, filter)
+					SoundIsolationService.PlaySound(ent, snd.SoundName, snd.Volume, snd.Pitch, snd.SoundLevel, SoundIsolationService.GetRecipientFilter(ent))
                 end
                 
 				return false
@@ -47,26 +61,14 @@ hook.Add( "EntityEmitSound", "SoundIsolationService.WeaponSound", SoundIsolation
 
 function SoundIsolationService.FragExplosion(frag)
 	if frag:GetClass() == "npc_grenade_frag" and IsValid(frag:GetOwner()) and SERVER then
-		local filter = RecipientFilter()
-
-		for _, ply in pairs(frag:GetOwner().lobby.players) do
-			filter:AddPlayer(ply)
-		end
-
-		SoundIsolationService.PlaySound(frag, "weapons/explode" .. math.random(3, 5) .. ".wav", 1, 100, 140, filter)
+		SoundIsolationService.PlaySound(frag, "weapons/explode" .. math.random(3, 5) .. ".wav", 1, 100, 140, SoundIsolationService.GetRecipientFilter(frag:GetOwner()))
 	end
 end 
 hook.Add( "EntityRemoved", "SoundIsolationService.FragExplosion", SoundIsolationService.FragExplosion)
 
 function SoundIsolationService.RPGExplosion(missile)
 	if missile:GetClass() == "env_explosion" and IsValid(missile:GetOwner()) then
-		local filter = RecipientFilter()
-
-		for _, ply in pairs(missile:GetOwner().lobby.players) do
-				filter:AddPlayer(ply)
-		end
-
-		SoundIsolationService.PlaySound(missile, "weapons/explode" .. math.random(3, 5) .. ".wav", 1, 100, 140, filter)
+		SoundIsolationService.PlaySound(missile, "weapons/explode" .. math.random(3, 5) .. ".wav", 1, 100, 140, SoundIsolationService.GetRecipientFilter(missile:GetOwner()))
 	end
 end
 hook.Add( "AcceptInput", "SoundIsolationService.RPGExplosion", SoundIsolationService.RPGExplosion)
