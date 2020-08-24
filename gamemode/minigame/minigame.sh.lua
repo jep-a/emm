@@ -84,7 +84,6 @@ function MinigameService.CallHookWithoutMethod(lobby, hk_name, ...)
 	end
 end
 
-
 -- # Init
 
 local MINIGAME_PROTOTYPES_DIRECTORY = "minigame_prototypes/"
