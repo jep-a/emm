@@ -90,13 +90,15 @@ hook.Add("PlayerDeathThink", "Respawn", function (ply)
 		allow_spawn = true
 
 		if
-			ply:IsBot() or
-			ply:KeyPressed(IN_FORWARD) or
-			ply:KeyPressed(IN_MOVELEFT) or
-			ply:KeyPressed(IN_BACK) or
-			ply:KeyPressed(IN_MOVERIGHT) or
-			ply:KeyPressed(IN_JUMP) or
-			cur_time > (ply.last_death_time + 5)
+			not ply.spectating and (
+				ply:IsBot() or
+				ply:KeyPressed(IN_FORWARD) or
+				ply:KeyPressed(IN_MOVELEFT) or
+				ply:KeyPressed(IN_BACK) or
+				ply:KeyPressed(IN_MOVERIGHT) or
+				ply:KeyPressed(IN_JUMP) or
+				cur_time > (ply.last_death_time + 5)
+			)
 		then
 			ply:Spawn()
 		end

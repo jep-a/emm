@@ -61,16 +61,25 @@ function SpectateService.Spectate(ply, cmd, args)
 					return
 				end
 
+				ply.spectating = true
 				ply.spectate_savepoint = SavepointService.CreateSavepoint(ply)
-			end
+				ply.spectate_timeout = CurTime() + 1
 
-			table.insert(target.spectators, ply)
-			ply:SpectateEntity(target)
-			ply:Spectate(ply.spectate_obs_mode)
-			ply.spectate_timeout = CurTime() + 1
-			TrailService.RemoveTrail(ply)
-			SpectateService.SendSpectateKeys(target.buttons, ply)
-			StaminaService.SendStamina(ply, target, "airaccel")
+				table.insert(target.spectators, ply)
+
+				GhostService.Ghost(ply, {
+					ragdoll = true,
+					freeze = true
+				})
+
+				ply:KillSilent()
+				ply:SpectateEntity(target)
+				ply:Spectate(ply.spectate_obs_mode)
+
+				SpectateService.SendSpectateKeys(target.buttons, ply)
+				StaminaService.SendStamina(ply, target, "airaccel")
+				TrailService.RemoveTrail(ply)
+			end
 		else
 			ply:ChatPrint "Player not found."
 		end
@@ -82,12 +91,19 @@ function SpectateService.UnSpectate(ply)
 	if ply:GetObserverMode() ~= OBS_MODE_NONE then
 		local health = ply:Health()
 
+		ply.spectating = false
+
 		table.RemoveByValue(ply:GetObserverTarget().spectators, ply)
+
 		TrailService.SetupTrail(ply)
+
 		ply:UnSpectate()
 		ply:Spawn()
 		ply:SetHealth(health)
+
+		GhostService.UnGhost(ply)
 		SavepointService.LoadSavepoint(ply, ply.spectate_savepoint)
+
 		ply:SetVelocity(Vector(0,0,0))
 	end
 end

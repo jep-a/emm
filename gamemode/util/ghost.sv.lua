@@ -36,13 +36,11 @@ function GhostService.Ragdoll(ply, freeze)
 				bone:SetPos(bone_pos)
 				bone:SetAngles(bone_ang)
 			end
-
-
 		end
 	end
 
 	if freeze then
-		timer.Simple(SAFE_FRAME * 2, function ()
+		timer.Simple(SAFE_FRAME * 3, function ()
 			for i = 0, phys_count do
 				local bone = ragdoll:GetPhysicsObjectNum(i)
 
@@ -60,16 +58,15 @@ function GhostService.Ghost(ply, options)
 	options = options or {}
 
 	ply.ghosting = true
-	ply.ghost_position = ply:WorldSpaceCenter()
+	ply.ghost_position = ply:GetPos()
 
 	if options.ragdoll then
 		ply.ghost_ragdoll = GhostService.Ragdoll(ply, options.freeze)
 	end
 
 	table.insert(GhostService.ghosts, ply)
-
 	hook.Run("PlayerGhost", ply)
-	NetService.Send("Ghost", ply, ply.ghost_position, options.ragdoll and ply.ghost_ragdoll:EntIndex())
+	NetService.Broadcast("Ghost", ply, ply.ghost_position, options.ragdoll and ply.ghost_ragdoll:EntIndex())
 end
 
 function GhostService.UnGhost(ply)
@@ -83,7 +80,7 @@ function GhostService.UnGhost(ply)
 		table.RemoveByValue(GhostService.ghosts, ply)
 
 		hook.Run("PlayerUnGhost", ply)
-		NetService.Send("UnGhost", ply)
+		NetService.Broadcast("UnGhost", ply)
 	end
 end
 hook.Add("EndPlayerClass", "GhostService.UnGhost", GhostService.UnGhost)
