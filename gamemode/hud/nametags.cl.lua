@@ -96,7 +96,7 @@ function NametagService.Draw()
 					if MinigameService.IsSharingLobby(ply) then
 						dist_offset = Lerp(ply.indicator_distance/800, 32, 24)
 					else
-						dist_offset = 0
+						dist_offset = Lerp(ply.indicator_distance/800, 16, 8)
 					end
 
 					surface.SetTextColor(ColorAlpha(color, CombineAlphas(color.a, alpha) * 255))
