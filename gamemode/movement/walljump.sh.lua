@@ -70,10 +70,10 @@ function WalljumpService.GetAngle(dir, wall_normal)
 	wall_ang:Normalize()
 	angle:Normalize()
 
+	angle:RotateAroundAxis(wall_normal, 90)
 	wall_ang = wall_ang.y
-	angle = math.abs(angle.y) - math.abs(wall_ang)
 
-	return math.abs(angle)
+	return math.abs(angle.p)
 end
 
 function WalljumpService.Trace(ply, dir)
@@ -83,10 +83,14 @@ function WalljumpService.Trace(ply, dir)
 	local walljump_distance = ply.walljump_distance - maxs.x
 	local perimeter_pos = ply_pos - Vector(dir.x * 23, dir.y * 23, 0)
 	local obb_trace = Vector(ply.walljump_distance/2, ply.walljump_distance/2, 0)
-
+	
 	perimeter_pos.x = math.Clamp(perimeter_pos.x, ply_pos.x + mins.x, ply_pos.x + maxs.x)
 	perimeter_pos.y = math.Clamp(perimeter_pos.y, ply_pos.y + mins.y, ply_pos.y + maxs.y)
 
+	if ply.sliding then
+		ply_pos.z = ply_pos.z - (ply.slide_hover_height + 2)
+	end
+	
 	local trace = util.TraceHull {
 		start = ply_pos,
 		endpos = perimeter_pos,
