@@ -8,6 +8,7 @@ function PlayerClassService.CreatePlayerClass(props)
 
 		friction = FrictionService.GetDefaultFriction(),
 		gravity = GravityService.GetDefaultGravity(),
+		air_accelerate = AiraccelService.GetDefaultAiraccel(),
 
 		can_walljump = true,
 		can_wallslide = true,

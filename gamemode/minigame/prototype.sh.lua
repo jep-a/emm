@@ -37,6 +37,12 @@ function MinigamePrototype:Init()
 
 			settings = {
 				{
+					key = "air_accelerate",
+					label = "Air acceleration",
+					type = "number"
+				},
+
+				{
 					key = "friction",
 					label = "Friction",
 					type = "number"
