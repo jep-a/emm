@@ -132,6 +132,9 @@ local function ShouldTakeDamage(victim, attacker, dmg)
 			(inflictor and MinigameService.IsSharingLobby(victim, inflictor))
 		then
 			should_damage = attacker.player_class.can_damage_everyone or attacker.player_class.can_damage[victim.player_class.key]
+			if (attacker.player_class.tag_on_damage and attacker.player_class.can_tag[victim.player_class.key]) then
+				TaggingService.Tag(attacker.lobby, attacker, victim)
+			end
 		else
 			should_damage = false
 		end
