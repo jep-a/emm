@@ -23,12 +23,10 @@ function TaggingService.Tag(lobby, taggable, tagger)
 		tagger:SetPlayerClass(taggable.lobby:GetPlayerClass(player_class_on_tag)) -- Such as Tagger turning Runner -> Frozen
 	end
 
-	timer.Remove("timer_for_player_class_on_delay_" .. tagger:SteamID())
-	print("Timer destroyed")
+	timer.Remove("timer_for_player_class_on_delay_" .. tagger:SteamID()) -- Remove any previous created timers for changing the player's class on delay
 
 	if (taggable.player_class.delay_amount and taggable.player_class.delay_amount > 0) then
 		timer.Create("timer_for_player_class_on_delay_" .. tagger:SteamID(), taggable.player_class.delay_amount, 1, function()
-			print("Time's up")
 			if (player_class_on_delay and tagger.player_class.name == player_class_on_tag) then -- Make sure delayed class is valid, make sure the tagger is in the same class (stops runners becoming taggers if they once were frozen)
 				tagger:SetPlayerClass(taggable.lobby:GetPlayerClass(player_class_on_delay)) -- Such as Frozen becoming Tagger
 			end
