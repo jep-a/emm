@@ -12,10 +12,27 @@ function TaggingService.Tag(lobby, taggable, tagger)
 
 	MinigameService.CallNetHook(taggable.lobby, "Tag", taggable, tagger)
 
+	local player_class_on_tag = taggable.player_class.player_class_on_tag
+	local player_class_on_delay = taggable.player_class.player_class_on_delay -- Because the RHS value may change in the timer for delayed classes (don't want to risk it)
+
 	if taggable.player_class.swap_on_tag then
 		MinigameService.SwapPlayerClass(taggable, tagger, taggable.player_class.kill_on_tag, taggable.player_class.kill_tagger_on_tag)
 	elseif taggable.player_class.recruit_on_tag then
 		tagger:SetPlayerClass(taggable.player_class)
+	elseif player_class_on_tag then
+		tagger:SetPlayerClass(taggable.lobby:GetPlayerClass(player_class_on_tag)) -- Such as Tagger turning Runner -> Frozen
+	end
+
+	timer.Remove("timer_for_player_class_on_delay_" .. tagger:SteamID())
+	print("Timer destroyed")
+
+	if (taggable.player_class.delay_amount and taggable.player_class.delay_amount > 0) then
+		timer.Create("timer_for_player_class_on_delay_" .. tagger:SteamID(), taggable.player_class.delay_amount, 1, function()
+			print("Time's up")
+			if (player_class_on_delay and tagger.player_class.name == player_class_on_tag) then -- Make sure delayed class is valid, make sure the tagger is in the same class (stops runners becoming taggers if they once were frozen)
+				tagger:SetPlayerClass(taggable.lobby:GetPlayerClass(player_class_on_delay)) -- Such as Frozen becoming Tagger
+			end
+		end)
 	end
 end
 
@@ -40,6 +57,7 @@ function TaggingService.Think()
 							ent:Alive() and
 							MinigameService.IsSharingLobby(taggable, ent) and
 							ent.player_class and
+							taggable.player_class.can_tag and
 							taggable.player_class.can_tag[ent.player_class.key]
 						then
 							TaggingService.Tag(taggable.lobby, taggable, ent)
