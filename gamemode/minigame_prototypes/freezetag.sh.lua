@@ -44,18 +44,3 @@ MINIGAME:AddAdjustableSetting {
 	key = "player_classes.Tagger.tag_on_damage",
 	label = "Runner can be frozen from damage"
 }
-
-local lobby = nil
-
-for k, v in pairs(player:GetAll()) do
-    if (k == 1) then
-        lobby = v.lobby
-	else
-		if (v.lobby) then
-			v.lobby:RemovePlayer(v)
-		end
-		if (lobby) then
-			lobby:AddPlayer(v)
-		end
-    end
-end
