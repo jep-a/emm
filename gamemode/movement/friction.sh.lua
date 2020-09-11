@@ -52,6 +52,11 @@ function FrictionService.Velocity(friction, move)
 end
 
 function FrictionService.SetupFriction(ply, move)
+	if ply.can_move == false then
+		ply:SetVelocity(Vector(0, 0, 0))
+		return true
+	end
+
 	if not ply.lobby and ply.friction ~= FrictionService.GetDefaultFriction() then
 		ply.friction = FrictionService.GetDefaultFriction()
 	end
@@ -65,4 +70,4 @@ function FrictionService.SetupFriction(ply, move)
 		move:SetVelocity(FrictionService.Velocity(ply.friction, move))
 	end
 end
-hook.Add("SetupMove", "FrictionService.SetupFriction", FrictionService.SetupFriction)
+hook.Add("Move", "FrictionService.SetupFriction", FrictionService.SetupFriction)
