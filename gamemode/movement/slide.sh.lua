@@ -128,12 +128,12 @@ end
 function SlideService.HandleSlideDamage(ply)
 	local vel = ply:GetVelocity()
 	local pos = ply:GetPos()
-	local slide_trace = SlideService.GetGroundTrace(pos, pos + (vel * FrameTime()) - Vector(0, 0, 2), ply)
-	local slide_vel = SlideService.Clip(vel, slide_trace.HitNormal)
+	local trace = SlideService.GetGroundTrace(pos, pos + (vel * FrameTime()) - Vector(0, 0, 2), ply)
+	local slide_vel = SlideService.Clip(vel, trace.HitNormal)
 
-	if SlideService.ShouldSlide(ply, slide_trace.HitNormal, vel, slide_vel.z) and (ply.surfing or ply.sliding) then
-		pos.z = slide_trace.HitPos.z + (ply.slide_hover_height - slide_trace.HitNormal.z)
-		ply.slide_onground = {[1] = slide_vel, [2] = pos}
+	if SlideService.ShouldSlide(ply, trace.HitNormal, vel, slide_vel.z) and (ply.surfing or ply.sliding) then
+		pos.z = trace.HitPos.z + (ply.slide_hover_height - trace.HitNormal.z)
+		ply.slide_onground = {slide_vel, pos}
 		ply:SetGroundEntity(NULL)
 	end
 end
@@ -142,20 +142,26 @@ hook.Add("OnPlayerHitGround", "SlideService.HandleSlideDamage", SlideService.Han
 function SlideService.SetupSlide(ply, move, cmd)
 	local vel = move:GetVelocity()
 	local pos = move:GetOrigin()
-	local slide_trace = SlideService.Trace(ply, vel, pos)
+	local trace = SlideService.Trace(ply, vel, pos)
 	local slide_vel = Vector()
 	local should_slide = false
 
-	if slide_trace then
-		slide_vel = SlideService.Clip(vel, slide_trace.HitNormal)
-		should_slide = SlideService.ShouldSlide(ply, slide_trace.HitNormal, vel, slide_vel.z)
+	if trace then
+		slide_vel = SlideService.Clip(vel, trace.HitNormal)
+		should_slide = SlideService.ShouldSlide(ply, trace.HitNormal, vel, slide_vel.z)
 
-		if 1 > slide_trace.HitNormal.z and not slide_trace.StartSolid and should_slide then
-			if SlideService.SlideStrafe(move, cmd, slide_trace.HitNormal) or ply:OnGround() then
+		if 1 > trace.HitNormal.z and not trace.StartSolid and should_slide then
+			if SlideService.SlideStrafe(move, cmd, trace.HitNormal) or ply:OnGround() then
 				ply:SetGroundEntity(NULL)
+				move:SetVelocity(vel)
+				move:SetOrigin(pos + Vector(0, 0, trace.HitNormal.z))
 			else
-				SlideService.Slide(ply, move, slide_trace, slide_vel)
+				SlideService.Slide(ply, move, trace, slide_vel)
 			end
+		end
+		
+		if not trace.StartSolid then
+			SlopeService.AddSpeed( trace.HitNormal, ply, move )
 		end
 	end
 
