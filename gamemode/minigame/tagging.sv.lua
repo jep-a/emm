@@ -18,6 +18,8 @@ function TaggingService.Tag(lobby, taggable, tagger)
 			MinigameService.SwapPlayerClass(taggable, tagger, taggable.player_class.kill_on_tag, taggable.player_class.kill_tagger_on_tag)
 		elseif taggable.player_class.recruit_on_tag then
 			tagger:SetPlayerClass(taggable.player_class)
+		elseif taggable.player_class_on_tag then
+			tagger:SetPlayerClass(taggable.lobby:GetPlayerClass(taggable.player_class_on_tag)) -- Such as Tagger turning Runner -> Frozen
 		end
 	end
 end
