@@ -119,6 +119,15 @@ function MinigamePrototype:AddPlayerClass(props, dynamic_props)
 	self.player_classes[ply_class.key] = ply_class
 end
 
+function MinigamePrototype:GetPlayerClass(name)
+	for k, v in pairs(self.player_classes) do
+		if (v.name == name) then
+			return v
+		end
+	end
+	return nil
+end
+
 function MinigamePrototype:AddHook(hk_name, hk_id, func)
 	self.hooks[hk_name] = self.hooks[hk_name] or {}
 	self.hooks[hk_name][hk_id] = func
