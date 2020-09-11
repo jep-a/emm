@@ -31,6 +31,7 @@ MINIGAME:AddPlayerClass {
     tag_word = "froze",
     color = COLOR_SKY,
 	can_tag = {Runner = true},
+	can_damage = {Tagger = true},
 	tag_on_damage = true,
 	can_damage_everyone = false,
 	player_class_on_tag = "Frozen",
@@ -53,20 +54,5 @@ if SERVER then
                 tagger:SetPlayerClass(taggable.lobby:GetPlayerClass("Tagger"))
             end
         end)
-    end
-end
-
-local lobby = nil
-
-for k, v in pairs(player:GetAll()) do
-    if (k == 1) then
-        lobby = v.lobby
-	else
-		if (v.lobby) then
-			v.lobby:RemovePlayer(v)
-		end
-		if (lobby) then
-			lobby:AddPlayer(v)
-		end
     end
 end
