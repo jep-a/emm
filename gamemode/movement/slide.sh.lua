@@ -29,7 +29,7 @@ function SlideService.GetGroundTrace(pos, end_pos, ply)
 		start = pos,
 		endpos = end_pos,
 		mins = ply:OBBMins(),
-		maxs = ply:OBBMaxs(),
+		maxs = ply:OBBMaxs() + Vector(0,0,2),
 		mask = MASK_PLAYERSOLID_BRUSHONLY
 	}
 end
