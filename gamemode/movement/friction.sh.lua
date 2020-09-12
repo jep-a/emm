@@ -53,7 +53,7 @@ end
 
 function FrictionService.SetupFriction(ply, move)
 	if ply.can_move == false then
-		ply:SetVelocity(Vector(0, 0, 0))
+		move:SetVelocity(Vector(0, 0, 0))
 		return true
 	end
 
