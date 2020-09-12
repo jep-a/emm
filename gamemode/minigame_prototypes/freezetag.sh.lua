@@ -20,7 +20,7 @@ MINIGAME:AddPlayerClass {
 
 MINIGAME:AddPlayerClass {
     name = "Runner",
-    tag_word = "unfroze",
+    tag_word = "unfrozen",
 	can_tag = {Frozen = true},
 	recruit_on_tag = true,
     end_on_none = true
@@ -28,7 +28,7 @@ MINIGAME:AddPlayerClass {
 
 MINIGAME:AddPlayerClass {
     name = "Tagger",
-    tag_word = "froze",
+    tag_word = "frozen",
     color = COLOR_SKY,
 	can_tag = {Runner = true},
 	can_damage = {Tagger = true},
