@@ -87,7 +87,7 @@ function WalljumpService.Trace(ply, dir)
 	perimeter_pos.x = math.Clamp(perimeter_pos.x, ply_pos.x + mins.x, ply_pos.x + maxs.x)
 	perimeter_pos.y = math.Clamp(perimeter_pos.y, ply_pos.y + mins.y, ply_pos.y + maxs.y)
 
-	if ply.sliding then
+	if ply.sliding or ply.surfing then
 		ply_pos.z = ply_pos.z - (ply.slide_hover_height + 2)
 	end
 	
