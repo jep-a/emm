@@ -85,17 +85,7 @@ end
 -- # Sliding
 
 function SlideService.SlideStrafe(move, normal)
-	local forward, right = move:GetMoveAngles():Forward(), move:GetMoveAngles():Right()
-	local wish_dir
-
-	forward.z = 0
-	right.z = 0
-	
-	wish_dir = (forward:GetNormalized() * move:GetForwardSpeed()) + (right:GetNormalized() * move:GetSideSpeed())
-	wish_dir.z = 0
-	wish_dir:Normalize()
-
-	if (normal:Dot(wish_dir) > 0 and move:GetVelocity():Dot(normal) > 0) then
+	if (normal:Dot(AiraccelService.WishDir(ply, move):GetNormalized()) > 0 and move:GetVelocity():Dot(normal) > 0) then
 		return true
 	end
 

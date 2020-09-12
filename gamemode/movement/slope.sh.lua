@@ -68,20 +68,12 @@ function SlopeService.LedgeBounce(ply, move)
 		1 > ledge_trace.Fraction and 
 		ledge_trace.Fraction > 0 and 
 		ledge_trace.HitNormal.z == 0 and 
-		not wall_trace.HitWorld and
-		vel.z > -50
-		and vel:Length2D() > 00
+		not wall_trace.HitWorld and 
+		vel.z > -50 and 
+		vel:Length2D() > 500 and 
+		ledge_trace.HitNormal:Dot(AiraccelService.WishDir(ply, move):GetNormalized()) < 0.5
 	then
-		local forward, right = move:GetMoveAngles():Forward(), move:GetMoveAngles():Right()
-		local wish_dir
-		
-		wish_dir = (forward:GetNormalized() * move:GetForwardSpeed()) + (right:GetNormalized() * move:GetSideSpeed())
-		wish_dir.z = 0
-		wish_dir:Normalize()
-
-		if ledge_trace.HitNormal:Dot(wish_dir) < 0.5 then
-			return ledge_trace.HitNormal
-		end
+		return ledge_trace.HitNormal
 	end
 	
 	return false
