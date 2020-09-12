@@ -4,6 +4,7 @@ SlopeService = SlopeService or {}
 -- # Properties
 
 function SlopeService.InitPlayerProperties(ply)
+	ply.bounce_height = 12
 	ply.slope_onground = false
 	ply.last_vel = Vector()
 end
@@ -39,11 +40,69 @@ function SlopeService.AddSpeed(normal, ply, move)
 end
 
 
+-- # Ledge Bounce
+
+function SlopeService.LedgeBounce(ply, move)
+	local pos = move:GetOrigin()
+	local vel = move:GetVelocity()
+	local bounce_height = Vector(0, 0, ply.bounce_height)
+	local pred_vel = (vel * FrameTime() * 4)
+	local ledge_trace = util.TraceHull {
+		start = pos,
+		endpos = pos + pred_vel,
+		mins = ply:OBBMins(),
+		maxs = Vector(ply:OBBMaxs().x, ply:OBBMaxs().y) + bounce_height,
+		mask = MASK_PLAYERSOLID_BRUSHONLY
+	}
+	local wall_trace = util.TraceHull {
+		start = pos + bounce_height,
+		endpos = pos + bounce_height + pred_vel,
+		mins = ply:OBBMins(),
+		maxs = ply:OBBMaxs() - bounce_height,
+		mask = MASK_PLAYERSOLID_BRUSHONLY
+	
+	}
+	
+	if 
+		ledge_trace.HitWorld and
+		1 > ledge_trace.Fraction and 
+		ledge_trace.Fraction > 0 and 
+		ledge_trace.HitNormal.z == 0 and 
+		not wall_trace.HitWorld and
+		vel.z > -50
+		and vel:Length2D() > 00
+	then
+		local forward, right = move:GetMoveAngles():Forward(), move:GetMoveAngles():Right()
+		local wish_dir
+		
+		wish_dir = (forward:GetNormalized() * move:GetForwardSpeed()) + (right:GetNormalized() * move:GetSideSpeed())
+		wish_dir.z = 0
+		wish_dir:Normalize()
+
+		if ledge_trace.HitNormal:Dot(wish_dir) < 0.5 then
+			return ledge_trace.HitNormal
+		end
+	end
+	
+	return false
+end
+
 function SlopeService.SetupSlope(ply, move)
+	local ledge_normal = SlopeService.LedgeBounce(ply, move) 
+	
 	if ply:OnGround() then
 		ply.slope_onground = true
 	else
 		ply.slope_onground = false
+	end
+	
+	if ledge_normal then
+		local normal = ledge_normal:Angle()
+
+		normal.x = 315
+		normal = normal:Forward()
+		ply:SetGroundEntity(NULL)
+		move:SetVelocity(SlideService.Clip(move:GetVelocity(), normal))
 	end
 
 	ply.last_vel = move:GetVelocity()

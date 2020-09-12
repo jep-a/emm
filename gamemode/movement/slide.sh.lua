@@ -84,14 +84,14 @@ end
 
 -- # Sliding
 
-function SlideService.SlideStrafe(move, cmd, normal)
+function SlideService.SlideStrafe(move, normal)
 	local forward, right = move:GetMoveAngles():Forward(), move:GetMoveAngles():Right()
 	local wish_dir
 
 	forward.z = 0
 	right.z = 0
 	
-	wish_dir = (forward:GetNormalized() * cmd:GetForwardMove()) + (right:GetNormalized() * cmd:GetSideMove())
+	wish_dir = (forward:GetNormalized() * move:GetForwardSpeed()) + (right:GetNormalized() * move:GetSideSpeed())
 	wish_dir.z = 0
 	wish_dir:Normalize()
 
@@ -151,7 +151,7 @@ function SlideService.SetupSlide(ply, move, cmd)
 		should_slide = SlideService.ShouldSlide(ply, trace.HitNormal, vel, slide_vel.z)
 
 		if 1 > trace.HitNormal.z and not trace.StartSolid and should_slide then
-			if SlideService.SlideStrafe(move, cmd, trace.HitNormal) or ply:OnGround() then
+			if SlideService.SlideStrafe(move, trace.HitNormal) or ply:OnGround() then
 				ply:SetGroundEntity(NULL)
 				move:SetVelocity(vel)
 				move:SetOrigin(pos + Vector(0, 0, trace.HitNormal.z))
