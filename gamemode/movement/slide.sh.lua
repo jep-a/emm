@@ -37,9 +37,10 @@ end
 function SlideService.Trace(ply, vel, pos)
 	local pred_vel = vel * FrameTime()
 	local hover_height = Vector(0, 0, ply.slide_hover_height)
-	local trace
+	local slide = ply.surfing or ply.sliding
+	local trace, slide_pos
 
-	if not ply.sliding and not ply.surfing then
+	if not slide then
 		if 0 > vel.z and not ply:OnGround() then
 			trace = SlideService.GetGroundTrace(pos, pos + pred_vel - hover_height, ply)
 		else
@@ -50,9 +51,7 @@ function SlideService.Trace(ply, vel, pos)
 			end
 		end
 	else
-		local slide = ply.surfing or ply.sliding
-		local slide_pos = pos - Vector(0, 0, hover_height.z - slide.HitNormal.z)
-		
+		slide_pos = pos - Vector(0, 0, hover_height.z - slide.HitNormal.z)
 		trace = SlideService.GetGroundTrace(pos + slide.HitNormal, slide_pos, ply)
 		
 		if trace.HitNormal.z == 0 then
@@ -68,12 +67,16 @@ function SlideService.Trace(ply, vel, pos)
 end
 
 function SlideService.ShouldSlide(ply, normal, vel, slide_vel_z)
-	if (0 > Vector(normal.x, normal.y):Dot(Vector(vel.x, vel.y):GetNormalized()) and
+	if 
+		(0 > Vector(normal.x, normal.y):Dot(Vector(vel.x, vel.y):GetNormalized()) and
 		1 > normal.z and
 		normal.z > ply.slide_minimum and
 		vel:Dot(vel) > 900 and
-		((not ply.sliding and slide_vel_z > 150) or ply.sliding)) or
-		(normal.z > 0 and ply.slide_minimum >= normal.z)
+		((not ply.sliding and 
+		slide_vel_z > 150) or 
+		ply.sliding)) or
+		(normal.z > 0 and 
+		ply.slide_minimum >= normal.z)
 	then
 		return true
 	end
@@ -85,7 +88,7 @@ end
 -- # Sliding
 
 function SlideService.SlideStrafe(move, normal)
-	if (normal:Dot(AiraccelService.WishDir(ply, move):GetNormalized()) > 0 and move:GetVelocity():Dot(normal) > 0) then
+	if normal:Dot(AiraccelService.WishDir(ply, move):GetNormalized()) > 0 and move:GetVelocity():Dot(normal) > 0 then
 		return true
 	end
 

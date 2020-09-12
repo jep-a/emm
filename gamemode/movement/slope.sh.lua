@@ -81,6 +81,7 @@ end
 
 function SlopeService.SetupSlope(ply, move)
 	local ledge_normal = SlopeService.LedgeBounce(ply, move) 
+	local normal
 	
 	if ply:OnGround() then
 		ply.slope_onground = true
@@ -89,8 +90,7 @@ function SlopeService.SetupSlope(ply, move)
 	end
 	
 	if ledge_normal then
-		local normal = ledge_normal:Angle()
-
+		normal = ledge_normal:Angle()
 		normal.x = 315
 		normal = normal:Forward()
 		ply:SetGroundEntity(NULL)
