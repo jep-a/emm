@@ -106,6 +106,7 @@ function SpectateService.UnSpectate(ply)
 	end
 end
 concommand.Add("emm_unspectate", SpectateService.UnSpectate)
+hook.Add("LobbyPlayerJoin", "SpectateService.UnSpectate", SpectateService.UnSpectate)
 hook.Add("EndPlayerClass", "SpectateService.UnSpectate", SpectateService.UnSpectate)
 
 function SpectateService.HandleDisconnect(ply)
