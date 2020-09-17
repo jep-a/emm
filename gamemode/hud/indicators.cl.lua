@@ -142,14 +142,17 @@ function IndicatorService.CalculateScreenPositions()
 
 		if IsValid(ply) and ply.pixel_visible_handle then
 			local ent = GhostService.Entity(ply)
-			local pos = ent:GetPos()
-			local x, y, vis, dist = IndicatorService.ScreenPosition(pos, eye_pos, ent)
 
-			ply.visible = util.PixelVisible(pos + ply:OBBCenter(), 32, ply.pixel_visible_handle)
-			ply.indicator_x = x
-			ply.indicator_y = y - 10
-			ply.indicator_is_visible = vis
-			ply.indicator_distance = dist
+			if IsValid(ent) then
+				local pos = ent:GetPos()
+				local x, y, vis, dist = IndicatorService.ScreenPosition(pos, eye_pos, ent)
+
+				ply.visible = util.PixelVisible(pos + ply:OBBCenter(), 32, ply.pixel_visible_handle)
+				ply.indicator_x = x
+				ply.indicator_y = y - 10
+				ply.indicator_is_visible = vis
+				ply.indicator_distance = dist
+			end
 		end
 	end
 
