@@ -30,24 +30,32 @@ local function NametagAlpha(ent)
 	return alpha
 end
 
-function NametagService.InitEntityProperties(ent)
-	if not IsLocalPlayer(ent) then
-		ent.nametag_alpha = AnimatableValue.New(0, {
-			smooth = true,
-			smooth_multiplier = nametag_alpha_smooth_multiplier,
+function NametagService.PlayerName(ply)
+	local text
 
-			generate = function ()
-				return NametagAlpha(ent)
-			end
-		})
+	if IsLocalPlayer(ply) then
+		text = "you"
+	else
+		text = ply:GetName()
 	end
+
+	return text
+end
+
+function NametagService.InitEntityProperties(ent)
+	ent.nametag_alpha = AnimatableValue.New(0, {
+		smooth = true,
+		smooth_multiplier = nametag_alpha_smooth_multiplier,
+
+		generate = function ()
+			return NametagAlpha(ent)
+		end
+	})
 end
 hook.Add("InitPlayerProperties", "NametagService.InitPlayerProperties", NametagService.InitEntityProperties)
 
 function NametagService.FinishPlayerProperties(ply)
-	if not IsLocalPlayer(ply) then
-		ply.nametag_alpha:Finish()
-	end
+	ply.nametag_alpha:Finish()
 end
 hook.Add("PlayerDisconnected", "NametagService.FinishPlayerProperties", NametagService.FinishPlayerProperties)
 
@@ -69,7 +77,7 @@ end
 hook.Add("LobbyEntityRemove", "NametagService.FinishEntityProperties", NametagService.FinishEntityProperties)
 
 function NametagService.Name(ent)
-	return ent.indicator_name or ent.GetIndicatorName and ent:GetIndicatorName() or ent.GetName and ent:GetName()
+	return ent.indicator_name or ent.GetIndicatorName and ent:GetIndicatorName() or NametagService.PlayerName(ent)
 end
 
 function NametagService.Draw()
@@ -80,7 +88,7 @@ function NametagService.Draw()
 		for i = 1, #plys do
 			local ply = plys[i]
 
-			if not IsLocalPlayer(ply) and ply.nametag_alpha then
+			if ply.nametag_alpha then
 				local alpha = ply.nametag_alpha.smooth
 
 				if alpha > 0 then

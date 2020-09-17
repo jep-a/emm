@@ -280,7 +280,7 @@ function IndicatorService.RenderOutlines()
 
 		for i = 1, #indicators do
 			local indicator = indicators[i]
-			local ent = indicator.entity
+			local ent = GhostService.Entity(indicator.entity)
 
 			render.SetStencilReferenceValue(i)
 
