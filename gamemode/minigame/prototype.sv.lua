@@ -39,7 +39,6 @@ end
 function MinigamePrototype:ForfeitDepartedPlayerClassToClosest(ply)
 	local ply_class = ply.player_class
 
-	PrintTable(ply_class)
 	if ply_class and ply_class.swap_closest_on_leave then
 		local closest_ply = MinigameService.PickClosestPlayerClass(self, ply, {
 			blacklist_class_key = ply_class.key,
