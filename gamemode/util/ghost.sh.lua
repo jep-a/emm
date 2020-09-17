@@ -1,6 +1,6 @@
 GhostService = GhostService or {}
 
-NetService.CreateSchema("Ghost", {"entity", "vector", "id"})
+NetService.CreateSchema("Ghost", {"entity", "vector", "boolean", "id"})
 NetService.CreateSchema("UnGhost", {"entity"})
 NetService.CreateUpstreamSchema "RequestGhosts"
 
@@ -14,17 +14,25 @@ hook.Add(
 	GhostService.InitPlayerProperties
 )
 
+function GhostService.Alive(ply)
+	local alive
+
+	if ply.ghosting then
+		alive = ply.ghost_dead
+	else
+		alive = ply:Alive()
+	end
+
+	return alive
+end
+
 function GhostService.Position(ply)
 	local pos
 
 	if ply.ghosting then
-		if IsValid(ply.ghost_ragdoll) then
-			pos = ply.ghost_ragdoll:WorldSpaceCenter()
-		else
-			pos = ply.ghost_position
-		end
+		pos = ply.ghost_position
 	else
-		pos = ply:WorldSpaceCenter()
+		pos = ply:GetPos()
 	end
 
 	return pos

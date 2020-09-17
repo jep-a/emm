@@ -40,7 +40,7 @@ end
 function SpectateService.Spectate(ply, cmd, args)
 	local target = SpectateService.FindPlayerByName(args[1])
 
-	if ply.can_spectate and CurTime() > ply.spectate_timeout then
+	if ply.can_spectate and not ply.spectating and CurTime() > ply.spectate_timeout then
 		if target then
 			if ply:GetObserverMode() == OBS_MODE_NONE then
 				if not ply:IsOnGround() then
@@ -61,6 +61,10 @@ function SpectateService.Spectate(ply, cmd, args)
 					return
 				end
 
+				if ply.lobby then
+					ply.lobby:RemovePlayer(ply)
+				end
+
 				ply.spectating = true
 				ply.spectate_savepoint = SavepointService.CreateSavepoint(ply)
 				ply.spectate_timeout = CurTime() + 1
@@ -68,11 +72,11 @@ function SpectateService.Spectate(ply, cmd, args)
 				table.insert(target.spectators, ply)
 
 				GhostService.Ghost(ply, {
+					kill = true,
 					ragdoll = true,
 					freeze = true
 				})
 
-				ply:KillSilent()
 				ply:SpectateEntity(target)
 				ply:Spectate(ply.spectate_obs_mode)
 
@@ -88,7 +92,7 @@ end
 concommand.Add("sv_emm_spectate", SpectateService.Spectate)
 
 function SpectateService.UnSpectate(ply)
-	if ply:GetObserverMode() ~= OBS_MODE_NONE then
+	if ply.spectating then
 		local health = ply:Health()
 
 		ply.spectating = false
@@ -108,6 +112,7 @@ function SpectateService.UnSpectate(ply)
 	end
 end
 concommand.Add("emm_unspectate", SpectateService.UnSpectate)
+hook.Add("EndPlayerClass", "SpectateService.UnSpectate", SpectateService.UnSpectate)
 
 function SpectateService.HandleDisconnect(ply)
 	if ply:GetObserverMode() ~= OBS_MODE_NONE then

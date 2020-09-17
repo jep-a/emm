@@ -78,7 +78,7 @@ function ENT:Think()
 			if
 				self ~= ent and
 				ent:IsPlayer() and
-				ent:Alive() and
+				GhostService.Alive(ent) and
 				MinigameService.IsSharingLobby(self, ent) and
 				ent.player_class and
 				self.can_tag[ent.player_class.key]

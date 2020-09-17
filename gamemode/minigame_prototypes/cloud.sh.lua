@@ -69,7 +69,7 @@ if SERVER then
 	end
 
 	function MINIGAME.player_classes.Cloud:SetupMove(move)
-		if IsFirstTimePredicted() and not self.cloud_set and self:Alive() and move:KeyPressed(IN_ATTACK) then
+		if IsFirstTimePredicted() and not self.cloud_set and GhostService.Alive(self) and move:KeyPressed(IN_ATTACK) then
 			self.lobby:SetCloud(self)
 		end
 	end

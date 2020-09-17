@@ -12,10 +12,9 @@ local function NametagAlpha(ent)
 		not_near_crosshair = math.sqrt(((ent.indicator_x - (ScrW()/2)) ^ 2) + ((ent.indicator_y - (ScrH()/2)) ^ 2)) > hide_radius
 	end
 
-	if IsValid(ent) and LocalPlayer():Alive() and not_near_crosshair and (
+	if IsValid(ent) and GhostService.Alive(LocalPlayer()) and not_near_crosshair and (
 		not IsPlayer(ent) or
-		ent:Alive() or
-		GhostService.IsGhostingWithoutRagdoll(ent)
+		GhostService.Alive(ent)
 	) then
 		if ent.indicator then
 			alpha = 255

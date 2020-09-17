@@ -59,6 +59,11 @@ function GhostService.Ghost(ply, options)
 
 	ply.ghosting = true
 	ply.ghost_position = ply:GetPos()
+	ply.ghost_dead = options.kill
+
+	if options.kill then
+		ply:KillSilent()
+	end
 
 	if options.ragdoll then
 		ply.ghost_ragdoll = GhostService.Ragdoll(ply, options.freeze)
@@ -72,6 +77,9 @@ end
 function GhostService.UnGhost(ply)
 	if ply.ghosting then
 		ply.ghosting = false
+		ply.ghost_position = nil
+		ply.ghost_dead = nil
+		ply.ghost_ragdoll_id = nil
 
 		if IsValid(ply.ghost_ragdoll) then
 			ply.ghost_ragdoll:Remove()
@@ -86,7 +94,7 @@ end
 hook.Add("EndPlayerClass", "GhostService.UnGhost", GhostService.UnGhost)
 
 function GhostService.EntityTakeDamage(victim, dmg)
-	if victim:GetClass() == "prop_ragdoll" then
+	if victim:GetClass() == "prop_ragdoll" and IsValid(victim.ghost_player) and victim.ghost_player:Alive() then
 		victim.ghost_player:TakeDamageInfo(dmg)
 	end
 end
@@ -99,6 +107,7 @@ function GhostService.SendGhosts(ply)
 	for _, ghost in pairs(GhostService.ghosts) do
 		net.WriteEntity(ghost)
 		net.WriteVector(ghost.ghost_position)
+		net.WriteBool(ghost.ghost_dead)
 		net.WriteEntity(ghost.ghost_ragdoll)
 	end
 

@@ -104,7 +104,7 @@ function IndicatorService.ScreenPosition(ent_or_pos, eye_pos, ent)
 		if IsValid(ent) then
 			local radius = ent:GetModelRadius() * ent:GetModelScale()
 
-			pos = ent:GetPos() + Vector(0, 0, radius)
+			pos = (isvector(ent_or_pos) and ent_or_pos or ent:GetPos()) + Vector(0, 0, radius)
 			dist = eye_pos:Distance(pos)
 
 			local ang = math.abs(math.NormalizeAngle((pos - eye_pos):Angle().p))
@@ -134,9 +134,10 @@ function IndicatorService.CalculateScreenPositions()
 		local ply = plys[i]
 
 		if IsValid(ply) and ply.pixel_visible_handle then
-			local x, y, vis, dist = IndicatorService.ScreenPosition(GhostService.Position(ply), eye_pos, ply)
+			local pos = GhostService.Position(ply)
+			local x, y, vis, dist = IndicatorService.ScreenPosition(pos, eye_pos, ply)
 
-			ply.visible = util.PixelVisible(ply:WorldSpaceCenter(), 32, ply.pixel_visible_handle)
+			ply.visible = util.PixelVisible(pos + ply:OBBCenter(), 32, ply.pixel_visible_handle)
 			ply.indicator_x = x
 			ply.indicator_y = y - 10
 			ply.indicator_is_visible = vis
@@ -428,7 +429,7 @@ end
 function IndicatorService.AddEntityIndicator(ent)
 	IndicatorService.container:Add(Indicator.New(ent))
 
-	if not IsPlayer(ent) or ent.just_spawned or ent:Alive() then
+	if not IsPlayer(ent) or ent.just_spawned or GhostService.Alive(ent) then
 		ent.indicator:AnimateAttribute("alpha", 255)
 	end
 end

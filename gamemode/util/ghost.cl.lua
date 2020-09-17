@@ -4,9 +4,10 @@ function GhostService.IsGhostingWithoutRagdoll(ply)
 	return ply.ghosting and not IsValid(ply.ghost_ragdoll)
 end
 
-function GhostService.Ghost(ply, pos, ragdoll_id)
+function GhostService.Ghost(ply, pos, dead, ragdoll_id)
 	ply.ghosting = true
 	ply.ghost_position = pos
+	ply.ghost_dead = dead
 	ply.ghost_ragdoll_id = ragdoll_id
 
 	if ragdoll_id then
@@ -30,6 +31,7 @@ NetService.Receive("Ghost", GhostService.Ghost)
 function GhostService.UnGhost(ply, ragdoll)
 	ply.ghosting = false
 	ply.ghost_position = nil
+	ply.ghost_dead = nil
 	ply.ghost_ragdoll_id = nil
 	ply.ghost_ragdoll = nil
 
@@ -87,10 +89,12 @@ function GhostService.ReceiveGhosts(len)
 	for i = 1, ghost_count do
 		local ply = net.ReadEntity()
 		local pos = net.ReadVector()
+		local dead = net.ReadBool()
 		local ragdoll = net.ReadEntity()
 
 		ply.ghosting = true
 		ply.ghost_position = pos
+		ply.ghost_dead = dead
 		ply.ghost_ragdoll = ragdoll
 	end
 

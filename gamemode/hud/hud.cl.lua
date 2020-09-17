@@ -354,7 +354,7 @@ hook.Add("LocalPlayerDeath", "HUDService.DeathHide", HUDService.DeathHide)
 
 function HUDService.LobbyUIShow()
 	if SettingsService.Get "show_hud" then
-		if LocalPlayer():Alive() then
+		if GhostService.Alive(LocalPlayer()) then
 			HUDService.ShowAll()
 
 			if IndicatorService.Visible() then
