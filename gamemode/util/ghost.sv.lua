@@ -2,11 +2,12 @@ util.AddNetworkString "Ghosts"
 
 GhostService.ghosts = GhostService.ghosts or {}
 
-function GhostService.Ragdoll(ply, freeze)
+function GhostService.Ragdoll(ply, statue)
 	local ragdoll = ents.Create "prop_ragdoll"
 
 	ragdoll:SetOwner(ply)
 	ragdoll:SetPos(ply:GetPos())
+	ragdoll:SetAngles(ply:GetAngles())
 	ragdoll:SetModel(ply:GetModel())
 	ragdoll:SetSkin(ply:GetSkin())
 
@@ -14,7 +15,6 @@ function GhostService.Ragdoll(ply, freeze)
 		ragdoll:SetBodygroup(body_group.id, ply:GetBodygroup(body_group.id))
 	end
 
-	ragdoll:SetAngles(ply:GetAngles())
 	ragdoll:SetColor(ply:GetColor())
 	ragdoll:Spawn()
 	ragdoll:Activate()
@@ -24,7 +24,6 @@ function GhostService.Ragdoll(ply, freeze)
 	ragdoll.lobby = ply.lobby
 
 	local phys_count = ragdoll:GetPhysicsObjectCount() - 1
-	local vel = ply:GetVelocity()
 
 	for i = 0, phys_count do
 		local bone = ragdoll:GetPhysicsObjectNum(i)
@@ -39,16 +38,12 @@ function GhostService.Ragdoll(ply, freeze)
 		end
 	end
 
-	if freeze then
-		timer.Simple(SAFE_FRAME * 3, function ()
-			for i = 0, phys_count do
-				local bone = ragdoll:GetPhysicsObjectNum(i)
+	if statue then
+		for i = 1, phys_count do
+			constraint.Weld(ragdoll, ragdoll, 0, i, 0)
 
-				if IsValid(bone) then
-					bone:Sleep()
-				end
-			end
-		end)
+			ragdoll:GetPhysicsObjectNum(i):SetVelocity(ply:GetVelocity())
+		end
 	end
 
 	return ragdoll
@@ -66,7 +61,7 @@ function GhostService.Ghost(ply, options)
 	end
 
 	if options.ragdoll then
-		ply.ghost_ragdoll = GhostService.Ragdoll(ply, options.freeze)
+		ply.ghost_ragdoll = GhostService.Ragdoll(ply, options.statue)
 	end
 
 	table.insert(GhostService.ghosts, ply)
