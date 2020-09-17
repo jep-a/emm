@@ -85,7 +85,7 @@ end
 
 function AiraccelService.SetupAiraccel(ply, move)
 	if CLIENT then
-		ply = GetPlayer()
+		ply = GetObservingPlayer()
 	end
 
 	if
@@ -116,7 +116,7 @@ function AiraccelService.SetupAiraccel(ply, move)
 
 		if ply:Alive() and not ply:OnGround() then
 			local vel_diff, new_vel = AiraccelService.Velocity(ply, move, ply.air_accelerate)
-			
+
 			if vel_diff > 0 then
 				move:SetVelocity(new_vel)
 			end

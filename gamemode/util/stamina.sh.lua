@@ -104,10 +104,10 @@ function StaminaService.Update()
 			StaminaService.UpdatePlayer(ply, cur_time)
 		end
 	else
-		local ply = GetPlayer()
+		local ply = GetObservingPlayer()
 
 		if IsValid(ply) and ply.stamina then
-			StaminaService.UpdatePlayer(GetPlayer(), cur_time)
+			StaminaService.UpdatePlayer(GetObservingPlayer(), cur_time)
 		end
 	end
 end
@@ -130,7 +130,7 @@ function StaminaService.Reload(lobby, settings)
 			end
 		else
 			local local_ply = LocalPlayer()
-	
+
 			if local_ply.player_class and ply_class == local_ply.player_class.key then
 				local_ply.stamina[stamina].infinite = v
 			end
