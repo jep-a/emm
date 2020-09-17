@@ -66,16 +66,14 @@ function SpectateService.Spectate(ply, cmd, args)
 				end
 
 				ply.spectating = true
-				ply.spectate_savepoint = SavepointService.CreateSavepoint(ply)
+
+				ply.spectate_savepoint = SavepointService.CreateSavepoint(ply, {
+					health = true
+				})
+
 				ply.spectate_timeout = CurTime() + 1
 
 				table.insert(target.spectators, ply)
-
-				GhostService.Ghost(ply, {
-					kill = true,
-					ragdoll = true,
-					freeze = true
-				})
 
 				ply:SpectateEntity(target)
 				ply:Spectate(ply.spectate_obs_mode)
@@ -93,8 +91,6 @@ concommand.Add("sv_emm_spectate", SpectateService.Spectate)
 
 function SpectateService.UnSpectate(ply)
 	if ply.spectating then
-		local health = ply:Health()
-
 		ply.spectating = false
 
 		table.RemoveByValue(ply:GetObserverTarget().spectators, ply)
@@ -103,9 +99,7 @@ function SpectateService.UnSpectate(ply)
 
 		ply:UnSpectate()
 		ply:Spawn()
-		ply:SetHealth(health)
 
-		GhostService.UnGhost(ply)
 		SavepointService.LoadSavepoint(ply, ply.spectate_savepoint)
 
 		ply:SetVelocity(Vector(0,0,0))

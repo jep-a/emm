@@ -15,11 +15,18 @@ hook.Add(
 
 -- # Saving/loading
 
-function SavepointService.CreateSavepoint(ply)
+function SavepointService.CreateSavepoint(ply, options)
+	options = options or {}
+
 	local savepoint = {}
+
 	savepoint.position = ply:GetPos()
 	savepoint.velocity = ply:GetVelocity()
 	savepoint.angle = ply:EyeAngles()
+
+	if options.health then
+		savepoint.health = ply:GetHealth()
+	end
 
 	return savepoint
 end
@@ -28,6 +35,10 @@ function SavepointService.LoadSavepoint(ply, savepoint)
 	ply:SetPos(savepoint.position)
 	ply:SetVelocity(-ply:GetVelocity() + savepoint.velocity)
 	ply:SetEyeAngles(savepoint.angle)
+
+	if savepoint.health then
+		ply:SetHealth(savepoint.health)
+	end
 end
 
 function SavepointService.RequestSavepoint(ply, cmd, args)
