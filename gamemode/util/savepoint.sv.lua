@@ -25,7 +25,7 @@ function SavepointService.CreateSavepoint(ply, options)
 	savepoint.angle = ply:EyeAngles()
 
 	if options.health then
-		savepoint.health = ply:GetHealth()
+		savepoint.health = ply:Health()
 	end
 
 	return savepoint
