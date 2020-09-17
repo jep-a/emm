@@ -37,3 +37,15 @@ function GhostService.Position(ply)
 
 	return pos
 end
+
+function GhostService.Entity(ply)
+	local ent
+
+	if ply.ghosting then
+		ent = ply.ghost_ragdoll
+	else
+		ent = ply
+	end
+
+	return ent
+end

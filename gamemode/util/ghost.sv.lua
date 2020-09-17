@@ -71,7 +71,7 @@ function GhostService.Ghost(ply, options)
 
 	table.insert(GhostService.ghosts, ply)
 	hook.Run("PlayerGhost", ply)
-	NetService.Broadcast("Ghost", ply, ply.ghost_position, options.ragdoll and ply.ghost_ragdoll:EntIndex())
+	NetService.Broadcast("Ghost", ply, ply.ghost_position, ply.ghost_dead, options.ragdoll and ply.ghost_ragdoll:EntIndex())
 end
 
 function GhostService.UnGhost(ply)
