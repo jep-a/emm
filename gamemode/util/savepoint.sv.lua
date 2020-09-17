@@ -31,13 +31,15 @@ function SavepointService.CreateSavepoint(ply, options)
 	return savepoint
 end
 
-function SavepointService.LoadSavepoint(ply, savepoint)
-	ply:SetPos(savepoint.position)
-	ply:SetVelocity(-ply:GetVelocity() + savepoint.velocity)
-	ply:SetEyeAngles(savepoint.angle)
+function SavepointService.LoadSavepoint(ply, savepoint, options)
+	options = options or {}
 
-	if savepoint.health then
-		ply:SetHealth(savepoint.health)
+	ply:SetPos(options.position or savepoint.position)
+	ply:SetVelocity(options.velocity or -ply:GetVelocity() + savepoint.velocity)
+	ply:SetEyeAngles(options.angle or savepoint.angle)
+
+	if options.angle or savepoint.health then
+		ply:SetHealth(options.angle or savepoint.health)
 	end
 end
 
