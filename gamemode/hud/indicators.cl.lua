@@ -103,8 +103,15 @@ function IndicatorService.ScreenPosition(ent_or_pos, eye_pos, ent)
 
 		if IsValid(ent) then
 			local radius = ent:GetModelRadius() * ent:GetModelScale()
+			local pos_offset
 
-			pos = (isvector(ent_or_pos) and ent_or_pos or ent:GetPos()) + Vector(0, 0, radius)
+			if ent.ghost and ent:GetClass() == "prop_ragdoll" then
+				pos_offset = Vector(0, 0, -38)
+			else
+				pos_offset = Vector(0, 0, 0)
+			end
+
+			pos = (isvector(ent_or_pos) and ent_or_pos or ent:GetPos()) + Vector(0, 0, radius) + pos_offset
 			dist = eye_pos:Distance(pos)
 
 			local ang = math.abs(math.NormalizeAngle((pos - eye_pos):Angle().p))
@@ -134,8 +141,9 @@ function IndicatorService.CalculateScreenPositions()
 		local ply = plys[i]
 
 		if IsValid(ply) and ply.pixel_visible_handle then
-			local pos = GhostService.Position(ply)
-			local x, y, vis, dist = IndicatorService.ScreenPosition(pos, eye_pos, ply)
+			local ent = GhostService.Entity(ply)
+			local pos = ent:GetPos()
+			local x, y, vis, dist = IndicatorService.ScreenPosition(pos, eye_pos, ent)
 
 			ply.visible = util.PixelVisible(pos + ply:OBBCenter(), 32, ply.pixel_visible_handle)
 			ply.indicator_x = x
@@ -360,7 +368,7 @@ function IndicatorService.RenderCoasters()
 		local ent = indicator.entity
 
 		if IsValid(ent) then
-			local pos = GhostService.Position(ent) + Vector(0, 0, 5)
+			local pos = GhostService.Entity(ent):GetPos() + Vector(0, 0, 5)
 
 			local trace = util.TraceLine {
 				start = pos,

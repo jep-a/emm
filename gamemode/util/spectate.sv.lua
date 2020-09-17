@@ -43,18 +43,6 @@ function SpectateService.Spectate(ply, cmd, args)
 	if ply.can_spectate and not ply.spectating and CurTime() > ply.spectate_timeout then
 		if target then
 			if ply:GetObserverMode() == OBS_MODE_NONE then
-				if not ply:IsOnGround() then
-					ply:ChatPrint "You can't spectate in the air."
-
-					return
-				end
-
-				if ply:Crouching() then
-					ply:ChatPrint "You can't spectate while crouching."
-
-					return
-				end
-
 				if target == ply then
 					ply:ChatPrint "You can't spectate yourself."
 
@@ -74,6 +62,12 @@ function SpectateService.Spectate(ply, cmd, args)
 				ply.spectate_timeout = CurTime() + 1
 
 				table.insert(target.spectators, ply)
+
+				GhostService.Ghost(ply, {
+					kill = true,
+					ragdoll = true,
+					statue = true
+				})
 
 				ply:SpectateEntity(target)
 				ply:Spectate(ply.spectate_obs_mode)
@@ -100,9 +94,14 @@ function SpectateService.UnSpectate(ply)
 		ply:UnSpectate()
 		ply:Spawn()
 
-		SavepointService.LoadSavepoint(ply, ply.spectate_savepoint)
+		local pos = ply.ghost_ragdoll:GetPos()
 
-		ply:SetVelocity(Vector(0,0,0))
+		GhostService.UnGhost(ply)
+
+		SavepointService.LoadSavepoint(ply, ply.spectate_savepoint, {
+			position = pos,
+			velocity = Vector(0, 0, 0)
+		})
 	end
 end
 concommand.Add("emm_unspectate", SpectateService.UnSpectate)

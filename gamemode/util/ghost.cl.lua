@@ -57,6 +57,7 @@ function GhostService.OnEntityCreated(ent)
 		if IsValid(ply) then
 			ply.ghost_ragdoll = ent
 
+			ent.ghost = true
 			ent.ghost_player = ply
 			ent.lobby = ply.lobby
 
@@ -91,6 +92,9 @@ function GhostService.ReceiveGhosts(len)
 		local pos = net.ReadVector()
 		local dead = net.ReadBool()
 		local ragdoll = net.ReadEntity()
+
+		ragdoll.ghost = true
+		ragdoll.ghost_player = ply
 
 		ply.ghosting = true
 		ply.ghost_position = pos

@@ -28,7 +28,7 @@ function TaggingService.Think()
 			local taggable = TaggingService.taggable_groups[i][_i]
 
 			if IsValid(taggable) then
-				local ents = ents.FindInSphere(GhostService.Position(taggable) + taggable:OBBCenter(), taggable.taggable_radius)
+				local ents = ents.FindInSphere(GhostService.Entity(taggable):GetPos() + taggable:OBBCenter(), taggable.taggable_radius)
 
 				if
 					taggable.taggable and

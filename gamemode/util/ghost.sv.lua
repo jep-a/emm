@@ -20,6 +20,7 @@ function GhostService.Ragdoll(ply, statue)
 	ragdoll:Activate()
 	ragdoll:SetCollisionGroup(COLLISION_GROUP_WEAPON)
 
+	ragdoll.ghost = true
 	ragdoll.ghost_player = ply
 	ragdoll.lobby = ply.lobby
 
