@@ -95,12 +95,20 @@ function SpectateService.UnSpectate(ply)
 		ply:Spawn()
 
 		local pos = ply.ghost_ragdoll:GetPos()
+		local vel = ply.ghost_ragdoll:GetVelocity()
 
 		GhostService.UnGhost(ply)
 
+		local trace = util.TraceLine {
+			start = pos,
+			endpos = pos + Vector(0, 0, -38),
+			filter = ply,
+			mask = MASK_PLAYERSOLID
+		}
+
 		SavepointService.LoadSavepoint(ply, ply.spectate_savepoint, {
-			position = pos,
-			velocity = Vector(0, 0, 0)
+			position = trace.HitPos,
+			velocity = vel
 		})
 	end
 end

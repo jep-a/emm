@@ -14,6 +14,7 @@ EMM.Include {
 	"util/pred-sound",
 	"util/stamina",
 	"util/time-associated-map",
+	"util/unstuck",
 	"util/savepoint",
 	"util/spectate",
 	"util/trail",

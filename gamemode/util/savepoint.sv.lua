@@ -34,13 +34,21 @@ end
 function SavepointService.LoadSavepoint(ply, savepoint, options)
 	options = options or {}
 
-	ply:SetPos(options.position or savepoint.position)
+	local pos = options.position or savepoint.position
+
+	ply:SetPos(pos)
 	ply:SetVelocity(options.velocity or -ply:GetVelocity() + savepoint.velocity)
 	ply:SetEyeAngles(options.angle or savepoint.angle)
 
 	if options.angle or savepoint.health then
 		ply:SetHealth(options.angle or savepoint.health)
 	end
+
+	timer.Simple(SAFE_FRAME * 1, function ()
+		if not UnstuckService.CheckHull(ply, pos) then
+			UnstuckService.Queue(ply)
+		end
+	end)
 end
 
 function SavepointService.RequestSavepoint(ply, cmd, args)
