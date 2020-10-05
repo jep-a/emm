@@ -107,7 +107,7 @@ hook.Add("SetupMove", "EMM.WallDamage", function (ply, move)
 		local collision_sound = "physics/body/body_medium_break" .. math.random(2, 4) .. ".wav"
 
 		if SERVER then
-			local wall_damage = (lost_velocity - min_velocity) * ply.collision_damage_multiplier
+			local wall_damage = math.min((lost_velocity - min_velocity) * ply.collision_damage_multiplier, ply:Health())
 			local view_punch = wall_damage/20
 			local dmg = DamageInfo()
 
