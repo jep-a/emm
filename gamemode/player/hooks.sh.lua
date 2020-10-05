@@ -29,9 +29,11 @@ hook.Add("InitPlayerProperties", "InitCorePlayerProperties", function (ply)
 
 	ply.can_take_fall_damage = true
 	ply.fall_damage_multiplier = 0.0563
+	ply.collision_damage_multiplier = 0.0563
 
 	ply.death_cooldown = 2
 	ply.last_death_time = 0
+	ply.old_velocity = Vector()
 end)
 
 hook.Add("PlayerDisconnected", "FinishPlayerProperties", function (ply)
@@ -71,4 +73,40 @@ hook.Add("OnEntityCreated", "AssignLobby", function (ent)
 	if IsValid(owner) and owner.lobby then
 		ent.lobby = owner.lobby
 	end
+end)
+
+
+-- # Walldamage
+
+hook.Add("SetupMove", "EMM.WallDamage", function (ply, move)
+	local velocity = move:GetVelocity()
+	local lost_velocity = ply.old_velocity - velocity
+	local min_velocity = 580
+	
+	if 
+		Vector(velocity.x, velocity.y):Dot(Vector(lost_velocity.x,lost_velocity.y):GetNormalized()) >= 0 and
+		lost_velocity:Length2D() > min_velocity and 
+		IsFirstTimePredicted() and 
+		not ply:OnGround() and 
+		ply:Alive() and
+		ply.can_take_collision_damage
+	then
+		if SERVER then
+			local wall_damage = (lost_velocity:Length2D() - min_velocity) * ply.collision_damage_multiplier
+			local view_punch = wall_damage/20
+			local dmg = DamageInfo()
+
+			dmg:SetDamage( wall_damage )
+			dmg:SetDamageType(DMG_FALL)
+			dmg:SetAttacker(game.GetWorld())
+			ply:ViewPunch(Angle(math.random(-view_punch, view_punch), math.random(-view_punch, view_punch), 0))
+			ply:TakeDamageInfo(dmg)
+		end
+
+		PredictedSoundService.PlaySound(ply, "physics/body/body_medium_break" .. math.random(2,4) .. ".wav")
+	end
+end)
+
+hook.Add("PlayerTick", "EMM.OldVelocity", function (ply, move)
+	ply.old_velocity = move:GetVelocity()
 end)
