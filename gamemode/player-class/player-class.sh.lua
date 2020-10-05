@@ -16,6 +16,7 @@ function PlayerClassService.CreatePlayerClass(props)
 		can_autojump = false,
 		can_regenerate_health = true,
 		can_take_fall_damage = true,
+		can_take_collision_damage = false,
 		can_damage_everyone = true,
 
 		has_infinite_wallslide = false,
