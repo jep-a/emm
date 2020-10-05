@@ -75,38 +75,50 @@ hook.Add("OnEntityCreated", "AssignLobby", function (ent)
 	end
 end)
 
+hook.Add("Move", "EMM.OldVelocity", function (ply, move)
+	ply.old_velocity = move:GetVelocity()
+end)
+
 
 -- # Walldamage
 
 hook.Add("SetupMove", "EMM.WallDamage", function (ply, move)
 	local velocity = move:GetVelocity()
-	local lost_velocity = ply.old_velocity - velocity
+	local pos = move:GetOrigin()
+	local lost_velocity = ply.old_velocity:Length2D() - velocity:Length2D()
 	local min_velocity = 580
-	
+	local trace = util.TraceHull {
+		start = pos,
+		endpos = pos + (ply.old_velocity * FrameTime() * 2),
+		mins = ply:OBBMins() + Vector(2, 2),
+		maxs = ply:OBBMaxs() - Vector(2, 2),
+		mask = MASK_PLAYERSOLID_BRUSHONLY
+	}
+
 	if 
-		Vector(velocity.x, velocity.y):Dot(Vector(lost_velocity.x,lost_velocity.y):GetNormalized()) >= 0 and
-		lost_velocity:Length2D() > min_velocity and 
+		0 > Vector(ply.old_velocity.x, ply.old_velocity.y):Dot(trace.HitNormal) and
+		-0.8 > Vector(ply.old_velocity.x, ply.old_velocity.y):GetNormalized():Dot(trace.HitNormal) and
+		lost_velocity > min_velocity and 
 		IsFirstTimePredicted() and 
 		not ply:OnGround() and 
 		ply:Alive() and
 		ply.can_take_collision_damage
 	then
+		local collision_sound = "physics/body/body_medium_break" .. math.random(2, 4) .. ".wav"
+
 		if SERVER then
-			local wall_damage = (lost_velocity:Length2D() - min_velocity) * ply.collision_damage_multiplier
+			local wall_damage = (lost_velocity - min_velocity) * ply.collision_damage_multiplier
 			local view_punch = wall_damage/20
 			local dmg = DamageInfo()
 
-			dmg:SetDamage( wall_damage )
+			dmg:SetDamage(wall_damage)
 			dmg:SetDamageType(DMG_FALL)
 			dmg:SetAttacker(game.GetWorld())
-			ply:ViewPunch(Angle(math.random(-view_punch, view_punch), math.random(-view_punch, view_punch), 0))
 			ply:TakeDamageInfo(dmg)
+			ply:ViewPunch(Angle(math.random(-view_punch, view_punch), math.random(-view_punch, view_punch), 0))
 		end
 
-		PredictedSoundService.PlaySound(ply, "physics/body/body_medium_break" .. math.random(2,4) .. ".wav")
+		PredictedSoundService.PlaySound(ply, collision_sound)
 	end
 end)
 
-hook.Add("PlayerTick", "EMM.OldVelocity", function (ply, move)
-	ply.old_velocity = move:GetVelocity()
-end)
