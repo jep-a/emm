@@ -54,7 +54,7 @@ function SlopeService.LedgeBounce(ply, move)
 		mask = MASK_PLAYERSOLID_BRUSHONLY
 	}
 	
-	if bottom_trace.HitWorld and bottom_trace.HitNormal.z == 0 and vel.z > -50 and vel:Length2D() > 500 then
+	if bottom_trace.HitWorld and bottom_trace.HitNormal.z == 0 and vel.z > -200 and vel:Length2D() > 500 then
 		local can_bounce = bottom_trace.HitNormal:Dot(AiraccelService.WishDir(ply, move):GetNormalized())
 		local top_trace = util.TraceHull {
 			start = pos + bounce_height,
@@ -90,7 +90,7 @@ function SlopeService.SetupSlope(ply, move)
 	else
 		ply.slope_onground = false
 	end
-	
+
 	if ledge_normal then
 		normal = ledge_normal:Angle()
 		normal.x = 315
