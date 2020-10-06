@@ -6,7 +6,6 @@ SlopeService = SlopeService or {}
 function SlopeService.InitPlayerProperties(ply)
 	ply.bounce_height = 12
 	ply.slope_onground = false
-	ply.old_velocity = Vector()
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
@@ -100,6 +99,5 @@ function SlopeService.SetupSlope(ply, move)
 		move:SetVelocity(SlideService.Clip(move:GetVelocity(), normal))
 	end
 
-	ply.old_velocity = move:GetVelocity()
 end
 hook.Add("Move", "SlopeService.SetupSlope", SlopeService.SetupSlope)
