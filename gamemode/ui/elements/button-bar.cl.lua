@@ -11,8 +11,10 @@ function ButtonBar:Init(props)
 		child_margin = 32,
 		background_color = props.background and COLOR_GRAY or props.background_color,
 		inherit_color = false,
+		fill_color = props.fill_color,
+		color = props.fill_color and props.color,
 		border = LINE_THICKNESS,
-		border_color = props.color,
+		border_color = props.fill_color and COLOR_BACKGROUND or props.color,
 		border_alpha = 0,
 		cursor = "hand",
 		bubble_mouse = false,
@@ -32,14 +34,17 @@ function ButtonBar:Init(props)
 			width = BUTTON_ICON_SIZE,
 			height = BUTTON_ICON_SIZE,
 			crop_y = 0.1,
-			material = props.material
+			material = props.material,
+			inherit_color = props.fill_color and false,
+			color = props.fill_color and COLOR_BACKGROUND
 		},
 
 		Element.New {
 			fit = true,
 			font = "ButtonBar",
 			text_justification = 4,
-			text = string.upper(props.text)
+			text = string.upper(props.text),
+			text_color = props.fill_color and COLOR_BACKGROUND
 		},
 
 		props.divider and Element.New {
@@ -62,6 +67,10 @@ function ButtonBar:Init(props)
 	})
 
 	self.on_click = props.on_click
+
+	if self:GetAttribute "fill_color" then
+		self:SetAttribute("text_color", COLOR_BACKGROUND)
+	end
 end
 
 function ButtonBar:OnMousePressed(mouse)

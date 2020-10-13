@@ -12,6 +12,7 @@ MINIGAME.random_player_classes = {
 
 MINIGAME:AddPlayerClass {
 	name = "Hunter",
+	color = COLOR_SKY,
 	can_tag = {Hunted = true},
 	minimum = 1,
 	recruit_on_tag = true
@@ -19,7 +20,6 @@ MINIGAME:AddPlayerClass {
 
 MINIGAME:AddPlayerClass {
 	name = "Hunted",
-	color = COLOR_SKY,
 	end_on_none = true,
 	player_class_on_death = "Hunter"
 }

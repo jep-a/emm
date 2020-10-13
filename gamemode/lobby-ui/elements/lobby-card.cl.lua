@@ -61,12 +61,15 @@ function LobbyCard:Init(lobby)
 			width = LARGE_BUTTON_ICON_SIZE,
 			height = LARGE_BUTTON_ICON_SIZE,
 			padding = 2,
+			inherit_color = false,
 			background_color = lobby.prototype.color,
+			color = COLOR_BACKGROUND,
 
 			Element.New {
 				width_percent = 1,
 				height_percent = 1,
-				material = PNGMaterial("emm2/minigames/"..lobby.prototype.key.."-2x.png")
+				material = PNGMaterial("emm2/minigames/"..lobby.prototype.key.."-2x.png"),
+				color = COLOR_RED
 			}
 		},
 
@@ -116,10 +119,10 @@ function LobbyCard:Init(lobby)
 	end
 
 	self.join = self.switch:Add(ButtonBar.New {
-		background_color = lobby.prototype.color,
-		color = COLOR_WHITE,
 		material = PNGMaterial "emm2/ui/join.png",
 		text = "Join",
+		fill_color = true,
+		color = lobby.prototype.color,
 
 		on_click = function ()
 			local cur_time = CurTime()
@@ -134,10 +137,10 @@ function LobbyCard:Init(lobby)
 	})
 
 	self.leave = self.switch:Add(ButtonBar.New {
-		background_color = lobby.prototype.color,
-		color = COLOR_WHITE,
 		material = PNGMaterial "emm2/ui/leave.png",
 		text = "Leave",
+		fill_color = true,
+		color = lobby.prototype.color,
 
 		on_click = function ()
 			NetService.SendToServer "RequestLobbyLeave"
