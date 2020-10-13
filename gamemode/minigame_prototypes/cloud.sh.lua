@@ -1,11 +1,11 @@
 MINIGAME.name = "Cloud"
 MINIGAME.color = COLOR_ROYAL
-MINIGAME.default_player_class = "Tagger"
+MINIGAME.default_player_class = "Climber"
 MINIGAME.required_players = 1
 
 MINIGAME.random_player_classes = {
 	class_key = "Cloud",
-	rejected_class_key = "Tagger"
+	rejected_class_key = "Climber"
 }
 
 hook.Add("CreateMinigameHookSchemas", "Cloud", function ()
@@ -37,7 +37,7 @@ MINIGAME:AddPlayerClass({
 })
 
 MINIGAME:AddPlayerClass {
-	name = "Tagger"
+	name = "Climber"
 }
 
 if SERVER then
@@ -47,7 +47,7 @@ if SERVER then
 			position = ply:GetPos(),
 			radius = 512,
 			owner_tag = true,
-			can_tag = {Tagger = true},
+			can_tag = {Climber = true},
 			indicator_name = "cloud",
 			model = "models/emm2/cloud.mdl",
 			model_scale = 3.33,
