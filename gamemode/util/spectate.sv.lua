@@ -54,11 +54,6 @@ function SpectateService.Spectate(ply, cmd, args)
 				end
 
 				ply.spectating = true
-
-				ply.spectate_savepoint = SavepointService.CreateSavepoint(ply, {
-					health = true
-				})
-
 				ply.spectate_timeout = CurTime() + 1
 
 				table.insert(target.spectators, ply)
@@ -66,7 +61,10 @@ function SpectateService.Spectate(ply, cmd, args)
 				GhostService.Ghost(ply, {
 					kill = true,
 					ragdoll = true,
-					statue = true
+					statue = true,
+					savepoint = {
+						health = true
+					}
 				})
 
 				ply:SpectateEntity(target)
@@ -74,7 +72,6 @@ function SpectateService.Spectate(ply, cmd, args)
 
 				SpectateService.SendSpectateKeys(target.buttons, ply)
 				StaminaService.SendStamina(ply, target, "airaccel")
-				TrailService.RemoveTrail(ply)
 			end
 		else
 			ply:ChatPrint "Player not found."
@@ -89,27 +86,10 @@ function SpectateService.UnSpectate(ply)
 
 		table.RemoveByValue(ply:GetObserverTarget().spectators, ply)
 
-		TrailService.SetupTrail(ply)
-
 		ply:UnSpectate()
 		ply:Spawn()
 
-		local pos = ply.ghost_ragdoll:GetPos()
-		local vel = ply.ghost_ragdoll:GetVelocity()
-
 		GhostService.UnGhost(ply)
-
-		local trace = util.TraceLine {
-			start = pos,
-			endpos = pos + Vector(0, 0, -38),
-			filter = ply,
-			mask = MASK_PLAYERSOLID
-		}
-
-		SavepointService.LoadSavepoint(ply, ply.spectate_savepoint, {
-			position = trace.HitPos,
-			velocity = vel
-		})
 	end
 end
 concommand.Add("emm_unspectate", SpectateService.UnSpectate)
