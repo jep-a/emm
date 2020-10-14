@@ -18,6 +18,14 @@ function TaggingService.Tag(lobby, taggable, tagger)
 			MinigameService.SwapPlayerClass(taggable, tagger, taggable.player_class.kill_on_tag, taggable.player_class.kill_tagger_on_tag)
 		elseif taggable.player_class.recruit_on_tag then
 			tagger:SetPlayerClass(taggable.player_class)
+		else
+			if taggable.player_class.player_class_on_tag then
+				taggable:SetPlayerClass(lobby.player_classes[taggable.player_class.player_class_on_tag])
+			end
+
+			if taggable.player_class.give_player_class_on_tag then
+				tagger:SetPlayerClass(lobby.player_classes[taggable.player_class.give_player_class_on_tag])
+			end
 		end
 	end
 end
