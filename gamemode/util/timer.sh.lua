@@ -6,14 +6,23 @@ hook.Add("Think", "Timer.CurTime", function ()
 	cur_time = CurTime()
 end)
 
-function Timer:Init(delay, props)
-	props = props or {}
+function Timer:Init(delay, props_or_func)
+	local props
+	local callback
+
+	if istable(props_or_func) then
+		props = props_or_func
+	else isfunction(props_or_func) then
+		callback = props_or_func
+	else
+		props = {}
+	end
 
 	self.counting = true
 	self.start_time = cur_time
 	self.end_time = cur_time + delay
 	self.timeleft = delay
-	self.callback = props.callback
+	self.callback = callback
 end
 
 function Timer:Count()
