@@ -34,3 +34,8 @@ function Timer:Think()
 	self:Count()
 end
 Class.AddHook(Timer, "Think")
+
+function Timer:Finish()
+	self.callback = nil
+	self:DisconnectFromHooks()
+end

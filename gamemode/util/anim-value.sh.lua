@@ -162,6 +162,7 @@ function AnimatableValue:Finish()
 		SettingsService.RemoveHook(self.setting_hook, Class.TableID(self))
 	end
 
+	self.callback = nil
 	self.animations = {}
 	self:DisconnectFromHooks()
 end
