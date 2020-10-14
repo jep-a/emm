@@ -43,4 +43,4 @@ function TriggerService.EndOwnedTriggers(ply)
 		end
 	end
 end
-hook.Add("EndPlayerClass", "TriggerService.EndOwnedTriggers", TriggerService.EndOwnedTriggers)
+hook.Add("FinishPlayerClass", "TriggerService.EndOwnedTriggers", TriggerService.EndOwnedTriggers)

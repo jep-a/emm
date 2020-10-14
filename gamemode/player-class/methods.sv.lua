@@ -23,7 +23,7 @@ function player_metatable:ClearPlayerClass(net)
 
 	table.RemoveByValue(self.lobby[self.player_class.key], self)
 	self.player_class = nil
-	self:EndPlayerClass()
+	self:FinishPlayerClass()
 
 	if net then
 		hook.Run("PlayerClassChange", self, old_class)

@@ -63,6 +63,10 @@ function player_metatable:SetupPlayerClass()
 	self.dynamic_player_class = table.Copy(self.player_class.dynamic_properties)
 	self:SetupCoreProperties()
 
+	if self.StartPlayerClass then
+		self:StartPlayerClass()
+	end
+
 	hook.Run("SetupPlayerClass", self)
 
 	if CLIENT and IsLocalPlayer(self) then
@@ -76,9 +80,13 @@ function player_metatable:SetupPlayerClass()
 	end
 end
 
-function player_metatable:EndPlayerClass()
+function player_metatable:FinishPlayerClass()
 	self.dynamic_player_class_properties = nil
 	self:SetupCoreProperties()
 
-	hook.Run("EndPlayerClass", self)
+	if self.EndPlayerClass then
+		self:EndPlayerClass()
+	end
+
+	hook.Run("FinishPlayerClass", self)
 end
