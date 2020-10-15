@@ -1,5 +1,7 @@
-function MinigameService.CreateLobby(props)
-	local lobby = MinigameLobby.New(props)
+function MinigameService.CreateLobby(props, notify)
+	notify = Default(notify, true)
+
+	local lobby = MinigameLobby.New(props, notify)
 	MinigameService.lobbies[lobby.id] = lobby
 
 	return lobby
@@ -29,7 +31,7 @@ function MinigameService.InitHUDElements()
 end
 hook.Add("InitHUDElements", "MinigameService.InitHUDElements", MinigameService.InitHUDElements)
 
-function MinigameLobby:Init(props)
+function MinigameLobby:Init(props, notify)
 	self.id = props.id
 	self.prototype = props.prototype
 	self.state = props.state
@@ -53,7 +55,7 @@ function MinigameLobby:Init(props)
 
 	self:InitSettings()
 
-	hook.Run("LobbyCreate", self)
+	hook.Run("LobbyCreate", self, notify)
 
 	if self:IsLocal() then
 		hook.Run("LocalLobbyCreate", self)
