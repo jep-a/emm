@@ -370,7 +370,7 @@ function IndicatorService.RenderCoasters()
 		local indicator = indicators[i]
 		local ent = indicator.entity
 
-		if IsValid(ent) then
+		if IsValid(ent) and IsValid(GhostService.Entity(ent)) then
 			local pos = GhostService.Entity(ent):GetPos() + Vector(0, 0, 5)
 
 			local trace = util.TraceLine {
