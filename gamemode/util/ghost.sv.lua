@@ -77,6 +77,10 @@ end
 
 function GhostService.UnGhost(ply)
 	if ply.ghosting then
+		if not ply:Alive() then
+			ply:Spawn()
+		end
+
 		ply.ghosting = false
 		ply.ghost_position = nil
 		ply.ghost_dead = nil

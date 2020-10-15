@@ -11,7 +11,12 @@ function GhostService.Ghost(ply, pos, dead, ragdoll_id)
 	ply.ghost_ragdoll_id = ragdoll_id
 
 	if ragdoll_id then
-		GhostService.queued_ragdolls[ragdoll_id] = ply
+		if IsValid(GhostService.queued_ragdolls[ragdoll_id]) then
+			ply.ghost_ragdoll = GhostService.queued_ragdolls[ragdoll_id]
+			GhostService.queued_ragdolls[ragdoll_id] = nil
+		else
+			GhostService.queued_ragdolls[ragdoll_id] = ply
+		end
 	end
 
 	if IsLocalPlayer(ply) then
@@ -62,6 +67,8 @@ function GhostService.OnEntityCreated(ent)
 			ent.lobby = ply.lobby
 
 			GhostService.queued_ragdolls[i] = nil
+		else
+			GhostService.queued_ragdolls[i] = ent
 		end
 	end
 end
