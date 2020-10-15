@@ -10,11 +10,16 @@ function GravityService.GetDefaultGravity()
 end
 
 function GravityService.InitPlayerProperties(ply)
-	ply.gravity = 300
+	ply.gravity = GravityService.GetDefaultGravity()
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
 	"GravityService.InitPlayerProperties",
+	GravityService.InitPlayerProperties
+)
+hook.Add(
+	"InitPlayerClassProperties",
+	"GravityService.InitPlayerClassProperties",
 	GravityService.InitPlayerProperties
 )
 

@@ -10,11 +10,16 @@ function FrictionService.GetDefaultFriction()
 end
 
 function FrictionService.InitPlayerProperties(ply)
-	ply.friction = GetConVar "emm_friction":GetFloat()
+	ply.friction = FrictionService.GetDefaultFriction()
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
 	"FrictionService.InitPlayerProperties",
+	FrictionService.InitPlayerProperties
+)
+hook.Add(
+	"InitPlayerClassProperties",
+	"FrictionService.InitPlayerClassProperties",
 	FrictionService.InitPlayerProperties
 )
 

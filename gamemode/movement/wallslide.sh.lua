@@ -27,6 +27,11 @@ hook.Add(
 	"WallslideService.InitPlayerProperties",
 	WallslideService.InitPlayerProperties
 )
+hook.Add(
+	"InitPlayerClassProperties",
+	"WallslideService.InitPlayerClassProperties",
+	WallslideService.InitPlayerProperties
+)
 
 function WallslideService.SetupStamina(ply)
 	ply.stamina.wallslide = ply.stamina.wallslide or StaminaService.CreateStaminaType()

@@ -8,6 +8,11 @@ function TaggingService.InitPlayerProperties(ply)
 end
 hook.Add("InitPlayerProperties", "TaggingService.InitPlayerProperties", TaggingService.InitPlayerProperties)
 
+function TaggingService.InitPlayerClassProperties(ply_class)
+	ply_class.can_tag = {}
+end
+hook.Add("InitPlayerClassProperties", "TaggingService.InitPlayerClassProperties", TaggingService.InitPlayerClassProperties)
+
 function TaggingService.Tag(lobby, taggable, tagger)
 	taggable.last_tag_time = CurTime()
 	tagger.last_tag_time = CurTime()

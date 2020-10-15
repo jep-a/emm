@@ -20,6 +20,7 @@ EMM.Include {
 	"util/spectate",
 	"util/trail",
 	"util/trigger",
+	"util/tagging",
 	"util/ghost",
 	"util/sound-isolation",
 
@@ -45,7 +46,6 @@ EMM.Include {
 	"minigame/net",
 	"minigame/states",
 	"minigame/settings",
-	"minigame/tagging",
 	"minigame/util",
 
 	"element/element",

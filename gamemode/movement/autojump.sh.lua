@@ -12,12 +12,13 @@ hook.Add(
 	"AutoJumpService.InitPlayerProperties",
 	AutoJumpService.InitPlayerProperties
 )
+-- hook.Add("InitPlayerClassProperties", "AutoJumpService.InitPlayerClassProperties", AutoJumpService.InitPlayerProperties)
 
 
 -- # Autojump
 
 function AutoJumpService.AutoJump(ply, move)
-	if 	
+	if
 		ply.can_autojump and
 		(move:KeyDown(IN_JUMP) or ply.force_autojump) and
 		ply:IsOnGround()
