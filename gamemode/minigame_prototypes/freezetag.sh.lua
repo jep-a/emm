@@ -38,5 +38,11 @@ if SERVER then
 			statue = true,
 			savepoint = true
 		})
+
+		self.frozen_timer = Timer.New(30, function ()
+			self:SetPlayerClass(MINIGAME.player_classes.Hunter)
+		end)
+
+		PlayerClassService.AddLifecycleObject(self, self.frozen_timer)
 	end
 end
