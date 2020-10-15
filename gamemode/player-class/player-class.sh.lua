@@ -21,6 +21,7 @@ function PlayerClassService.CreatePlayerClass(props, dynamic_props)
 		has_infinite_wallslide = false,
 		has_infinite_airaccel = false,
 
+		can_tag = {},
 		can_damage = {},
 		weapons = {},
 
@@ -32,6 +33,10 @@ function PlayerClassService.CreatePlayerClass(props, dynamic_props)
 	ply_class.dynamic_properties = dynamic_props
 
 	return ply_class
+end
+
+function PlayerClassService.AddLifecycleObject(ply, object)
+	table.insert(ply.player_class_objects, object)
 end
 
 function PlayerClassService.MinigamePlayerClass(ply, id_or_key)

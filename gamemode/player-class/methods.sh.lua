@@ -60,7 +60,8 @@ function player_metatable:HasPlayerClass()
 end
 
 function player_metatable:SetupPlayerClass()
-	self.dynamic_player_class = table.Copy(self.player_class.dynamic_properties)
+	self.dynamic_player_class = table.Copy(self.player_class.dynamic_properties) or {}
+	self.player_class_objects = {}
 	self:SetupCoreProperties()
 
 	if self.StartPlayerClass then
@@ -81,7 +82,18 @@ function player_metatable:SetupPlayerClass()
 end
 
 function player_metatable:FinishPlayerClass()
-	self.dynamic_player_class_properties = nil
+	if self.player_class_objects then
+		for _, object in pairs (self.player_class_objects) do
+			if object.Finish then
+				object:Finish()
+			elseif object.Remove then
+				object:Remove()
+			end
+		end
+	end
+
+	self.dynamic_player_class = nil
+	self.player_class_objects = nil
 	self:SetupCoreProperties()
 
 	if self.EndPlayerClass then
