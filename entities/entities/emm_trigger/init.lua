@@ -6,6 +6,7 @@ function ENT:Initialize()
 	local ang = self.angle
 	local lobby = self.lobby
 
+	self.tagging = {}
 	self.can_tag_tables = {}
 
 	self:SetPos(self.position)
@@ -84,6 +85,19 @@ function ENT:Think()
 				self.can_tag[ent.player_class.key]
 			then
 				hook.Run("TriggerStartTouch", self, ent)
+			end
+		end
+
+		local tagging = self.owner_tag and self:GetOwner().tagging or self.tagging
+		local tagging_len = #tagging
+
+		if tagging_len > 0 then
+			for i = tagging_len, 1, -1 do
+				local ent = tagging[i]
+
+				if not table.HasValue(ents, ent) then
+					table.remove(tagging, i)
+				end
 			end
 		end
 	end

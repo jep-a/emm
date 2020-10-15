@@ -4,6 +4,7 @@ function TaggingService.InitPlayerProperties(ply)
 	ply.taggable = true
 	ply.taggable_radius = 80
 	ply.taggable_cooldown = 1
+	ply.tagging = {}
 	ply.last_tag_time = 0
 end
 hook.Add("InitPlayerProperties", "TaggingService.InitPlayerProperties", TaggingService.InitPlayerProperties)
@@ -14,23 +15,27 @@ end
 hook.Add("InitPlayerClassProperties", "TaggingService.InitPlayerClassProperties", TaggingService.InitPlayerClassProperties)
 
 function TaggingService.Tag(lobby, taggable, tagger)
-	taggable.last_tag_time = CurTime()
-	tagger.last_tag_time = CurTime()
+	if not table.HasValue(taggable.tagging, tagger) then
+		table.insert(taggable.tagging, tagger)
 
-	MinigameService.CallNetHook(taggable.lobby, "Tag", taggable, tagger)
+		taggable.last_tag_time = CurTime()
+		tagger.last_tag_time = CurTime()
 
-	if taggable.player_class then
-		if taggable.player_class.swap_on_tag then
-			MinigameService.SwapPlayerClass(taggable, tagger, taggable.player_class.kill_on_tag, taggable.player_class.kill_tagger_on_tag)
-		elseif taggable.player_class.recruit_on_tag then
-			tagger:SetPlayerClass(taggable.player_class)
-		else
-			if taggable.player_class.player_class_on_tag then
-				taggable:SetPlayerClass(lobby.player_classes[taggable.player_class.player_class_on_tag])
-			end
+		MinigameService.CallNetHook(taggable.lobby, "Tag", taggable, tagger)
 
-			if taggable.player_class.give_player_class_on_tag then
-				tagger:SetPlayerClass(lobby.player_classes[taggable.player_class.give_player_class_on_tag])
+		if taggable.player_class then
+			if taggable.player_class.swap_on_tag then
+				MinigameService.SwapPlayerClass(taggable, tagger, taggable.player_class.kill_on_tag, taggable.player_class.kill_tagger_on_tag)
+			elseif taggable.player_class.recruit_on_tag then
+				tagger:SetPlayerClass(taggable.player_class)
+			else
+				if taggable.player_class.player_class_on_tag then
+					taggable:SetPlayerClass(lobby.player_classes[taggable.player_class.player_class_on_tag])
+				end
+
+				if taggable.player_class.give_player_class_on_tag then
+					tagger:SetPlayerClass(lobby.player_classes[taggable.player_class.give_player_class_on_tag])
+				end
 			end
 		end
 	end
@@ -62,6 +67,19 @@ function TaggingService.Think()
 							CurTime() > ((ent.last_tag_time or 0) + (ent.taggable_cooldown or 1))
 						then
 							TaggingService.Tag(taggable.lobby, taggable, ent)
+						end
+					end
+				end
+
+				local tagging = taggable.tagging
+				local tagging_len = #tagging
+
+				if tagging_len > 0 then
+					for __i = tagging_len, 1, -1 do
+						local ent = tagging[__i]
+
+						if not table.HasValue(ents, ent) then
+							table.remove(tagging, __i)
 						end
 					end
 				end
