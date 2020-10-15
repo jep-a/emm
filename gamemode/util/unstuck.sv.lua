@@ -63,8 +63,6 @@ function UnstuckService.GetClearTiles(ply, pos, tiles)
 		end
 	end
 
-	PrintTable(clear_tiles)
-
 	return clear_tiles
 end
 
