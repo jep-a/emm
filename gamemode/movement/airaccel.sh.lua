@@ -5,16 +5,19 @@ AiraccelService = AiraccelService or {}
 
 CreateConVar("emm_airaccelerate", 10, FCVAR_REPLICATED, "Air acceleration")
 
-function AiraccelService.InitPlayerProperties(ply)
+function AiraccelService.InitPlayerProperties(ply, ply_class)
 	ply.can_airaccel = true
 	ply.has_infinite_airaccel = false
-	ply.airaccel_regen_step = 0.1
-	ply.airaccel_decay_step = 0.1
-	ply.airaccel_cooldown = 2
-	ply.airaccel_velocity_cost = 0.01
-	ply.airaccel_boost_velocity = 10000
-	ply.airaccel_sound = "player/suit_sprint.wav"
 	ply.air_accelerate = AiraccelService.GetDefaultAiraccel()
+
+	if not ply_class then
+		ply.airaccel_regen_step = 0.1
+		ply.airaccel_decay_step = 0.1
+		ply.airaccel_cooldown = 2
+		ply.airaccel_velocity_cost = 0.01
+		ply.airaccel_boost_velocity = 10000
+		ply.airaccel_sound = "player/suit_sprint.wav"
+	end
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",

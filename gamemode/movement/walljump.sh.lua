@@ -3,15 +3,20 @@ WalljumpService = WalljumpService or {}
 
 -- # Properties
 
-function WalljumpService.InitPlayerProperties(ply)
+function WalljumpService.InitPlayerProperties(ply, ply_class)
 	ply.can_walljump = true
 	ply.can_walljump_sky = false
-	ply.walljump_delay = 0.2
-	ply.walljump_distance = 30
-	ply.walljump_velocity_multiplier = 260
-	ply.walljump_up_velocity = 200
-	ply.walljump_sound = "npc/footsteps/hardboot_generic"
-	ply.last_walljump_time = 0
+
+	if not ply_class then
+		ply.last_wallslide_time = 0
+		ply.last_wallslide_effect_time = 0
+		ply.walljump_delay = 0.2
+		ply.walljump_distance = 30
+		ply.walljump_velocity_multiplier = 260
+		ply.walljump_up_velocity = 200
+		ply.walljump_sound = "npc/footsteps/hardboot_generic"
+		ply.last_walljump_time = 0
+	end
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
