@@ -1,18 +1,13 @@
 Timer = Timer or Class.New()
 
-local cur_time = 0
-
-hook.Add("Think", "Timer.CurTime", function ()
-	cur_time = CurTime()
-end)
-
 function Timer:Init(delay, props_or_func)
 	local props
 	local callback
+	local cur_time = CurTime()
 
 	if istable(props_or_func) then
 		props = props_or_func
-	else isfunction(props_or_func) then
+	elseif isfunction(props_or_func) then
 		callback = props_or_func
 	else
 		props = {}
@@ -26,6 +21,8 @@ function Timer:Init(delay, props_or_func)
 end
 
 function Timer:Count()
+	local cur_time = CurTime()
+
 	if cur_time > self.end_time then
 		if self.callback then
 			self.callback(self)
