@@ -10,6 +10,7 @@ hook.Add("InitPlayerProperties", "TaggingService.InitPlayerProperties", TaggingS
 
 function TaggingService.Tag(lobby, taggable, tagger)
 	taggable.last_tag_time = CurTime()
+	tagger.last_tag_time = CurTime()
 
 	MinigameService.CallNetHook(taggable.lobby, "Tag", taggable, tagger)
 
@@ -52,7 +53,8 @@ function TaggingService.Think()
 							GhostService.Alive(ent) and
 							MinigameService.IsSharingLobby(taggable, ent) and
 							ent.player_class and
-							taggable.player_class.can_tag[ent.player_class.key]
+							taggable.player_class.can_tag[ent.player_class.key] and
+							CurTime() > ((ent.last_tag_time or 0) + (ent.taggable_cooldown or 1))
 						then
 							TaggingService.Tag(taggable.lobby, taggable, ent)
 						end
