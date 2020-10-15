@@ -246,14 +246,8 @@ function AnimatableValue:Animate()
 	end
 end
 
-local cur_time = 0
-
-hook.Add("Think", "AnimatableValue.CurTime", function ()
-	cur_time = CurTime()
-end)
-
 function AnimatableValue:DetectChanges()
-	if cur_time > (self.last_change_time + self.debounce_time) and self.last_change ~= self.current then
+	if CurTime() > (self.last_change_time + self.debounce_time) and self.last_change ~= self.current then
 		self.debounce = self.current
 
 		if self.callback then
