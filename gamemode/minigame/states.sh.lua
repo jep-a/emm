@@ -8,6 +8,10 @@ function MinigameStateService.State(lobby, k_or_id)
 	end
 end
 
+function MinigameStateService.AddLifecycleObject(lobby, object)
+	table.insert(lobby.state_objects, object)
+end
+
 function MinigamePrototype:CanRestart()
 	return self.prototype.key ~= "Miscellaneous" and self.state == self.states.Playing or self.state == self.states.Starting
 end
@@ -23,21 +27,21 @@ function MinigamePrototype:AddDefaultStates()
 		name = "Waiting",
 		next = "Starting"
 	}
-	
+
 	self:AddState {
 		name = "Starting",
 		time = 5,
 		next = "Playing",
 		notify_countdown = true
 	}
-	
+
 	self:AddState {
 		name = "Playing",
 		next = "Ending",
 		notify_countdown = true,
 		notify_countdown_text = ""
 	}
-	
+
 	self:AddState {
 		name = "Ending",
 		time = 5,
@@ -45,4 +49,16 @@ function MinigamePrototype:AddDefaultStates()
 		notify_countdown = true,
 		notify_countdown_text = "restarting in"
 	}
+end
+
+function MinigamePrototype:EndState()
+	for _, object in pairs(self.state_objects) do
+		if object.Finish then
+			object:Finish()
+		elseif object.Remove then
+			object:Remove()
+		end
+	end
+
+	self.state_objects = {}
 end

@@ -14,6 +14,8 @@ function MinigameLobby:SetState(state)
 
 	if old_state and old_state.time then
 		MinigameStateService.EndStateTimer(self)
+		MinigameService.CallHook(self, "EndState", old_state, state)
+		MinigameService.CallHook(self, "EndState"..state.name, old_state, state)
 	end
 
 	self.state = state
