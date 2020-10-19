@@ -83,7 +83,7 @@ end
 
 function player_metatable:FinishPlayerClass()
 	if self.player_class_objects then
-		for _, object in pairs (self.player_class_objects) do
+		for _, object in pairs(self.player_class_objects) do
 			if object.Finish then
 				object:Finish()
 			elseif object.Remove then
