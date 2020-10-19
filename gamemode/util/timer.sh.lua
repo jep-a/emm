@@ -20,6 +20,14 @@ function Timer:Init(delay, props_or_func)
 	self.callback = callback
 end
 
+function Timer:Pause()
+	self.counting = false
+end
+
+function Timer:Resume()
+	self.counting = true
+end
+
 function Timer:Count()
 	local cur_time = CurTime()
 
