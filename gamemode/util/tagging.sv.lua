@@ -11,6 +11,7 @@ hook.Add("InitPlayerProperties", "TaggingService.InitPlayerProperties", TaggingS
 
 function TaggingService.InitPlayerClassProperties(ply_class)
 	ply_class.can_tag = {}
+	ply_class.notify_on_tag = true
 end
 hook.Add("InitPlayerClassProperties", "TaggingService.InitPlayerClassProperties", TaggingService.InitPlayerClassProperties)
 
@@ -28,6 +29,7 @@ function TaggingService.Tag(lobby, taggable, tagger)
 		end
 
 		MinigameService.CallNetHook(taggable.lobby, "Tag", taggable, tagger)
+		MinigameService.CallHook(taggable.lobby, taggable_ply_class.key.."Tag", taggable, tagger)
 
 		if taggable_ply_class.swap_on_tag then
 			MinigameService.SwapPlayerClass(taggable, tagger, taggable_ply_class.kill_on_tag, taggable_ply_class.kill_tagger_on_tag)
@@ -50,6 +52,7 @@ function TaggingService.EndTag(lobby, taggable, tagger)
 		table.RemoveByValue(taggable.tagging, tagger)
 
 		MinigameService.CallNetHook(taggable.lobby, "EndTag", taggable, tagger)
+		MinigameService.CallHook(taggable.lobby, taggable.player_class.key.."EndTag", taggable, tagger)
 
 		local taggable_ply_class = taggable.player_class
 

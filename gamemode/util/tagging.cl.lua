@@ -1,4 +1,12 @@
 hook.Add("CreateMinigameHooks", "TaggingService", function (proto)
+	proto:AddHook("Tag", "TaggingService.Tag", function (self, taggable, tagger)
+		MinigameService.CallHook(self, taggable.player_class.key.."Tag", taggable, tagger)
+	end)
+
+	proto:AddHook("EndTag", "TaggingService.EndTag", function (self, taggable, tagger)
+		MinigameService.CallHook(self, taggable.player_class.key.."EndTag", taggable, tagger)
+	end)
+
 	proto:AddHookNotification("Tag", function (self, involves_local_ply, taggable, tagger)
 		local taggable_is_victim = taggable.tag_victim
 		local tag_word = taggable.tag_word or "tagged"
