@@ -29,15 +29,15 @@ function NotificationService.PushSideText(text)
 	end
 end
 
-function NotificationService.PushText(text)
+function NotificationService.PushText(text, key)
 	if NotificationService.Visible() then
-		return HUDService.quadrant_b:Add(NotificationContainer.New(TextBar.New(text)))
+		return HUDService.quadrant_b:Add(NotificationContainer.New(TextBar.New(text), nil, key))
 	end
 end
 
-function NotificationService.PushAvatarText(ply, text)
+function NotificationService.PushAvatarText(ply, text, key)
 	if NotificationService.Visible() then
-		return HUDService.quadrant_b:Add(NotificationContainer.New(AvatarNotification.New(ply, text)))
+		return HUDService.quadrant_b:Add(NotificationContainer.New(AvatarNotification.New(ply, text), nil, key))
 	end
 end
 
