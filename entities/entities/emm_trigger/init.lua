@@ -6,8 +6,10 @@ function ENT:Initialize()
 	local ang = self.angle
 	local lobby = self.lobby
 
-	self.tagging = {}
 	self.can_tag_tables = {}
+	self.taggable = true
+	self.tagging = {}
+	self.last_tag_time = CurTime()
 
 	self:SetPos(self.position)
 	self:SetRadius(self.radius or 0)
@@ -76,14 +78,7 @@ function ENT:Think()
 		for i = 1, #ents do
 			local ent = ents[i]
 
-			if
-				self ~= ent and
-				ent:IsPlayer() and
-				GhostService.Alive(ent) and
-				MinigameService.IsSharingLobby(self, ent) and
-				ent.player_class and
-				self.can_tag[ent.player_class.key]
-			then
+			if TaggingService.Taggable(self, ent) then
 				hook.Run("TriggerStartTouch", self, ent)
 			end
 		end
@@ -96,7 +91,7 @@ function ENT:Think()
 				local ent = tagging[i]
 
 				if not table.HasValue(ents, ent) then
-					table.remove(tagging, i)
+					hook.Run("TriggerEndTouch", self, ent)
 				end
 			end
 		end
