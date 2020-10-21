@@ -7,6 +7,7 @@ EMM.Include {
 	"util/variables",
 	"util/util",
 	"util/palette",
+	"util/circles",
 	"util/class",
 	"util/cubic-bezier",
 	"util/timer",

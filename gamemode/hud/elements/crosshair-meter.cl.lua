@@ -46,6 +46,10 @@ function CrosshairMeter:Init(props)
 	self.line_thickness = AnimatableValue.New(props.line_thickness or HUD_LINE_THICKNESS)
 	self.arc_length = props.arc_length and AnimatableValue.New(props.arc_length) or AnimatableValue.NewFromSetting "crosshair_meter_arc_length"
 
+	self.circle = Circles.New(CIRCLE_OUTLINED, self.radius.current, 0, 0, self.line_thickness.current)
+	self.circle:SetDistance(10)
+	self.circle:Rotate(self.angle.current - 270)
+
 	if props.show_value then
 		local origin_x, origin_y = self:CalculateValueTextPosition()
 		local pos_justify_x, pos_justify_y = self:CalculateValueTextJustification()
@@ -125,7 +129,7 @@ function CrosshairMeter:CalculateValueTextJustification()
 	else
 		pos_justify_y = JUSTIFY_CENTER
 	end
-	
+
 	return pos_justify_x, pos_justify_y
 end
 
@@ -188,49 +192,25 @@ function CrosshairMeter:OnValueChanged(v)
 end
 
 function CrosshairMeter:Paint()
+	local circle = self.circle
 	local attr = self.attributes
 	local half_w = attr.width.current/2
 	local half_h = attr.height.current/2
 
 	local radius = self.radius.current
-	local quality = math.Remap(radius, 64, 980, 1200, 3600)
-	local padding = quality/360
-	
-	local arc = self.arc_length.current
-	local half_arc = arc/2
+	local half_arc = self.arc_length.current/2
+	local arc_percent = half_arc * self.percent.smooth
 
-	local ang = self.angle.current + 90 - half_arc
-	
 	draw.NoTexture()
+	surface.SetDrawColor(self.attributes.background_color.current)
 
-	render.ClearStencil()
-	render.SetStencilEnable(true)
-	render.SetStencilTestMask(255)
-	render.SetStencilWriteMask(255)
-	render.SetStencilReferenceValue(1)
-
-	render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_NEVER)
-	render.SetStencilPassOperation(STENCILOPERATION_REPLACE)
-	render.SetStencilFailOperation(STENCILOPERATION_REPLACE)
-	render.SetStencilZFailOperation(STENCILOPERATION_REPLACE)
-
-	surface.SetDrawColor(COLOR_WHITE)
-	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, radius - self.line_thickness.current, arc + (padding * 2), ang - padding, quality))
-
-	render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_NOTEQUAL)
-	render.SetStencilPassOperation(STENCILOPERATION_KEEP)
-	render.SetStencilFailOperation(STENCILOPERATION_KEEP)
-	render.SetStencilZFailOperation(STENCILOPERATION_KEEP)
-
-	local percent = self.percent.smooth * arc
-
-	if 1 > math.Round(self.percent.smooth, 4) then
-		surface.SetDrawColor(self.attributes.background_color.current)
-		surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, radius, arc, ang, quality))
-	end
+	circle:SetRadius(radius)
+	circle:SetPos(half_w, half_h)
+	circle:SetAngles(-half_arc, half_arc)
+	circle()
 
 	surface.SetDrawColor(self:GetColor())
-	surface.DrawPoly(GenerateSurfaceCircle(half_w, half_h, radius, percent, ang + half_arc - (percent/2), quality))
 
-	render.SetStencilEnable(false)
+	circle:SetAngles(-arc_percent, arc_percent)
+	circle()
 end
