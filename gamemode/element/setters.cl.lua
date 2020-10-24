@@ -1,7 +1,9 @@
 Element.setters = {
 	duration = function (self, static_attr, attr, v)
-		static_attr.duration = v
-		static_attr.start_time = CurTime()
+		if v > 0 then
+			static_attr.duration = v
+			static_attr.start_time = CurTime()
+		end
 	end,
 
 	layout = function (self, static_attr, attr, v)

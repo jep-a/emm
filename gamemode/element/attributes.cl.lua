@@ -115,13 +115,13 @@ function Element:InitAttributes()
 	}
 
 	self.optional_attributes = {}
-	
+
 	for _, k in pairs(optional_attributes) do
 		self.optional_attributes[k] = true
 	end
-	
+
 	self.layout_invalidators = {}
-	
+
 	for _, k in pairs(layout_invalidators) do
 		self.layout_invalidators[k] = true
 	end
@@ -159,7 +159,7 @@ end
 
 function Element:SetText(text)
 	text = tostring(text)
-	
+
 	local old_text = self.panel.text:GetText()
 
 	if text ~= old_text then
@@ -238,18 +238,20 @@ function Element:SetAttribute(k, v, no_layout)
 end
 
 function Element:SetAttributes(attr)
-	for k, v in pairs(attr) do
-		self:SetAttribute(k, v, true)
-	end
+	if attr then
+		for k, v in pairs(attr) do
+			self:SetAttribute(k, v, true)
+		end
 
-	if not self.laying_out then
-		self:Layout()
+		if not self.laying_out then
+			self:Layout()
+		end
 	end
 end
 
 function Element:GetColor()
 	local color
-	
+
 	local parent = self.parent
 
 	if self.static_attributes.inherit_color and parent then
