@@ -37,7 +37,7 @@ function SavepointService.LoadSavepoint(ply, savepoint, options)
 	local pos = options.position or savepoint.position
 
 	ply:SetPos(pos)
-	ply:SetVelocity(options.velocity or -ply:GetVelocity() + savepoint.velocity)
+	ply:SetVelocity(-ply:GetVelocity() + (options.velocity or savepoint.velocity))
 	ply:SetEyeAngles(options.angle or savepoint.angle)
 
 	if options.angle or savepoint.health then
