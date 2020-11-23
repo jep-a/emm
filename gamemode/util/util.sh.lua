@@ -25,6 +25,22 @@ function Default(...)
 	return final_v
 end
 
+function Property(table, key, default, collect)
+	if table then
+		local v = not Nily(table[key]) and table[key] or default
+
+		if collect then
+			table[key] = nil
+		elseif Nily(table[key]) then
+			table[key] = v
+		end
+
+		return v
+	else
+		return default
+	end
+end
+
 function RemapClamp(n, in_min, in_max, out_min, out_max)
 	return math.Remap(math.Clamp(n, in_min, in_max), in_min, in_max, out_min, out_max)
 end
