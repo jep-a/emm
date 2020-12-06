@@ -8,8 +8,11 @@ function MinigameStateService.State(lobby, k_or_id)
 	end
 end
 
-function MinigameStateService.AddLifecycleObject(lobby, object)
-	table.insert(lobby.state_objects, object)
+function MinigameStateService.AddLifecycleObject(lobby, object, callback)
+	table.insert(lobby.state_objects, {
+		object = object,
+		callback = callback
+	})
 end
 
 function MinigamePrototype:CanRestart()
@@ -53,10 +56,16 @@ end
 
 function MinigamePrototype:EndState()
 	for _, object in pairs(self.state_objects) do
-		if object.Finish then
-			object:Finish()
-		elseif object.Remove then
-			object:Remove()
+		local instance = object.instance
+
+		if object.callback then
+			object.callback()
+		end
+
+		if instance.Finish then
+			instance:Finish()
+		elseif instance.Remove then
+			instance:Remove()
 		end
 	end
 

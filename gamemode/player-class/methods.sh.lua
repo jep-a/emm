@@ -84,10 +84,16 @@ end
 function player_metatable:FinishPlayerClass()
 	if self.player_class_objects then
 		for _, object in pairs(self.player_class_objects) do
-			if object.Finish then
-				object:Finish()
-			elseif object.Remove then
-				object:Remove()
+			local instance = object.object
+
+			if object.callback then
+				object.callback()
+			end
+
+			if instance.Finish then
+				instance:Finish()
+			elseif instance.Remove then
+				instance:Remove()
 			end
 		end
 	end

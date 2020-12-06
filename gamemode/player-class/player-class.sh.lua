@@ -24,8 +24,11 @@ function PlayerClassService.CreatePlayerClass(props, dynamic_props)
 	return ply_class
 end
 
-function PlayerClassService.AddLifecycleObject(ply, object)
-	table.insert(ply.player_class_objects, object)
+function PlayerClassService.AddLifecycleObject(ply, object, callback)
+	table.insert(ply.player_class_objects, {
+		object = object,
+		callback = callback
+	})
 end
 
 function PlayerClassService.MinigamePlayerClass(ply, id_or_key)
