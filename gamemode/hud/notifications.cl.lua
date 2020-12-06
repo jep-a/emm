@@ -22,42 +22,73 @@ end
 
 function NotificationService.PushSideText(text)
 	if NotificationService.Visible() then
-		return HUDService.quadrant_c:Add(NotificationContainer.New(TextBar.New(text, {
-			padding = 0,
-			fill_color = false
-		})))
+		return NotificationContainer.New("c", {
+			key = key,
+			notification = TextBar.New(text, {
+				padding = 0,
+				fill_color = false
+			})
+		})
 	end
 end
 
 function NotificationService.PushText(text, key)
 	if NotificationService.Visible() then
-		return HUDService.quadrant_b:Add(NotificationContainer.New(TextBar.New(text), nil, key))
+		return NotificationContainer.New("b", {
+			key = key,
+			notification = TextBar.New(text)
+		})
 	end
 end
 
 function NotificationService.PushAvatarText(ply, text, key)
 	if NotificationService.Visible() then
-		return HUDService.quadrant_b:Add(NotificationContainer.New(AvatarNotification.New(ply, text), nil, key))
+		return NotificationContainer.New("b", {
+			key = key,
+			notification = AvatarNotification.New(ply, text)
+		})
 	end
 end
 
-function NotificationService.PushCountdown(time, text, key)
+function NotificationService.PushCountdown(time, text, key, i)
 	if NotificationService.Visible() then
-		return HUDService.quadrant_b:Add(NotificationContainer.New(CountdownNotification.New(time, text), time - CurTime(), key))
+		return NotificationContainer.New("a", {
+			key = key,
+			index = i,
+			notification = CountdownNotification.New(time, text),
+			duration = time - CurTime()
+		})
+	end
+end
+
+function NotificationService.PushMeter(props, key, i)
+	if NotificationService.Visible() then
+		return NotificationContainer.New("b", {
+			key = key,
+			index = i,
+			duration = 0,
+			meter = HUDMeter.New(table.Merge({
+				width_percent = 1,
+				top_layout = true,
+				padding_bottom = MARGIN * 4,
+				value_text_func = math.ceil
+			}, props)),
+			fill_x = false,
+			width_percent = HUD_METER_SIZE,
+			layout_justification_x = JUSTIFY_CENTER,
+			child_margin = MARGIN * 4
+		})
 	end
 end
 
 function NotificationService.PushMetaText(text, key, i)
 	if NotificationService.Visible() then
-		local notification = NotificationContainer.New(TextBar.New(text), 0, key)
-
-		if i then
-			HUDService.quadrant_a:Add(i, notification)
-		else
-			HUDService.quadrant_a:Add(notification)
-		end
-
-		return notification
+		return NotificationContainer.New("a", {
+			key = key,
+			index = i,
+			duration = 0,
+			notification = TextBar.New(text)
+		})
 	end
 end
 

@@ -1,16 +1,19 @@
 NotificationContainer = NotificationContainer or Class.New(Element)
 
-function NotificationContainer:Init(children, duration, key)
-	duration = duration or 3
-
-	if duration == 0 then
-		duration = nil
-	end
+function NotificationContainer:Init(quadrant_or_props, props)
+	local quadrant = isstring(quadrant_or_props) and quadrant_or_props
+	local props = istable(quadrant_or_props) and quadrant_or_props or props
 
 	NotificationContainer.super.Init(self, {
-		duration = duration,
+		layout_direction = DIRECTION_COLUMN,
 		fit = true
 	})
+
+	local key = Property(props, "key", nil, true)
+	local index = Property(props, "index", nil, true)
+	local flash = Property(props, "flash", true, true)
+	local animate = Property(props, "animate", true, true)
+	Property(props, "duration", 3)
 
 	if key then
 		self.key = key
@@ -20,20 +23,27 @@ function NotificationContainer:Init(children, duration, key)
 		if old_notif then
 			old_notif:Finish()
 		end
-	
+
 		NotificationService.stickies[key] = self
 	end
 
-	if Class.InstanceOf(children, Element) then 
-		self:Add(children)
-	else
-		for _, child in pairs(children) do
-			self:Add(child)
+	self:SetAttributes(props)
+
+	if quadrant then
+		if index then
+			HUDService["quadrant_"..quadrant]:Add(index, self)
+		else
+			HUDService["quadrant_"..quadrant]:Add(self)
 		end
 	end
 
-	self:Add(NotificationService.CreateFlash())
-	self:AnimateStart()
+	if flash then
+		self:Add(NotificationService.CreateFlash())
+	end
+
+	if animate then
+		self:AnimateStart()
+	end
 end
 
 function NotificationContainer:AnimateStart()
@@ -91,34 +101,31 @@ CountdownNotification = CountdownNotification or Class.New(Element)
 
 function CountdownNotification:Init(end_time, text)
 	CountdownNotification.super.Init(self, {
-		width = BAR_WIDTH,
-		fit_y = true
+		fit = true
 	})
 
 	self.end_time = end_time
 
 	if text and #text > 0 then
-		self:Add(TextBar.New(text, {
-			width = BAR_WIDTH,
-			fit_x = false,
-			fit_y = true
-		}))
+		self:Add(TextBar.New(text))
 	end
 
 	self.time = self:Add(TextBar.New(nil, {
-		width = BAR_WIDTH,
-		padding_y = MARGIN * 2,
-		fit_x = false,
-		fit_y = true,
-		fill_color = true,
-		font = "HUDMeterValue"
+		background_color = COLOR_GRAY,
+		fill_color = false,
+		text_color = false,
+		font = "Countdown"
 	}))
 
-	if text then
+	if text and #text > 0 then
 		self.time:SetAttributes {
-			background_color = COLOR_GRAY,
-			fill_color = false,
-			text_color = false
+			font = "TextBarSecondary"
+		}
+	else
+		self.time:SetAttributes {
+			padding_top = MARGIN * 1.5,
+			padding_bottom = MARGIN * 2,
+			padding_x = MARGIN * 4
 		}
 	end
 end

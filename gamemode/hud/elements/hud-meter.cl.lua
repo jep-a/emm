@@ -2,7 +2,10 @@
 
 HUDMeter = HUDMeter or Class.New(Element)
 
-function HUDMeter:Init(quadrant, props)
+function HUDMeter:Init(quadrant_or_props, props)
+	local quadrant = isstring(quadrant_or_props) and quadrant_or_props
+	local props = istable(quadrant_or_props) and quadrant_or_props or props
+
 	HUDMeter.super.Init(self, {
 		layout_justification_x = JUSTIFY_CENTER,
 		layout_justification_y = JUSTIFY_START,
@@ -13,11 +16,14 @@ function HUDMeter:Init(quadrant, props)
 		child_margin = MARGIN * 4
 	})
 
+	self:SetAttributes(props)
+
 	self.value_func = props.value_func
 	self.bar_value_func = props.bar_value_func
 	self.value_divider = props.value_divider or 100
 	self.hide_value_on_empty = props.hide_value_on_empty
 	self.hide_value_on_full = props.hide_value_on_full
+	self.value_text_func = props.value_text_func
 
 	local init_v = self.value_func()
 
@@ -27,10 +33,19 @@ function HUDMeter:Init(quadrant, props)
 		end
 	})
 
-	HUDService["quadrant_"..quadrant]:Add(self)
+	if quadrant then
+		HUDService["quadrant_"..quadrant]:Add(self)
+	end
+
+	local init_percent = init_v/self.value_divider
+
+	self.bar = self:Add(2, MeterBar.New {
+		percent = init_percent,
+		height = props.line_thickness or HUD_LINE_THICKNESS
+	})
 
 	if props.show_value then
-		self.value_text_container = self:Add(Element.New {
+		self.value_text_container = self:Add(props.top_layout and 3 or 1, Element.New {
 			fit = true,
 			wrap = false,
 			child_margin = 2,
@@ -52,7 +67,7 @@ function HUDMeter:Init(quadrant, props)
 				font = "HUDMeterValueSmall"
 			})
 		end
-	
+
 		if props.units then
 			self.value_text_container:Add(Element.New {
 				self_adjacent_justification = JUSTIFY_END,
@@ -65,16 +80,9 @@ function HUDMeter:Init(quadrant, props)
 		end
 	end
 
-	local init_percent = init_v/self.value_divider
-
-	self.bar = self:Add(MeterBar.New {
-		percent = init_percent,
-		height = props.line_thickness or HUD_LINE_THICKNESS
-	})
-
 	self:OnValueChanged(self.debounced_value)
 
-	self:Add(Element.New {
+	self:Add(props.top_layout and 1 or 3, Element.New {
 		width = HUD_ICON_SIZE,
 		height = HUD_ICON_SIZE,
 		crop_y = 0.25,
@@ -88,32 +96,36 @@ function HUDMeter:Finish()
 end
 
 function HUDMeter:SetValueText(round_sub_value)
-	local v = tostring(self.debounced_value.debounce)
-
-	if self.sub_value_text then
-		self.value_text:SetText(string.sub(v, 1, -2))
-
-		if not round_sub_value then
-			self.sub_value_text:SetText(string.sub(v, -1))
-		end
+	if self.value_text_func then
+		self.value_text:SetText(self.value_text_func(self.debounced_value.debounce))
 	else
-		self.value_text:SetText(v)
+		local v = tostring(self.debounced_value.debounce)
+
+		if self.sub_value_text then
+			self.value_text:SetText(string.sub(v, 1, -2))
+
+			if not round_sub_value then
+				self.sub_value_text:SetText(string.sub(v, -1))
+			end
+		else
+			self.value_text:SetText(v)
+		end
 	end
 end
 
 function HUDMeter:Think()
 	HUDMeter.super.Think(self)
 
-	local value = self.value_func()
+	local value = self.value_func() or 0
 
 	local width_percent
-	
+
 	if self.bar_value_func then
 		width_percent = self.bar_value_func()
 	else
 		width_percent = value/self.value_divider
 	end
-	
+
 	self.debounced_value.current = value
 	self.bar:SetPercent(width_percent)
 
