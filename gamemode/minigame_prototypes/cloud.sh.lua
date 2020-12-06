@@ -12,18 +12,6 @@ hook.Add("CreateMinigameHookSchemas", "Cloud", function ()
 	MinigameNetService.CreateHookSchema("SetCloud", {"entity"})
 end)
 
-if SERVER then
-	MINIGAME:AddHook("StartStateStarting", "ClearEntities", MinigameService.ClearEntities)
-else
-	MINIGAME:AddHookNotification("SetCloud", function (self, involves_local_ply, cloud)
-		if involves_local_ply then
-			NotificationService.PushText "you set cloud"
-		else
-			NotificationService.PushAvatarText(cloud, "set cloud")
-		end
-	end)
-end
-
 MINIGAME:AddPlayerClass({
 	name = "Cloud",
 	color = COLOR_CLOUD,
@@ -61,11 +49,12 @@ if SERVER then
 		dynamic_ply_class.cloud_set = true
 		dynamic_ply_class.swap_closest_on_death = false
 
+		MinigameStateService.AddLifecycleObject(self, ply.cloud_trigger)
 		MinigameService.CallNetHookWithoutMethod(self, "SetCloud", ply)
 	end
 
-	function MINIGAME:Tag(taggable, tagger)
-		taggable.cloud_trigger:Remove()
+	function MINIGAME.player_classes.Cloud:Tag(tagger)
+		self.cloud_trigger:Remove()
 	end
 
 	function MINIGAME.player_classes.Cloud:SetupMove(move)
@@ -73,4 +62,12 @@ if SERVER then
 			self.lobby:SetCloud(self)
 		end
 	end
+else
+	MINIGAME:AddHookNotification("SetCloud", function (self, involves_local_ply, cloud)
+		if involves_local_ply then
+			NotificationService.PushText "you set cloud"
+		else
+			NotificationService.PushAvatarText(cloud, "set cloud")
+		end
+	end)
 end
