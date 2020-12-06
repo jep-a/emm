@@ -113,11 +113,11 @@ function MinigamePrototype:NotifyStateCountdown(involves_local_ply, old_state, n
 			text = string.lower(new_state.name).." in"
 		end
 
-		self.countdown_notification = NotificationService.PushCountdown(self.last_state_start + new_state.time, text, "StateCountdown")
+		self.countdown_notification = NotificationService.PushCountdown(self.last_state_start + new_state.time, text, "StateCountdown", 3)
 	end
 end
 
-local function InvolvesLocalPlayer(...)
+function MinigameService.InvolvesLocalPlayer(...)
 	local local_ply = LocalPlayer()
 
 	local involves_local_ply
@@ -133,20 +133,20 @@ local function InvolvesLocalPlayer(...)
 	return involves_local_ply
 end
 
-local function WrapNotificationFunc(func)
+function MinigameService.NotificationFunction(func)
 	return function (lobby, ...)
 		if lobby:IsLocal() then
-			func(lobby, InvolvesLocalPlayer(...), ...)
+			func(lobby, MinigameService.InvolvesLocalPlayer(...), ...)
 		end
 	end
 end
 
 function MinigamePrototype:AddHookNotification(hk_name, func)
-	self:AddHook(hk_name, "Notification", WrapNotificationFunc(func))
+	self:AddHook(hk_name, "Notification", MinigameService.NotificationFunction(func))
 end
 
 function MinigamePrototype:AddStateHookNotification(state_key, hk_name, func)
-	self:AddStateHook(state_key, hk_name, "Notification", WrapNotificationFunc(func))
+	self:AddStateHook(state_key, hk_name, "Notification", MinigameService.NotificationFunction(func))
 end
 
 function MinigamePrototype:AddDefaultHooks()
