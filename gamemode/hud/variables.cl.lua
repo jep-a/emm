@@ -137,6 +137,11 @@ SettingsService.New("crosshair_meter_arc_length", {
 	help = "Crosshair meter arc length (degrees)"
 })
 
+surface.CreateFont("Countdown", {
+	font = "Roboto Mono",
+	size = 36
+})
+
 surface.CreateFont("HUDMeterValue", {
 	font = "Roboto Mono",
 	size = 34
