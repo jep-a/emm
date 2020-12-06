@@ -31,14 +31,16 @@ end
 function Timer:Count()
 	local cur_time = CurTime()
 
-	if cur_time > self.end_time then
-		if self.callback then
-			self.callback(self)
-		end
+	if self.counting then
+		if cur_time > self.end_time then
+			if self.callback then
+				self.callback(self)
+			end
 
-		self:Finish()
-	elseif self.counting then
-		self.timeleft = math.max(cur_time - self.end_time, 1)
+			self:Finish()
+		else
+			self.timeleft = self.end_time - cur_time
+		end
 	else
 		self.end_time = cur_time + self.timeleft
 	end
