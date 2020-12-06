@@ -38,6 +38,11 @@ surface.CreateFont("TextBar", {
 	weight = 900
 })
 
+surface.CreateFont("TextBarSecondary", {
+	font = "Roboto Mono",
+	size = 24
+})
+
 surface.CreateFont("Header", {
 	font = "Roboto",
 	size = 26
