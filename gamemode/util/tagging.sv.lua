@@ -1,20 +1,5 @@
 TaggingService.taggable_groups = TaggingService.taggable_groups or {}
 
-function TaggingService.InitPlayerProperties(ply)
-	ply.taggable = true
-	ply.taggable_radius = 80
-	ply.taggable_cooldown = 1
-	ply.tagging = {}
-	ply.last_tag_time = 0
-end
-hook.Add("InitPlayerProperties", "TaggingService.InitPlayerProperties", TaggingService.InitPlayerProperties)
-
-function TaggingService.InitPlayerClassProperties(ply_class)
-	ply_class.can_tag = {}
-	ply_class.notify_on_tag = true
-end
-hook.Add("InitPlayerClassProperties", "TaggingService.InitPlayerClassProperties", TaggingService.InitPlayerClassProperties)
-
 function TaggingService.Tag(lobby, taggable, tagger)
 	if not table.HasValue(taggable.tagging, tagger) then
 		table.insert(taggable.tagging, tagger)
@@ -24,12 +9,12 @@ function TaggingService.Tag(lobby, taggable, tagger)
 
 		local taggable_ply_class = taggable.player_class
 
+		MinigameService.CallNetHook(taggable.lobby, "Tag", taggable, tagger)
+		MinigameService.CallHook(taggable.lobby, taggable_ply_class.key.."Tag", taggable, tagger)
+
 		if taggable_ply_class.Tag then
 			taggable:Tag(tagger)
 		end
-
-		MinigameService.CallNetHook(taggable.lobby, "Tag", taggable, tagger)
-		MinigameService.CallHook(taggable.lobby, taggable_ply_class.key.."Tag", taggable, tagger)
 
 		if taggable_ply_class.swap_on_tag then
 			MinigameService.SwapPlayerClass(taggable, tagger, taggable_ply_class.kill_on_tag, taggable_ply_class.kill_tagger_on_tag)
@@ -43,6 +28,13 @@ function TaggingService.Tag(lobby, taggable, tagger)
 			if taggable_ply_class.give_player_class_on_tag then
 				tagger:SetPlayerClass(lobby.player_classes[taggable_ply_class.give_player_class_on_tag])
 			end
+		end
+
+		MinigameService.CallNetHook(taggable.lobby, "PostTag", taggable, tagger)
+		MinigameService.CallHook(taggable.lobby, taggable_ply_class.key.."PostTag", taggable, tagger)
+
+		if taggable_ply_class.PostTag then
+			taggable:PostTag(tagger)
 		end
 	end
 end
@@ -58,6 +50,13 @@ function TaggingService.EndTag(lobby, taggable, tagger)
 
 		if taggable_ply_class.EndTag then
 			taggable:EndTag(tagger)
+		end
+
+		MinigameService.CallNetHook(taggable.lobby, "PostEndTag", taggable, tagger)
+		MinigameService.CallHook(taggable.lobby, taggable_ply_class.key.."PostEndTag", taggable, tagger)
+
+		if taggable_ply_class.PostEndTag then
+			taggable:PostEndTag(tagger)
 		end
 	end
 end
