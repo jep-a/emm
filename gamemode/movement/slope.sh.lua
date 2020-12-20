@@ -5,7 +5,7 @@ SlopeService = SlopeService or {}
 
 function SlopeService.InitPlayerProperties(ply)
 	ply.bounce_height = 12
-	ply.slope_onground = false
+	ply.on_slope = false
 end
 hook.Add(
 	SERVER and "InitPlayerProperties" or "InitLocalPlayerProperties",
@@ -17,7 +17,7 @@ hook.Add(
 -- # Slope Boost
 
 function SlopeService.AddSpeed(normal, ply, move)
-	if 1 > normal.z and ply:OnGround() and not ply.slope_onground and 0 >= ply.old_velocity.z then
+	if 1 > normal.z and ply:OnGround() and not ply.on_slope and 0 >= ply.old_velocity.z then
 		local old_velocity = ply.old_velocity
 		local dot, vel
 		
@@ -86,9 +86,9 @@ function SlopeService.SetupSlope(ply, move)
 	local normal
 	
 	if ply:OnGround() then
-		ply.slope_onground = true
+		ply.on_slope = true
 	else
-		ply.slope_onground = false
+		ply.on_slope = false
 	end
 
 	if ledge_normal then
