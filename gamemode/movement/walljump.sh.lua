@@ -65,14 +65,12 @@ end
 
 function WalljumpService.GetAngle(dir, wall_normal)
 	local angle = dir:Angle()
-	local wall_ang = wall_normal:Angle()
-
-	wall_ang:Normalize()
+	
+	wall_normal = SlideService.GetNormalDir(wall_normal)
+	wall_normal.z = 0
 	angle:Normalize()
-
 	angle:RotateAroundAxis(wall_normal, 90)
-	wall_ang = wall_ang.y
-
+	
 	return math.abs(angle.p)
 end
 
@@ -88,7 +86,7 @@ function WalljumpService.Trace(ply, dir)
 	perimeter_pos.y = math.Clamp(perimeter_pos.y, ply_pos.y + mins.y, ply_pos.y + maxs.y)
 
 	if ply.sliding or ply.surfing then
-		ply_pos.z = ply_pos.z - (ply.slide_hover_height.z)
+		ply_pos.z = ply_pos.z - (ply.slide_hover_height)
 	end
 	
 	local trace = util.TraceHull {
