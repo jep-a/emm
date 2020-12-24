@@ -18,7 +18,12 @@ function CrosshairMeter:Init(props)
 		background_color = COLOR_BLACK
 	})
 
-	self.value_func = props.value_func
+	self.value_func = props.value_func or function ()
+		return 0
+	end
+
+	self.percent_func = props.percent_func
+	self.text_func = props.text_func
 	self.value_divider = props.value_divider or 100
 	self.hide_value_on_empty = props.hide_value_on_empty
 	self.hide_value_on_full = props.hide_value_on_full
@@ -40,7 +45,15 @@ function CrosshairMeter:Init(props)
 		end
 	})
 
-	self.percent = AnimatableValue.New(init_v/self.value_divider, {smooth = true})
+	local init_percent
+
+	if self.percent_func then
+		init_percent = self.percent_func()
+	else
+		init_percent = init_v/self.value_divider
+	end
+
+	self.percent = AnimatableValue.New(init_percent, {smooth = true})
 	self.angle = AnimatableValue.New(props.angle, layout_props)
 	self.radius = props.radius and AnimatableValue.New(props.radius, layout_props) or AnimatableValue.NewFromSetting("crosshair_meter_radius", layout_props)
 	self.line_thickness = AnimatableValue.New(props.line_thickness or HUD_LINE_THICKNESS)
@@ -54,7 +67,7 @@ function CrosshairMeter:Init(props)
 		local origin_x, origin_y = self:CalculateValueTextPosition()
 		local pos_justify_x, pos_justify_y = self:CalculateValueTextJustification()
 
-		self.value_text_container = self:Add(Element.New {
+		self.text_container = self:Add(Element.New {
 			layout = false,
 			origin_position = true,
 			origin_x = origin_x,
@@ -69,14 +82,14 @@ function CrosshairMeter:Init(props)
 			alpha = not HUDMeter.ShouldHideValueText(self) and 255 or 0
 		})
 
-		self.value_text = self.value_text_container:Add(Element.New {
+		self.text = self.text_container:Add(Element.New {
 			fit = true,
 			crop_y = 0.125,
 			font = "CrosshairMeterValue"
 		})
 
 		if props.sub_value then
-			self.sub_value_text = self.value_text_container:Add(Element.New {
+			self.sub_text = self.text_container:Add(Element.New {
 				fit = true,
 				crop_y = 0.125,
 				font = "CrosshairMeterValueSmall"
@@ -103,7 +116,7 @@ function CrosshairMeter:Think()
 	self.debounced_value.current = v
 	self.percent.current = v/self.value_divider
 
-	if self.value_text then
+	if self.text then
 		HUDMeter.SetValueText(self)
 	end
 end
@@ -158,8 +171,8 @@ function CrosshairMeter:CalculateValueTextPosition(local_pos)
 end
 
 function CrosshairMeter:LayoutValueText()
-	local v_text_container_attr = self.value_text_container.attributes
-	local v_text_container_static_attr = self.value_text_container.static_attributes
+	local v_text_container_attr = self.text_container.attributes
+	local v_text_container_static_attr = self.text_container.static_attributes
 
 	local pos_justify_x, pos_justify_y = self:CalculateValueTextJustification()
 
@@ -178,7 +191,7 @@ function CrosshairMeter:Layout()
 	self:GenerateSize()
 	self:PositionFromOrigin()
 
-	if self.value_text then
+	if self.text then
 		self:LayoutValueText()
 	end
 

@@ -18,12 +18,15 @@ function HUDMeter:Init(quadrant_or_props, props)
 
 	self:SetAttributes(props)
 
-	self.value_func = props.value_func
-	self.bar_value_func = props.bar_value_func
+	self.value_func = props.value_func or function ()
+		return 0
+	end
+
+	self.percent_func = props.percent_func
+	self.text_func = props.text_func
 	self.value_divider = props.value_divider or 100
 	self.hide_value_on_empty = props.hide_value_on_empty
 	self.hide_value_on_full = props.hide_value_on_full
-	self.value_text_func = props.value_text_func
 
 	local init_v = self.value_func()
 
@@ -37,7 +40,13 @@ function HUDMeter:Init(quadrant_or_props, props)
 		HUDService["quadrant_"..quadrant]:Add(self)
 	end
 
-	local init_percent = init_v/self.value_divider
+	local init_percent
+
+	if self.percent_func then
+		init_percent = self.percent_func()
+	else
+		init_percent = init_v/self.value_divider
+	end
 
 	self.bar = self:Add(2, MeterBar.New {
 		percent = init_percent,
@@ -45,14 +54,14 @@ function HUDMeter:Init(quadrant_or_props, props)
 	})
 
 	if props.show_value then
-		self.value_text_container = self:Add(props.top_layout and 3 or 1, Element.New {
+		self.text_container = self:Add(props.top_layout and 3 or 1, Element.New {
 			fit = true,
 			wrap = false,
 			child_margin = 2,
 			alpha = not self:ShouldHideValueText() and 255 or 0
 		})
 
-		self.value_text = self.value_text_container:Add(Element.New {
+		self.text = self.text_container:Add(Element.New {
 			fit = true,
 			crop_top = 0.225,
 			crop_bottom = 0.125,
@@ -60,7 +69,7 @@ function HUDMeter:Init(quadrant_or_props, props)
 		})
 
 		if props.sub_value then
-			self.sub_value_text = self.value_text_container:Add(Element.New {
+			self.sub_text = self.text_container:Add(Element.New {
 				fit = true,
 				crop_top = 0.225,
 				crop_bottom = 0.125,
@@ -69,7 +78,7 @@ function HUDMeter:Init(quadrant_or_props, props)
 		end
 
 		if props.units then
-			self.value_text_container:Add(Element.New {
+			self.text_container:Add(Element.New {
 				self_adjacent_justification = JUSTIFY_END,
 				fit = true,
 				crop_top = 0.225,
@@ -96,19 +105,21 @@ function HUDMeter:Finish()
 end
 
 function HUDMeter:SetValueText(round_sub_value)
-	if self.value_text_func then
-		self.value_text:SetText(self.value_text_func(self.debounced_value.debounce))
-	else
-		local v = tostring(self.debounced_value.debounce)
-
-		if self.sub_value_text then
-			self.value_text:SetText(string.sub(v, 1, -2))
-
-			if not round_sub_value then
-				self.sub_value_text:SetText(string.sub(v, -1))
-			end
+	if self.text then
+		if self.text_func then
+			self.text:SetText(self.text_func(self.debounced_value.debounce))
 		else
-			self.value_text:SetText(v)
+			local v = tostring(self.debounced_value.debounce)
+
+			if self.sub_text then
+				self.text:SetText(string.sub(v, 1, -2))
+
+				if not round_sub_value then
+					self.sub_text:SetText(string.sub(v, -1))
+				end
+			else
+				self.text:SetText(v)
+			end
 		end
 	end
 end
@@ -116,12 +127,11 @@ end
 function HUDMeter:Think()
 	HUDMeter.super.Think(self)
 
-	local value = self.value_func() or 0
-
+	local value = self.value_func()
 	local width_percent
 
-	if self.bar_value_func then
-		width_percent = self.bar_value_func()
+	if self.percent_func then
+		width_percent = self.percent_func()
 	else
 		width_percent = value/self.value_divider
 	end
@@ -129,7 +139,7 @@ function HUDMeter:Think()
 	self.debounced_value.current = value
 	self.bar:SetPercent(width_percent)
 
-	if self.value_text then
+	if self.text then
 		self:SetValueText()
 	end
 end
@@ -141,13 +151,15 @@ function HUDMeter:ShouldHideValueText(v)
 end
 
 function HUDMeter:OnValueChanged(v)
-	if self.value_text then
+	if self.text then
 		if not self.hid_value and HUDMeter.ShouldHideValueText(self, v) then
-			self.value_text_container:AnimateAttribute("alpha", 0)
+			self.text_container:AnimateAttribute("alpha", 0)
 			self.hid_value = true
 		elseif self.hid_value then
-			self.value_text_container:AnimateAttribute("alpha", 255)
+			self.text_container:AnimateAttribute("alpha", 255)
 			self.hid_value = false
 		end
 	end
 end
+
+-- TODO: make crosshair meter match new proposed hud meter code
