@@ -70,8 +70,7 @@ function NotificationService.PushMeter(props, key, i)
 			meter = HUDMeter.New(table.Merge({
 				width_percent = 1,
 				top_layout = true,
-				padding_bottom = MARGIN * 4,
-				value_text_func = math.ceil
+				padding_bottom = MARGIN * 4
 			}, props)),
 			fill_x = false,
 			width_percent = HUD_METER_SIZE,
