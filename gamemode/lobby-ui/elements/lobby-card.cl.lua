@@ -15,20 +15,13 @@ function LobbyCardContainer:Init(lobby)
 	self:AnimateAttribute("alpha", 255, ANIMATION_DURATION * 2)
 end
 
-function LobbyCardContainer:AnimateFinish()
-	self:AnimateAttribute("alpha", 0, {
+function LobbyCardContainer:Finish()
+	self:AnimateFinish {
 		duration = ANIMATION_DURATION * 2,
-
-		callback = function ()
-			LobbyCardContainer.super.Finish(self)
-		end
-	})
+		alpha = 0
+	}
 
 	self.lobby_card:FinishLobby()
-end
-
-function LobbyCardContainer:Finish()
-	self:AnimateFinish()
 end
 
 LobbyCard = LobbyCard or Class.New(Element)
@@ -175,17 +168,11 @@ function LobbyCard:AddRestartAction()
 end
 
 function LobbyCard:FinishRestartAction()
-	local old_restart = self.restart
-
-	old_restart:AnimateAttribute("crop_bottom", 1, {
+	self.restart:AnimateFinish {
 		duration = ANIMATION_DURATION * 2,
-
-		callback = function ()
-			old_restart:Finish()
-		end
-	})
-
-	old_restart:AnimateAttribute("alpha", 0, ANIMATION_DURATION * 2)
+		crop_bottom = 1,
+		alpha = 0
+	}
 
 	self.restart = nil
 end
@@ -216,19 +203,15 @@ end
 hook.Add("LocalLobbySetState", "LobbyCard.AdjustStateHostActions", LobbyCard.AdjustStateHostActions)
 
 function LobbyCard:FinishLobby()
-	if not self.finishing then
-		self.finishing = true
-
-		if self == self.lobby.card_element then
-			self.lobby.card_element = nil
-		end
-
-		for _, ply in pairs(self.lobby.players) do
-		    if IsValid(ply) then
-			    ply.lobby_card_element = nil
-			end
-		end
-
-		self.lobby = nil
+	if self == self.lobby.card_element then
+		self.lobby.card_element = nil
 	end
+
+	for _, ply in pairs(self.lobby.players) do
+		if IsValid(ply) then
+			ply.lobby_card_element = nil
+		end
+	end
+
+	self.lobby = nil
 end

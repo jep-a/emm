@@ -94,8 +94,8 @@ function Indicator:Think()
 	end
 end
 
-function Indicator:AnimateFinish()
-	self:AnimateAttribute("alpha", 0, {
+function Indicator:Finish()
+	self:AnimateFinish {
 		callback = function ()
 			local ent = self.entity
 
@@ -107,12 +107,8 @@ function Indicator:AnimateFinish()
 
 			self.world_alpha:Finish()
 			self.off_screen:Finish()
+		end,
 
-			Indicator.super.Finish(self)
-		end
-	})
-end
-
-function Indicator:Finish()
-	self:AnimateFinish()
+		alpha = 0
+	}
 end

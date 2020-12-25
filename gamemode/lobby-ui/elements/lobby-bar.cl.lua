@@ -42,7 +42,7 @@ function LobbyBar:Init(lobby)
 
 	self.lobby = lobby
 	lobby.bar_element = self
-	
+
 	self.type_container = self:Add(Element.New {
 		layout_justification_y = JUSTIFY_CENTER,
 		width = 64,
@@ -98,28 +98,19 @@ function LobbyBar:AnimateStart()
 	self:Add(NotificationService.CreateFlash())
 end
 
-function LobbyBar:AnimateFinish()
-	self:AnimateAttribute("crop_bottom", 1, {
-		duration = ANIMATION_DURATION * 4,
-
-		callback = function ()
-			LobbyBar.super.Finish(self)
-		end
-	})
-
-	self:AnimateAttribute("background_color", COLOR_BACKGROUND_LIGHT)
-end
-
 function LobbyBar:Finish()
-	if not self.finishing then
-		self.finishing = true
-
+	if not self.animating_finish then
 		if self == self.lobby.bar_element then
 			self.lobby.bar_element = nil
 		end
 
 		self.lobby = nil
-		self:AnimateFinish()
+
+		self:AnimateFinish {
+			duration = ANIMATION_DURATION * 4,
+			crop_bottom = 1,
+			background_color = COLOR_BACKGROUND_LIGHT
+		}
 	end
 end
 

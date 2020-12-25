@@ -27,17 +27,9 @@ function PlayerBar:AnimateStart()
 	self:Add(NotificationService.CreateFlash())
 end
 
-function PlayerBar:AnimateFinish()
-	self:AnimateAttribute("crop_bottom", 1, {
-		callback = function ()
-			PlayerBar.super.Finish(self)
-		end
-	})
-end
-
 function PlayerBar:Finish()
 	self.player = nil
-	self:AnimateFinish()
+	self:AnimateFinish {crop_bottom = 1}
 end
 
 function PlayerBar:Layout()

@@ -104,7 +104,7 @@ function InputDragger:GenerateOption(i, option_i)
 
 	if insert_i then
 		local insert_i_in_range = insert_i > 0
-		
+
 		if i == insert_i then
 			is_insert = true
 			v = self.insert_option
@@ -141,7 +141,7 @@ function InputDragger:GenerateOption(i, option_i)
 		self.generated_options[i] = OptionValue(v)
 
 		local text
-		
+
 		if istable(v) and v.text then
 			text = v.text
 		elseif self.text_generate then
@@ -189,24 +189,19 @@ function InputDragger:InitOptions(default)
 	end
 end
 
-function InputDragger:AnimateFinish()
-	self:AnimateAttribute("alpha", 0, {
-		callback = function ()
-			InputDragger.super.Finish(self)
-		end
-	})
-end
-
 function InputDragger:Finish()
 	self.scroll:Finish()
-	self:AnimateFinish()
+
+	self:AnimateFinish {
+		alpha = 0
+	}
 end
 
 function InputDragger:SetScrollPos()
 	local _, y = self.panel:LocalCursorPos()
-	
+
 	local scroll
-	
+
 	if math.Round(CurTime() - self.start_time, 2) > (1/30) then
 		scroll = option_padding + math.Round((y - (self:GetFinalHeight()/2))/scroll_step) + 1
 	else

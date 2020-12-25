@@ -13,15 +13,15 @@ Element = Element or Class.New()
 function Element:Init(props)
 	self.children = {}
 	self.layout_children = {}
-	
+
 	self.panel = vgui.Create "ElementPanel"
 	self.panel.element = self
 
 	self.setting_hooks = {}
-	
+
 	self:InitStates()
 	self:InitAttributes()
-	
+
 	if props then
 		self:SetAttributes(props)
 	end
@@ -81,6 +81,48 @@ function Element:Clear()
 
 	for _, element in pairs(finishing_children) do
 		element:Finish()
+	end
+end
+
+function Element:MarkForAnimatingFinish()
+	self.animating_finish = true
+
+	for _, child in pairs(self.children) do
+		child:MarkForAnimatingFinish()
+	end
+end
+
+function Element:AnimateFinish(props_or_duration, props)
+	if not self.animating_finish then
+		local duration
+
+		if istable(props_or_duration) then
+			props = props_or_duration
+			duration = Property(props, "duration", ANIMATION_DURATION, true)
+		else
+			duration = props_or_duration
+		end
+
+		callback = Property(props, "callback", nil, true)
+		attributes = props
+
+		self:MarkForAnimatingFinish()
+
+		for k, v in pairs(attributes) do
+			if istable(v) then
+				self:AnimateAttribute(k, v.value, v.props)
+			else
+				self:AnimateAttribute(k, v)
+			end
+		end
+
+		self.finish_timer = Timer.New(duration, function ()
+			if callback then
+				callback()
+			end
+
+			Element.Finish(self)
+		end)
 	end
 end
 
@@ -156,11 +198,11 @@ function Element:OnMousePressed(mouse)
 end
 
 function Element:OnMouseReleased(mouse)
-	-- 
+	--
 end
 
 function Element:OnMouseScrolled(scroll)
-	-- 
+	--
 end
 
 function Element:OnMouseEntered()
@@ -194,10 +236,10 @@ hook.Add("Think", "Element.DragThink", function ()
 				holding_element:StartDragging()
 			end
 		end
-	
+
 		if holding_element.dragging then
 			holding_element:DragThink()
-			
+
 			if not mouse_down then
 				holding_element:StopDragging()
 			end

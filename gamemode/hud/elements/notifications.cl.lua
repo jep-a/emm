@@ -56,8 +56,8 @@ function NotificationContainer:AnimateStart()
 	self:AnimateAttribute("layout_crop_y", 0)
 end
 
-function NotificationContainer:AnimateFinish()
-	self:AnimateAttribute("crop_bottom", 1, {
+function NotificationContainer:Finish()
+	self:AnimateFinish {
 		duration = ANIMATION_DURATION * 10,
 
 		callback = function ()
@@ -68,16 +68,11 @@ function NotificationContainer:AnimateFinish()
 					NotificationService.stickies[self.key] = nil
 				end
 			end
+		end,
 
-			NotificationContainer.super.Finish(self)
-		end
-	})
-
-	self:AnimateAttribute("alpha", 0, ANIMATION_DURATION * 10)
-end
-
-function NotificationContainer:Finish()
-	self:AnimateFinish()
+		crop_bottom = 1,
+		alpha = 0
+	}
 end
 
 AvatarNotification = AvatarNotification or Class.New(Element)

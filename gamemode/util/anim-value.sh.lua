@@ -112,7 +112,7 @@ function AnimatableValue:AnimateTo(v, props_or_duration, ease, delay)
 	local stack
 
 	if istable(props_or_duration) then
-		duration = props_or_duration.duration or 0.2
+		duration = props_or_duration.duration or ANIMATION_DURATION
 		ease = props_or_duration.ease or DefaultEase
 		delay = props_or_duration.delay or 0
 		finish = props_or_duration.finish
@@ -120,7 +120,7 @@ function AnimatableValue:AnimateTo(v, props_or_duration, ease, delay)
 		animate_callback = props_or_duration.animate_callback
 		stack = props_or_duration.stack
 	else
-		duration = props_or_duration or 0.2
+		duration = props_or_duration or ANIMATION_DURATION
 		ease = ease or DefaultEase
 		delay = delay or 0
 	end
