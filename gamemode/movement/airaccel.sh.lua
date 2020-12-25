@@ -71,17 +71,15 @@ function AiraccelService.KeyPress(ply, key)
 end
 hook.Add("KeyPress", "AiraccelService.KeyPress", AiraccelService.KeyPress)
 
-function AiraccelService.WishDir(ply, move)
-	local fwd = move:GetMoveAngles():Forward()
-
-	return (Vector(fwd.x, fwd.y, 0):GetNormalized() * move:GetForwardSpeed()) + (Vector(fwd.y, -fwd.x, 0):GetNormalized() * move:GetSideSpeed() * 1.05)
+function AiraccelService.WishDir(ply, fwd, fwd_speed, side_speed)
+	return (Vector(fwd.x, fwd.y, 0):GetNormalized() * fwd_speed) + (Vector(fwd.y, -fwd.x, 0):GetNormalized() * side_speed * 1.05)
 end
 
 
 -- # Airacceling
 
 function AiraccelService.Velocity(ply, move, amount)
-	local strafe_vel = AiraccelService.WishDir(ply, move)
+	local strafe_vel = AiraccelService.WishDir(ply, move:GetMoveAngles():Forward(), move:GetForwardSpeed(), move:GetSideSpeed())
 	local strafe_vel_length = math.Clamp(strafe_vel:Length(), 0, 300)
 	local strafe_vel_norm = strafe_vel:GetNormalized()
 	local vel_diff = strafe_vel_length/10 - move:GetVelocity():Dot(strafe_vel_norm)
