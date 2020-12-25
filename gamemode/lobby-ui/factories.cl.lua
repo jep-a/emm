@@ -8,6 +8,7 @@ function LobbyUIService.CreateHeader(text, fit)
 		font = "Header",
 		text_justification = 5,
 		text = text,
+		background_color = COLOR_BACKGROUND_LIGHT,
 		border = LINE_THICKNESS
 	}
 
