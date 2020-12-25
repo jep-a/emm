@@ -68,7 +68,7 @@ function NumberInput:Init(text, props)
 			border_color = COLOR_GRAY_DARK,
 			border_alpha = 255
 		},
-		
+
 		hover = {
 			border_alpha = 255
 		},
@@ -101,10 +101,12 @@ function NumberInput:Enable()
 end
 
 function NumberInput:OnValueChanged(v, no_callback)
-	self.value = v
+	local validated_v = tonumber(v) and v or tostring(0)
+
+	self.value = validated_v
 
 	if not no_callback and self.on_change then
-		self.on_change(self, v)
+		self.on_change(self, validated_v)
 	end
 end
 
@@ -115,7 +117,7 @@ end
 
 function NumberInput:OnMousePressed(mouse)
 	NumberInput.super.OnMousePressed(self, mouse)
-	
+
 	if self.on_click then
 		self.on_click(self, mouse)
 	end
