@@ -127,20 +127,22 @@ end
 function HUDMeter:Think()
 	HUDMeter.super.Think(self)
 
-	local value = self.value_func()
-	local width_percent
+	if not self.animating_finish then
+		local value = self.value_func()
+		local width_percent
 
-	if self.percent_func then
-		width_percent = self.percent_func()
-	else
-		width_percent = value/self.value_divider
-	end
+		if self.percent_func then
+			width_percent = self.percent_func()
+		else
+			width_percent = value/self.value_divider
+		end
 
-	self.debounced_value.current = value
-	self.bar:SetPercent(width_percent)
+		self.debounced_value.current = value
+		self.bar:SetPercent(width_percent)
 
-	if self.text then
-		self:SetValueText()
+		if self.text then
+			self:SetValueText()
+		end
 	end
 end
 
