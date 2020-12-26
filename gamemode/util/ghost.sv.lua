@@ -119,13 +119,6 @@ function GhostService.UnGhost(ply)
 end
 hook.Add("FinishPlayerClass", "GhostService.UnGhost", GhostService.UnGhost)
 
-function GhostService.EntityTakeDamage(victim, dmg)
-	if victim:GetClass() == "prop_ragdoll" and IsValid(victim.ghost_player) and victim.ghost_player:Alive() then
-		victim.ghost_player:TakeDamageInfo(dmg)
-	end
-end
-hook.Add("EntityTakeDamage", "GhostService.EntityTakeDamage", GhostService.EntityTakeDamage)
-
 function GhostService.SendGhosts(ply)
 	net.Start "Ghosts"
 	net.WriteUInt(table.Count(GhostService.ghosts), 8)
