@@ -32,6 +32,46 @@ MINIGAME:AddPlayerClass {
 	notify_on_tag = false
 }
 
+function MINIGAME.player_classes.Frozen:GetFrozenPercent()
+	local v
+
+	local frozen_time = self.lobby.frozen_time
+	local save_time = self.lobby.save_time
+	local frozen_timer = self.frozen_timer
+	local save_timer = self.save_timer
+	local curr_frozen_time = frozen_timer and frozen_timer.timeleft or 0
+	local curr_save_time = save_timer and save_timer.timeleft or 0
+
+	if save_timer and frozen_timer then
+		v = (curr_save_time/save_time) * (1 - (curr_frozen_time/frozen_time))
+	elseif frozen_timer then
+		v = 1 - (curr_frozen_time/frozen_time)
+	end
+
+	return v
+end
+
+function MINIGAME.player_classes.Frozen:GetFrozenTimeleft()
+	local timeleft
+
+	local frozen_timer = self.frozen_timer
+	local save_timer = self.save_timer
+	local curr_frozen_time = frozen_timer and frozen_timer.timeleft or 0
+	local curr_save_time = save_timer and save_timer.timeleft or 0
+
+	if save_timer then
+		timeleft = curr_save_time
+	elseif frozen_timer then
+		timeleft = curr_frozen_time
+	end
+
+	return timeleft
+end
+
+function MINIGAME.player_classes.Frozen:GetIndicatorPercent()
+	return 1 - self:GetFrozenPercent()
+end
+
 function MINIGAME.player_classes.Hunter:PostTag(tagger)
 	if SERVER then
 		GhostService.Ghost(tagger, {
@@ -48,7 +88,7 @@ function MINIGAME.player_classes.Hunter:PostTag(tagger)
 		end
 	end)
 
-	PlayerClassService.AddLifecycleObject(tagger, tagger.frozen_timer)
+	PlayerClassService.AddLifecycleObject(tagger, "frozen_timer")
 
 	if CLIENT and LocalPlayer() == tagger then
 		local frozen_time = self.lobby.frozen_time
@@ -58,35 +98,10 @@ function MINIGAME.player_classes.Hunter:PostTag(tagger)
 			icon_material = PNGMaterial "emm2/minigames/freezetag-2x.png",
 			show_value = true,
 			percent_func = function ()
-				local v
-				local frozen_timer = tagger.frozen_timer
-				local save_timer = tagger.save_timer
-				local curr_frozen_time = frozen_timer and frozen_timer.timeleft or 0
-				local curr_save_time = save_timer and save_timer.timeleft or 0
-
-				if save_timer and frozen_timer then
-					v = (curr_save_time/save_time) * (1 - (curr_frozen_time/frozen_time))
-				elseif frozen_timer then
-					v = 1 - (curr_frozen_time/frozen_time)
-				end
-
-				return v
+				return tagger:GetFrozenPercent()
 			end,
 			text_func = function ()
-				local text
-
-				local frozen_timer = tagger.frozen_timer
-				local save_timer = tagger.save_timer
-				local curr_frozen_time = frozen_timer and frozen_timer.timeleft or 0
-				local curr_save_time = save_timer and save_timer.timeleft or 0
-
-				if save_timer then
-					text = curr_save_time
-				elseif frozen_timer then
-					text = curr_frozen_time
-				end
-
-				return math.ceil(text)
+				return math.ceil(tagger:GetFrozenTimeleft())
 			end
 		}, "frozen_timer", 1)
 
@@ -103,9 +118,10 @@ function MINIGAME.player_classes.Frozen:PostTag(tagger)
 				self:SetPlayerClass(MINIGAME.player_classes.Hunted)
 			end
 		end)
+
+		PlayerClassService.AddLifecycleObject(self, "save_timer")
 	end
 
-	PlayerClassService.AddLifecycleObject(self, self.save_timer)
 
 	if CLIENT and LocalPlayer() == tagger then
 		local save_time = self.lobby.save_time
@@ -114,13 +130,14 @@ function MINIGAME.player_classes.Frozen:PostTag(tagger)
 			icon_material = PNGMaterial "emm2/minigames/freezetag-2x.png",
 			show_value = true,
 			percent_func = function ()
-				return self.save_timer and (self.save_timer.timeleft/save_time) or 0
+				return self.save_timer.timeleft/save_time
 			end,
 			text_func = function ()
-				return math.ceil(self.save_timer and self.save_timer.timeleft or 0)
+				return math.ceil(self:GetFrozenTimeleft())
 			end
 		}, "save_timer", 1)
 
+		PlayerClassService.AddLifecycleObject(self, notification)
 		PlayerClassService.AddLifecycleObject(tagger, notification)
 	end
 end
