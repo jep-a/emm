@@ -44,7 +44,7 @@ function SlideService.GetGroundTrace(pos, end_pos, ply)
 	}
 end
 
-function SlideService.Trace(ply, vel, pos, move)
+function SlideService.Trace(ply, vel, pos)
 	local pred_vel = vel * FrameTime()
 	local hover_height = Vector(0, 0, ply.slide_hover_height)
 	local slide = ply.surfing or ply.sliding
@@ -52,13 +52,13 @@ function SlideService.Trace(ply, vel, pos, move)
 	local offset = (ply:OnGround() and Vector(0, 0, 1)) or Vector(0, 0, 0)
 	local area_trace = util.TraceHull {
 		start = pos,
-		endpos = pos + (pred_vel * 3) - hover_height*5,
+		endpos = pos + (pred_vel * 3) - hover_height * 5,
 		mins = ply:OBBMins() - offset,
 		maxs = ply:OBBMaxs() + offset + Vector(0, 0, 2),
 		mask = MASK_PLAYERSOLID_BRUSHONLY
 	}
 	local ramp_normal = (area_trace and ((slide and slide.HitNormal) or area_trace.HitNormal)) or Vector()
-	local slide_pos = pos - (ramp_normal * (hover_height.z)) 
+	local slide_pos = pos - (ramp_normal * hover_height.z)
 
 	if slide then
 		trace = SlideService.GetGroundTrace(pos, slide_pos - hover_height * 2, ply)
