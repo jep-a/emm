@@ -16,7 +16,7 @@ local function NametagAlpha(ent)
 		not IsPlayer(ent) or
 		GhostService.Alive(ent)
 	) then
-		if ent.indicator then
+		if MinigameService.IsSharingLobby(ent) then
 			alpha = 255
 		elseif ent.visible and ent.visible >= 0.5 then
 			alpha = HALF_ALPHA
@@ -100,7 +100,7 @@ function NametagService.Draw()
 
 					local dist_offset
 
-					if MinigameService.IsSharingLobby(ply) then
+					if MinigameService.IsSharingLobby(ply) or IsLocalPlayer(ply) then
 						dist_offset = Lerp(ply.indicator_distance/800, 32, 24)
 					else
 						dist_offset = Lerp(ply.indicator_distance/800, 16, 8)

@@ -21,14 +21,10 @@ end
 function IndicatorService.PlayerShouldHaveIndicator(ply)
 	local should_have_indicator
 
-	if ply.player_class then
-		if ply.ghosting then
-			should_have_indicator = true
-		else
-			should_have_indicator = not IsLocalPlayer(ply)
-		end
+	if ply.ghosting then
+		should_have_indicator = true
 	else
-		should_have_indicator = false
+		should_have_indicator = not IsLocalPlayer(ply)
 	end
 
 	return should_have_indicator
@@ -233,7 +229,7 @@ function IndicatorService.DrawWorldPositions()
 				local indicator_percent
 
 				if indicator_ent:IsPlayer() then
-					local health_percent = indicator_ent:Health()/indicator_ent.max_health
+					local health_percent = indicator_ent.GetIndicatorPercent and indicator_ent:GetIndicatorPercent() or (indicator_ent:Health()/indicator_ent.max_health)
 
 					if GhostService.IsGhostingWithoutRagdoll(indicator_ent) or (health_percent >= 1) then
 						indicator_percent = 1
@@ -499,6 +495,7 @@ end
 hook.Add("LocalLobbyPlayerClassChange", "IndicatorService.LobbyPlayerClassChange", IndicatorService.LobbyPlayerClassChange)
 
 hook.Add("LocalPlayerGhost", "IndicatorService.RefreshPlayerIndicator", IndicatorService.RefreshPlayerIndicator)
+hook.Add("LocalPlayerUnGhost", "IndicatorService.RefreshPlayerIndicator", IndicatorService.RefreshPlayerIndicator)
 
 function IndicatorService.LobbyEntityAdd(lobby, ent)
 	if IndicatorService.Visible() then
