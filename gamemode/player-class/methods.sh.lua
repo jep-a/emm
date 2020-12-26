@@ -84,16 +84,22 @@ end
 function player_metatable:FinishPlayerClass()
 	if self.player_class_objects then
 		for _, object in pairs(self.player_class_objects) do
-			local instance = object.object
+			local instance = object.object or self[object.key]
 
-			if object.callback then
-				object.callback()
-			end
+			if instance then
+				if object.callback then
+					object.callback()
+				end
 
-			if instance.Finish then
-				instance:Finish()
-			elseif instance.Remove then
-				instance:Remove()
+				if instance.Finish then
+					instance:Finish()
+				elseif instance.Remove then
+					instance:Remove()
+				end
+
+				if object.key then
+					self[object.key] = nil
+				end
 			end
 		end
 	end

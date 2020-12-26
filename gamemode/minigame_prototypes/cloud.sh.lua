@@ -49,7 +49,8 @@ if SERVER then
 		dynamic_ply_class.cloud_set = true
 		dynamic_ply_class.swap_closest_on_death = false
 
-		MinigameStateService.AddLifecycleObject(self, ply.cloud_trigger)
+		PlayerClassService.AddLifecycleObject(ply, "cloud_trigger")
+		MinigameStateService.AddLifecycleObject(self, "cloud_trigger")
 		MinigameService.CallNetHookWithoutMethod(self, "SetCloud", ply)
 	end
 

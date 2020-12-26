@@ -8,11 +8,18 @@ function MinigameStateService.State(lobby, k_or_id)
 	end
 end
 
-function MinigameStateService.AddLifecycleObject(lobby, object, callback)
-	table.insert(lobby.state_objects, {
-		object = object,
-		callback = callback
-	})
+function MinigameStateService.AddLifecycleObject(lobby, key_or_object, callback)
+	if isstring(key_or_object) then
+		table.insert(lobby.state_objects, {
+			key = key_or_object,
+			callback = callback
+		})
+	else
+		table.insert(lobby.state_objects, {
+			object = key_or_object,
+			callback = callback
+		})
+	end
 end
 
 function MinigamePrototype:CanRestart()
@@ -56,16 +63,22 @@ end
 
 function MinigamePrototype:EndState()
 	for _, object in pairs(self.state_objects) do
-		local instance = object.instance
+		local instance = object.object or self[object.key]
 
-		if object.callback then
-			object.callback()
-		end
+		if instance then
+			if object.callback then
+				object.callback()
+			end
 
-		if instance.Finish then
-			instance:Finish()
-		elseif instance.Remove then
-			instance:Remove()
+			if instance.Finish then
+				instance:Finish()
+			elseif instance.Remove then
+				instance:Remove()
+			end
+
+			if object.key then
+				self[object.key] = nil
+			end
 		end
 	end
 
