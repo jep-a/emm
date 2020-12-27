@@ -3,26 +3,8 @@ SpectateService.unspectate_keys = bit.bor(IN_JUMP, IN_MOVELEFT, IN_MOVERIGHT, IN
 SpectateService.buttons = 0
 
 
--- # Utils
-
-function SpectateService.AutoComplete(cmd, args)
-	local tbl = {}
-
-	for _, v in pairs(player.GetAll()) do
-		if string.find(string.lower(" " .. v:Nick()), args:lower()) then
-			table.insert(tbl, "emm_spectate " .. v:Nick())
-		end
-	end
-
-	return tbl
-end
-
-
 -- # Spectating
-
-concommand.Add("emm_spectate", function(ply, cmd, args)
-	RunConsoleCommand("sv_emm_spectate", unpack(args))
-end, SpectateService.AutoComplete)
+CommandService.AddCommand({name = "spectate", varargs = {"player"}})
 
 function SpectateService.TargetKeyDown(key)
 	return bit.band(SpectateService.buttons, key)

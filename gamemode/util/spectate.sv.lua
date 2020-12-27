@@ -18,14 +18,6 @@ hook.Add(
 
 -- # Util
 
-function SpectateService.FindPlayerByName(name)
-	for _, v in pairs(player.GetAll()) do
-		if string.find(string.lower(" "..v:Nick()), name:lower()) then
-			return v
-		end
-	end
-end
-
 util.AddNetworkString "SpectateKeys"
 
 function SpectateService.SendSpectateKeys(buttons, players)
@@ -37,9 +29,7 @@ end
 
 -- # Hooks
 
-function SpectateService.Spectate(ply, cmd, args)
-	local target = SpectateService.FindPlayerByName(args[1])
-
+function SpectateService.Spectate(ply, target)
 	if ply.can_spectate and CurTime() > ply.spectate_timeout then
 		if target then
 			if ply:GetObserverMode() == OBS_MODE_NONE then
@@ -73,7 +63,7 @@ function SpectateService.Spectate(ply, cmd, args)
 		end
 	end
 end
-concommand.Add("sv_emm_spectate", SpectateService.Spectate)
+CommandService.AddCommand({name = "spectate", varargs = {"player"}, callback = SpectateService.Spectate})
 
 function SpectateService.UnSpectate(ply)
 	if ply:GetObserverMode() ~= OBS_MODE_NONE then
