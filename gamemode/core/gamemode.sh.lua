@@ -10,7 +10,6 @@ EMM.Include {
 	"command/class",
 	"command/hooks",
 
-	"util/activity",
 	"util/variables",
 	"util/util",
 	"util/palette",
@@ -24,8 +23,6 @@ EMM.Include {
 	"util/spectate",
 	"util/trail",
 	"util/sound-isolation",
-	"util/task",
-	"util/tutorial",
 
 	"player/hooks",
 	"player/methods",
