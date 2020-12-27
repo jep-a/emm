@@ -110,6 +110,6 @@ function GhostService.ReceiveGhosts(len)
 	end
 
 	GhostService.received_ghosts = true
-	hook.Run "ReceiveLobbies"
+	hook.Run "ReceiveGhosts"
 end
 net.Receive("Ghosts", GhostService.ReceiveGhosts)
