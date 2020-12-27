@@ -25,6 +25,7 @@ NetService.type_readers = {
 	string = net.ReadString,
 	entity = net.ReadEntity,
 	vector = net.ReadVector,
+	angle = net.ReadAngle,
 
 	entities = function ()
 		local ents = {}
@@ -57,6 +58,7 @@ NetService.type_writers = {
 	string = net.WriteString,
 	entity = net.WriteEntity,
 	vector = net.WriteVector,
+	angle = net.WriteAngle,
 
 	entities = function (ents)
 		net.WriteUInt(#ents, 8)
@@ -83,10 +85,12 @@ function NetService.CreateWriter(name, schema)
 	schema = schema or {}
 
 	local sender = function (...)
+		local args = {...}
+
 		net.Start(name)
 
 		for i = 1, #schema do
-			NetService.type_writers[schema[i]](select(i, ...))
+			NetService.type_writers[schema[i]](args[i])
 		end
 	end
 
