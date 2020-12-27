@@ -204,6 +204,10 @@ function IndicatorService.IndicatorIconPosition(indicator)
 	return indicator_x, indicator_y, size
 end
 
+function IndicatorService.GetIndicatorPercent(ent)
+	return ent.GetIndicatorPercent and ent:GetIndicatorPercent() or (ent:Health()/(ent.max_health or 100))
+end
+
 
 -- # Drawing/rendering
 
@@ -229,7 +233,7 @@ function IndicatorService.DrawWorldPositions()
 				local indicator_percent
 
 				if indicator_ent:IsPlayer() then
-					local health_percent = indicator_ent.GetIndicatorPercent and indicator_ent:GetIndicatorPercent() or (indicator_ent:Health()/indicator_ent.max_health)
+					local health_percent = IndicatorService.GetIndicatorPercent(indicator_ent)
 
 					if GhostService.IsGhostingWithoutRagdoll(indicator_ent) or (health_percent >= 1) then
 						indicator_percent = 1
