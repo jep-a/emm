@@ -205,7 +205,21 @@ function IndicatorService.IndicatorIconPosition(indicator)
 end
 
 function IndicatorService.GetIndicatorPercent(ent)
-	return ent.GetIndicatorPercent and ent:GetIndicatorPercent() or (ent:Health()/(ent.max_health or 100))
+	local percent
+
+	if ent.GetIndicatorPercent then
+		percent = ent:GetIndicatorPercent()
+	else
+		local max_health = ent.max_health or 100
+
+		if ent.savepoint and ent.savepoint.health then
+			percent = ent.savepoint.health/max_health
+		else
+			percent = ent:Health()/max_health
+		end
+	end
+
+	return percent
 end
 
 

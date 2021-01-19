@@ -105,6 +105,8 @@ function GhostService.UnGhost(ply)
 			else
 				SavepointService.LoadSavepoint(ply, ply.ghost_savepoint)
 			end
+
+			SavepointService.FinishSavepoint(ply.ghost_savepoint)
 		end
 
 		if IsValid(ply.ghost_ragdoll) then
