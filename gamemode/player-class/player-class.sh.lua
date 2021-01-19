@@ -5,6 +5,7 @@ function PlayerClassService.CreatePlayerClass(props, dynamic_props)
 		key = props.key or props.name,
 		display_name = true,
 		color = props.color,
+		adjustable = true,
 
 		can_regenerate_health = true,
 		can_take_fall_damage = true,

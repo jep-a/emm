@@ -28,6 +28,7 @@ MINIGAME:AddPlayerClass {
 MINIGAME:AddPlayerClass {
 	name = "Frozen",
 	color = COLOR_WHITE,
+	adjustable = false,
 	can_tag = {Hunted = true},
 	notify_on_tag = false
 }
@@ -152,6 +153,4 @@ function MINIGAME.player_classes.Frozen:EndTag(tagger)
 	end
 end
 
--- TODO: frozen indicator health status
--- TODO: remove frozen player class lobby settings
 -- TODO: respawn freezetag states

@@ -163,5 +163,3 @@ function HUDMeter:OnValueChanged(v)
 		end
 	end
 end
-
--- TODO: make crosshair meter match new proposed hud meter code
