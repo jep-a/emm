@@ -105,6 +105,10 @@ end
 
 function NotificationService.Clear(lobby, ply)
 	if NotificationService.Visible() and not lobby or IsLocalPlayer(ply) then
+		for _, element in pairs(HUDService.quadrant_a.children) do
+			FinishNotificationContainer(element)
+		end
+
 		for _, element in pairs(HUDService.quadrant_b.children) do
 			FinishNotificationContainer(element)
 		end
