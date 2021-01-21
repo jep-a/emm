@@ -147,7 +147,21 @@ local function ShouldTakeDamage(victim, attacker, dmg)
 end
 
 hook.Add("EntityTakeDamage", "EMM.EntityTakeDamage", function (victim, dmg)
-	return not ShouldTakeDamage(victim, dmg:GetAttacker(), dmg)
+	local attacker = dmg:GetAttacker()
+	local should_damage = ShouldTakeDamage(victim, attacker, dmg)
+
+	if should_damage then
+		local inflictor = dmg:GetInflictor()
+		local dmg_amount = dmg:GetDamage()
+
+		NetService.Broadcast("EntityTakeDamage", victim, inflictor, attacker, math.Truncate(dmg_amount, 2))
+
+		if victim.lobby then
+			MinigameService.CallHook(victim.lobby, "EntityTakeDamage", victim, inflictor, attacker, dmg_amount)
+		end
+	end
+
+	return not should_damage
 end)
 
 hook.Add("PlayerShouldTakeDamage", "EMM.PlayerShouldTakeDamage", function (victim, attacker)

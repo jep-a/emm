@@ -4,6 +4,7 @@ NetService.CreateSchema("PlayerDisconnected", {"entity"})
 NetService.CreateSchema("PrePlayerDeath", {"entity", "entity"})
 NetService.CreateSchema("PlayerDeath", {"entity", "entity", "entity"})
 NetService.CreateSchema("PostPlayerDeath", {"entity"})
+NetService.CreateSchema("EntityTakeDamage", {"entity", "entity", "entity", "float"})
 
 -- # Properties
 

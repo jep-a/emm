@@ -20,7 +20,7 @@ local function CallPlayerInitialSpawnHooks(ply_index)
 	if init_post_ent then
 		CallPlayerSpawnHook(queued_player_init_spawn_hooks, ply_index, function ()
 			local ply = Entity(ply_index)
-		
+
 			hook.Run("PlayerInitialSpawn", ply)
 			hook.Run("InitPlayerProperties", ply)
 		end)
@@ -176,5 +176,21 @@ NetService.Receive("PostPlayerDeath", function (ply)
 		end
 
 		MinigameService.CallHook(ply.lobby, "PostPlayerDeath", ply)
+	end
+end)
+
+NetService.Receive("EntityTakeDamage", function (victim, inflictor, attacker, dmg)
+	hook.Run("EntityTakeDamage", victim, inflictor, attacker, dmg)
+
+	if LocalPlayer() == ply then
+		hook.Run("LocalEntityTakeDamage", victim, inflictor, attacker, dmg)
+	end
+
+	if victim.lobby then
+		if MinigameService.IsLocalLobby(victim) then
+			hook.Run("LocalLobbyEntityTakeDamage", victim.lobby, victim, inflictor, attacker, dmg)
+		end
+
+		MinigameService.CallHook(victim.lobby, "EntityTakeDamage", victim, inflictor, attacker, dmg)
 	end
 end)
