@@ -23,7 +23,11 @@ SLIDE_MAX_TRACES = 4
 -- # Util
 
 function SlideService.GetNormalDir(vector)
-	return Vector(math.ceil(vector.x) + math.floor(vector.x), math.ceil(vector.y) + math.floor(vector.y), math.ceil(vector.z) + math.floor(vector.z))
+	local x = vector.x
+	local y = vector.y
+	local z = vector.z
+
+	return Vector(math.ceil(x) + math.floor(x), math.ceil(y) + math.floor(y), math.ceil(z) + math.floor(z))
 end
 
 function SlideService.Clip(vel, plane)
@@ -31,7 +35,7 @@ function SlideService.Clip(vel, plane)
 end
 
 function SlideService.MovingTowardsPlane(vel, plane)
-	return (0 > Vector(vel.x, vel.y):Dot(Vector(plane.x, plane.y)) and true) or false
+	return (0 > Vector(vel.x, vel.y):Dot(Vector(plane.x, plane.y)))
 end
 
 function SlideService.GetGroundTrace(pos, end_pos, ply)
@@ -59,7 +63,7 @@ function SlideService.Trace(ply, vel, pos)
 	}
 	local ramp_normal = (area_trace and ((slide and slide.HitNormal) or area_trace.HitNormal)) or Vector()
 	local slide_pos = pos - (ramp_normal * hover_height.z)
-
+	
 	if slide then
 		trace = SlideService.GetGroundTrace(pos, slide_pos - hover_height * 2, ply)
 
@@ -75,7 +79,7 @@ function SlideService.Trace(ply, vel, pos)
 				slide_pos = pos + Vector(0, 0, pred_vel.z) - hover_height
 			end
 
-			trace = SlideService.GetGroundTrace(pos, slide_pos, ply)
+			trace = SlideService.GetGroundTrace(pos, slide_pos - hover_height, ply)
 			trace.is_init = true
 		else
 			trace = SlideService.GetGroundTrace(pos, slide_pos - hover_height, ply)
@@ -83,10 +87,13 @@ function SlideService.Trace(ply, vel, pos)
 		end
 	end
 
-	if trace.HitNormal:LengthSqr() ~= 0 then
+	local normal = trace.HitNormal
+	local normal_length = normal:LengthSqr()
+
+	if normal_length ~= 0 and normal_length ~= 1 then
 		local trace_distance = 3
-		local corr_trace_pos = (SlideService.Clip(vel, trace.HitNormal):GetNormalized()) * trace_distance
-		local crease_trace
+		local corr_trace_pos = (SlideService.Clip(vel, normal):GetNormalized()) * trace_distance
+		local crease_trace, corr_normal
 
 		if 0 > vel.z then
 			ramp_normal.x = ramp_normal.y
@@ -95,9 +102,10 @@ function SlideService.Trace(ply, vel, pos)
 
 		corr_trace_pos = Vector(corr_trace_pos.x * math.abs(ramp_normal.y), corr_trace_pos.y * math.abs(ramp_normal.x), corr_trace_pos.z) * trace_distance
 		corr_trace = SlideService.GetGroundTrace(pos, pos - (hover_height * trace_distance) + corr_trace_pos + (ramp_normal * Vector(1,1)), ply)
+		corr_normal = corr_trace.HitNormal
 
-		if corr_trace.HitNormal ~= trace.HitNormal and corr_trace.HitNormal.z > 0 and 1 > corr_trace.HitNormal.z then
-			trace.HitNormal = (corr_trace.HitNormal + trace.HitNormal)/2
+		if corr_normal ~= normal and corr_normal.z > 0 and 1 > corr_normal.z then
+			trace.HitNormal = (corr_normal + normal)/2
 		end
 		return trace
 	end
@@ -145,7 +153,7 @@ function SlideService.SlideStrafe(move, normal)
 end
 
 function SlideService.Slide(ply, move, trace, slide_vel)
-	if not (ply.sliding or ply.surfing)  then
+	if not (ply.sliding or ply.surfing) then
 		ply.sliding = (SlideService.ShouldSlide(ply, trace.HitNormal, slide_vel) and trace) or false
 		ply.surfing = (SlideService.ShouldSurf(ply, trace.HitNormal, slide_vel) and trace) or false
 	end
@@ -176,8 +184,9 @@ end
 hook.Add("OnPlayerHitGround", "SlideService.HandleSlideDamage", SlideService.HandleSlideDamage)
 
 function SlideService.SetupSlide(ply, move, cmd)
-	local traces = {}
+	local normals = {}
 	local trace_count = 0
+	local normal
 
 	if ply.slide_onground then
 		move:SetVelocity(ply.slide_onground[1])
@@ -191,14 +200,15 @@ function SlideService.SetupSlide(ply, move, cmd)
 		local trace = SlideService.Trace(ply, vel, pos)
 
 		if trace then
-			trace.should_slide = SlideService.ShouldSlide(ply, trace.HitNormal, vel) or SlideService.ShouldSurf(ply, trace.HitNormal, vel)
+			normal = trace.HitNormal
+			trace.should_slide = SlideService.ShouldSlide(ply, normal, vel) or SlideService.ShouldSurf(ply, normal, vel)
 
 			if trace_count >= 1 then
 				local is_same_plane = false
 
 				for j = 1, trace_count do
 					if i > j then
-						if traces[j].HitNormal == trace.HitNormal and trace.HitNormal.z > 0 and 1 > trace.HitNormal.z then
+						if normals[j] == normal and normal.z > 0 and 1 > normal.z then
 							is_same_plane = true
 							break
 						end
@@ -210,17 +220,17 @@ function SlideService.SetupSlide(ply, move, cmd)
 				end
 			end
 
-			if 1 > trace.HitNormal.z and not trace.StartSolid and trace.should_slide then
+			if 1 > normal.z and not trace.StartSolid and trace.should_slide then
 				trace_count = trace_count + 1
-				traces[trace_count] = trace
+				normals[trace_count] = normal
 
-				if SlideService.SlideStrafe(move, trace.HitNormal) or ply:OnGround() then
+				if SlideService.SlideStrafe(move, normal) or (ply:OnGround() and vel:Dot(normal) > 0) then
 					ply:SetGroundEntity(NULL)
 					move:SetVelocity(vel)
 					move:SetOrigin(pos)
 					trace.should_slide = false
 				else
-					SlideService.Slide(ply, move, trace, SlideService.Clip(vel, trace.HitNormal))
+					SlideService.Slide(ply, move, trace, SlideService.Clip(vel, normal))
 				end
 			end
 		end
@@ -231,4 +241,4 @@ function SlideService.SetupSlide(ply, move, cmd)
 		end
 	end
 end
-hook.Add("PlayerTick", "SlideService.SetupSlide", SlideService.SetupSlide)
+hook.Add("SetupMove", "SlideService.SetupSlide", SlideService.SetupSlide)
