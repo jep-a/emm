@@ -16,13 +16,24 @@ MINIGAME:AddPlayerClass {
 	name = "Hunter",
 	can_tag = {Hunted = true},
 	minimum = 1,
-	give_player_class_on_tag = "Frozen"
+	give_player_class_on_tag = "Frozen",
+	tag_on_damage = true,
+
+	weapons = {
+		weapon_crossbow = true,
+		weapon_rpg = true
+	}
 }
 
 MINIGAME:AddPlayerClass {
 	name = "Hunted",
 	color = COLOR_PEACH,
-	end_on_none = true
+	end_on_none = true,
+
+	weapons = {
+		weapon_crossbow = true,
+		weapon_rpg = true
+	}
 }
 
 MINIGAME:AddPlayerClass {
@@ -153,4 +164,5 @@ function MINIGAME.player_classes.Frozen:EndTag(tagger)
 	end
 end
 
+-- TODO: tag on any damage
 -- TODO: respawn freezetag states

@@ -125,6 +125,8 @@ function MinigamePrototype:AddDefaultHooks()
 	self:AddStateHook("Playing", "PlayerLeave", "ForfeitDepartedPlayerClassToClosest", self.ForfeitDepartedPlayerClassToClosest)
 	self:AddStateHook("Playing", "PlayerClassChange", "EndIfNoPlayerClasses", self.CheckIfNoPlayerClasses)
 	self:AddStateHook("Playing", "SettingsChange", "ReloadLoadouts", self.ReloadLoadouts)
+
+	hook.Run("CreateMinigameHooks", self)
 end
 
 function MinigamePrototype:AddRequirePlayersHooks()

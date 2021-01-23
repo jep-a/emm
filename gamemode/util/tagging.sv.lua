@@ -1,4 +1,4 @@
-TaggingService.taggable_groups = TaggingService.taggable_groups or {}
+TaggingService.TaggableTarget_groups = TaggingService.TaggableTarget_groups or {}
 
 function TaggingService.Tag(lobby, taggable, tagger)
 	if not table.HasValue(taggable.tagging, tagger) then
@@ -61,7 +61,15 @@ function TaggingService.EndTag(lobby, taggable, tagger)
 	end
 end
 
-function TaggingService.Taggable(taggable, tagger)
+function TaggingService.Taggable(taggable)
+	return (
+		taggable.taggable and
+		GhostService.Alive(taggable) and
+		CurTime() > (taggable.last_tag_time + taggable.taggable_cooldown)
+	)
+end
+
+function TaggingService.TaggableTarget(taggable, tagger)
 	local can_tag = taggable.player_class and taggable.player_class.can_tag or taggable.can_tag
 
 	return (
@@ -75,15 +83,11 @@ function TaggingService.Taggable(taggable, tagger)
 end
 
 function TaggingService.LoopEnts(taggable, ents)
-	if
-		taggable.taggable and
-		GhostService.Alive(taggable) and
-		CurTime() > (taggable.last_tag_time + taggable.taggable_cooldown)
-	then
+	if TaggingService.Taggable(taggable) then
 		for i = 1, #ents do
 			local ent = ents[i]
 
-			if TaggingService.Taggable(taggable, ent) then
+			if TaggingService.TaggableTarget(taggable, ent) then
 				TaggingService.Tag(taggable.lobby, taggable, ent)
 			end
 		end
@@ -104,9 +108,9 @@ function TaggingService.LoopEnts(taggable, ents)
 end
 
 function TaggingService.Think()
-	for i = 1, #TaggingService.taggable_groups do
-		for _i = 1, #TaggingService.taggable_groups[i] do
-			local taggable = TaggingService.taggable_groups[i][_i]
+	for i = 1, #TaggingService.TaggableTarget_groups do
+		for _i = 1, #TaggingService.TaggableTarget_groups[i] do
+			local taggable = TaggingService.TaggableTarget_groups[i][_i]
 
 			if IsValid(taggable) then
 				local ents = ents.FindInSphere(GhostService.Entity(taggable):GetPos() + taggable:OBBCenter(), taggable.taggable_radius)
@@ -129,7 +133,7 @@ end)
 function TaggingService.InitLobby(lobby)
 	for k, ply_class in pairs(lobby.player_classes) do
 		if ply_class.can_tag then
-			table.insert(TaggingService.taggable_groups, lobby[k])
+			table.insert(TaggingService.TaggableTarget_groups, lobby[k])
 		end
 	end
 end
@@ -138,8 +142,18 @@ hook.Add("LobbyCreate", "TaggingService.InitLobby", TaggingService.InitLobby)
 function TaggingService.FinishLobby(lobby)
 	for k, ply_class in pairs(lobby.player_classes) do
 		if ply_class.can_tag then
-			table.RemoveByValue(TaggingService.taggable_groups, lobby[k])
+			table.RemoveByValue(TaggingService.TaggableTarget_groups, lobby[k])
 		end
 	end
 end
 hook.Add("LobbyFinish", "TaggingService.FinishLobby", TaggingService.FinishLobby)
+
+function TaggingService.TagOnDamage(lobby, victim, inflictor, attacker)
+	if TaggingService.Taggable(attacker) and TaggingService.TaggableTarget(attacker, victim) and attacker.tag_on_damage then
+		TaggingService.Tag(lobby, attacker, victim)
+		TaggingService.EndTag(lobby, attacker, victim)
+	end
+end
+hook.Add("CreateMinigameHooks", "TaggingService", function (proto)
+	proto:AddStateHook("Playing", "EntityTakeDamage", "TaggingService.TagOnDamage", TaggingService.TagOnDamage)
+end)

@@ -19,5 +19,6 @@ hook.Add("InitPlayerProperties", "TaggingService.InitPlayerProperties", TaggingS
 function TaggingService.InitPlayerClassProperties(ply_class)
 	ply_class.can_tag = {}
 	ply_class.notify_on_tag = true
+	ply_class.tag_on_damage = false
 end
 hook.Add("InitPlayerClassProperties", "TaggingService.InitPlayerClassProperties", TaggingService.InitPlayerClassProperties)

@@ -78,7 +78,7 @@ function ENT:Think()
 		for i = 1, #ents do
 			local ent = ents[i]
 
-			if TaggingService.Taggable(self, ent) then
+			if TaggingService.TaggableTarget(self, ent) then
 				hook.Run("TriggerStartTouch", self, ent)
 			end
 		end
