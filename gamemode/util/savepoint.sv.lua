@@ -90,7 +90,7 @@ function SavepointService.SendSavepoints(ply)
 	net.WriteUInt(table.Count(SavepointService.savepoints), 8)
 
 	for _, savepoint in pairs(SavepointService.savepoints) do
-		NetService.WriteID(savepoint.id))
+		NetService.WriteID(savepoint.id)
 		net.WriteEntity(savepoint.creator)
 		net.WriteVector(savepoint.position)
 		net.WriteVector(savepoint.velocity)
