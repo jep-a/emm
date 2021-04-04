@@ -3,4 +3,5 @@
 	"base" "base"
 	"title"	"Parkour"
 	"menusystem" "1"
+	"category" "other"
 }
