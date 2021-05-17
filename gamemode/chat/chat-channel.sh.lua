@@ -28,11 +28,14 @@ end
 function ChatChannel:AddPlayer(ply, flags)
     table.insert(self.players,ply)
     self.flags[ply] = flags or 0
+		ChatService.CallHook(self, "OnPlayerJoin", ply)
 end
 
 function ChatChannel:RemovePlayer(ply)
     table.remove(self.flags, ply)
     self.flags[ply] = nil
+
+		ChatService.CallHook(self, "OnPlayerLeave", ply)
 end
 
 function ChatChannel:AddOperator(ply)
@@ -52,10 +55,12 @@ end
 function ChatChannel:Ban(ply)
     self:RemovePlayer(ply)
     self.bans[ply] = true
+		ChatService.CallHook(self, "OnPlayerBan", ply)
 end
 
 function ChatChannel:RemoveBan(ply)
     self.bans[ply] = nil
+		ChatService.CallHook(self, "OnPlayerUnban", ply)
 end
 
 function ChatChannel:CheckBan(ply)
@@ -66,12 +71,14 @@ function ChatChannel:Mute(ply)
     if ChatChannel.HasPlayer(self, ply) then
         self.flags[ply] = self.flags[ply] | ChatChannel.MUTE
     end
+		ChatService.CallHook(self, "OnPlayerMute", ply)
 end
 
 function ChatChannel:RemoveMute(ply)
     if ChatChannel.HasPlayer(self, ply) then
         self.flags[ply] = self.flags[ply] & ~ChatChannel.MUTE
     end
+		ChatService.CallHook(self, "OnPlayerUnmute", ply)
 end
 
 
@@ -92,6 +99,7 @@ function ChatChannel:AddInvite(ply, timeout)
            self.invites[ply] = nil 
         end)
     end
+		ChatService.CallHook(self, "OnPlayerInvite", ply)
 end
 
 function ChatChannel:RemoveInvite(ply)
@@ -100,6 +108,7 @@ function ChatChannel:RemoveInvite(ply)
         timer.Remove(timer_id)
     end
     self.invites[ply] = nil
+		ChatService.CallHook(self, "OnPlayerInviteExpire", ply)
 end
 
 function ChatChannel:HasInvite(ply)
