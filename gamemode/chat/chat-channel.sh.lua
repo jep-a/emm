@@ -1,15 +1,24 @@
-ChatChannel = ChatChannel or Class.New()
+ChatChannel = ChatChannel or Class.New({__tostring = function(channel)
+	return channel.host:Name().."'s ".."chat channel: "..channel.name
+end})
+
 ChatChannel.MUTED = 1   --0b0001
 ChatChannel.OPERATOR = 1<<1   --0b0010
 
-function ChatChannel:Init(id, host, private)
+function ChatChannel:Init(id, host, name, private, invites)
     self.id = id or 0
+		self.name = name or nil
     self.host = host or nil
     self.private = private or nil
     self.players = {}
     self.flags = {}
     self.bans = {}
     self.invites = {}
+
+		invites = invites or {}
+		for _, invite in pairs(invites) do
+			self:AddInvite(unpack(invites))
+		end
 
     if host ~= nil then
         self:AddPlayer(host)
@@ -26,7 +35,7 @@ function ChatChannel:HasPlayer(ply)
 end
 
 function ChatChannel:AddPlayer(ply, flags)
-    table.insert(self.players,ply)
+    table.insert(self.players, ply)
     self.flags[ply] = flags or 0
 		ChatService.CallHook(self, "OnPlayerJoin", ply)
 end
@@ -40,10 +49,12 @@ end
 
 function ChatChannel:AddOperator(ply)
     self.flags[ply] = self.flags[ply] | ChatChannel.OPERATOR
+		ChatService.CallHook(self, "OnPlayerPromote", ply)
 end
 
 function ChatChannel:RemoveOperator(ply)
     self.flags[ply] = self.flags[ply] & ~ChatChannel.OPERATOR
+		ChatService.CallHook(self, "OnPlayerDemote", ply)
 end
 
 function ChatChannel:CheckOperator(ply)
@@ -54,6 +65,7 @@ end
 
 function ChatChannel:Ban(ply)
     self:RemovePlayer(ply)
+		self:RemoveInvite(ply)
     self.bans[ply] = true
 		ChatService.CallHook(self, "OnPlayerBan", ply)
 end
@@ -95,22 +107,37 @@ end
 function ChatChannel:AddInvite(ply, timeout)
     self.invites[ply] = true
     if(timeout) then 
-        timer.Create("chatinvite_ch"..self.id.."_pl"..ply.UserID(), timeout, 1, function()
-           self.invites[ply] = nil 
-        end)
+			timer.Create(self:GetInviteID(), timeout, 1, function()
+				self.invites[ply] = nil 
+				ChatService.CallHook(self, "OnPlayerInviteExpire", ply)
+			end)
     end
-		ChatService.CallHook(self, "OnPlayerInvite", ply)
+		ChatService.CallHook(self, "OnPlayerInvite", ply, timeout)
 end
 
+
 function ChatChannel:RemoveInvite(ply)
-    local timer_id = "chatinvite_ch"..self.id.."_pl"..ply.UserID()
-    if timer.Exists(timer_id) then
-        timer.Remove(timer_id)
-    end
-    self.invites[ply] = nil
-		ChatService.CallHook(self, "OnPlayerInviteExpire", ply)
+  local timer_id = self:GetInviteID(ply)
+  if not timer.Exists(timer_id) then
+		return
+  end
+	timer.Remove(timer_id)
+  self.invites[ply] = nil
+	ChatService.CallHook(self, "OnPlayerInviteRemove", ply)
 end
 
 function ChatChannel:HasInvite(ply)
-    return self.invites[ply] == true
+  return self.invites[ply] == true
+end
+
+function ChatChannel:SetName(name)
+	self.name = name
+end
+
+function ChatChannel:GetName()
+	return self.name
+end
+
+function ChatChannel:GetInviteID(ply)
+	return "invite_ch_"..self.id.."_pl_"..ply.UserID()
 end

@@ -25,3 +25,5 @@ end
 function ChatService.AddHook(channel, hk_name, func)
 	table.insert(channel.hooks[hk_name], func)
 end
+
+function ChatService.InviteI

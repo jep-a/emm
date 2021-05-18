@@ -10,26 +10,24 @@ function ChatNetService.CreateTextChannel(channel_id, creator, is_private)
 end
 NetService.Receive("CreateTextChannel", ChatNetService.CreateTextChannel)
 
-
 function ChatNetService.DestroyChannel(channel)
 end
 NetService.Receive("DestroyChannel", ChatNetService.DestroyChannel)
 
 -- TODO: Add timeout for invites
 --- Handle invite from a channel
----@param channel ChatChannel | "Channel the player is invite to"
+---@param channel ChatChannel | "Channel the player is invited to"
 ---@param ply Player | "Player being invited to the channel"
 function ChatNetService.ChatChannelInvite(channel, ply)
     if LocalPlayer() == ply then
-        NetService.Broadcast(channel)
-    else
-        --- Print that the player was invited to the channel
+			ChatText({COLOR_PINK,"Invite to "..channel})
     end
+		channel:Create
 end
 NetService.Receive("ChatChannelInvite", ChatNetService.ChatChannelInvite)
 
 --- Handle player joining a channel
----@param channel any
+---@param channel ChatChannel | "Joining player"
 ---@param ply any
 function ChatNetService.PlayerJoinChannel(channel, ply)
     channel:AddPlayer(ply)

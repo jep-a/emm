@@ -66,7 +66,6 @@ NetService.Receive("ReqJoinChannel", ChatNetService.ReqJoinChannel)
 function ChatNetService.ReqChannelInvite(ply, channel, recipient)
     if channel.flags[ply] & ChatChannel.OPERATOR then
         NetService.Send("ChatChannelInvite", recipient, channel, recipient)
-        NetService.Send("ChatChannelInvite", channel.players, channel, recipient)
     end
 end
 NetService.Receive("ReqChannelInvite", ChatNetService.ReqChannelInvite)
@@ -77,7 +76,7 @@ NetService.Receive("ReqChannelInvite", ChatNetService.ReqChannelInvite)
 function ChatNetService.ReqLeaveChannel(ply, channel)
     if channel.id > 2 then
         ChatService.RemovePlayer(channel, ply)
-        ChatService.AddPlayer(ChatService.channels[2], ply)
+        ChatService.AddPlayer(channel, ply)
     end
 end
 NetService.Receive("ReqLeaveChannel", ChatNetService.ReqLeaveChannel)
@@ -87,8 +86,8 @@ NetService.Receive("ReqLeaveChannel", ChatNetService.ReqLeaveChannel)
 ---@param recipient Player | "Player that accepted the invite"
 ---@param channel ChatChannel | "Chat channel to join"
 function ChatNetService.ReqAcceptChatInvite(recipient, channel)
-    channel:AddPlayer(recipient)
-    NetService.Broadcast("PlayerJoinChannel", channel, recipient)
+	if not channel:HasInvite(recipient) then return end
+	ChatService.AddPlayer(channel, ply)
 end
 NetService.Receive("ReqAcceptChatInvite", ChatNetService.ReqAcceptChatInvite)
 
