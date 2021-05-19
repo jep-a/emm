@@ -25,7 +25,7 @@ NetService.type_readers = {
 	string = net.ReadString,
 	entity = net.ReadEntity,
 	vector = net.ReadVector,
-	int = net.ReadInt,
+	integer = net.ReadInt,
 
 	entities = function ()
 		local ents = {}
@@ -58,7 +58,7 @@ NetService.type_writers = {
 	string = net.WriteString,
 	entity = net.WriteEntity,
 	vector = net.WriteVector,
-	int = net.WriteInt,
+	integer = net.WriteInt,
 
 	entities = function (ents)
 		net.WriteUInt(#ents, 8)

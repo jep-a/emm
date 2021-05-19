@@ -18,11 +18,11 @@ NetService.Receive("DestroyChannel", ChatNetService.DestroyChannel)
 --- Handle invite from a channel
 ---@param channel ChatChannel | "Channel the player is invited to"
 ---@param ply Player | "Player being invited to the channel"
-function ChatNetService.ChatChannelInvite(channel, ply)
+function ChatNetService.ChatChannelInvite(channel, ply, timeout)
     if LocalPlayer() == ply then
-			ChatText({COLOR_PINK,"Invite to "..channel})
+			ChatText({COLOR_PINK,"Invite to "..channel:GetInviteID(ply)})
     end
-		channel:Create
+		channel:CreateInvite(ply, timeout)
 end
 NetService.Receive("ChatChannelInvite", ChatNetService.ChatChannelInvite)
 

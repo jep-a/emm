@@ -22,15 +22,24 @@ end
 function ChatService.PacketToChannels(packet)
     local channel_info = util.JSONToTable(util.Decompress(packet))
     for channel_id, channel_data in pairs(channel_info) do
-        local new_channel = {}
-        if channel_data.voice then
-            new_channel = ChatService.CreateVoiceChannel(channel_id, channel_data.private, Player(channel_data.host))
-        else
-            new_channel = ChatService.CreateTextChannel(channel_id, channel_data.private, Player(channel_data.host))
-        end
-        --What about bans?
-        for ply_id, flags in pairs(channel_tab.ply_flags) do
-            new_channel.players[Player(ply_id)] = flags
-        end
-    end
+			local new_channel = {}
+			if channel_data.voice then
+					new_channel = ChatService.CreateVoiceChannel(channel_id, channel_data.private, Player(channel_data.host))
+			else
+					new_channel = ChatService.CreateTextChannel(channel_id, channel_data.private, Player(channel_data.host))
+			end
+
+			for ply_id, flags in pairs(channel_tab.ply_flags) do
+				new_channel:AddPlayer(Player(ply_id))
+				new_channel:SetPlayerFlags(flags)
+			end
+
+			for _, invite in pairs(invites) do
+				new_channel:AddInvite(unpack(invite))
+			end
+
+			for ply,_ in pairs(channel_data.bans) do
+				new_channel:Ban(ply)
+			end
+		end	
 end

@@ -5,7 +5,7 @@ end})
 ChatChannel.MUTED = 1   --0b0001
 ChatChannel.OPERATOR = 1<<1   --0b0010
 
-function ChatChannel:Init(id, host, name, private, invites)
+function ChatChannel:Init(id, host, name, private)
     self.id = id or 0
 		self.name = name or nil
     self.host = host or nil
@@ -14,11 +14,6 @@ function ChatChannel:Init(id, host, name, private, invites)
     self.flags = {}
     self.bans = {}
     self.invites = {}
-
-		invites = invites or {}
-		for _, invite in pairs(invites) do
-			self:AddInvite(unpack(invites))
-		end
 
     if host ~= nil then
         self:AddPlayer(host)
@@ -106,7 +101,7 @@ end
 
 function ChatChannel:AddInvite(ply, timeout)
     self.invites[ply] = true
-    if(timeout) then 
+    if timeout and timeout > 0 then 
 			timer.Create(self:GetInviteID(), timeout, 1, function()
 				self.invites[ply] = nil 
 				ChatService.CallHook(self, "OnPlayerInviteExpire", ply)
@@ -141,3 +136,8 @@ end
 function ChatChannel:GetInviteID(ply)
 	return "invite_ch_"..self.id.."_pl_"..ply.UserID()
 end
+
+function ChatChannel:SetPlayerFlags(ply, flags)
+	self.flags[ply] = flags
+end
+	

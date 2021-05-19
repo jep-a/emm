@@ -17,7 +17,7 @@ NetService.CreateSchema("CreateTextChannel", {"id", "entity", "bool"})
 -- DestroyChannel: {ChannelID: obj_id}
 NetService.CreateSchema("DestroyChannel", {"chat_channel"})
 -- ChatChannelInvite: {ChannelID: obj_id, Who: player}
-NetService.CreateSchema("ChatChannelInvite", {"chat_channel", "entity"})
+NetService.CreateSchema("ChatChannelInvite", {"chat_channel", "entity", "integer"})
 -- PlayerJoinChannel: {ChannelID: obj_id, Who: player}
 NetService.CreateSchema("PlayerJoinChannel", {"chat_channel", "entity"})
 -- PlayerLeaveChannel: {ChannelID: obj_id, Who: player}
@@ -45,7 +45,7 @@ NetService.CreateUpstreamSchema("ReqCreateTextChannel", {"bool"})
 -- ReqJoinChannel: {ChannelID: obj_id}
 NetService.CreateUpstreamSchema("ReqJoinChannel", {"chat_channel"})
 -- ReqChannelInvite: {ChannelID: obj_id, Who: entity}
-NetService.CreateUpstreamSchema("ReqChannelInvite", {"chat_channel", "entity"})
+NetService.CreateUpstreamSchema("ReqChannelInvite", {"chat_channel", "entity", "integer"})
 -- ReqLeaveChannel: {ChannelID: obj_id}
 NetService.CreateUpstreamSchema("ReqLeaveChannel", {"chat_channel"})
 -- ReqChannelBanPlayer: {ChannelID: obj_id, Who: entity}
