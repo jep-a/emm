@@ -1,4 +1,4 @@
-VoiceChannel = VoiceChannel or Class.New(ChatChannel)
+VoiceChannel = VoiceChannel or Class.New(CommChannel)
 
 function VoiceChannel:Init(id, host, private)
     VoiceChannel.super.Init(self, id, host, private)

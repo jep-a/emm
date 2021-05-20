@@ -9,7 +9,7 @@ function ChatNetService.ReqCreateVoiceChannel(creator, private)
     local has_channel = false
     local current_channel = {}
     -- TODO: Find better way to do this
-    for channel_id, channel in pairs(ChatService.channels) do
+    for channel_id, channel in pairs(CommService.channels) do
         if channel:HasPlayer(creator) then
             current_channel = channel
         end
@@ -19,8 +19,8 @@ function ChatNetService.ReqCreateVoiceChannel(creator, private)
     end
 
     if not has_channel then
-        ChatService.RemovePlayer(current_channel, creator)
-        ChatService.CreateVoiceChannel(creator, private)
+        CommService.RemovePlayer(current_channel, creator)
+        CommService.CreateVoiceChannel(creator, private)
     end
 end
 NetService.Receive("ReqCreateVoiceChannel", ChatNetService.ReqCreateVoiceChannel)
@@ -33,7 +33,7 @@ function ChatNetService.ReqCreateTextChannel(creator, private)
     local has_channel = false
     local current_channel = {}
     -- TODO: Find better way to do this
-    for channel_id, channel in pairs(ChatService.channels) do
+    for channel_id, channel in pairs(CommService.channels) do
         if channel:HasPlayer(creator) then
             current_channel = channel
         end
@@ -43,7 +43,7 @@ function ChatNetService.ReqCreateTextChannel(creator, private)
     end
 
     if not has_channel then
-        ChatService.CreateTextChannel(creator, private)
+        CommService.CreateTextChannel(creator, private)
     end
 end
 NetService.Receive("ReqCreateTextChannel", ChatNetService.ReqCreateTextChannel)
@@ -55,7 +55,7 @@ function ChatNetService.ReqJoinChannel(ply, channel)
     -- Check if the target channel is private or the player is banned
     if channel.private or channel:CheckBan(ply) then return end
     if channel:HasPlayer(ply) then return end
-    ChatService.AddPlayer(channel, ply)
+    CommService.AddPlayer(channel, ply)
 end
 NetService.Receive("ReqJoinChannel", ChatNetService.ReqJoinChannel)
 
@@ -64,7 +64,7 @@ NetService.Receive("ReqJoinChannel", ChatNetService.ReqJoinChannel)
 ---@param channel ChatChannel | "Chat channel the player is requesting to invite to"
 ---@param recipient Player | "Recipient of the invite"
 function ChatNetService.ReqChannelInvite(ply, channel, recipient)
-    if channel.flags[ply] & ChatChannel.OPERATOR then
+    if channel.flags[ply] & CommChannel.OPERATOR then
         NetService.Send("ChatChannelInvite", recipient, channel, recipient)
     end
 end
@@ -75,8 +75,8 @@ NetService.Receive("ReqChannelInvite", ChatNetService.ReqChannelInvite)
 ---@param channel ChatChannel | "Channel the player is leaving"
 function ChatNetService.ReqLeaveChannel(ply, channel)
     if channel.id > 2 then
-        ChatService.RemovePlayer(channel, ply)
-        ChatService.AddPlayer(channel, ply)
+        CommService.RemovePlayer(channel, ply)
+        CommService.AddPlayer(channel, ply)
     end
 end
 NetService.Receive("ReqLeaveChannel", ChatNetService.ReqLeaveChannel)
@@ -87,13 +87,13 @@ NetService.Receive("ReqLeaveChannel", ChatNetService.ReqLeaveChannel)
 ---@param channel ChatChannel | "Chat channel to join"
 function ChatNetService.ReqAcceptChatInvite(recipient, channel)
 	if not channel:HasInvite(recipient) then return end
-	ChatService.AddPlayer(channel, ply)
+	CommService.AddPlayer(channel, ply)
 end
 NetService.Receive("ReqAcceptChatInvite", ChatNetService.ReqAcceptChatInvite)
 
 --- Handle request to sync lobbies to a player
 ---@param ply Player | "Player to send the lobbies to"
 function ChatNetService.ReqSyncLobbies(ply)
-    NetService.Send("SyncLobbyData",ply, ChatService.ChannelsToPacket())
+    NetService.Send("SyncLobbyData",ply, CommService.ChannelsToPacket())
 end
 NetService.Receive("ReqSyncLobbies", ChatNetService.ReqSyncLobbies)

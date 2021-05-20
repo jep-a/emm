@@ -1,12 +1,12 @@
-ChatNetService = ChatNetService or ChatService or {}
+ChatNetService = ChatNetService or CommService or {}
 
 function ChatNetService.CreateVoiceChannel(channel_id, creator, is_private)
-    ChatService.channels[channel_id] = VoiceChannel:New(channel_id, creator, is_private)
+    CommService.channels[channel_id] = VoiceChannel:New(channel_id, creator, is_private)
 end
 NetService.Receive("CreateVoiceChannel", ChatNetService.CreateVoiceChannel)
 
 function ChatNetService.CreateTextChannel(channel_id, creator, is_private)
-    ChatService.channels[channel_id] = TextChannel:New(channel_id, creator, is_private)
+    CommService.channels[channel_id] = TextChannel:New(channel_id, creator, is_private)
 end
 NetService.Receive("CreateTextChannel", ChatNetService.CreateTextChannel)
 
@@ -81,6 +81,6 @@ NetService.Receive("ChannelUnsetOP", ChatNetService.ChannelUnsetOP)
 --- Handle lobby data syncing
 ---@param data String | "Data to be synced"
 function ChatNetService.SyncLobbyData(data)
-    ChatService.PacketToChannels(data)
+    CommService.PacketToChannels(data)
 end
 NetService.Receive("SyncLobbyData", ChatNetService.SyncLobbyData)

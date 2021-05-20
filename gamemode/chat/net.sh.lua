@@ -3,7 +3,7 @@ NetService.type_writers.chat_channel = NetService.type_writers.obj_id
 
 --- Type reader for chat channel
 NetService.type_readers.chat_channel = function()
-    return ChatService.channels[NetService.ReadID()]
+    return CommService.channels[NetService.ReadID()]
 end
 
 -- Signal name: {Schema Description}
