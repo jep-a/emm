@@ -29,29 +29,11 @@ end
 --- Return compressed string representing the channel info
 function ChannelService.ChannelsToPacket()
     local channel_info = {}
-    for channel_id, channel_data in pairs(ChannelService.channels) do
-        local channel_tab = {}
-        channel_tab.ply_flags = {}
-
-        channel_tab.id = channel_id
-        channel_tab.voice = Class.InstanceOf(channel_tab, VoiceChannel)
-        channel_tab.host_id = channel_data.host:UserID()
-        channel_tab.private = channel_data.private
-				channel_tab.players = channel_data.players
-				channel_tab.bans = channel_data.bans
-
-        for ply, ply_flags in pairs(channel_data.flags) do
-          channel_tab.ply_flags[ply:UserID()] = ply_flags
-        end
-
-				channel_tab.invites = {}
-				for ply, _ in pairs(channel_data.invites) do
-					table.insert(channel_tab.invites, { 
-							ply, timer.TimeLeft(channel_data:GetInviteID(ply)) or -1
-					})
-				end
-        table.insert(channel_info, channel_tab)
+    for _, channel in pairs(ChannelService.channels) do
+				table.insert(channel_info, channel:GetSerializeable())
     end
+		-- TODO: abstract serialization into member function so that
+		--       child data members can also be serialized with polymorphism
     
     return util.Compress(util.TableToJSON(channel_info))
 end

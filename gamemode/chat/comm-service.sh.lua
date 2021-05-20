@@ -1,17 +1,17 @@
-ChatService = ChatService or {}
-ChatService.channels = ChatService.channels or {}
+CommService = CommService or {}
+CommService.channels = CommService.channels or {}
 
 --- Remove channel from the channel list
 ---@param channel_id uint8
-function ChatService.DestroyChannel(channel_id)
-    if(ChatService.channels[channel_id]) then
-        ChatService.channels[channel_id] = nil
+function CommService.DestroyChannel(channel_id)
+    if(CommService.channels[channel_id]) then
+        CommService.channels[channel_id] = nil
     end
 end
 
 
 -- Call channel specific hook
-function ChatService.CallHook(channel, hk_name, ...)
+function CommService.CallHook(channel, hk_name, ...)
 	if channel[hk_name] then
 		channel[hk_name](channel, ...)
 	end
@@ -22,8 +22,7 @@ function ChatService.CallHook(channel, hk_name, ...)
 	end
 end
 
-function ChatService.AddHook(channel, hk_name, func)
+function CommService.AddHook(channel, hk_name, func)
 	table.insert(channel.hooks[hk_name], func)
 end
 
-function ChatService.InviteI

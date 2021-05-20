@@ -1,6 +1,4 @@
-CommChannel = CommChannel or Class.New({__tostring = function(channel)
-	return channel.host:Name().."'s ".."chat channel: "..channel.name
-end})
+CommChannel = CommChannel or Class.New()
 CommChannel.MUTED = 1   --0b0001
 CommChannel.OPERATOR = 1<<1   --0b0010
 
@@ -31,24 +29,24 @@ end
 function CommChannel:AddPlayer(ply, flags)
     table.insert(self.players, ply)
     self.flags[ply] = flags or 0
-		ChatService.CallHook(self, "OnPlayerJoin", ply)
+		CommService.CallHook(self, "OnPlayerJoin", ply)
 end
 
 function CommChannel:RemovePlayer(ply)
     table.remove(self.flags, ply)
     self.flags[ply] = nil
 
-		ChatService.CallHook(self, "OnPlayerLeave", ply)
+		CommService.CallHook(self, "OnPlayerLeave", ply)
 end
 
 function CommChannel:AddOperator(ply)
     self.flags[ply] = self.flags[ply] | CommChannel.OPERATOR
-		ChatService.CallHook(self, "OnPlayerPromote", ply)
+		CommService.CallHook(self, "OnPlayerPromote", ply)
 end
 
 function CommChannel:RemoveOperator(ply)
     self.flags[ply] = self.flags[ply] & ~CommChannel.OPERATOR
-		ChatService.CallHook(self, "OnPlayerDemote", ply)
+		CommService.CallHook(self, "OnPlayerDemote", ply)
 end
 
 function CommChannel:CheckOperator(ply)
@@ -61,12 +59,12 @@ function CommChannel:Ban(ply)
     self:RemovePlayer(ply)
 		self:RemoveInvite(ply)
     self.bans[ply] = true
-		ChatService.CallHook(self, "OnPlayerBan", ply)
+		CommService.CallHook(self, "OnPlayerBan", ply)
 end
 
 function CommChannel:RemoveBan(ply)
     self.bans[ply] = nil
-		ChatService.CallHook(self, "OnPlayerUnban", ply)
+		CommService.CallHook(self, "OnPlayerUnban", ply)
 end
 
 function CommChannel:CheckBan(ply)
@@ -77,14 +75,14 @@ function CommChannel:Mute(ply)
     if CommChannel.HasPlayer(self, ply) then
         self.flags[ply] = self.flags[ply] | CommChannel.MUTE
     end
-		ChatService.CallHook(self, "OnPlayerMute", ply)
+		CommService.CallHook(self, "OnPlayerMute", ply)
 end
 
 function CommChannel:RemoveMute(ply)
     if CommChannel.HasPlayer(self, ply) then
         self.flags[ply] = self.flags[ply] & ~CommChannel.MUTE
     end
-		ChatService.CallHook(self, "OnPlayerUnmute", ply)
+		CommService.CallHook(self, "OnPlayerUnmute", ply)
 end
 
 
@@ -103,10 +101,10 @@ function CommChannel:AddInvite(ply, timeout)
     if timeout and timeout > 0 then 
 			timer.Create(self:GetInviteID(), timeout, 1, function()
 				self.invites[ply] = nil 
-				ChatService.CallHook(self, "OnPlayerInviteExpire", ply)
+				CommService.CallHook(self, "OnPlayerInviteExpire", ply)
 			end)
     end
-		ChatService.CallHook(self, "OnPlayerInvite", ply, timeout)
+		CommService.CallHook(self, "OnPlayerInvite", ply, timeout)
 end
 
 
@@ -117,7 +115,7 @@ function CommChannel:RemoveInvite(ply)
   end
 	timer.Remove(timer_id)
   self.invites[ply] = nil
-	ChatService.CallHook(self, "OnPlayerInviteRemove", ply)
+	CommService.CallHook(self, "OnPlayerInviteRemove", ply)
 end
 
 function CommChannel:HasInvite(ply)
@@ -140,3 +138,23 @@ function CommChannel:SetPlayerFlags(ply, flags)
 	self.flags[ply] = flags
 end
 	
+function CommChannel:GetSerializeable(to_serialize)
+	to_serialize = to_serialize or {}
+	to_serialize.id = self.id
+	to_serialize.name = self.name
+	to_serialize.host_id = self.host:UserID()
+	to_serialize.private = self.private
+	to_serialize.players = self.players
+	to_serialize.bans = self.bans
+	to_serialize.flags = self.flags
+
+	to_serialize.invites = {}
+	for ply, _ in pairs(self.invites) do 
+		table.insert(to_serialize.invites, { 
+				ply, timer.TimeLeft(self:GetInviteID(ply)) or -1
+		})
+	end
+
+	return to_serialize
+
+end

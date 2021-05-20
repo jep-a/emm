@@ -6,7 +6,7 @@ ChannelService.channels = ChannelService.channels or {}
 ---@param is_private boolean | "Is the channel private?"
 function ChannelService.CreateVoiceChannel(channel_id, is_private, host)
     --- TODO: Update this statement when the voice channel class is complete
-    ChannelService.channels[channel_id] = VoiceChannelClass:New(is_private)
+    ChannelService.channels[channel_id] = VoiceChannel:New(is_private)
 end 
 
 --- Add new text channel
@@ -14,7 +14,7 @@ end
 ---@param is_private boolean | "Is the channel private?"
 function ChannelService.CreateTextChannel(channel_id, is_private, host)
     --- TODO: Update this statement when the text channel class is complete
-    ChannelService.channels[channel_id] = TextChannelClass:New(is_private)
+    ChannelService.channels[channel_id] = TextChannel:New(is_private)
 end
 
 --- Converts the packet to channels

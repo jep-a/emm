@@ -20,3 +20,11 @@ function VoiceChannel:AddPlayer(ply, flags)
 		end
 	end
 end
+
+function VoiceChannel:GetSerializeable()
+	local to_serialize = {}
+	VoiceChannel.super.GetSerializeable(self, to_serialize)
+
+	--somehow indicate voice channel here
+
+end
