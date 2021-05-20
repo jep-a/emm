@@ -53,7 +53,7 @@ function SlideService.Trace(ply, vel, pos)
 	local hover_height = Vector(0, 0, ply.slide_hover_height)
 	local slide = ply.surfing or ply.sliding
 	local trace
-	local offset = (ply:OnGround() and Vector(0, 0, 1)) or Vector(0, 0, 0)
+	local offset = (ply:OnGround() and Vector(0, 0, 1)) or Vector()
 	local area_trace = util.TraceHull {
 		start = pos,
 		endpos = pos + (pred_vel * 3) - hover_height * 5,
@@ -62,10 +62,10 @@ function SlideService.Trace(ply, vel, pos)
 		mask = MASK_PLAYERSOLID_BRUSHONLY
 	}
 	local ramp_normal = (area_trace and ((slide and slide.HitNormal) or area_trace.HitNormal)) or Vector()
-	local slide_pos = pos - (ramp_normal * hover_height.z)
+	local slide_pos = pos - (ramp_normal * hover_height.z) - hover_height
 	
 	if slide then
-		trace = SlideService.GetGroundTrace(pos, slide_pos - hover_height * 2, ply)
+		trace = SlideService.GetGroundTrace(pos, slide_pos  - hover_height*2, ply)
 
 		if slide.is_init then
 			trace.HitPos.z = slide.HitPos.z
@@ -78,13 +78,10 @@ function SlideService.Trace(ply, vel, pos)
 			else
 				slide_pos = pos + Vector(0, 0, pred_vel.z) - hover_height
 			end
-
-			trace = SlideService.GetGroundTrace(pos, slide_pos - hover_height, ply)
-			trace.is_init = true
-		else
-			trace = SlideService.GetGroundTrace(pos, slide_pos - hover_height, ply)
-			trace.is_init = true
 		end
+		
+		trace = SlideService.GetGroundTrace(pos, slide_pos, ply)
+		trace.is_init = true
 	end
 
 	local normal = trace.HitNormal
@@ -92,20 +89,20 @@ function SlideService.Trace(ply, vel, pos)
 
 	if normal_length ~= 0 and normal_length ~= 1 then
 		local trace_distance = 3
-		local corr_trace_pos = (SlideService.Clip(vel, normal):GetNormalized()) * trace_distance
-		local crease_trace, corr_normal
+		local correction_trace_pos = (SlideService.Clip(vel, normal):GetNormalized()) * trace_distance
+		local crease_trace, correction_normal
 
 		if 0 > vel.z then
 			ramp_normal.x = ramp_normal.y
 			ramp_normal.y = ramp_normal.x
 		end
 
-		corr_trace_pos = Vector(corr_trace_pos.x * math.abs(ramp_normal.y), corr_trace_pos.y * math.abs(ramp_normal.x), corr_trace_pos.z) * trace_distance
-		corr_trace = SlideService.GetGroundTrace(pos, pos - (hover_height * trace_distance) + corr_trace_pos + (ramp_normal * Vector(1,1)), ply)
-		corr_normal = corr_trace.HitNormal
+		correction_trace_pos = Vector(correction_trace_pos.x * math.abs(ramp_normal.y), correction_trace_pos.y * math.abs(ramp_normal.x), correction_trace_pos.z) * trace_distance
+		correction_trace = SlideService.GetGroundTrace(pos, pos - (hover_height * trace_distance) + correction_trace_pos + (ramp_normal * Vector(1,1)), ply)
+		correction_normal = correction_trace.HitNormal
 
-		if corr_normal ~= normal and corr_normal.z > 0 and 1 > corr_normal.z then
-			trace.HitNormal = (corr_normal + normal)/2
+		if correction_normal ~= normal and correction_normal.z > 0 and 1 > correction_normal.z then
+			trace.HitNormal = (correction_normal + normal)/2
 		end
 		return trace
 	end
@@ -142,10 +139,10 @@ end
 
 -- # Sliding
 
-function SlideService.SlideStrafe(move, normal)
+function SlideService.SlideStrafe(move, vel, normal)
 	local wish_dir = AiraccelService.WishDir(ply, move:GetMoveAngles():Forward(), move:GetForwardSpeed(), move:GetSideSpeed())
 
-	if normal:Dot(wish_dir:GetNormalized()) > 0 and move:GetVelocity():Dot(normal) > 0 then
+	if normal:Dot(wish_dir:GetNormalized()) > 0 and vel:Dot(normal) > 0 then
 		return true
 	end
 
@@ -153,14 +150,16 @@ function SlideService.SlideStrafe(move, normal)
 end
 
 function SlideService.Slide(ply, move, trace, slide_vel)
-	if not (ply.sliding or ply.surfing) then
+	local slide = ply.sliding or ply.surfing
+	local pos = move:GetOrigin()
+
+	if not (ply.sliding or ply.surfing) or trace.HitNormal.z ~= slide.HitNormal.z then
 		ply.sliding = (SlideService.ShouldSlide(ply, trace.HitNormal, slide_vel) and trace) or false
 		ply.surfing = (SlideService.ShouldSurf(ply, trace.HitNormal, slide_vel) and trace) or false
 	end
 
 	if ply.sliding or ply.surfing then
-		local pos = move:GetOrigin()
-
+		pos = pos + trace.HitNormal * 0.25
 		pos.z = trace.HitPos.z + ply.slide_hover_height
 		ply:SetGroundEntity(NULL)
 		move:SetVelocity(slide_vel)
@@ -184,10 +183,13 @@ end
 hook.Add("OnPlayerHitGround", "SlideService.HandleSlideDamage", SlideService.HandleSlideDamage)
 
 function SlideService.SetupSlide(ply, move, cmd)
+	local can_slide = true
 	local normals = {}
 	local trace_count = 0
 	local normal
 
+	if not can_slide then return end
+	
 	if ply.slide_onground then
 		move:SetVelocity(ply.slide_onground[1])
 		move:SetOrigin(ply.slide_onground[2])
@@ -224,7 +226,7 @@ function SlideService.SetupSlide(ply, move, cmd)
 				trace_count = trace_count + 1
 				normals[trace_count] = normal
 
-				if SlideService.SlideStrafe(move, normal) or (ply:OnGround() and vel:Dot(normal) > 0) then
+				if SlideService.SlideStrafe(move, move:GetVelocity(), normal) or (ply:OnGround() and vel:Dot(normal) > 0) then
 					ply:SetGroundEntity(NULL)
 					move:SetVelocity(vel)
 					move:SetOrigin(pos)
