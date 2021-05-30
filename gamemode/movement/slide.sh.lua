@@ -58,7 +58,7 @@ function SlideService.ShouldSlide(ply, normal, vel)
 		normal.z > ply.slide_minimum and
 		vel:Dot(vel) > ply.slide_minimum_vel and
 		((not ply.sliding and 
-		slide_vel.z and slide_vel.z > 150 or vel.z > 150) or 
+		slide_vel.z > 150 or vel.z > 150) or 
 		ply.sliding))
 	then
 		return true
@@ -103,11 +103,15 @@ function SlideService.Trace(ply, vel, pos)
 	local slide_pos = pos - (ramp_normal * 0.025) - hover_height
 	
 	if slide then
-		trace = SlideService.GetGroundTrace(slide_pos + hover_height, slide_pos - hover_height, ply)
+		trace = SlideService.GetGroundTrace(pos , slide_pos - hover_height, ply)
 
 		if slide.is_init then
 			trace.HitPos.z = slide.HitPos.z
 			slide.is_init = false
+		else
+			if trace.HitNormal:LengthSqr() < slide.HitNormal:LengthSqr() then
+				return false
+			end
 		end
 	else
 		if 0 > vel.z and not ply:OnGround() then
@@ -191,11 +195,11 @@ function SlideService.SetupSlide(ply, move, cmd)
 				normal = trace.HitNormal
 				trace.should_slide = SlideService.ShouldSlide(ply, normal, vel) or SlideService.ShouldSurf(ply, normal, vel)
 
-				if trace_count >= 1 then
+				if trace_count > 1 then
 					local is_same_plane = false
 
 					for j = 1, trace_count do
-						if i > j and (normals[j] == normal and normal.z > 0 and 1 > normal.z) and SlideService.MovingTowardsPlane(vel, normal) then
+						if i > j and (normals[j] == normal and normal.z > 0 and 1 > normal.z) then
 							is_same_plane = true
 							break
 						end
@@ -207,16 +211,16 @@ function SlideService.SetupSlide(ply, move, cmd)
 				end
 
 				if 1 > normal.z and not trace.StartSolid and trace.should_slide then
+					local slide = ply.sliding or ply.surfing
+
 					trace_count = trace_count + 1
 					normals[trace_count] = normal
 
 					if SlideService.SlideStrafe(move, move:GetVelocity(), normal) or (ply:OnGround() and vel:Dot(normal) > 0) then
 						ply:SetGroundEntity(NULL)
-						move:SetVelocity(original_velocity)
-						move:SetOrigin(original_position)
+						move:SetVelocity(vel)
+						move:SetOrigin(pos)
 						trace.should_slide = false
-						ply.sliding = false
-						ply.surfing = false
 						break
 					else
 						SlideService.Slide(ply, move, trace, SlideService.Clip(vel, normal))
