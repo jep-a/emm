@@ -11,6 +11,7 @@ function WalljumpService.InitPlayerProperties(ply)
 	ply.walljump_velocity_multiplier = 260
 	ply.walljump_up_velocity = 200
 	ply.walljump_sound = "npc/footsteps/hardboot_generic"
+	ply.walljump_angle = 58
 	ply.last_walljump_time = 0
 end
 hook.Add(
@@ -115,7 +116,7 @@ function WalljumpService.Walljump(ply, move, dir)
 	if
 		trace.Hit and
 		(ply.can_walljump_sky or not trace.HitSky) and
-		(58 > WalljumpService.GetAngle(dir, trace.HitNormal))
+		(ply.walljump_angle > WalljumpService.GetAngle(dir, trace.HitNormal))
 	then
 		did_walljump = true
 
