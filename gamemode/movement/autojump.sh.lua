@@ -40,16 +40,16 @@ function AutoJumpService.DuckJump(ply, move)
 		start = pos,
 		endpos = pos,
 		mins = mins,
-		maxs = maxs + Vector(0,0,maxs.z/2),
+		maxs = maxs + Vector(0, 0, maxs.z/2),
 		mask = MASK_PLAYERSOLID_BRUSHONLY
 	}
-	local should_jump = (((ply:KeyPressed(IN_JUMP) or ply:KeyReleased(IN_JUMP))) or (ply.can_autojump and ply:KeyDown(IN_JUMP)) or ply.force_autojump)
+	local should_jump = ((ply:KeyPressed(IN_JUMP) or ply:KeyReleased(IN_JUMP)) or (ply.can_autojump and ply:KeyDown(IN_JUMP)) or ply.force_autojump)
 
 	if 
 		ply:OnGround() and 
 		not move:KeyDown(IN_DUCK) and 
 		ply:Crouching() and 
-		ply.old_velocity.z <= 0 and
+		0 >= ply.old_velocity.z and
 		should_jump
 	then
 		if not trace_hull.HitWorld then
@@ -61,7 +61,7 @@ function AutoJumpService.DuckJump(ply, move)
 		end
 	end
 
-	if not trace_hull.HitWorld and ply.unduck_jump and not ply:IsFlagSet( FL_DUCKING ) then
+	if not trace_hull.HitWorld and ply.unduck_jump and not ply:IsFlagSet(FL_DUCKING) then
 		ply:AddFlags(FL_DUCKING)
 
 		if ply:OnGround() then
