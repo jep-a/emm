@@ -32,6 +32,7 @@ hook.Add("InitPlayerProperties", "InitCorePlayerProperties", function (ply)
 
 	ply.death_cooldown = 2
 	ply.last_death_time = 0
+	ply.old_velocity = Vector()
 end)
 
 hook.Add("PlayerDisconnected", "FinishPlayerProperties", function (ply)
@@ -71,4 +72,8 @@ hook.Add("OnEntityCreated", "AssignLobby", function (ent)
 	if IsValid(owner) and owner.lobby then
 		ent.lobby = owner.lobby
 	end
+end)
+
+hook.Add("Move", "EMM.OldVelocity", function (ply, move)
+	ply.old_velocity = move:GetVelocity()
 end)
