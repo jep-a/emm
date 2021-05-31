@@ -39,7 +39,7 @@ function SlideService.MovingTowardsPlane(vel, plane)
 	return (0 > Vector(vel.x, vel.y):Dot(Vector(plane.x, plane.y)))
 end
 
-function SlideService.GetGroundTrace(pos, end_pos, ply)
+function SlideService.GetGroundTrace(ply, pos, end_pos)
 	return util.TraceHull {
 		start = pos,
 		endpos = end_pos,
@@ -103,13 +103,13 @@ function SlideService.Trace(ply, vel, pos)
 	local slide_pos = pos - (ramp_normal * 0.025) - hover_height
 	
 	if slide then
-		trace = SlideService.GetGroundTrace(pos , slide_pos - hover_height, ply)
+		trace = SlideService.GetGroundTrace(ply, pos , slide_pos - hover_height)
 
 		if slide.is_init then
 			trace.HitPos.z = slide.HitPos.z
 			slide.is_init = false
 		else
-			if trace.HitNormal:LengthSqr() < slide.HitNormal:LengthSqr() then
+			if ((slide.HitNormal:LengthSqr() < trace.HitNormal:LengthSqr()) or (trace.HitNormal.x ~= slide.HitNormal.x and trace.HitNormal.y ~= slide.HitNormal.y)) and vel.z > 0 then
 				return false
 			end
 		end
@@ -122,7 +122,7 @@ function SlideService.Trace(ply, vel, pos)
 			end
 		end
 
-		trace = SlideService.GetGroundTrace(pos, slide_pos, ply)
+		trace = SlideService.GetGroundTrace(ply, pos, slide_pos)
 		trace.is_init = true
 	end
 
@@ -186,7 +186,7 @@ function SlideService.SetupSlide(ply, move, cmd)
 			ply.slide_onground = false
 		end
 
-		for i = 1, SLIDE_MAX_TRACES do
+		for curr_trace = 1, SLIDE_MAX_TRACES do
 			local vel = move:GetVelocity()
 			local pos = move:GetOrigin()
 			local trace = SlideService.Trace(ply, vel, pos)
@@ -198,8 +198,8 @@ function SlideService.SetupSlide(ply, move, cmd)
 				if trace_count > 1 then
 					local is_same_plane = false
 
-					for j = 1, trace_count do
-						if i > j and (normals[j] == normal and normal.z > 0 and 1 > normal.z) then
+					for prev_trace = 1, trace_count do
+						if curr_trace > prev_trace and (normals[prev_trace] == normal and normal.z > 0 and normal.z > 1) then
 							is_same_plane = true
 							break
 						end
