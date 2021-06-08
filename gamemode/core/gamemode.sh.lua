@@ -32,6 +32,7 @@ EMM.Include {
 	"movement/airaccel-patch",
 	"movement/slope",
 	"movement/slide",
+	"movement/ledge-bounce",
 	"movement/friction",
 	"movement/gravity",
 
