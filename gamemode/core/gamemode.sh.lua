@@ -30,7 +30,9 @@ EMM.Include {
 	"movement/airaccel",
 	"movement/autojump",
 	"movement/airaccel-patch",
+	"movement/slope",
 	"movement/slide",
+	"movement/ledge-bounce",
 	"movement/friction",
 	"movement/gravity",
 

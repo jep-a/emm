@@ -45,4 +45,4 @@ function GravityService.SetupGravity(ply, move)
 		move:SetVelocity(GravityService.Velocity(ply, move))
 	end
 end
-hook.Add("SetupMove", "GravityService.SetupGravity", GravityService.SetupGravity)
+hook.Add("PlayerTick", "GravityService.SetupGravity", GravityService.SetupGravity)
