@@ -4,7 +4,7 @@ LedgeBounce = LedgeBounce or {}
 -- # Properties
 
 function LedgeBounce.InitPlayerProperties(ply)
-	ply.bounce_height = 12
+	ply.bounce_height = 21
 	ply.bounce_angle = 45
 	ply.bounce_min_vel = 500^2
 end
@@ -30,18 +30,19 @@ function LedgeBounce.DoBounce(ply, vel, pos, wish_dir)
 			maxs = Vector(ply_maxs.x, ply_maxs.y, ply.bounce_height),
 			mask = MASK_PLAYERSOLID_BRUSHONLY
 		}
-		
-		if bottom_trace.HitWorld and bottom_trace.HitNormal.z == 0 then
-			local can_bounce = bottom_trace.HitNormal:Dot(wish_dir:GetNormalized())
+		local can_bounce = bottom_trace.HitNormal:Dot(wish_dir:GetNormalized())
+
+		if bottom_trace.HitWorld and 0.5 > can_bounce and can_bounce ~= 0 then
+			local trace_pos = bottom_trace.HitPos + bottom_trace.HitNormal + pred_vel
 			local top_trace = util.TraceHull {
-				start = pos + bounce_height,
-				endpos = pos + bounce_height + pred_vel,
+				start = trace_pos + bounce_height,
+				endpos = trace_pos,
 				mins = ply_mins,
 				maxs = ply_maxs - bounce_height,
 				mask = MASK_PLAYERSOLID_BRUSHONLY
 			}
 
-			if 1 > bottom_trace.Fraction and bottom_trace.Fraction > 0 and not top_trace.HitWorld and 0.5 > can_bounce and can_bounce ~= 0 then
+			if 1 > bottom_trace.Fraction and bottom_trace.Fraction > 0 and top_trace.HitWorld and not top_trace.StartSolid and top_trace.HitNormal ~= bottom_trace.HitNormal then
 				return bottom_trace.HitNormal
 			end
 		end
@@ -53,10 +54,10 @@ end
 function LedgeBounce.SetupBounce(ply, move)
 	local vel = move:GetVelocity()
 	local ledge_normal = LedgeBounce.DoBounce(ply, vel, move:GetOrigin(), AiraccelService.WishDir(ply, move:GetMoveAngles():Forward(), move:GetForwardSpeed(), move:GetSideSpeed())) 
-	local normal
 
 	if ledge_normal then
-		normal = ledge_normal:Angle()
+		local normal = ledge_normal:Angle()
+
 		normal.x = 360 - ply.bounce_angle
 		normal = normal:Forward()
 		ply:SetGroundEntity(NULL)
