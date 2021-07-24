@@ -85,6 +85,11 @@ function MinigamePrototype:Init()
 				},
 
 				{
+					key = "can_take_collision_damage",
+					label = "Can take collision damage"
+				},
+
+				{
 					key = "has_infinite_wallslide",
 					label = "Has infinite wallslide stamina"
 				},
