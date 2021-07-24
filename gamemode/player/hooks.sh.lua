@@ -29,7 +29,7 @@ hook.Add("InitPlayerProperties", "InitCorePlayerProperties", function (ply)
 
 	ply.can_take_fall_damage = true
 	ply.fall_damage_multiplier = 0.0563
-	ply.collision_damage_multiplier = 0.0563
+	ply.wall_collision_damage_multiplier = 0.0163
 
 	ply.death_cooldown = 2
 	ply.last_death_time = 0
@@ -97,17 +97,17 @@ hook.Add("SetupMove", "EMM.WallDamage", function (ply, move)
 
 	if 
 		0 > Vector(ply.old_velocity.x, ply.old_velocity.y):Dot(trace.HitNormal) and
-		-0.8 > Vector(ply.old_velocity.x, ply.old_velocity.y):GetNormalized():Dot(trace.HitNormal) and
+		(-0.8) > Vector(ply.old_velocity.x, ply.old_velocity.y):GetNormalized():Dot(trace.HitNormal) and
 		lost_velocity > min_velocity and 
 		IsFirstTimePredicted() and 
 		not ply:OnGround() and 
 		ply:Alive() and
 		ply.can_take_collision_damage
 	then
-		local collision_sound = "physics/body/body_medium_break" .. math.random(2, 4) .. ".wav"
+		local collision_sound = "player/pl_fallpain1.wav"
 
 		if SERVER then
-			local wall_damage = math.min((lost_velocity - min_velocity) * ply.collision_damage_multiplier, ply:Health())
+			local wall_damage = math.min((lost_velocity - min_velocity) * ply.wall_collision_damage_multiplier, ply:Health())
 			local view_punch = wall_damage/20
 			local dmg = DamageInfo()
 
