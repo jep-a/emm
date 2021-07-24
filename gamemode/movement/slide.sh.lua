@@ -24,14 +24,6 @@ SLIDE_MAX_TRACES = 4
 
 -- # Util
 
-function SlideService.GetNormalDir(vector)
-	local x = vector.x
-	local y = vector.y
-	local z = vector.z
-
-	return Vector(math.Clamp(math.ceil(x) + math.floor(x), -1, 1), math.Clamp(math.ceil(y) + math.floor(y), -1, 1), math.Clamp(math.ceil(z) + math.floor(z), -1, 1))
-end
-
 function SlideService.Clip(vel, plane)
 	return vel - (plane * vel:Dot(plane))
 end
@@ -92,9 +84,9 @@ function SlideService.Trace(ply, vel, pos)
 		maxs = ply:OBBMaxs() + obb_offset + Vector(0, 0, 2),
 		mask = MASK_PLAYERSOLID_BRUSHONLY
 	}
-	local ramp_normal = (area_trace and ((slide and slide.HitNormal) or area_trace.HitNormal)) or Vector()
+	local ramp_normal = (area_trace.HitWorld and ((slide and slide.HitNormal) or area_trace.HitNormal)) or Vector()
 	local slide_pos = pos - (ramp_normal * 0.025) - hover_height
-	local trace, normal_length
+	local trace, normal_length, wall_trace
 	
 	if slide then
 		trace = SlideService.GetGroundTrace(ply, pos, slide_pos - hover_height)
@@ -118,6 +110,18 @@ function SlideService.Trace(ply, vel, pos)
 
 		trace = SlideService.GetGroundTrace(ply, pos, slide_pos)
 		trace.is_init = true
+		wall_trace = util.TraceHull {
+			start = area_trace.HitPos,
+			endpos = area_trace.HitPos - ramp_normal,
+			mins = ply:OBBMins(),
+			maxs = ply:OBBMaxs(),
+			mask = MASK_PLAYERSOLID_BRUSHONLY
+		}
+		wall_trace.HitNormal.z = 0
+
+		if wall_trace.HitNormal:LengthSqr()  == 1 then
+			trace.HitNormal = ramp_normal
+		end
 	end
 	
 	if trace then
