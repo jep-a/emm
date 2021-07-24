@@ -64,10 +64,18 @@ function WalljumpService.PressedWalljumpButtons(buttons, old_buttons)
 	return walljump_buttons_down > bit.band(walljump_buttons_down, old_buttons)
 end
 
+function WalljumpService.GetSurfaceDirection(vector)
+	local x = vector.x
+	local y = vector.y
+	local z = vector.z
+
+	return Vector(math.Clamp(math.ceil(x) + math.floor(x), -1, 1), math.Clamp(math.ceil(y) + math.floor(y), -1, 1), math.Clamp(math.ceil(z) + math.floor(z), -1, 1))
+end
+
 function WalljumpService.GetAngle(dir, wall_normal)
 	local angle = dir:Angle()
 	
-	wall_normal = SlideService.GetNormalDir(wall_normal)
+	wall_normal = WalljumpService.GetSurfaceDirection(wall_normal)
 	wall_normal.z = 0
 	angle:Normalize()
 	angle:RotateAroundAxis(wall_normal, 90)
