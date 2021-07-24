@@ -42,7 +42,8 @@ function JumpService.UnDuckJump(ply, move)
 		not move:KeyDown(IN_DUCK) and 
 		ply:Crouching() and 
 		0 >= ply.old_velocity.z and 
-		((ply:KeyPressed(IN_JUMP) or ply:KeyReleased(IN_JUMP)) or (ply.can_autojump and ply:KeyDown(IN_JUMP)) or ply.force_autojump)
+		((ply:KeyPressed(IN_JUMP) or ply:KeyReleased(IN_JUMP)) or (ply.can_autojump and ply:KeyDown(IN_JUMP)) or 
+		ply.force_autojump)
 	then
 		trace_hull = util.TraceHull {
 			start = pos,
