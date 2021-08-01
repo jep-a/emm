@@ -11,6 +11,7 @@ function WalljumpService.InitPlayerProperties(ply)
 	ply.walljump_velocity_multiplier = 260
 	ply.walljump_up_velocity = 200
 	ply.walljump_sound = "npc/footsteps/hardboot_generic"
+	ply.walljump_angle = 58
 	ply.last_walljump_time = 0
 end
 hook.Add(
@@ -63,16 +64,22 @@ function WalljumpService.PressedWalljumpButtons(buttons, old_buttons)
 	return walljump_buttons_down > bit.band(walljump_buttons_down, old_buttons)
 end
 
+function WalljumpService.GetSurfaceDirection(vector)
+	local x = vector.x
+	local y = vector.y
+	local z = vector.z
+
+	return Vector(math.Clamp(math.ceil(x) + math.floor(x), -1, 1), math.Clamp(math.ceil(y) + math.floor(y), -1, 1), math.Clamp(math.ceil(z) + math.floor(z), -1, 1))
+end
+
 function WalljumpService.GetAngle(dir, wall_normal)
 	local angle = dir:Angle()
-	local wall_ang = wall_normal:Angle()
-
-	wall_ang:Normalize()
+	
+	wall_normal = WalljumpService.GetSurfaceDirection(wall_normal)
+	wall_normal.z = 0
 	angle:Normalize()
-
 	angle:RotateAroundAxis(wall_normal, 90)
-	wall_ang = wall_ang.y
-
+	
 	return math.abs(angle.p)
 end
 
@@ -87,8 +94,8 @@ function WalljumpService.Trace(ply, dir)
 	perimeter_pos.x = math.Clamp(perimeter_pos.x, ply_pos.x + mins.x, ply_pos.x + maxs.x)
 	perimeter_pos.y = math.Clamp(perimeter_pos.y, ply_pos.y + mins.y, ply_pos.y + maxs.y)
 
-	if ply.sliding then
-		ply_pos.z = ply_pos.z - (ply.slide_hover_height + 2)
+	if ply.sliding or ply.surfing then
+		perimeter_pos.z = perimeter_pos.z - (ply.slide_hover_height + 1)
 	end
 	
 	local trace = util.TraceHull {
@@ -117,7 +124,7 @@ function WalljumpService.Walljump(ply, move, dir)
 	if
 		trace.Hit and
 		(ply.can_walljump_sky or not trace.HitSky) and
-		(58 > WalljumpService.GetAngle(dir, trace.HitNormal))
+		(ply.walljump_angle > WalljumpService.GetAngle(dir, trace.HitNormal))
 	then
 		did_walljump = true
 

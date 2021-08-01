@@ -65,4 +65,4 @@ function FrictionService.SetupFriction(ply, move)
 		move:SetVelocity(FrictionService.Velocity(ply.friction, move))
 	end
 end
-hook.Add("SetupMove", "FrictionService.SetupFriction", FrictionService.SetupFriction)
+hook.Add("PlayerTick", "FrictionService.SetupFriction", FrictionService.SetupFriction)
