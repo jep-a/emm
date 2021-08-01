@@ -4,13 +4,18 @@ GM.Author = "arkade"
 EMM.Include {
 	"settings/settings",
 
+	"util/class",
+	
+	"command/command",
+	"command/class",
+	"command/hooks",
+
 	"util/variables",
 	"util/util",
 	"util/palette",
-	"util/class",
+	"util/net",
 	"util/cubic-bezier",
 	"util/anim-value",
-	"util/net",
 	"util/pred-sound",
 	"util/stamina",
 	"util/time-associated-map",
