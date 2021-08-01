@@ -178,3 +178,11 @@ NetService.Receive("PostPlayerDeath", function (ply)
 		MinigameService.CallHook(ply.lobby, "PostPlayerDeath", ply)
 	end
 end)
+
+
+-- # Footsteps
+
+hook.Add("PlayerFootstep", "PlayFootsteps", function( ply, pos, foot, sound, volume)
+	ply:EmitSound( sound, 75, 100, volume, CHAN_BODY)
+	return true
+end )
